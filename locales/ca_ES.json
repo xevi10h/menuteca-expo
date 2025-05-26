@@ -1,0 +1,33 @@
+{
+	"discover": {
+		"searchMenus": "Cerca menús"
+	},
+	"filters": {
+		"price": "Preu",
+		"rating": "Valoració",
+		"sortBy": "Ordenar per"
+	},
+	"horizontalScroll": {
+		"bestRating": "Amb millor valoració",
+		"mostPopular": "Més populars",
+		"newest": "Més nous",
+		"closest": "Per la teva zona",
+		"recommended": "Recomanats per tu",
+		"alreadyTried": "Els que ja has provat"
+	},
+	"cuisinesRestaurants": {
+		"mediterranean": "Mediterrani",
+		"japanese": "Japonès",
+		"italian": "Italià",
+		"mexican": "Mexicà",
+		"american": "Americà",
+		"chinese": "Xinès",
+		"indian": "Indi",
+		"thai": "Tailandès",
+		"korean": "Coreà",
+		"hauteCuisine": "Alta cuina"
+	},
+	"general": {
+		"from": "Des de"
+	}
+}

@@ -1,0 +1,33 @@
+{
+	"discover": {
+		"searchMenus": "Search menus"
+	},
+	"filters": {
+		"price": "Price",
+		"rating": "Rating",
+		"sortBy": "Sort by"
+	},
+	"horizontalScroll": {
+		"bestRating": "Best rated",
+		"mostPopular": "The most popular",
+		"newest": "The newest",
+		"closest": "In your zone",
+		"recommended": "Recommended for you",
+		"alreadyTried": "The ones you have already tried"
+	},
+	"cuisinesRestaurants": {
+		"mediterranean": "Mediterranean",
+		"japanese": "Japanese",
+		"italian": "Italian",
+		"mexican": "Mexican",
+		"american": "American",
+		"chinese": "Chinese",
+		"indian": "Indian",
+		"thai": "Thai",
+		"korean": "Korean",
+		"hauteCuisine": "Haute cuisine"
+	},
+	"general": {
+		"from": "From"
+	}
+}
