@@ -29,5 +29,15 @@
 	},
 	"general": {
 		"from": "Des de"
+	},
+	"restaurant": {
+		"information": "Informació",
+		"menu": "Menú",
+		"vegetarian": "Vegetarià",
+		"glutenFree": "Sense gluten",
+		"vegan": "Vegà",
+		"photos": "Fotos",
+		"reviews": "Què opinen els usuaris",
+		"mapPlaceholder": "Mapa del restaurant"
 	}
 }

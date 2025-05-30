@@ -29,5 +29,15 @@
 	},
 	"general": {
 		"from": "À partir de"
+	},
+	"restaurant": {
+		"information": "Information",
+		"menu": "Menu",
+		"vegetarian": "Végétarien",
+		"glutenFree": "Sans gluten",
+		"vegan": "Végétalien",
+		"photos": "Photos",
+		"reviews": "Avis des utilisateurs",
+		"mapPlaceholder": "Carte du restaurant"
 	}
 }

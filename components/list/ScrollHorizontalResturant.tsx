@@ -1,7 +1,17 @@
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
+import { router } from 'expo-router';
+import {
+	Dimensions,
+	Image,
+	ScrollView,
+	StyleSheet,
+	Text,
+	TouchableOpacity,
+	View,
+} from 'react-native';
 
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+const { width } = Dimensions.get('window');
 
 export type ScrollHorizontalResturantProps = {
 	title: string;
@@ -54,7 +64,13 @@ export default function ScrollHorizontalResturant({
 			distance: 1.5,
 		},
 	];
+
 	const { t } = useTranslation();
+
+	const handleRestaurantPress = (restaurantId: number) => {
+		router.push(`/restaurant/${restaurantId}`);
+	};
+
 	return (
 		<View style={styles.container}>
 			<View style={{ marginLeft: 24 }}>
@@ -72,13 +88,15 @@ export default function ScrollHorizontalResturant({
 				}}
 			>
 				{restaurants.map((restaurant) => (
-					<View
+					<TouchableOpacity
 						key={restaurant.id}
 						style={{
 							marginRight: 12,
-							width: 345,
+							width: width * 0.8,
 							marginLeft: 24,
 						}}
+						onPress={() => handleRestaurantPress(restaurant.id)}
+						activeOpacity={0.7}
 					>
 						<Image
 							source={{ uri: restaurant.image }}
@@ -172,7 +190,7 @@ export default function ScrollHorizontalResturant({
 								{`${restaurant.distance} km`}
 							</Text>
 						</View>
-					</View>
+					</TouchableOpacity>
 				))}
 			</ScrollView>
 		</View>
