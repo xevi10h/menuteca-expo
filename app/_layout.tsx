@@ -1,3 +1,4 @@
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import {
 	DarkTheme,
 	DefaultTheme,
@@ -29,18 +30,20 @@ export default function RootLayout() {
 	}
 
 	return (
-		<ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-			<Stack screenOptions={{ headerShown: false }}>
-				<Stack.Screen name="index" />
-				<Stack.Screen
-					name="restaurant/[id]"
-					options={{
-						presentation: 'card',
-						gestureEnabled: true,
-						animation: 'slide_from_right',
-					}}
-				/>
-			</Stack>
-		</ThemeProvider>
+		<ActionSheetProvider>
+			<ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+				<Stack screenOptions={{ headerShown: false }}>
+					<Stack.Screen name="index" />
+					<Stack.Screen
+						name="restaurant/[id]"
+						options={{
+							presentation: 'card',
+							gestureEnabled: true,
+							animation: 'slide_from_right',
+						}}
+					/>
+				</Stack>
+			</ThemeProvider>
+		</ActionSheetProvider>
 	);
 }

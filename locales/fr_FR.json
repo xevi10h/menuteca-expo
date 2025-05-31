@@ -38,6 +38,7 @@
 		"vegan": "Végétalien",
 		"photos": "Photos",
 		"reviews": "Avis des utilisateurs",
-		"mapPlaceholder": "Carte du restaurant"
+		"mapPlaceholder": "Carte du restaurant",
+		"cancelOpenMap": "Annuler"
 	}
 }

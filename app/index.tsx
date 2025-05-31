@@ -1,3 +1,4 @@
+import { allRestaurants } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import CenterLocationMapButton from '@/components/CenterLocationMapButton';
 import CuisineHorizontalScroll from '@/components/CuisineHorizontalScroll';
@@ -12,7 +13,7 @@ import ScrollHorizontalResturant, {
 	Restaurant,
 } from '@/components/list/ScrollHorizontalResturant';
 import { useRef, useState } from 'react';
-import { Image, Platform, ScrollView, View } from 'react-native';
+import { Image, Platform, ScrollView, Text, View } from 'react-native';
 import MapViewType from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -22,40 +23,6 @@ export default function Index() {
 		useState<Restaurant | null>(null);
 	const [modalVisible, setModalVisible] = useState(false);
 	const mapViewRef = useRef<MapViewType>(null);
-
-	// Mock restaurants data - en producción esto vendría de una API
-	const restaurants: Restaurant[] = [
-		{
-			id: 1,
-			name: 'Sant Francesc Restaurant',
-			minimumPrice: 15,
-			cuisine: 'mediterranean',
-			rating: 4.5,
-			image:
-				'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
-			distance: 2.5,
-		},
-		{
-			id: 2,
-			name: 'Tika Tacos',
-			minimumPrice: 12,
-			cuisine: 'mexican',
-			rating: 4.0,
-			image:
-				'https://images.pexels.com/photos/2092507/pexels-photo-2092507.jpeg',
-			distance: 3.0,
-		},
-		{
-			id: 3,
-			name: 'El gran sol',
-			minimumPrice: 10,
-			cuisine: 'chinese',
-			rating: 4.8,
-			image:
-				'https://images.pexels.com/photos/1907228/pexels-photo-1907228.jpeg',
-			distance: 1.5,
-		},
-	];
 
 	const handleMarkerPress = (restaurant: Restaurant) => {
 		setSelectedRestaurant(restaurant);
@@ -163,15 +130,49 @@ export default function Index() {
 						longitudeDelta: 0.0421,
 					}}
 				>
-					{restaurants.map((restaurant, index) => (
+					{allRestaurants.map((restaurant) => (
 						<Marker
 							key={restaurant.id}
 							coordinate={{
-								latitude: 41.3851 + index * 0.01, // Mock coordinates
-								longitude: 2.1734 + index * 0.01,
+								latitude: restaurant.coordinates.latitude,
+								longitude: restaurant.coordinates.longitude,
 							}}
 							onPress={() => handleMarkerPress(restaurant)}
-						/>
+						>
+							{restaurant.profileImage ? (
+								<Image
+									src={restaurant.profileImage}
+									style={{ width: 40, height: 40, borderRadius: 20 }}
+									resizeMode="cover"
+								/>
+							) : (
+								<View
+									style={{
+										width: 40,
+										height: 40,
+										borderRadius: 20,
+										backgroundColor: colors.primary,
+										justifyContent: 'center',
+										alignItems: 'center',
+									}}
+								>
+									<Text
+										style={{
+											color: colors.quaternary,
+											fontSize: 18,
+											fontFamily: 'Manrope',
+											fontWeight: '700',
+										}}
+									>
+										{restaurant.name
+											.split(' ')
+											.map((word) => word[0])
+											.join('')
+											.slice(0, 2)}
+									</Text>
+								</View>
+							)}
+						</Marker>
 					))}
 				</MapView>
 			</View>

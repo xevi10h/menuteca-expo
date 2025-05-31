@@ -1,3 +1,4 @@
+import { allRestaurants } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { router } from 'expo-router';
@@ -24,47 +25,21 @@ export type Restaurant = {
 	minimumPrice: number;
 	cuisine: string;
 	rating: number;
-	image: string;
+	mainImage: string;
+	profileImage?: string;
+	images: string[];
 	distance: number;
+	address: string;
+	coordinates: {
+		latitude: number;
+		longitude: number;
+	};
 };
 
 export default function ScrollHorizontalResturant({
 	title,
 	sortBy,
 }: ScrollHorizontalResturantProps) {
-	const restaurants: Restaurant[] = [
-		{
-			id: 1,
-			name: 'Sant Francesc Restaurant',
-			minimumPrice: 15,
-			cuisine: 'mediterranean',
-			rating: 4.5,
-			image:
-				'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
-			distance: 2.5,
-		},
-		{
-			id: 2,
-			name: 'Tika Tacos',
-			minimumPrice: 12,
-			cuisine: 'mexican',
-			rating: 4.0,
-			image:
-				'https://images.pexels.com/photos/2092507/pexels-photo-2092507.jpeg',
-			distance: 3.0,
-		},
-		{
-			id: 3,
-			name: 'El gran sol',
-			minimumPrice: 10,
-			cuisine: 'chinese',
-			rating: 4.8,
-			image:
-				'https://images.pexels.com/photos/1907228/pexels-photo-1907228.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500',
-			distance: 1.5,
-		},
-	];
-
 	const { t } = useTranslation();
 
 	const handleRestaurantPress = (restaurantId: number) => {
@@ -87,7 +62,7 @@ export default function ScrollHorizontalResturant({
 					marginTop: 10,
 				}}
 			>
-				{restaurants.map((restaurant) => (
+				{allRestaurants.map((restaurant) => (
 					<TouchableOpacity
 						key={restaurant.id}
 						style={{
@@ -99,7 +74,7 @@ export default function ScrollHorizontalResturant({
 						activeOpacity={0.7}
 					>
 						<Image
-							source={{ uri: restaurant.image }}
+							source={{ uri: restaurant.mainImage }}
 							style={{
 								borderTopRightRadius: 24,
 								borderTopLeftRadius: 24,

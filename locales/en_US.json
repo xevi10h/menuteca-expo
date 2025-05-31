@@ -38,6 +38,7 @@
 		"vegan": "Vegan",
 		"photos": "Photos",
 		"reviews": "What users think",
-		"mapPlaceholder": "Restaurant map"
+		"mapPlaceholder": "Restaurant map",
+		"cancelOpenMap": "Cancel"
 	}
 }
