@@ -2,9 +2,9 @@ import { allRestaurants } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import CenterLocationMapButton from '@/components/CenterLocationMapButton';
 import CuisineHorizontalScroll from '@/components/CuisineHorizontalScroll';
+import ExpandableMapRestaurantModal from '@/components/ExpandableMapRestaurantModal';
 import ListFilter from '@/components/ListFilter';
 import MainSearcher from '@/components/MainSearcher';
-import MapRestaurantModal from '@/components/MapRestaurantModal';
 import ProfilePhotoButton from '@/components/ProfileButton';
 import ViewButton from '@/components/ViewButton';
 import MapView from '@/components/crossPlatformMap/MapView';
@@ -12,19 +12,23 @@ import Marker from '@/components/crossPlatformMap/Marker';
 import ScrollHorizontalResturant, {
 	Restaurant,
 } from '@/components/list/ScrollHorizontalResturant';
+import * as Location from 'expo-location';
 import { useRef, useState } from 'react';
 import { Image, Platform, ScrollView, Text, View } from 'react-native';
-import MapViewType from 'react-native-maps';
+import MapViewType, { Camera } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function Index() {
+	const [statusForegroundPermissions, requestStatusForegroundPermissions] =
+		Location.useForegroundPermissions();
 	const [view, setView] = useState<'list' | 'map'>('list');
 	const [selectedRestaurant, setSelectedRestaurant] =
 		useState<Restaurant | null>(null);
 	const [modalVisible, setModalVisible] = useState(false);
 	const mapViewRef = useRef<MapViewType>(null);
 
-	const handleMarkerPress = (restaurant: Restaurant) => {
+	const handleMarkerPress = async (restaurant: Restaurant) => {
+		await centerCoordinatesMarker(restaurant);
 		setSelectedRestaurant(restaurant);
 		setModalVisible(true);
 	};
@@ -32,6 +36,59 @@ export default function Index() {
 	const handleModalClose = () => {
 		setModalVisible(false);
 		setSelectedRestaurant(null);
+	};
+
+	const centerCoordinatesButtonAction = async () => {
+		try {
+			// Verificar el estado del permiso
+			if (!statusForegroundPermissions?.granted) {
+				// Solicitar permisos si aún no se han concedido
+				const newPermissions = await requestStatusForegroundPermissions();
+				if (!newPermissions.granted) {
+					// Manejar la situación si los permisos no son concedidos
+					return; // Salir de la función si no hay permisos
+				}
+			}
+
+			const { coords } = await Location.getCurrentPositionAsync();
+			const { longitude, latitude } = coords;
+			if (longitude && latitude && mapViewRef.current) {
+				const newCamera: Camera = {
+					center: {
+						latitude,
+						longitude,
+					},
+					zoom: 16,
+					heading: 0,
+					pitch: 0,
+					altitude: 1000,
+				};
+				mapViewRef.current?.animateCamera(newCamera, { duration: 1000 });
+			}
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const centerCoordinatesMarker = async (restaurant: Restaurant) => {
+		try {
+			const { longitude, latitude } = restaurant.coordinates;
+			if (longitude && latitude && mapViewRef.current) {
+				const newCamera: Camera = {
+					center: {
+						latitude,
+						longitude,
+					},
+					zoom: 16,
+					heading: 0,
+					pitch: 0,
+					altitude: 1000,
+				};
+				mapViewRef.current?.animateCamera(newCamera, { duration: 1000 });
+			}
+		} catch (error) {
+			console.error(error);
+		}
 	};
 
 	return (
@@ -137,7 +194,7 @@ export default function Index() {
 								latitude: restaurant.coordinates.latitude,
 								longitude: restaurant.coordinates.longitude,
 							}}
-							onPress={() => handleMarkerPress(restaurant)}
+							onPress={async () => handleMarkerPress(restaurant)}
 						>
 							{restaurant.profileImage ? (
 								<Image
@@ -179,7 +236,7 @@ export default function Index() {
 
 			{view === 'map' && (
 				<CenterLocationMapButton
-					onPress={() => setView('map')}
+					onPress={async () => await centerCoordinatesButtonAction()}
 					additionalBottom={140}
 				/>
 			)}
@@ -196,7 +253,7 @@ export default function Index() {
 			/>
 
 			{/* Modal para detalles del restaurante desde el mapa */}
-			<MapRestaurantModal
+			<ExpandableMapRestaurantModal
 				restaurant={selectedRestaurant}
 				isVisible={modalVisible}
 				onClose={handleModalClose}

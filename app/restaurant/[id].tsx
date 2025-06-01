@@ -122,7 +122,12 @@ export default function RestaurantDetail() {
 						)}
 					</View>
 					<View style={styles.restaurantDetails}>
-						<Text style={styles.restaurantName}>{restaurant.name}</Text>
+						<View style={{ flex: 1, width: '50%' }}>
+							<Text style={styles.restaurantName}>{restaurant.name}</Text>
+							<Text style={styles.cuisineText}>
+								{t(`cuisinesRestaurants.${restaurant.cuisine}`)}
+							</Text>
+						</View>
 						<View
 							style={{ flexDirection: 'row', gap: 5, alignItems: 'baseline' }}
 						>
@@ -213,7 +218,6 @@ const styles = StyleSheet.create({
 		left: 20,
 		width: 40,
 		height: 40,
-		borderRadius: 20,
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
@@ -222,7 +226,6 @@ const styles = StyleSheet.create({
 		right: 20,
 		width: 40,
 		height: 40,
-		borderRadius: 20,
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
@@ -269,10 +272,16 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	restaurantName: {
-		fontSize: 18,
-		width: '50%',
+		fontSize: 20,
 		fontFamily: 'Manrope',
 		fontWeight: '700',
+		color: colors.quaternary,
+		marginBottom: 5,
+	},
+	cuisineText: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
 		color: colors.quaternary,
 		marginBottom: 5,
 	},

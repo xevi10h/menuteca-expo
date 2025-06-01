@@ -8,6 +8,7 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 
@@ -30,20 +31,24 @@ export default function RootLayout() {
 	}
 
 	return (
-		<ActionSheetProvider>
-			<ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-				<Stack screenOptions={{ headerShown: false }}>
-					<Stack.Screen name="index" />
-					<Stack.Screen
-						name="restaurant/[id]"
-						options={{
-							presentation: 'card',
-							gestureEnabled: true,
-							animation: 'slide_from_right',
-						}}
-					/>
-				</Stack>
-			</ThemeProvider>
-		</ActionSheetProvider>
+		<GestureHandlerRootView style={{ flex: 1 }}>
+			<ActionSheetProvider>
+				<ThemeProvider
+					value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+				>
+					<Stack screenOptions={{ headerShown: false }}>
+						<Stack.Screen name="index" />
+						<Stack.Screen
+							name="restaurant/[id]"
+							options={{
+								presentation: 'card',
+								gestureEnabled: true,
+								animation: 'slide_from_right',
+							}}
+						/>
+					</Stack>
+				</ThemeProvider>
+			</ActionSheetProvider>
+		</GestureHandlerRootView>
 	);
 }
