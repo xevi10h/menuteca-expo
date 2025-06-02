@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
 	content: {
 		flex: 1,
 		position: 'absolute',
-		top: height * 0.35,
+		top: height * 0.3,
 		alignItems: 'center',
 		paddingHorizontal: 40,
 		justifyContent: 'center',
@@ -115,6 +115,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		position: 'absolute',
 		width: '100%',
+		marginTop: -height * 0.05,
 	},
 	backgroundIcon: {
 		width: width * 0.7,
