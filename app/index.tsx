@@ -253,11 +253,13 @@ export default function Index() {
 			/>
 
 			{/* Modal para detalles del restaurante desde el mapa */}
-			<ExpandableMapRestaurantModal
-				restaurant={selectedRestaurant}
-				isVisible={modalVisible}
-				onClose={handleModalClose}
-			/>
+			{selectedRestaurant && (
+				<ExpandableMapRestaurantModal
+					restaurant={selectedRestaurant}
+					isVisible={modalVisible}
+					onClose={handleModalClose}
+				/>
+			)}
 		</View>
 	);
 }

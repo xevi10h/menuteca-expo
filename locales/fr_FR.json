@@ -28,7 +28,13 @@
 		"hauteCuisine": "Haute cuisine"
 	},
 	"general": {
-		"from": "À partir de"
+		"from": "À partir de",
+		"cancel": "Annuler",
+		"save": "Enregistrer",
+		"next": "Suivant",
+		"finish": "Terminer",
+		"yes": "OUI",
+		"no": "NON"
 	},
 	"restaurant": {
 		"information": "Information",
@@ -40,5 +46,76 @@
 		"reviews": "Avis des utilisateurs",
 		"mapPlaceholder": "Carte du restaurant",
 		"cancelOpenMap": "Annuler"
+	},
+	"registerRestaurant": {
+		"hasMenu": "Avez-vous un restaurant avec ",
+		"questionMenu": "menu?",
+		"restaurantName": "Comment s'appelle-t-il?",
+		"restaurantNameSubtitle": "Nom du restaurant",
+		"restaurantNamePlaceholder": "ex: Bar Menuteca",
+		"whereIs": "Où est-il?",
+		"configureLater": "Configurer plus tard",
+		"addressSubtitle": "Adresse",
+		"addressPlaceholder": "ex: Rue Laurel, 96, Logroño",
+		"cuisineTypes": "Quel type de nourriture est servi?",
+		"cuisineTypesSubtitle": "Sélectionnez au moins 1 option et jusqu'à 3",
+		"stepIndicator": {
+			"next1": "Suivant (1/3)",
+			"next2": "Suivant (2/3)",
+			"finish": "Terminer (3/3)"
+		},
+		"selectPhoto": "Sélectionnez une photo qui représente votre restaurant. ex: Logo",
+		"myMenus": "Mes menus",
+		"addMenu": "ajouter un menu",
+		"uploadPhotos": "Télécharger des photos",
+		"uploadPhotosDescription": "Ajoutez des photos du restaurant et des plats pour que les utilisateurs puissent mieux connaître votre restaurant",
+		"foodType": "Type de nourriture",
+		"foodTypeDescription": "Sélectionnez au moins 3 options de types de nourriture servis dans votre restaurant",
+		"address": "Adresse",
+		"cuisineOptions": {
+			"mediterranean": "Méditerranéenne",
+			"japanese": "Japonaise",
+			"italian": "Italienne",
+			"american": "Américaine",
+			"hauteCuisine": "Haute cuisine",
+			"asian": "Asiatique",
+			"mexican": "Mexicaine",
+			"vegetarian": "Végétarienne",
+			"vegan": "Végétalienne",
+			"traditional": "Traditionnelle",
+			"glutenFree": "Sans gluten",
+			"homemade": "Fait maison"
+		}
+	},
+	"menuCreation": {
+		"menuName": "Nom du menu",
+		"menuNamePlaceholder": "ex: menu du midi",
+		"whatDays": "Quels jours le menu s'applique-t-il?",
+		"whatTime": "À quelle heure est-il disponible?",
+		"timeFrom": "De",
+		"timeTo": "à",
+		"price": "Prix",
+		"pricePlaceholder": "ex: 15€",
+		"menuTitle": "Allons-y avec le menu",
+		"firstCourses": "Entrées",
+		"secondCourses": "Plats principaux",
+		"dishPlaceholder": "ex: salade césar",
+		"addFirstCourse": "ajouter une autre entrée",
+		"addSecondCourse": "ajouter un plat principal",
+		"addManually": "Ajouter manuellement",
+		"uploadMenuPhoto": "Télécharger la photo du menu",
+		"addDishDescription": "Ajoutez une description du plat et/ou de l'ingrédient",
+		"dishDescriptionPlaceholder": "ex: Tomate, mozzarella, poulet...",
+		"dietaryOptions": "Sélectionnez si nécessaire, l'une des options suivantes",
+		"addDescription": "Ajouter une description",
+		"addSupplement": "Ajoutez un supplément (€) pour le plat",
+		"supplementPlaceholder": "ex: 3€",
+		"addSupplementButton": "Ajouter un supplément",
+		"dietary": {
+			"glutenFree": "sans gluten",
+			"lactoseFree": "sans lactose",
+			"vegetarian": "végétarien",
+			"spicy": "épicé"
+		}
 	}
 }

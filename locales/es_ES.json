@@ -28,7 +28,13 @@
 		"hauteCuisine": "Alta cocina"
 	},
 	"general": {
-		"from": "Desde"
+		"from": "Desde",
+		"cancel": "Cancelar",
+		"save": "Guardar",
+		"next": "Siguiente",
+		"finish": "Finalizar",
+		"yes": "SI",
+		"no": "NO"
 	},
 	"restaurant": {
 		"information": "Información",
@@ -40,5 +46,76 @@
 		"reviews": "Qué opinan los usuarios",
 		"mapPlaceholder": "Mapa del restaurante",
 		"cancelOpenMap": "Cancelar"
+	},
+	"registerRestaurant": {
+		"hasMenu": "¿Tienes un restaurante con ",
+		"questionMenu": "menú?",
+		"restaurantName": "¿Como se llama?",
+		"restaurantNameSubtitle": "Nombre del restaurante",
+		"restaurantNamePlaceholder": "ej: Bar Menuteca",
+		"whereIs": "¿Donde esta?",
+		"configureLater": "Configurar más adelante",
+		"addressSubtitle": "Dirección",
+		"addressPlaceholder": "ej: Calle Laurel, 96, Logroño",
+		"cuisineTypes": "¿Que tipo de comidas se sirve?",
+		"cuisineTypesSubtitle": "Selecciona al menos 1 opción y hasta 3",
+		"stepIndicator": {
+			"next1": "Siguiente (1/3)",
+			"next2": "Siguiente (2/3)",
+			"finish": "Finalizar (3/3)"
+		},
+		"selectPhoto": "Selecciona una foto que represente tu restaurante. ej: Logo",
+		"myMenus": "Mis menús",
+		"addMenu": "añade un menú",
+		"uploadPhotos": "Subir fotos",
+		"uploadPhotosDescription": "Añade fotos del restaurante y de platos para que los usuarios puedan conocer más tu restaurante",
+		"foodType": "Tipo de comida",
+		"foodTypeDescription": "Selecciona al menos 3 opciones de tipos de comida que se sirven en tu restaurante",
+		"address": "Dirección",
+		"cuisineOptions": {
+			"mediterranean": "Mediterránea",
+			"japanese": "Japonesa",
+			"italian": "Italiana",
+			"american": "Americana",
+			"hauteCuisine": "Alta cocina",
+			"asian": "Asiática",
+			"mexican": "Mejicana",
+			"vegetarian": "Vegetariana",
+			"vegan": "Vegana",
+			"traditional": "Tradicional",
+			"glutenFree": "Sin gluten",
+			"homemade": "Casera"
+		}
+	},
+	"menuCreation": {
+		"menuName": "Nombre del menú",
+		"menuNamePlaceholder": "ej: menú de mediodía",
+		"whatDays": "¿Qué días aplica el menú?",
+		"whatTime": "¿De qué hora a que hora esta disponible?",
+		"timeFrom": "De",
+		"timeTo": "a",
+		"price": "Precio",
+		"pricePlaceholder": "ej: 15€",
+		"menuTitle": "Vamos con el menú",
+		"firstCourses": "Primeros",
+		"secondCourses": "Segundos",
+		"dishPlaceholder": "ej: ensalada cesar",
+		"addFirstCourse": "añadir otro primero",
+		"addSecondCourse": "añadir segundo",
+		"addManually": "Añadir manualmente",
+		"uploadMenuPhoto": "Subir foto del menú",
+		"addDishDescription": "Añade una descripción del plato y/o ingrediente",
+		"dishDescriptionPlaceholder": "ej: Tomate, mozarella, pollo...",
+		"dietaryOptions": "Selecciona si es necesario, alguna de las siguientes opciones",
+		"addDescription": "Añadir descripción",
+		"addSupplement": "Añade un suplemento (€) por el plato",
+		"supplementPlaceholder": "ej: 3€",
+		"addSupplementButton": "Añadir suplemento",
+		"dietary": {
+			"glutenFree": "sense gluten",
+			"lactoseFree": "sense lactosa",
+			"vegetarian": "vegetarià",
+			"spicy": "picant"
+		}
 	}
 }

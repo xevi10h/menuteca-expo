@@ -1,8 +1,13 @@
+import { router } from 'expo-router';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 export default function ProfilePhotoButton() {
+	const handlePress = () => {
+		router.push('/profile/register-restaurant');
+	};
+
 	return (
-		<TouchableOpacity>
+		<TouchableOpacity onPress={handlePress}>
 			<View>
 				<Image
 					source={require('@/assets/images/default_user_avatar.png')}

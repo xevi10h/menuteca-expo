@@ -67,12 +67,10 @@ export default function RestaurantBasicInformation({
 							alignItems: 'baseline',
 						}}
 					>
-						<Text
-							style={[styles.collapsedPriceFromText, { color: colorToUse }]}
-						>
+						<Text style={[styles.priceFromText, { color: colorToUse }]}>
 							{t('general.from')}
 						</Text>
-						<Text style={[styles.collapsedPriceText, { color: colorToUse }]}>
+						<Text style={[styles.priceText, { color: colorToUse }]}>
 							{restaurant.minimumPrice}€
 						</Text>
 					</View>
@@ -112,7 +110,7 @@ const styles = StyleSheet.create({
 		gap: 20,
 	},
 	restaurantName: {
-		fontSize: 18,
+		fontSize: 20,
 		fontFamily: 'Manrope',
 		fontWeight: '700',
 		color: colors.primary,
@@ -136,12 +134,12 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 6,
 		paddingVertical: 2,
 	},
-	collapsedPriceFromText: {
-		fontSize: 14,
+	priceFromText: {
+		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '500',
 	},
-	collapsedPriceText: {
+	priceText: {
 		fontSize: 24,
 		fontFamily: 'Manrope',
 		fontWeight: '600',

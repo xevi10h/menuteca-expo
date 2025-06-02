@@ -1,11 +1,13 @@
 import { getMenusByRestaurantId, getRestaurantById } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
+import RestaurantBasicInformation from '@/components/RestaurantBasicInformation';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import {
+	Dimensions,
 	Image,
 	ImageBackground,
 	ScrollView,
@@ -15,9 +17,23 @@ import {
 	View,
 } from 'react-native';
 import { getApps } from 'react-native-map-link';
+import Animated, {
+	runOnJS,
+	useAnimatedStyle,
+	useSharedValue,
+	withTiming,
+} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Information from '../../components/restaurantDetail/Information';
 import Menu from '../../components/restaurantDetail/Menu';
+
+const { width: screenWidth } = Dimensions.get('window');
+
+// Interface para las medidas de los tabs
+interface TabMeasurements {
+	information: { x: number; width: number };
+	menu: { x: number; width: number };
+}
 
 export default function RestaurantDetail() {
 	const { id } = useLocalSearchParams<{ id: string }>();
@@ -30,11 +46,55 @@ export default function RestaurantDetail() {
 	const menus = getMenusByRestaurantId(id!);
 
 	// Estado para las pestañas
-	const [activeTab, setActiveTab] = React.useState<'information' | 'menu'>(
+	const [activeTab, setActiveTab] = useState<'information' | 'menu'>(
 		'information',
 	);
+	const [isTransitioning, setIsTransitioning] = useState(false);
 
-	// Función para abrir el mapa
+	// Estado para almacenar las medidas de los tabs
+	const [tabMeasurements, setTabMeasurements] = useState<TabMeasurements>({
+		information: { x: 0, width: 0 },
+		menu: { x: 0, width: 0 },
+	});
+
+	// Animated values
+	const translateX = useSharedValue(0);
+	const tabIndicatorX = useSharedValue(0);
+	const tabIndicatorWidth = useSharedValue(0);
+
+	// Referencias a los componentes para evitar re-renders
+	const informationComponent = useMemo(
+		() => (
+			<Information restaurant={restaurant} onMapPress={openMapNavigation} />
+		),
+		[restaurant],
+	);
+
+	const menuComponent = useMemo(() => <Menu menus={menus} />, [menus]);
+
+	const handleTabLayout = (tab: 'information' | 'menu', event: any) => {
+		const { width } = event.nativeEvent.layout;
+		const tabIndicator =
+			tab === 'information' ? -(width / 2 + 2) : width / 2 + 38;
+
+		setTabMeasurements((prev) => {
+			const newMeasurements = {
+				...prev,
+				[tab]: { x: tabIndicator, width: width * 0.8 },
+			};
+
+			if (
+				tab === activeTab &&
+				(tabIndicatorWidth.value === 0 || tabIndicatorX.value === 0)
+			) {
+				tabIndicatorX.value = tabIndicator;
+				tabIndicatorWidth.value = width * 0.8;
+			}
+
+			return newMeasurements;
+		});
+	};
+
 	const openMapNavigation = async () => {
 		const result = await getApps({
 			latitude: restaurant.coordinates.latitude!,
@@ -74,6 +134,44 @@ export default function RestaurantDetail() {
 		);
 	};
 
+	const handleTabChange = (tab: 'information' | 'menu') => {
+		if (tab === activeTab || isTransitioning) return;
+
+		setIsTransitioning(true);
+
+		const targetX = tab === 'information' ? 0 : -(screenWidth - 40);
+
+		const currentTabMeasurement = tabMeasurements[tab];
+		if (currentTabMeasurement.width > 0) {
+			tabIndicatorX.value = withTiming(currentTabMeasurement.x, {
+				duration: 300,
+			});
+			tabIndicatorWidth.value = withTiming(currentTabMeasurement.width, {
+				duration: 300,
+			});
+		}
+
+		translateX.value = withTiming(targetX, { duration: 300 }, () => {
+			runOnJS(setIsTransitioning)(false);
+		});
+
+		setActiveTab(tab);
+	};
+
+	// Animated styles
+	const contentAnimatedStyle = useAnimatedStyle(() => {
+		return {
+			transform: [{ translateX: translateX.value }],
+		};
+	});
+
+	const tabIndicatorStyle = useAnimatedStyle(() => {
+		return {
+			transform: [{ translateX: tabIndicatorX.value }],
+			width: tabIndicatorWidth.value,
+		};
+	});
+
 	return (
 		<View style={styles.container}>
 			{/* Header Image */}
@@ -103,38 +201,17 @@ export default function RestaurantDetail() {
 					<Ionicons name="share-outline" size={24} color={colors.quaternary} />
 				</TouchableOpacity>
 
-				<View style={styles.headerInfo}>
-					<View style={styles.restaurantIcon}>
-						{restaurant.profileImage ? (
-							<Image
-								src={restaurant.profileImage}
-								style={{ width: '100%', height: '100%', borderRadius: 30 }}
-								resizeMode="cover"
-							/>
-						) : (
-							<Text style={styles.restaurantIconText}>
-								{restaurant.name
-									.split(' ')
-									.map((word) => word[0])
-									.join('')
-									.slice(0, 2)}
-							</Text>
-						)}
-					</View>
-					<View style={styles.restaurantDetails}>
-						<View style={{ flex: 1, width: '50%' }}>
-							<Text style={styles.restaurantName}>{restaurant.name}</Text>
-							<Text style={styles.cuisineText}>
-								{t(`cuisinesRestaurants.${restaurant.cuisine}`)}
-							</Text>
-						</View>
-						<View
-							style={{ flexDirection: 'row', gap: 5, alignItems: 'baseline' }}
-						>
-							<Text style={styles.priceFromText}>{t('general.from')}</Text>
-							<Text style={styles.priceText}>{restaurant.minimumPrice}€</Text>
-						</View>
-					</View>
+				<View
+					style={{
+						position: 'absolute',
+						bottom: 50,
+						width: '100%',
+					}}
+				>
+					<RestaurantBasicInformation
+						restaurant={restaurant}
+						color={colors.quaternary}
+					/>
 				</View>
 			</View>
 
@@ -148,8 +225,9 @@ export default function RestaurantDetail() {
 					{/* Tab Container */}
 					<View style={styles.tabContainer}>
 						<TouchableOpacity
-							style={styles.tab}
-							onPress={() => setActiveTab('information')}
+							onPress={() => handleTabChange('information')}
+							disabled={isTransitioning}
+							onLayout={(event) => handleTabLayout('information', event)}
 						>
 							<Text
 								style={[
@@ -161,8 +239,9 @@ export default function RestaurantDetail() {
 							</Text>
 						</TouchableOpacity>
 						<TouchableOpacity
-							style={styles.tab}
-							onPress={() => setActiveTab('menu')}
+							onPress={() => handleTabChange('menu')}
+							disabled={isTransitioning}
+							onLayout={(event) => handleTabLayout('menu', event)}
 						>
 							<Text
 								style={[
@@ -173,18 +252,23 @@ export default function RestaurantDetail() {
 								{t('restaurant.menu')}
 							</Text>
 						</TouchableOpacity>
+
+						{/* Animated tab indicator */}
+						<Animated.View style={[styles.tabIndicator, tabIndicatorStyle]} />
 					</View>
 
-					{/* Information Tab Content */}
-					{activeTab === 'information' && (
-						<Information
-							restaurant={restaurant}
-							onMapPress={openMapNavigation}
-						/>
-					)}
+					{/* Animated Content Container */}
+					<View style={styles.animatedContentContainer}>
+						<Animated.View
+							style={[styles.slidingContent, contentAnimatedStyle]}
+						>
+							{/* Information Tab Content */}
+							<View style={styles.tabContent}>{informationComponent}</View>
 
-					{/* Menu Tab Content */}
-					{activeTab === 'menu' && <Menu menus={menus} />}
+							{/* Menu Tab Content */}
+							<View style={styles.tabContent}>{menuComponent}</View>
+						</Animated.View>
+					</View>
 
 					{/* Bottom spacing */}
 					<View style={{ height: 100 }} />
@@ -299,14 +383,10 @@ const styles = StyleSheet.create({
 	},
 	tabContainer: {
 		flexDirection: 'row',
-		marginVertical: 10,
+		marginVertical: 20,
+		paddingBottom: 10,
 		justifyContent: 'center',
-	},
-	tab: {
-		paddingHorizontal: 20,
-		paddingVertical: 10,
-		marginRight: 10,
-		borderRadius: 20,
+		gap: 40,
 	},
 	tabText: {
 		fontSize: 16,
@@ -316,5 +396,23 @@ const styles = StyleSheet.create({
 	},
 	activeTabText: {
 		color: colors.primary,
+	},
+	animatedContentContainer: {
+		overflow: 'hidden',
+	},
+	slidingContent: {
+		flexDirection: 'row',
+		width: (screenWidth - 40) * 2,
+	},
+	tabContent: {
+		width: screenWidth - 40,
+		paddingRight: 0,
+	},
+	tabIndicator: {
+		position: 'absolute',
+		bottom: 0,
+		height: 2,
+		backgroundColor: colors.primary,
+		borderRadius: 1,
 	},
 });

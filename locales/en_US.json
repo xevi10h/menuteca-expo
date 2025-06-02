@@ -28,7 +28,13 @@
 		"hauteCuisine": "Haute cuisine"
 	},
 	"general": {
-		"from": "From"
+		"from": "From",
+		"cancel": "Cancel",
+		"save": "Save",
+		"next": "Next",
+		"finish": "Finish",
+		"yes": "YES",
+		"no": "NO"
 	},
 	"restaurant": {
 		"information": "Information",
@@ -40,5 +46,76 @@
 		"reviews": "What users think",
 		"mapPlaceholder": "Restaurant map",
 		"cancelOpenMap": "Cancel"
+	},
+	"registerRestaurant": {
+		"hasMenu": "Do you have a restaurant with ",
+		"questionMenu": "menu?",
+		"restaurantName": "What's it called?",
+		"restaurantNameSubtitle": "Restaurant name",
+		"restaurantNamePlaceholder": "e.g: Bar Menuteca",
+		"whereIs": "Where is it?",
+		"configureLater": "Configure later",
+		"addressSubtitle": "Address",
+		"addressPlaceholder": "e.g: Laurel Street, 96, Logroño",
+		"cuisineTypes": "What type of food is served?",
+		"cuisineTypesSubtitle": "Select at least 1 option and up to 3",
+		"stepIndicator": {
+			"next1": "Next (1/3)",
+			"next2": "Next (2/3)",
+			"finish": "Finish (3/3)"
+		},
+		"selectPhoto": "Select a photo that represents your restaurant. e.g: Logo",
+		"myMenus": "My menus",
+		"addMenu": "add a menu",
+		"uploadPhotos": "Upload photos",
+		"uploadPhotosDescription": "Add photos of the restaurant and dishes so users can learn more about your restaurant",
+		"foodType": "Food type",
+		"foodTypeDescription": "Select at least 3 options of food types served in your restaurant",
+		"address": "Address",
+		"cuisineOptions": {
+			"mediterranean": "Mediterranean",
+			"japanese": "Japanese",
+			"italian": "Italian",
+			"american": "American",
+			"hauteCuisine": "Haute cuisine",
+			"asian": "Asian",
+			"mexican": "Mexican",
+			"vegetarian": "Vegetarian",
+			"vegan": "Vegan",
+			"traditional": "Traditional",
+			"glutenFree": "Gluten free",
+			"homemade": "Homemade"
+		}
+	},
+	"menuCreation": {
+		"menuName": "Menu name",
+		"menuNamePlaceholder": "e.g: lunch menu",
+		"whatDays": "What days does the menu apply?",
+		"whatTime": "What time is it available?",
+		"timeFrom": "From",
+		"timeTo": "to",
+		"price": "Price",
+		"pricePlaceholder": "e.g: 15€",
+		"menuTitle": "Let's go with the menu",
+		"firstCourses": "First courses",
+		"secondCourses": "Second courses",
+		"dishPlaceholder": "e.g: caesar salad",
+		"addFirstCourse": "add another first course",
+		"addSecondCourse": "add second course",
+		"addManually": "Add manually",
+		"uploadMenuPhoto": "Upload menu photo",
+		"addDishDescription": "Add a description of the dish and/or ingredient",
+		"dishDescriptionPlaceholder": "e.g: Tomato, mozzarella, chicken...",
+		"dietaryOptions": "Select if necessary, any of the following options",
+		"addDescription": "Add description",
+		"addSupplement": "Add a supplement (€) for the dish",
+		"supplementPlaceholder": "e.g: 3€",
+		"addSupplementButton": "Add supplement",
+		"dietary": {
+			"glutenFree": "gluten free",
+			"lactoseFree": "lactose free",
+			"vegetarian": "vegetarian",
+			"spicy": "spicy"
+		}
 	}
 }

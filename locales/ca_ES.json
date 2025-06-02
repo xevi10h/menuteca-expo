@@ -28,7 +28,13 @@
 		"hauteCuisine": "Alta cuina"
 	},
 	"general": {
-		"from": "Des de"
+		"from": "Des de",
+		"cancel": "Cancel·lar",
+		"save": "Desar",
+		"next": "Següent",
+		"finish": "Finalitzar",
+		"yes": "SÍ",
+		"no": "NO"
 	},
 	"restaurant": {
 		"information": "Informació",
@@ -40,5 +46,76 @@
 		"reviews": "Què opinen els usuaris",
 		"mapPlaceholder": "Mapa del restaurant",
 		"cancelOpenMap": "Cancel·lar"
+	},
+	"registerRestaurant": {
+		"hasMenu": "Tens un restaurant amb ",
+		"questionMenu": "menú?",
+		"restaurantName": "Com es diu?",
+		"restaurantNameSubtitle": "Nom del restaurant",
+		"restaurantNamePlaceholder": "ex: Bar Menuteca",
+		"whereIs": "On està?",
+		"configureLater": "Configurar més endavant",
+		"addressSubtitle": "Adreça",
+		"addressPlaceholder": "ex: Carrer Llorer, 96, Logronyo",
+		"cuisineTypes": "Quin tipus de menjar se serveix?",
+		"cuisineTypesSubtitle": "Selecciona almenys 1 opció i fins a 3",
+		"stepIndicator": {
+			"next1": "Següent (1/3)",
+			"next2": "Següent (2/3)",
+			"finish": "Finalitzar (3/3)"
+		},
+		"selectPhoto": "Selecciona una foto que representi el teu restaurant. ex: Logo",
+		"myMenus": "Els meus menús",
+		"addMenu": "afegeix un menú",
+		"uploadPhotos": "Pujar fotos",
+		"uploadPhotosDescription": "Afegeix fotos del restaurant i de plats perquè els usuaris puguin conèixer més el teu restaurant",
+		"foodType": "Tipus de menjar",
+		"foodTypeDescription": "Selecciona almenys 3 opcions de tipus de menjar que se serveixen al teu restaurant",
+		"address": "Adreça",
+		"cuisineOptions": {
+			"mediterranean": "Mediterrània",
+			"japanese": "Japonesa",
+			"italian": "Italiana",
+			"american": "Americana",
+			"hauteCuisine": "Alta cuina",
+			"asian": "Asiàtica",
+			"mexican": "Mexicana",
+			"vegetarian": "Vegetariana",
+			"vegan": "Vegana",
+			"traditional": "Tradicional",
+			"glutenFree": "Sense gluten",
+			"homemade": "Casolana"
+		}
+	},
+	"menuCreation": {
+		"menuName": "Nom del menú",
+		"menuNamePlaceholder": "ex: menú de migdia",
+		"whatDays": "Quins dies s'aplica el menú?",
+		"whatTime": "De quina hora a quina hora està disponible?",
+		"timeFrom": "De",
+		"timeTo": "a",
+		"price": "Preu",
+		"pricePlaceholder": "ex: 15€",
+		"menuTitle": "Anem amb el menú",
+		"firstCourses": "Primers",
+		"secondCourses": "Segons",
+		"dishPlaceholder": "ex: amanida cessar",
+		"addFirstCourse": "afegir un altre primer",
+		"addSecondCourse": "afegir segon",
+		"addManually": "Afegir manualment",
+		"uploadMenuPhoto": "Pujar foto del menú",
+		"addDishDescription": "Afegeix una descripció del plat i/o ingredient",
+		"dishDescriptionPlaceholder": "ex: Tomàquet, mozzarella, pollastre...",
+		"dietaryOptions": "Selecciona si cal, alguna de les següents opcions",
+		"addDescription": "Afegir descripció",
+		"addSupplement": "Afegeix un suplement (€) pel plat",
+		"supplementPlaceholder": "ex: 3€",
+		"addSupplementButton": "Afegir suplement",
+		"dietary": {
+			"glutenFree": "sense gluten",
+			"lactoseFree": "sense lactosa",
+			"vegetarian": "vegetarià",
+			"spicy": "picant"
+		}
 	}
 }

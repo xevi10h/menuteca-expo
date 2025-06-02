@@ -3,7 +3,7 @@ import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
 	Dimensions,
 	Image,
@@ -29,10 +29,15 @@ import { Restaurant } from './list/ScrollHorizontalResturant';
 import Information from './restaurantDetail/Information';
 import Menu from './restaurantDetail/Menu';
 
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
+
+interface TabMeasurements {
+	information: { x: number; width: number };
+	menu: { x: number; width: number };
+}
 
 interface ExpandableMapRestaurantModalProps {
-	restaurant: Restaurant | null;
+	restaurant: Restaurant;
 	isVisible: boolean;
 	onClose: () => void;
 }
@@ -45,9 +50,6 @@ export default function ExpandableMapRestaurantModal({
 	const { t } = useTranslation();
 	const insets = useSafeAreaInsets();
 	const { showActionSheetWithOptions } = useActionSheet();
-	const [activeTab, setActiveTab] = useState<'information' | 'menu'>(
-		'information',
-	);
 
 	// Animation values
 	const translateY = useSharedValue(SCREEN_HEIGHT);
@@ -55,9 +57,33 @@ export default function ExpandableMapRestaurantModal({
 	const modalHeight = useSharedValue(150); // Initial collapsed height
 	const isExpanded = useSharedValue(false);
 
-	const menus = restaurant
-		? getMenusByRestaurantId(restaurant.id.toString())
-		: [];
+	const menus = getMenusByRestaurantId(restaurant?.id?.toString());
+
+	// Estado para las pestañas
+	const [activeTab, setActiveTab] = useState<'information' | 'menu'>(
+		'information',
+	);
+	const [isTransitioning, setIsTransitioning] = useState(false);
+
+	// Estado para almacenar las medidas de los tabs
+	const [tabMeasurements, setTabMeasurements] = useState<TabMeasurements>({
+		information: { x: 0, width: 0 },
+		menu: { x: 0, width: 0 },
+	});
+
+	// Animated values
+	const translateX = useSharedValue(0);
+	const tabIndicatorX = useSharedValue(0);
+	const tabIndicatorWidth = useSharedValue(0);
+
+	const informationComponent = useMemo(
+		() => (
+			<Information restaurant={restaurant} onMapPress={openMapNavigation} />
+		),
+		[restaurant],
+	);
+
+	const menuComponent = useMemo(() => <Menu menus={menus} />, [menus]);
 
 	const handleClose = () => {
 		opacity.value = withTiming(0, { duration: 200 });
@@ -125,6 +151,29 @@ export default function ExpandableMapRestaurantModal({
 			}
 		});
 
+	const handleTabLayout = (tab: 'information' | 'menu', event: any) => {
+		const { width } = event.nativeEvent.layout;
+		const tabIndicator =
+			tab === 'information' ? -(width / 2 + 2) : width / 2 + 38;
+
+		setTabMeasurements((prev) => {
+			const newMeasurements = {
+				...prev,
+				[tab]: { x: tabIndicator, width: width * 0.8 },
+			};
+
+			if (
+				tab === activeTab &&
+				(tabIndicatorWidth.value === 0 || tabIndicatorX.value === 0)
+			) {
+				tabIndicatorX.value = tabIndicator;
+				tabIndicatorWidth.value = width * 0.8;
+			}
+
+			return newMeasurements;
+		});
+	};
+
 	const openMapNavigation = async () => {
 		if (!restaurant) return;
 
@@ -166,6 +215,44 @@ export default function ExpandableMapRestaurantModal({
 		);
 	};
 
+	const handleTabChange = (tab: 'information' | 'menu') => {
+		if (tab === activeTab || isTransitioning) return;
+
+		setIsTransitioning(true);
+
+		const targetX = tab === 'information' ? 0 : -(SCREEN_WIDTH - 40);
+
+		const currentTabMeasurement = tabMeasurements[tab];
+		if (currentTabMeasurement.width > 0) {
+			tabIndicatorX.value = withTiming(currentTabMeasurement.x, {
+				duration: 300,
+			});
+			tabIndicatorWidth.value = withTiming(currentTabMeasurement.width, {
+				duration: 300,
+			});
+		}
+
+		translateX.value = withTiming(targetX, { duration: 300 }, () => {
+			runOnJS(setIsTransitioning)(false);
+		});
+
+		setActiveTab(tab);
+	};
+
+	// Animated styles
+	const contentAnimatedStyle = useAnimatedStyle(() => {
+		return {
+			transform: [{ translateX: translateX.value }],
+		};
+	});
+
+	const tabIndicatorStyle = useAnimatedStyle(() => {
+		return {
+			transform: [{ translateX: tabIndicatorX.value }],
+			width: tabIndicatorWidth.value,
+		};
+	});
+
 	useEffect(() => {
 		if (isVisible && restaurant) {
 			opacity.value = withTiming(1, { duration: 200 });
@@ -175,7 +262,7 @@ export default function ExpandableMapRestaurantModal({
 			});
 			modalHeight.value = 150;
 			isExpanded.value = false;
-			setActiveTab('information');
+			handleTabChange('information');
 		} else if (!isVisible) {
 			handleClose();
 		}
@@ -317,8 +404,9 @@ export default function ExpandableMapRestaurantModal({
 								{/* Tab Container */}
 								<View style={styles.tabContainer}>
 									<TouchableOpacity
-										style={styles.tab}
-										onPress={() => setActiveTab('information')}
+										onPress={() => handleTabChange('information')}
+										disabled={isTransitioning}
+										onLayout={(event) => handleTabLayout('information', event)}
 									>
 										<Text
 											style={[
@@ -330,8 +418,9 @@ export default function ExpandableMapRestaurantModal({
 										</Text>
 									</TouchableOpacity>
 									<TouchableOpacity
-										style={styles.tab}
-										onPress={() => setActiveTab('menu')}
+										onPress={() => handleTabChange('menu')}
+										disabled={isTransitioning}
+										onLayout={(event) => handleTabLayout('menu', event)}
 									>
 										<Text
 											style={[
@@ -342,20 +431,27 @@ export default function ExpandableMapRestaurantModal({
 											{t('restaurant.menu')}
 										</Text>
 									</TouchableOpacity>
+
+									{/* Animated tab indicator */}
+									<Animated.View
+										style={[styles.tabIndicator, tabIndicatorStyle]}
+									/>
 								</View>
 
-								{/* Information Tab Content */}
-								{activeTab === 'information' && (
-									<Information
-										restaurant={restaurant}
-										onMapPress={openMapNavigation}
-									/>
-								)}
+								{/* Animated Content Container */}
+								<View style={styles.animatedContentContainer}>
+									<Animated.View
+										style={[styles.slidingContent, contentAnimatedStyle]}
+									>
+										{/* Information Tab Content */}
+										<View style={styles.tabContent}>
+											{informationComponent}
+										</View>
 
-								{/* Menu Tab Content */}
-								{activeTab === 'menu' && <Menu menus={menus} />}
-
-								{/* Bottom spacing */}
+										{/* Menu Tab Content */}
+										<View style={styles.tabContent}>{menuComponent}</View>
+									</Animated.View>
+								</View>
 								<View style={{ height: 100 }} />
 							</ScrollView>
 						</ImageBackground>
@@ -448,14 +544,10 @@ const styles = StyleSheet.create({
 	},
 	tabContainer: {
 		flexDirection: 'row',
-		marginVertical: 10,
+		marginVertical: 20,
+		paddingBottom: 10,
 		justifyContent: 'center',
-	},
-	tab: {
-		paddingHorizontal: 20,
-		paddingVertical: 10,
-		marginRight: 10,
-		borderRadius: 20,
+		gap: 40,
 	},
 	tabText: {
 		fontSize: 16,
@@ -465,5 +557,24 @@ const styles = StyleSheet.create({
 	},
 	activeTabText: {
 		color: colors.primary,
+	},
+	animatedContentContainer: {
+		overflow: 'hidden',
+	},
+	slidingContent: {
+		flexDirection: 'row',
+		width: (SCREEN_WIDTH - 40) * 2,
+	},
+
+	tabContent: {
+		width: SCREEN_WIDTH - 40,
+		paddingRight: 0,
+	},
+	tabIndicator: {
+		position: 'absolute',
+		bottom: 0,
+		height: 2,
+		backgroundColor: colors.primary,
+		borderRadius: 1,
 	},
 });
