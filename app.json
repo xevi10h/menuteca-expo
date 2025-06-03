@@ -4,7 +4,7 @@
 		"slug": "menuteca-expo",
 		"version": "1.0.0",
 		"orientation": "portrait",
-		"icon": "./assets/images/splash_screen_white.png",
+		"icon": "./assets/images/icon_white_splash_screen.png",
 		"scheme": "menutecaexpo",
 		"userInterfaceStyle": "automatic",
 		"newArchEnabled": true,
@@ -13,15 +13,15 @@
 		},
 		"android": {
 			"adaptiveIcon": {
-				"foregroundImage": "./assets/images/splash_screen_white.png",
-				"backgroundColor": "#ffffff"
+				"foregroundImage": "./assets/images/icon_white_splash_screen.png",
+				"backgroundColor": "#48280E"
 			},
 			"edgeToEdgeEnabled": true
 		},
 		"web": {
 			"bundler": "metro",
 			"output": "static",
-			"favicon": "./assets/images/splash_screen_white.png"
+			"favicon": "./assets/images/icon_white_splash_screen.png"
 		},
 		"plugins": [
 			"expo-router",
@@ -29,14 +29,15 @@
 				"expo-splash-screen",
 				{
 					"backgroundColor": "#48280E",
-					"image": "./assets/images/splash_screen_white.png",
+					"image": "./assets/images/icon_white_splash_screen.png",
 					"imageWidth": 100,
 					"resizeMode": "contain",
 					"ios": {
-						"imageWidth": 200
+						"imageWidth": 200,
+						"imageHeight": 200
 					},
 					"dark": {
-						"image": "./assets/images/splash_screen_white.png",
+						"image": "./assets/images/icon_white_splash_screen.png",
 						"backgroundColor": "#48280E"
 					}
 				}

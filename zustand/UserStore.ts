@@ -2,12 +2,11 @@ import { getDeviceLanguage } from '@/shared/functions/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import IUser from '../shared/interfaces/IUser';
-import { Language } from '../shared/types/Language';
+import { Language, User } from '../shared/types';
 
 interface UserState {
-	user: IUser;
-	setUser: (user: IUser) => void;
+	user: User;
+	setUser: (user: User) => void;
 	updatePhoto: (photo: string) => void;
 	updateUsername: (username: string) => void;
 	setDefaultUser: () => void;
@@ -17,7 +16,7 @@ interface UserState {
 	};
 }
 
-export const undefinedUser: IUser = {
+export const undefinedUser: User = {
 	id: '',
 	email: '',
 	username: '',
@@ -34,7 +33,7 @@ export const useUserStore = create<UserState>()(
 	persist(
 		(set, get) => ({
 			user: undefinedUser,
-			setUser: (user: IUser) => {
+			setUser: (user: User) => {
 				set((state) => ({
 					user: { ...state.user, ...user },
 				}));

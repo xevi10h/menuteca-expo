@@ -1,5 +1,7 @@
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
+import { Days, DishCategory } from '@/shared/enums';
+import { Dish, MenuData } from '@/shared/types';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
@@ -12,35 +14,11 @@ import {
 	View,
 } from 'react-native';
 
-interface Dish {
-	id: string;
-	name: string;
-	description: string;
-	extraPrice: number;
-	isVegetarian: boolean;
-	isLactoseFree: boolean;
-	isSpicy: boolean;
-	isGlutenFree: boolean;
-	category: 'PRIMEROS' | 'SEGUNDOS' | 'POSTRES';
-}
-
-interface MenuData {
-	id: string;
-	name: string;
-	days: string[];
-	startTime: string;
-	endTime: string;
-	price: string;
-	dishes: Dish[];
-}
-
 interface MenuCreationModalProps {
 	visible: boolean;
 	onClose: () => void;
 	onSave: (menu: MenuData) => void;
 }
-
-const DAYS = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 
 export default function MenuCreationModal({
 	visible,
@@ -63,7 +41,7 @@ export default function MenuCreationModal({
 			isLactoseFree: false,
 			isSpicy: false,
 			isGlutenFree: false,
-			category: 'PRIMEROS',
+			category: DishCategory.APPETIZERS,
 		},
 		{
 			id: '2',
@@ -74,7 +52,7 @@ export default function MenuCreationModal({
 			isLactoseFree: false,
 			isSpicy: false,
 			isGlutenFree: false,
-			category: 'PRIMEROS',
+			category: DishCategory.APPETIZERS,
 		},
 		{
 			id: '3',
@@ -85,7 +63,7 @@ export default function MenuCreationModal({
 			isLactoseFree: false,
 			isSpicy: false,
 			isGlutenFree: false,
-			category: 'PRIMEROS',
+			category: DishCategory.APPETIZERS,
 		},
 		{
 			id: '4',
@@ -96,7 +74,7 @@ export default function MenuCreationModal({
 			isLactoseFree: false,
 			isSpicy: false,
 			isGlutenFree: false,
-			category: 'PRIMEROS',
+			category: DishCategory.APPETIZERS,
 		},
 	]);
 
@@ -111,9 +89,7 @@ export default function MenuCreationModal({
 		);
 	};
 
-	const addDish = (
-		category: 'PRIMEROS' | 'SEGUNDOS' | 'POSTRES' = 'PRIMEROS',
-	) => {
+	const addDish = (category: DishCategory) => {
 		const newDish: Dish = {
 			id: Date.now().toString(),
 			name: t('menuCreation.dishPlaceholder'),
@@ -168,7 +144,7 @@ export default function MenuCreationModal({
 			days: selectedDays,
 			startTime,
 			endTime,
-			price,
+			price: parseFloat(price) || 0,
 			dishes,
 		};
 		onSave(menu);
@@ -219,7 +195,7 @@ export default function MenuCreationModal({
 						<View style={styles.section}>
 							<Text style={styles.label}>{t('menuCreation.whatDays')}</Text>
 							<View style={styles.daysContainer}>
-								{DAYS.map((day) => (
+								{Object.values(Days).map((day) => (
 									<TouchableOpacity
 										key={day}
 										style={[
@@ -234,7 +210,7 @@ export default function MenuCreationModal({
 												selectedDays.includes(day) && styles.dayTextSelected,
 											]}
 										>
-											{day}
+											{t(`daysLetter.${day}`)}
 										</Text>
 									</TouchableOpacity>
 								))}
@@ -272,6 +248,7 @@ export default function MenuCreationModal({
 								placeholder={t('menuCreation.pricePlaceholder')}
 								value={price}
 								onChangeText={setPrice}
+								keyboardType="numeric"
 							/>
 						</View>
 
@@ -287,7 +264,7 @@ export default function MenuCreationModal({
 									{t('menuCreation.firstCourses')}
 								</Text>
 								{dishes
-									.filter((d) => d.category === 'PRIMEROS')
+									.filter((d) => d.category === DishCategory.APPETIZERS)
 									.map((dish) => (
 										<View key={dish.id} style={styles.dishItem}>
 											<TextInput
@@ -321,7 +298,7 @@ export default function MenuCreationModal({
 									))}
 								<TouchableOpacity
 									style={styles.addDishButton}
-									onPress={() => addDish('PRIMEROS')}
+									onPress={() => addDish(DishCategory.APPETIZERS)}
 								>
 									<Ionicons name="add" size={20} color={colors.primary} />
 									<Text style={styles.addDishText}>
@@ -336,7 +313,7 @@ export default function MenuCreationModal({
 									{t('menuCreation.secondCourses')}
 								</Text>
 								{dishes
-									.filter((d) => d.category === 'SEGUNDOS')
+									.filter((d) => d.category === DishCategory.MAIN_COURSES)
 									.map((dish) => (
 										<View key={dish.id} style={styles.dishItem}>
 											<TextInput
@@ -370,7 +347,7 @@ export default function MenuCreationModal({
 									))}
 								<TouchableOpacity
 									style={styles.addDishButton}
-									onPress={() => addDish('SEGUNDOS')}
+									onPress={() => addDish(DishCategory.MAIN_COURSES)}
 								>
 									<Ionicons name="add" size={20} color={colors.primary} />
 									<Text style={styles.addDishText}>

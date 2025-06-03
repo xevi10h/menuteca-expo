@@ -1,6 +1,6 @@
 import { colors } from '@/assets/styles/colors';
-import { Restaurant } from '@/components/list/ScrollHorizontalResturant';
 import { useTranslation } from '@/hooks/useTranslation';
+import { Restaurant } from '@/shared/types';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {

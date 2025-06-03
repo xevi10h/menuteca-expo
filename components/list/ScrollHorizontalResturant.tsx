@@ -19,30 +19,13 @@ export type ScrollHorizontalResturantProps = {
 	sortBy: string;
 };
 
-export type Restaurant = {
-	id: number;
-	name: string;
-	minimumPrice: number;
-	cuisine: string;
-	rating: number;
-	mainImage: string;
-	profileImage?: string;
-	images: string[];
-	distance: number;
-	address: string;
-	coordinates: {
-		latitude: number;
-		longitude: number;
-	};
-};
-
 export default function ScrollHorizontalResturant({
 	title,
 	sortBy,
 }: ScrollHorizontalResturantProps) {
 	const { t } = useTranslation();
 
-	const handleRestaurantPress = (restaurantId: number) => {
+	const handleRestaurantPress = (restaurantId: string) => {
 		router.push(`/restaurant/${restaurantId}`);
 	};
 

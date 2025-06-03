@@ -1,5 +1,5 @@
 import * as Localization from 'expo-localization';
-import { Language } from '../types/Language';
+import { Language } from '../types';
 
 export function deviceLanguageToLanguage(deviceLanguage: string): Language {
 	switch (deviceLanguage) {

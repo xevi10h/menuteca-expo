@@ -9,9 +9,8 @@ import ProfilePhotoButton from '@/components/ProfileButton';
 import ViewButton from '@/components/ViewButton';
 import MapView from '@/components/crossPlatformMap/MapView';
 import Marker from '@/components/crossPlatformMap/Marker';
-import ScrollHorizontalResturant, {
-	Restaurant,
-} from '@/components/list/ScrollHorizontalResturant';
+import ScrollHorizontalResturant from '@/components/list/ScrollHorizontalResturant';
+import { Restaurant } from '@/shared/types';
 import * as Location from 'expo-location';
 import { useRef, useState } from 'react';
 import { Image, Platform, ScrollView, Text, View } from 'react-native';

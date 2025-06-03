@@ -1,8 +1,9 @@
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
 	Dimensions,
 	Image,
@@ -21,15 +22,28 @@ export default function AddressScreen() {
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
 	const [address, setAddress] = useState('');
+	const setRegisterRestaurantAddress = useRegisterRestaurantStore(
+		(state) => state.setRegisterRestaurantAddress,
+	);
+	const [isNextDisabled, setIsNextDisabled] = useState(true);
 
 	const handleBack = () => {
 		router.back();
 	};
 
 	const handleNext = () => {
-		// Aquí podrías guardar la dirección en el contexto/estado global
+		setRegisterRestaurantAddress(address);
 		router.push('/profile/register-restaurant/cuisine-types');
 	};
+
+	useEffect(() => {
+		// Check if the address is valid (not empty)
+		if (address.trim().length > 0) {
+			setIsNextDisabled(false);
+		} else {
+			setIsNextDisabled(true);
+		}
+	}, [address, router]);
 
 	return (
 		<View style={[styles.container, { paddingTop: insets.top }]}>
@@ -76,8 +90,12 @@ export default function AddressScreen() {
 				</TouchableOpacity>
 			</View>
 			<TouchableOpacity
-				style={[styles.nextButton, { bottom: insets.bottom + 40 }]}
+				style={[
+					styles.nextButton,
+					{ bottom: insets.bottom + 40, opacity: isNextDisabled ? 0.5 : 1 },
+				]}
 				onPress={handleNext}
+				disabled={isNextDisabled}
 			>
 				<Text style={styles.nextButtonText}>
 					{t('registerRestaurant.stepIndicator.next2')}

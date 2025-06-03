@@ -46,14 +46,6 @@ export default function RootLayout() {
 								animation: 'slide_from_right',
 							}}
 						/>
-						<Stack.Screen
-							name="profile/register-restaurant"
-							options={{
-								presentation: 'modal',
-								gestureEnabled: true,
-								animation: 'slide_from_right',
-							}}
-						/>
 					</Stack>
 				</ThemeProvider>
 			</ActionSheetProvider>

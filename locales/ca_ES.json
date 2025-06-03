@@ -72,20 +72,7 @@
 		"foodType": "Tipus de menjar",
 		"foodTypeDescription": "Selecciona almenys 3 opcions de tipus de menjar que se serveixen al teu restaurant",
 		"address": "Adreça",
-		"cuisineOptions": {
-			"mediterranean": "Mediterrània",
-			"japanese": "Japonesa",
-			"italian": "Italiana",
-			"american": "Americana",
-			"hauteCuisine": "Alta cuina",
-			"asian": "Asiàtica",
-			"mexican": "Mexicana",
-			"vegetarian": "Vegetariana",
-			"vegan": "Vegana",
-			"traditional": "Tradicional",
-			"glutenFree": "Sense gluten",
-			"homemade": "Casolana"
-		}
+		"noCuisinesSelected": "No has seleccionat cap tipus de cuina"
 	},
 	"menuCreation": {
 		"menuName": "Nom del menú",
@@ -117,5 +104,33 @@
 			"vegetarian": "vegetarià",
 			"spicy": "picant"
 		}
+	},
+	"days": {
+		"monday": "Dilluns",
+		"tuesday": "Dimarts",
+		"wednesday": "Dimecres",
+		"thursday": "Dijous",
+		"friday": "Divendres",
+		"saturday": "Dissabte",
+		"sunday": "Diumenge"
+	},
+	"daysLetter": {
+		"monday": "D",
+		"tuesday": "D",
+		"wednesday": "M",
+		"thursday": "J",
+		"friday": "V",
+		"saturday": "S",
+		"sunday": "D"
+	},
+	"dishCategories": {
+		"appetizers": "Entrants",
+		"firstCourses": "Primers plats",
+		"secondCourses": "Segons plats",
+		"mainCourses": "Plats principals",
+		"sides": "Acompanyaments",
+		"desserts": "Postres",
+		"coffes": "Cafès",
+		"drinks": "Begudes"
 	}
 }

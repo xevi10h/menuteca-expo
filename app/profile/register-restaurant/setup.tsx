@@ -1,5 +1,10 @@
+import { allCuisines } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
+import MenuCreationModal from '@/components/MenuCreationModal';
 import { useTranslation } from '@/hooks/useTranslation';
+import { MenuData } from '@/shared/types';
+import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
+import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -12,19 +17,9 @@ import {
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import MenuCreationModal from '../../../components/MenuCreationModal';
-
-interface MenuData {
-	id: string;
-	name: string;
-	days: string[];
-	startTime: string;
-	endTime: string;
-	price: string;
-	dishes: any[];
-}
 
 export default function SetupScreen() {
+	const language = useUserStore((state) => state.user.language);
 	const { t } = useTranslation();
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
@@ -44,17 +39,20 @@ export default function SetupScreen() {
 	const addMenu = (menu: MenuData) => {
 		setMenus((prev) => [...prev, menu]);
 	};
-
-	// Mock data for selected cuisines - en una implementación real vendrían del contexto
-	const selectedCuisines = ['mediterranean', 'vegetarian', 'traditional'];
-
+	const provisionalRegisterRestaurant = useRegisterRestaurantStore(
+		(store) => store.registerRestaurant,
+	);
 	return (
 		<View style={[styles.setupContainer, { paddingTop: insets.top }]}>
 			<View style={styles.setupHeader}>
 				<TouchableOpacity onPress={handleBack} style={styles.cancelButton}>
 					<Text style={styles.cancelText}>{t('general.cancel')}</Text>
 				</TouchableOpacity>
-				<Text style={styles.setupTitle}>Sant Francesc Restaurant</Text>
+				<View style={{ flex: 2 }}>
+					<Text style={styles.setupTitle} numberOfLines={1}>
+						{provisionalRegisterRestaurant.name}
+					</Text>
+				</View>
 				<TouchableOpacity style={styles.saveButton} onPress={handleSave}>
 					<Text style={styles.saveText}>{t('general.save')}</Text>
 				</TouchableOpacity>
@@ -155,14 +153,29 @@ export default function SetupScreen() {
 					<Text style={styles.sectionSubtitle}>
 						{t('registerRestaurant.foodTypeDescription')}
 					</Text>
+
 					<View style={styles.selectedCuisines}>
-						{selectedCuisines.slice(0, 3).map((cuisine) => (
-							<View key={cuisine} style={styles.selectedCuisineTag}>
+						{provisionalRegisterRestaurant?.cuisinesIds ? (
+							provisionalRegisterRestaurant?.cuisinesIds
+								.slice(0, 3)
+								.map((cuisine) => (
+									<View key={cuisine} style={styles.selectedCuisineTag}>
+										<Text style={styles.selectedCuisineText}>
+											{
+												allCuisines.find((c) => c.id === cuisine)?.name[
+													language
+												]
+											}
+										</Text>
+									</View>
+								))
+						) : (
+							<View key={'no-cuisine'} style={styles.selectedCuisineTag}>
 								<Text style={styles.selectedCuisineText}>
-									{t(`registerRestaurant.cuisineOptions.${cuisine}`)}
+									{t('registerRestaurant.noCuisinesSelected')}
 								</Text>
 							</View>
-						))}
+						)}
 					</View>
 				</View>
 			</ScrollView>
@@ -187,11 +200,11 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		paddingHorizontal: 20,
 		paddingVertical: 15,
-		borderBottomWidth: 1,
-		borderBottomColor: '#E5E5E5',
+		gap: 10,
+		width: '100%',
 	},
 	cancelButton: {
-		padding: 5,
+		flex: 1,
 	},
 	cancelText: {
 		color: colors.primary,
@@ -204,15 +217,17 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.primary,
+		textAlign: 'center',
 	},
 	saveButton: {
-		padding: 5,
+		flex: 1,
 	},
 	saveText: {
 		color: colors.primary,
 		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '600',
+		textAlign: 'right',
 	},
 	setupContent: {
 		flex: 1,

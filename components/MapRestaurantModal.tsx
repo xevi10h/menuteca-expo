@@ -1,5 +1,6 @@
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
+import { Restaurant } from '@/shared/types';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect } from 'react';
 import {
@@ -18,7 +19,6 @@ import Animated, {
 	withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Restaurant } from './list/ScrollHorizontalResturant';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 

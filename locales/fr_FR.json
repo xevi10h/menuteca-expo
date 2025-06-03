@@ -72,20 +72,7 @@
 		"foodType": "Type de nourriture",
 		"foodTypeDescription": "Sélectionnez au moins 3 options de types de nourriture servis dans votre restaurant",
 		"address": "Adresse",
-		"cuisineOptions": {
-			"mediterranean": "Méditerranéenne",
-			"japanese": "Japonaise",
-			"italian": "Italienne",
-			"american": "Américaine",
-			"hauteCuisine": "Haute cuisine",
-			"asian": "Asiatique",
-			"mexican": "Mexicaine",
-			"vegetarian": "Végétarienne",
-			"vegan": "Végétalienne",
-			"traditional": "Traditionnelle",
-			"glutenFree": "Sans gluten",
-			"homemade": "Fait maison"
-		}
+		"noCuisinesSelected": "Vous n'avez sélectionné aucun type de cuisine"
 	},
 	"menuCreation": {
 		"menuName": "Nom du menu",
@@ -117,5 +104,33 @@
 			"vegetarian": "végétarien",
 			"spicy": "épicé"
 		}
+	},
+	"days": {
+		"monday": "Lundi",
+		"tuesday": "Mardi",
+		"wednesday": "Mercredi",
+		"thursday": "Jeudi",
+		"friday": "Vendredi",
+		"saturday": "Samedi",
+		"sunday": "Dimanche"
+	},
+	"daysLetter": {
+		"monday": "L",
+		"tuesday": "M",
+		"wednesday": "X",
+		"thursday": "J",
+		"friday": "V",
+		"saturday": "S",
+		"sunday": "D"
+	},
+	"dishCategories": {
+		"appetizers": "Apéritifs",
+		"firstCourses": "Entrées",
+		"secondCourses": "Plats principaux",
+		"mainCourses": "Plats principaux",
+		"sides": "Accompagnements",
+		"desserts": "Desserts",
+		"coffes": "Cafés",
+		"drinks": "Beverages"
 	}
 }

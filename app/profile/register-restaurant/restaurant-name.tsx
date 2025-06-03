@@ -1,8 +1,9 @@
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
 	Dimensions,
 	Image,
@@ -21,15 +22,27 @@ export default function RestaurantNameScreen() {
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
 	const [restaurantName, setRestaurantName] = useState('');
+	const [isNextDisabled, setIsNextDisabled] = useState(true);
+	const setRegisterRestaurantName = useRegisterRestaurantStore(
+		(state) => state.setRegisterRestaurantName,
+	);
 
 	const handleBack = () => {
 		router.back();
 	};
 
 	const handleNext = () => {
-		// Aquí podrías guardar el nombre en el contexto/estado global
+		setRegisterRestaurantName(restaurantName);
 		router.push('/profile/register-restaurant/address');
 	};
+
+	useEffect(() => {
+		if (restaurantName.trim().length > 0) {
+			setIsNextDisabled(false);
+		} else {
+			setIsNextDisabled(true);
+		}
+	}, [restaurantName]);
 
 	return (
 		<View style={[styles.container, { paddingTop: insets.top }]}>
@@ -73,8 +86,12 @@ export default function RestaurantNameScreen() {
 				/>
 			</View>
 			<TouchableOpacity
-				style={[styles.button, { bottom: insets.bottom + 40 }]}
+				style={[
+					styles.button,
+					{ bottom: insets.bottom + 40, opacity: isNextDisabled ? 0.5 : 1 },
+				]}
 				onPress={handleNext}
+				disabled={isNextDisabled}
 			>
 				<Text style={styles.buttonText}>
 					{t('registerRestaurant.stepIndicator.next1')}

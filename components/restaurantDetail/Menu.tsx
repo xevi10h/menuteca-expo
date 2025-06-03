@@ -1,5 +1,7 @@
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
+import { DishCategory } from '@/shared/enums';
+import { Dish, MenuData } from '@/shared/types.js';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
@@ -11,35 +13,14 @@ import {
 	View,
 } from 'react-native';
 
-export interface MenuItem {
-	id: number;
-	name: string;
-	description: string;
-	extraPrice?: number;
-	category: string;
-	isVegetarian?: boolean;
-	isVegan?: boolean;
-	isGlutenFree?: boolean;
-	isLactoseFree?: boolean;
-	isSpicy?: boolean;
-}
-
-export interface MenuCategory {
-	id: number;
-	name: string;
-	items: MenuItem[];
-}
-
-export interface MenuData {
-	id: number;
-	name: string;
-	subtitle: string;
-	price: string;
-	categories: MenuCategory[];
-}
-
 interface MenuProps {
 	menus: MenuData[];
+}
+
+interface GroupedDishes {
+	category: DishCategory;
+	categoryName: string;
+	dishes: Dish[];
 }
 
 const Menu: React.FC<MenuProps> = ({ menus }) => {
@@ -62,7 +43,25 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 		}
 	};
 
-	const renderMenuItem = ({ item }: { item: MenuItem }) => (
+	// Función para agrupar platos por categoría
+	const groupDishesByCategory = (dishes: Dish[]): GroupedDishes[] => {
+		const grouped = dishes.reduce((acc, dish) => {
+			if (!acc[dish.category]) {
+				acc[dish.category] = [];
+			}
+			acc[dish.category].push(dish);
+			return acc;
+		}, {} as Record<DishCategory, Dish[]>);
+
+		// Convertir a array y añadir nombres de categorías traducidos
+		return Object.entries(grouped).map(([category, dishes]) => ({
+			category: category as DishCategory,
+			categoryName: t(`dishCategories.${category}`),
+			dishes: dishes,
+		}));
+	};
+
+	const renderMenuItem = ({ item }: { item: Dish }) => (
 		<View style={styles.menuItem}>
 			<View style={styles.menuItemHeader}>
 				<Text style={styles.menuItemName}>{item.name}</Text>
@@ -106,7 +105,7 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 				</View>
 			</View>
 			<Text style={styles.menuItemDescription}>{item.description}</Text>
-			{item.extraPrice !== undefined && (
+			{item.extraPrice > 0 && (
 				<View style={styles.menuItemPriceContainer}>
 					<Text style={styles.menuItemPriceText}>
 						+{item.extraPrice.toFixed(2)}€
@@ -116,13 +115,13 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 		</View>
 	);
 
-	const renderMenuCategory = ({ item }: { item: MenuCategory }) => (
+	const renderMenuCategory = ({ item }: { item: GroupedDishes }) => (
 		<View style={styles.menuCategory}>
-			<Text style={styles.menuCategoryTitle}>{item.name}</Text>
+			<Text style={styles.menuCategoryTitle}>{item.categoryName}</Text>
 			<FlatList
-				data={item.items}
+				data={item.dishes}
 				renderItem={renderMenuItem}
-				keyExtractor={(menuItem) => menuItem.id.toString()}
+				keyExtractor={(dish) => dish.id.toString()}
 				scrollEnabled={false}
 			/>
 		</View>
@@ -135,6 +134,9 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 			</View>
 		);
 	}
+
+	// Agrupar los platos del menú actual por categoría
+	const groupedDishes = groupDishesByCategory(currentMenu.dishes);
 
 	return (
 		<View style={styles.menuContainer}>
@@ -186,9 +188,9 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 
 			{/* Menu Categories */}
 			<FlatList
-				data={currentMenu.categories}
+				data={groupedDishes}
 				renderItem={renderMenuCategory}
-				keyExtractor={(category) => category.id.toString()}
+				keyExtractor={(groupedDish) => groupedDish.category}
 				scrollEnabled={false}
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={styles.menuContent}
@@ -206,8 +208,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		paddingHorizontal: 10,
-
-		// backgroundColor: colors.quaternary,
 		borderRadius: 15,
 		paddingVertical: 15,
 		shadowColor: '#000',
@@ -225,7 +225,6 @@ const styles = StyleSheet.create({
 		borderRadius: 20,
 		justifyContent: 'center',
 		alignItems: 'center',
-		// backgroundColor: '#f8f8f8',
 	},
 	navigationButtonDisabled: {
 		opacity: 0.3,

@@ -1,6 +1,7 @@
 import { getMenusByRestaurantId } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
+import { Restaurant } from '@/shared/types';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -25,7 +26,6 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import RestaurantBasicInformation from './RestaurantBasicInformation';
-import { Restaurant } from './list/ScrollHorizontalResturant';
 import Information from './restaurantDetail/Information';
 import Menu from './restaurantDetail/Menu';
 

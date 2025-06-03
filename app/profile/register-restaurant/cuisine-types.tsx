@@ -1,8 +1,11 @@
+import { allCuisines } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
+import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
 	Dimensions,
 	Image,
@@ -15,33 +18,23 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
 
-const CUISINE_TYPES = [
-	'mediterranean',
-	'japanese',
-	'italian',
-	'american',
-	'hauteCuisine',
-	'asian',
-	'mexican',
-	'vegetarian',
-	'vegan',
-	'traditional',
-	'glutenFree',
-	'homemade',
-];
-
 export default function CuisineTypesScreen() {
 	const { t } = useTranslation();
+	const language = useUserStore((state) => state.user.language);
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
 	const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
+	const [isNextDisabled, setIsNextDisabled] = useState(true);
+	const setRegisterRestaurantCuisines = useRegisterRestaurantStore(
+		(state) => state.setRegisterRestaurantCuisines,
+	);
 
 	const handleBack = () => {
 		router.back();
 	};
 
 	const handleNext = () => {
-		// Aquí podrías guardar los tipos de cocina en el contexto/estado global
+		setRegisterRestaurantCuisines(selectedCuisines);
 		router.push('/profile/register-restaurant/setup');
 	};
 
@@ -54,6 +47,15 @@ export default function CuisineTypesScreen() {
 				: prev,
 		);
 	};
+
+	useEffect(() => {
+		// Check if at least one cuisine is selected
+		if (selectedCuisines.length > 0) {
+			setIsNextDisabled(false);
+		} else {
+			setIsNextDisabled(true);
+		}
+	}, [selectedCuisines]);
 
 	return (
 		<View style={[styles.container, { paddingTop: insets.top }]}>
@@ -91,24 +93,24 @@ export default function CuisineTypesScreen() {
 				</View>
 
 				<View style={styles.cuisineGrid}>
-					{CUISINE_TYPES.map((cuisine) => (
+					{allCuisines.map((cuisine) => (
 						<TouchableOpacity
-							key={cuisine}
+							key={cuisine.id}
 							style={[
 								styles.cuisineButton,
-								selectedCuisines.includes(cuisine) &&
+								selectedCuisines.includes(cuisine.id) &&
 									styles.cuisineButtonSelected,
 							]}
-							onPress={() => handleCuisineToggle(cuisine)}
+							onPress={() => handleCuisineToggle(cuisine.id)}
 						>
 							<Text
 								style={[
 									styles.cuisineButtonText,
-									selectedCuisines.includes(cuisine) &&
+									selectedCuisines.includes(cuisine.id) &&
 										styles.cuisineButtonTextSelected,
 								]}
 							>
-								{t(`registerRestaurant.cuisineOptions.${cuisine}`)}
+								{cuisine.name[language]}
 							</Text>
 						</TouchableOpacity>
 					))}
@@ -121,8 +123,12 @@ export default function CuisineTypesScreen() {
 				</TouchableOpacity>
 			</View>
 			<TouchableOpacity
-				style={[styles.nextButton, { bottom: insets.bottom + 40 }]}
+				style={[
+					styles.nextButton,
+					{ bottom: insets.bottom + 40, opacity: isNextDisabled ? 0.5 : 1 },
+				]}
 				onPress={handleNext}
+				disabled={isNextDisabled}
 			>
 				<Text style={styles.nextButtonText}>
 					{t('registerRestaurant.stepIndicator.finish')}
