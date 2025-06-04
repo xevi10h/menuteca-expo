@@ -35,7 +35,7 @@ export default function CuisineTypesScreen() {
 
 	const handleNext = () => {
 		setRegisterRestaurantCuisines(selectedCuisines);
-		router.push('/profile/register-restaurant/setup');
+		router.push('/profile/register-restaurant/setup/edit');
 	};
 
 	const handleCuisineToggle = (cuisine: string) => {

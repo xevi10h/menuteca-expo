@@ -34,7 +34,9 @@
 		"next": "Siguiente",
 		"finish": "Finalizar",
 		"yes": "SI",
-		"no": "NO"
+		"no": "NO",
+		"edit": "Editar",
+		"preview": "Vista previa"
 	},
 	"restaurant": {
 		"information": "Información",

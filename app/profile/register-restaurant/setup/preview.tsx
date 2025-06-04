@@ -1,10 +1,10 @@
 import { getMenusByRestaurantId, getRestaurantById } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import RestaurantBasicInformation from '@/components/RestaurantBasicInformation';
+import Information from '@/components/restaurantDetail/Information';
+import Menu from '@/components/restaurantDetail/Menu';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useActionSheet } from '@expo/react-native-action-sheet';
-import { Ionicons } from '@expo/vector-icons';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
 import React, { useMemo, useState } from 'react';
 import {
 	Dimensions,
@@ -16,16 +16,12 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native';
-import { getApps } from 'react-native-map-link';
 import Animated, {
 	runOnJS,
 	useAnimatedStyle,
 	useSharedValue,
 	withTiming,
 } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Information from '../../components/restaurantDetail/Information';
-import Menu from '../../components/restaurantDetail/Menu';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -35,15 +31,15 @@ interface TabMeasurements {
 	menu: { x: number; width: number };
 }
 
-export default function RestaurantDetail() {
-	const { id } = useLocalSearchParams<{ id: string }>();
-	const router = useRouter();
+export default function PreviewTab() {
 	const { t } = useTranslation();
-	const insets = useSafeAreaInsets();
-	const { showActionSheetWithOptions } = useActionSheet();
+	const provisionalRegisterRestaurant = useRegisterRestaurantStore(
+		(store) => store.registerRestaurant,
+	);
 
-	const restaurant = getRestaurantById(id!);
-	const menus = getMenusByRestaurantId(id!);
+	// Usamos el primer restaurante como mock data para la preview
+	const restaurant = getRestaurantById('1');
+	const menus = getMenusByRestaurantId('1');
 
 	// Estado para las pestañas
 	const [activeTab, setActiveTab] = useState<'information' | 'menu'>(
@@ -64,9 +60,7 @@ export default function RestaurantDetail() {
 
 	// Referencias a los componentes para evitar re-renders
 	const informationComponent = useMemo(
-		() => (
-			<Information restaurant={restaurant} onMapPress={openMapNavigation} />
-		),
+		() => <Information restaurant={restaurant} onMapPress={() => {}} />,
 		[restaurant],
 	);
 
@@ -93,45 +87,6 @@ export default function RestaurantDetail() {
 
 			return newMeasurements;
 		});
-	};
-
-	const openMapNavigation = async () => {
-		const result = await getApps({
-			latitude: restaurant.coordinates.latitude!,
-			longitude: restaurant.coordinates.longitude!,
-			title: restaurant.name,
-			googleForceLatLon: false,
-			alwaysIncludeGoogle: true,
-			appsWhiteList: ['google-maps', 'apple-maps', 'waze'],
-		});
-		showActionSheetWithOptions(
-			{
-				options: [
-					...result.map((app) => app.name),
-					t('restaurant.cancelOpenMap'),
-				],
-				textStyle: { fontFamily: 'Montserrat-Regular' },
-				cancelButtonIndex: result.length,
-				icons: [
-					...result.map((app, index) => (
-						<Image
-							key={`icon-${app.name}-${index}`}
-							source={app.icon}
-							style={{ width: 24, height: 24 }}
-						/>
-					)),
-					<Ionicons
-						key={'icon-cancel-map'}
-						name="close"
-						size={24}
-						color={colors.quaternary}
-					/>,
-				],
-			},
-			(buttonIndex) => {
-				buttonIndex !== undefined && result[buttonIndex]?.open();
-			},
-		);
 	};
 
 	const handleTabChange = (tab: 'information' | 'menu') => {
@@ -172,44 +127,27 @@ export default function RestaurantDetail() {
 		};
 	});
 
+	// Crear un restaurante mock con los datos del formulario
+	const previewRestaurant = {
+		...restaurant,
+		name: provisionalRegisterRestaurant.name || restaurant.name,
+		address: provisionalRegisterRestaurant.address || restaurant.address,
+	};
+
 	return (
 		<View style={styles.container}>
 			{/* Header Image */}
 			<View style={styles.imageContainer}>
 				<Image
 					source={{ uri: restaurant.mainImage }}
-					style={[styles.headerImage, { height: 250 + insets.top }]}
+					style={styles.headerImage}
 					resizeMode="cover"
 				/>
 				<View style={styles.imageOverlay} />
 
-				{/* Back Button */}
-				<TouchableOpacity
-					style={[styles.backButton, { top: insets.top + 10 }]}
-					onPress={() => router.back()}
-				>
-					<Ionicons name="chevron-back" size={24} color={colors.quaternary} />
-				</TouchableOpacity>
-
-				{/* Share Button */}
-				<TouchableOpacity
-					style={[styles.shareButton, { top: insets.top + 10 }]}
-					onPress={() => {
-						/* Handle share */
-					}}
-				>
-					<Ionicons name="share-outline" size={24} color={colors.quaternary} />
-				</TouchableOpacity>
-
-				<View
-					style={{
-						position: 'absolute',
-						bottom: 50,
-						width: '100%',
-					}}
-				>
+				<View style={styles.restaurantInfo}>
 					<RestaurantBasicInformation
-						restaurant={restaurant}
+						restaurant={previewRestaurant}
 						color={colors.quaternary}
 					/>
 				</View>
@@ -288,6 +226,7 @@ const styles = StyleSheet.create({
 	},
 	headerImage: {
 		width: '100%',
+		height: 200,
 	},
 	imageOverlay: {
 		position: 'absolute',
@@ -297,21 +236,10 @@ const styles = StyleSheet.create({
 		bottom: 0,
 		backgroundColor: 'rgba(0, 0, 0, 0.4)',
 	},
-	backButton: {
+	restaurantInfo: {
 		position: 'absolute',
-		left: 20,
-		width: 40,
-		height: 40,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	shareButton: {
-		position: 'absolute',
-		right: 20,
-		width: 40,
-		height: 40,
-		justifyContent: 'center',
-		alignItems: 'center',
+		bottom: 30,
+		width: '100%',
 	},
 	contentBackground: {
 		flex: 1,
@@ -326,60 +254,6 @@ const styles = StyleSheet.create({
 	content: {
 		flex: 1,
 		paddingHorizontal: 20,
-	},
-	headerInfo: {
-		position: 'absolute',
-		flexDirection: 'row',
-		bottom: 50,
-		justifyContent: 'center',
-		paddingHorizontal: 25,
-	},
-	restaurantIcon: {
-		width: 60,
-		height: 60,
-		borderRadius: 30,
-		backgroundColor: colors.primary,
-		justifyContent: 'center',
-		alignItems: 'center',
-		marginRight: 15,
-	},
-	restaurantIconText: {
-		color: colors.quaternary,
-		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
-	},
-	restaurantDetails: {
-		flex: 1,
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-	},
-	restaurantName: {
-		fontSize: 20,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
-		color: colors.quaternary,
-		marginBottom: 5,
-	},
-	cuisineText: {
-		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
-		color: colors.quaternary,
-		marginBottom: 5,
-	},
-	priceFromText: {
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
-		color: colors.quaternary,
-	},
-	priceText: {
-		fontSize: 24,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
-		color: colors.quaternary,
 	},
 	tabContainer: {
 		flexDirection: 'row',
