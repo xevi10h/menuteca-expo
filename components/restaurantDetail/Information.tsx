@@ -128,8 +128,14 @@ const Information: React.FC<InformationProps> = ({
 			<View>
 				<Text style={styles.sectionTitle}>{t('restaurant.reviews')}</Text>
 				<View style={styles.ratingContainer}>
-					<Text style={styles.ratingText}>{restaurant.rating} / 5</Text>
-					<Ionicons name="star" size={20} color={colors.primary} />
+					{restaurant.rating ? (
+						<>
+							<Text style={styles.ratingText}>{restaurant.rating} / 5</Text>
+							<Ionicons name="star" size={20} color={colors.primary} />
+						</>
+					) : (
+						<Text style={styles.ratingText}>{t('restaurant.noRating')}</Text>
+					)}
 				</View>
 			</View>
 		</>

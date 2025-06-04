@@ -1,7 +1,7 @@
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
+import { Restaurant } from '@/shared/types';
 import { Image, StyleSheet, Text, View } from 'react-native';
-import { Restaurant } from './list/ScrollHorizontalResturant';
 
 interface RestaurantBasicInformationProps {
 	restaurant: Restaurant;

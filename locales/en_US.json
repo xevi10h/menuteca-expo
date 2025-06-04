@@ -60,19 +60,18 @@
 		"addressSubtitle": "Address",
 		"addressPlaceholder": "e.g: Laurel Street, 96, Logroño",
 		"cuisineTypes": "What type of food is served?",
-		"cuisineTypesSubtitle": "Select at least 1 option and up to 3",
+		"cuisineTypesSubtitle": "Select 1 option",
 		"stepIndicator": {
 			"next1": "Next (1/3)",
 			"next2": "Next (2/3)",
 			"finish": "Finish (3/3)"
 		},
-		"selectPhoto": "Select a photo that represents your restaurant. e.g: Logo",
+		"selectPhoto": "Select a profile photo for your restaurant.",
 		"myMenus": "My menus",
 		"addMenu": "add a menu",
 		"uploadPhotos": "Upload photos",
 		"uploadPhotosDescription": "Add photos of the restaurant and dishes so users can learn more about your restaurant",
 		"foodType": "Food type",
-		"foodTypeDescription": "Select at least 3 options of food types served in your restaurant",
 		"address": "Address",
 		"noCuisinesSelected": "You have not selected any type of cuisine"
 	},

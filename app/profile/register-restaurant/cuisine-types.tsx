@@ -23,10 +23,10 @@ export default function CuisineTypesScreen() {
 	const language = useUserStore((state) => state.user.language);
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
-	const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
+	const [selectedCuisine, setSelectedCuisine] = useState<string | null>(null);
 	const [isNextDisabled, setIsNextDisabled] = useState(true);
 	const setRegisterRestaurantCuisines = useRegisterRestaurantStore(
-		(state) => state.setRegisterRestaurantCuisines,
+		(state) => state.setRegisterRestaurantCuisine,
 	);
 
 	const handleBack = () => {
@@ -34,28 +34,21 @@ export default function CuisineTypesScreen() {
 	};
 
 	const handleNext = () => {
-		setRegisterRestaurantCuisines(selectedCuisines);
+		setRegisterRestaurantCuisines(selectedCuisine);
 		router.push('/profile/register-restaurant/setup/edit');
 	};
 
 	const handleCuisineToggle = (cuisine: string) => {
-		setSelectedCuisines((prev) =>
-			prev.includes(cuisine)
-				? prev.filter((c) => c !== cuisine)
-				: prev.length < 3
-				? [...prev, cuisine]
-				: prev,
-		);
+		setSelectedCuisine((prev) => (prev === cuisine ? null : cuisine));
 	};
 
 	useEffect(() => {
-		// Check if at least one cuisine is selected
-		if (selectedCuisines.length > 0) {
+		if (selectedCuisine) {
 			setIsNextDisabled(false);
 		} else {
 			setIsNextDisabled(true);
 		}
-	}, [selectedCuisines]);
+	}, [selectedCuisine]);
 
 	return (
 		<View style={[styles.container, { paddingTop: insets.top }]}>
@@ -98,15 +91,14 @@ export default function CuisineTypesScreen() {
 							key={cuisine.id}
 							style={[
 								styles.cuisineButton,
-								selectedCuisines.includes(cuisine.id) &&
-									styles.cuisineButtonSelected,
+								selectedCuisine === cuisine.id && styles.cuisineButtonSelected,
 							]}
 							onPress={() => handleCuisineToggle(cuisine.id)}
 						>
 							<Text
 								style={[
 									styles.cuisineButtonText,
-									selectedCuisines.includes(cuisine.id) &&
+									selectedCuisine === cuisine.id &&
 										styles.cuisineButtonTextSelected,
 								]}
 							>

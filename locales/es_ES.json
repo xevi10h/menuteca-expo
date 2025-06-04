@@ -60,19 +60,18 @@
 		"addressSubtitle": "Dirección",
 		"addressPlaceholder": "ej: Calle Laurel, 96, Logroño",
 		"cuisineTypes": "¿Que tipo de comidas se sirve?",
-		"cuisineTypesSubtitle": "Selecciona al menos 1 opción y hasta 3",
+		"cuisineTypesSubtitle": "Selecciona 1 opción",
 		"stepIndicator": {
 			"next1": "Siguiente (1/3)",
 			"next2": "Siguiente (2/3)",
 			"finish": "Finalizar (3/3)"
 		},
-		"selectPhoto": "Selecciona una foto que represente tu restaurante. ej: Logo",
+		"selectPhoto": "Selecciona una foto de perfil para tu restaurante.",
 		"myMenus": "Mis menús",
 		"addMenu": "añade un menú",
 		"uploadPhotos": "Subir fotos",
 		"uploadPhotosDescription": "Añade fotos del restaurante y de platos para que los usuarios puedan conocer más tu restaurante",
 		"foodType": "Tipo de comida",
-		"foodTypeDescription": "Selecciona al menos 3 opciones de tipos de comida que se sirven en tu restaurante",
 		"address": "Dirección",
 		"noCuisinesSelected": "No has seleccionado ningún tipo de cocina"
 	},

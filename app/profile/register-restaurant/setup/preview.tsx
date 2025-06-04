@@ -1,9 +1,9 @@
-import { getMenusByRestaurantId, getRestaurantById } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import RestaurantBasicInformation from '@/components/RestaurantBasicInformation';
 import Information from '@/components/restaurantDetail/Information';
 import Menu from '@/components/restaurantDetail/Menu';
 import { useTranslation } from '@/hooks/useTranslation';
+import { Restaurant } from '@/shared/types';
 import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
 import React, { useMemo, useState } from 'react';
 import {
@@ -33,13 +33,9 @@ interface TabMeasurements {
 
 export default function PreviewTab() {
 	const { t } = useTranslation();
-	const provisionalRegisterRestaurant = useRegisterRestaurantStore(
+	const registerRestaurant = useRegisterRestaurantStore(
 		(store) => store.registerRestaurant,
 	);
-
-	// Usamos el primer restaurante como mock data para la preview
-	const restaurant = getRestaurantById('1');
-	const menus = getMenusByRestaurantId('1');
 
 	// Estado para las pestañas
 	const [activeTab, setActiveTab] = useState<'information' | 'menu'>(
@@ -58,13 +54,63 @@ export default function PreviewTab() {
 	const tabIndicatorX = useSharedValue(0);
 	const tabIndicatorWidth = useSharedValue(0);
 
-	// Referencias a los componentes para evitar re-renders
-	const informationComponent = useMemo(
-		() => <Information restaurant={restaurant} onMapPress={() => {}} />,
-		[restaurant],
+	// Crear un restaurante mock con los datos del formulario
+	const previewRestaurant: Restaurant = useMemo(
+		() => ({
+			id: 'preview',
+			name: registerRestaurant.name || 'Tu Restaurante',
+			minimumPrice:
+				registerRestaurant.menus && registerRestaurant.menus.length > 0
+					? Math.min(...registerRestaurant.menus.map((m) => m.price))
+					: 15,
+			cuisine: registerRestaurant.cuisineId || 'mediterranean',
+			rating: 4.5,
+			mainImage:
+				registerRestaurant.images?.[0] ||
+				'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
+			profileImage: registerRestaurant.profileImage,
+			images:
+				registerRestaurant.images && registerRestaurant.images.length > 0
+					? registerRestaurant.images
+					: [
+							'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
+							'https://images.pexels.com/photos/2092507/pexels-photo-2092507.jpeg',
+							'https://images.pexels.com/photos/1907228/pexels-photo-1907228.jpeg',
+					  ],
+			distance: 0,
+			address: registerRestaurant.address || 'Tu dirección',
+			coordinates: registerRestaurant.coordinates || {
+				latitude: 41.3851,
+				longitude: 2.1734,
+			},
+		}),
+		[registerRestaurant],
 	);
 
-	const menuComponent = useMemo(() => <Menu menus={menus} />, [menus]);
+	// Menús del restaurante provisional
+	const previewMenus = registerRestaurant.menus || [];
+
+	// Referencias a los componentes para evitar re-renders
+	const informationComponent = useMemo(
+		() => <Information restaurant={previewRestaurant} onMapPress={() => {}} />,
+		[previewRestaurant],
+	);
+
+	const menuComponent = useMemo(() => {
+		if (previewMenus.length === 0) {
+			return (
+				<View style={styles.emptyMenuContainer}>
+					<Text style={styles.emptyMenuText}>
+						{t('restaurant.noMenuAvailable')}
+					</Text>
+					<Text style={styles.emptyMenuSubtext}>
+						Añade un menú desde la pestaña de edición
+					</Text>
+				</View>
+			);
+		}
+		return <Menu menus={previewMenus} />;
+	}, [previewMenus, t]);
 
 	const handleTabLayout = (tab: 'information' | 'menu', event: any) => {
 		const { width } = event.nativeEvent.layout;
@@ -127,19 +173,12 @@ export default function PreviewTab() {
 		};
 	});
 
-	// Crear un restaurante mock con los datos del formulario
-	const previewRestaurant = {
-		...restaurant,
-		name: provisionalRegisterRestaurant.name || restaurant.name,
-		address: provisionalRegisterRestaurant.address || restaurant.address,
-	};
-
 	return (
 		<View style={styles.container}>
 			{/* Header Image */}
 			<View style={styles.imageContainer}>
 				<Image
-					source={{ uri: restaurant.mainImage }}
+					source={{ uri: previewRestaurant.mainImage }}
 					style={styles.headerImage}
 					resizeMode="cover"
 				/>
@@ -238,7 +277,7 @@ const styles = StyleSheet.create({
 	},
 	restaurantInfo: {
 		position: 'absolute',
-		bottom: 30,
+		bottom: 60,
 		width: '100%',
 	},
 	contentBackground: {
@@ -288,5 +327,26 @@ const styles = StyleSheet.create({
 		height: 2,
 		backgroundColor: colors.primary,
 		borderRadius: 1,
+	},
+	emptyMenuContainer: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingVertical: 60,
+	},
+	emptyMenuText: {
+		fontSize: 18,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.primary,
+		textAlign: 'center',
+		marginBottom: 10,
+	},
+	emptyMenuSubtext: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primaryLight,
+		textAlign: 'center',
 	},
 });

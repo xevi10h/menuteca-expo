@@ -3,7 +3,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { Days, DishCategory } from '@/shared/enums';
 import { Dish, MenuData } from '@/shared/types';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
 	Modal,
 	ScrollView,
@@ -18,12 +18,14 @@ interface MenuCreationModalProps {
 	visible: boolean;
 	onClose: () => void;
 	onSave: (menu: MenuData) => void;
+	editingMenu?: MenuData;
 }
 
 export default function MenuCreationModal({
 	visible,
 	onClose,
 	onSave,
+	editingMenu,
 }: MenuCreationModalProps) {
 	const { t } = useTranslation();
 	const [menuName, setMenuName] = useState('');
@@ -31,57 +33,79 @@ export default function MenuCreationModal({
 	const [startTime, setStartTime] = useState('00:00');
 	const [endTime, setEndTime] = useState('00:00');
 	const [price, setPrice] = useState('');
-	const [dishes, setDishes] = useState<Dish[]>([
-		{
-			id: '1',
-			name: t('menuCreation.dishPlaceholder'),
-			description: '',
-			extraPrice: 0,
-			isVegetarian: false,
-			isLactoseFree: false,
-			isSpicy: false,
-			isGlutenFree: false,
-			category: DishCategory.APPETIZERS,
-		},
-		{
-			id: '2',
-			name: t('menuCreation.dishPlaceholder'),
-			description: '',
-			extraPrice: 0,
-			isVegetarian: false,
-			isLactoseFree: false,
-			isSpicy: false,
-			isGlutenFree: false,
-			category: DishCategory.APPETIZERS,
-		},
-		{
-			id: '3',
-			name: t('menuCreation.dishPlaceholder'),
-			description: '',
-			extraPrice: 0,
-			isVegetarian: false,
-			isLactoseFree: false,
-			isSpicy: false,
-			isGlutenFree: false,
-			category: DishCategory.APPETIZERS,
-		},
-		{
-			id: '4',
-			name: t('menuCreation.dishPlaceholder'),
-			description: '',
-			extraPrice: 0,
-			isVegetarian: false,
-			isLactoseFree: false,
-			isSpicy: false,
-			isGlutenFree: false,
-			category: DishCategory.APPETIZERS,
-		},
-	]);
+	const [dishes, setDishes] = useState<Dish[]>([]);
 
 	const [showDishModal, setShowDishModal] = useState(false);
 	const [showSupplementModal, setShowSupplementModal] = useState(false);
 	const [currentDish, setCurrentDish] = useState<Dish | null>(null);
 	const [supplementPrice, setSupplementPrice] = useState('');
+
+	// Initialize form with editing menu data
+	useEffect(() => {
+		if (visible) {
+			if (editingMenu) {
+				setMenuName(editingMenu.name);
+				setSelectedDays(editingMenu.days);
+				setStartTime(editingMenu.startTime);
+				setEndTime(editingMenu.endTime);
+				setPrice(editingMenu.price.toString());
+				setDishes(editingMenu.dishes);
+			} else {
+				// Reset form for new menu
+				setMenuName('');
+				setSelectedDays([]);
+				setStartTime('00:00');
+				setEndTime('00:00');
+				setPrice('');
+				setDishes([
+					{
+						id: '1',
+						name: t('menuCreation.dishPlaceholder'),
+						description: '',
+						extraPrice: 0,
+						isVegetarian: false,
+						isLactoseFree: false,
+						isSpicy: false,
+						isGlutenFree: false,
+						category: DishCategory.APPETIZERS,
+					},
+					{
+						id: '2',
+						name: t('menuCreation.dishPlaceholder'),
+						description: '',
+						extraPrice: 0,
+						isVegetarian: false,
+						isLactoseFree: false,
+						isSpicy: false,
+						isGlutenFree: false,
+						category: DishCategory.APPETIZERS,
+					},
+					{
+						id: '3',
+						name: t('menuCreation.dishPlaceholder'),
+						description: '',
+						extraPrice: 0,
+						isVegetarian: false,
+						isLactoseFree: false,
+						isSpicy: false,
+						isGlutenFree: false,
+						category: DishCategory.APPETIZERS,
+					},
+					{
+						id: '4',
+						name: t('menuCreation.dishPlaceholder'),
+						description: '',
+						extraPrice: 0,
+						isVegetarian: false,
+						isLactoseFree: false,
+						isSpicy: false,
+						isGlutenFree: false,
+						category: DishCategory.APPETIZERS,
+					},
+				]);
+			}
+		}
+	}, [visible, editingMenu, t]);
 
 	const toggleDay = (day: string) => {
 		setSelectedDays((prev) =>
@@ -104,6 +128,10 @@ export default function MenuCreationModal({
 		setDishes((prev) => [...prev, newDish]);
 	};
 
+	const removeDish = (dishId: string) => {
+		setDishes((prev) => prev.filter((dish) => dish.id !== dishId));
+	};
+
 	const openDishModal = (dish: Dish) => {
 		setCurrentDish(dish);
 		setShowDishModal(true);
@@ -111,6 +139,7 @@ export default function MenuCreationModal({
 
 	const openSupplementModal = (dish: Dish) => {
 		setCurrentDish(dish);
+		setSupplementPrice(dish.extraPrice > 0 ? dish.extraPrice.toString() : '');
 		setShowSupplementModal(true);
 	};
 
@@ -139,22 +168,23 @@ export default function MenuCreationModal({
 
 	const handleSave = () => {
 		const menu: MenuData = {
-			id: Date.now().toString(),
+			id: editingMenu?.id || Date.now().toString(),
 			name: menuName,
 			days: selectedDays,
 			startTime,
 			endTime,
 			price: parseFloat(price) || 0,
-			dishes,
+			dishes: dishes.filter(
+				(dish) =>
+					dish.name.trim() !== '' &&
+					dish.name !== t('menuCreation.dishPlaceholder'),
+			),
 		};
 		onSave(menu);
-		// Reset form
-		setMenuName('');
-		setSelectedDays([]);
-		setStartTime('00:00');
-		setEndTime('00:00');
-		setPrice('');
-		setDishes([]);
+		onClose();
+	};
+
+	const handleClose = () => {
 		onClose();
 	};
 
@@ -167,10 +197,12 @@ export default function MenuCreationModal({
 			>
 				<View style={styles.modalContainer}>
 					<View style={styles.modalHeader}>
-						<TouchableOpacity onPress={onClose}>
+						<TouchableOpacity onPress={handleClose}>
 							<Text style={styles.cancelText}>{t('general.cancel')}</Text>
 						</TouchableOpacity>
-						<Text style={styles.modalTitle}>Sant Francesc Restaurant</Text>
+						<Text style={styles.modalTitle}>
+							{editingMenu ? 'Editar Menú' : 'Sant Francesc Restaurant'}
+						</Text>
 						<TouchableOpacity onPress={handleSave}>
 							<Text style={styles.saveText}>{t('general.save')}</Text>
 						</TouchableOpacity>
@@ -294,6 +326,16 @@ export default function MenuCreationModal({
 											>
 												<Text style={styles.priceIconText}>€+</Text>
 											</TouchableOpacity>
+											<TouchableOpacity
+												style={styles.deleteIcon}
+												onPress={() => removeDish(dish.id)}
+											>
+												<Ionicons
+													name="trash"
+													size={16}
+													color={colors.primary}
+												/>
+											</TouchableOpacity>
 										</View>
 									))}
 								<TouchableOpacity
@@ -342,6 +384,16 @@ export default function MenuCreationModal({
 												onPress={() => openSupplementModal(dish)}
 											>
 												<Text style={styles.priceIconText}>€+</Text>
+											</TouchableOpacity>
+											<TouchableOpacity
+												style={styles.deleteIcon}
+												onPress={() => removeDish(dish.id)}
+											>
+												<Ionicons
+													name="trash"
+													size={16}
+													color={colors.primary}
+												/>
 											</TouchableOpacity>
 										</View>
 									))}
@@ -426,9 +478,18 @@ export default function MenuCreationModal({
 								<Ionicons
 									name="leaf-outline"
 									size={20}
-									color={colors.primary}
+									color={
+										currentDish?.isGlutenFree
+											? colors.quaternary
+											: colors.primary
+									}
 								/>
-								<Text style={styles.dietaryText}>
+								<Text
+									style={[
+										styles.dietaryText,
+										currentDish?.isGlutenFree && styles.dietaryTextSelected,
+									]}
+								>
 									{t('menuCreation.dietary.glutenFree')}
 								</Text>
 							</TouchableOpacity>
@@ -450,9 +511,18 @@ export default function MenuCreationModal({
 								<Ionicons
 									name="water-outline"
 									size={20}
-									color={colors.primary}
+									color={
+										currentDish?.isLactoseFree
+											? colors.quaternary
+											: colors.primary
+									}
 								/>
-								<Text style={styles.dietaryText}>
+								<Text
+									style={[
+										styles.dietaryText,
+										currentDish?.isLactoseFree && styles.dietaryTextSelected,
+									]}
+								>
 									{t('menuCreation.dietary.lactoseFree')}
 								</Text>
 							</TouchableOpacity>
@@ -471,8 +541,21 @@ export default function MenuCreationModal({
 									}
 								}}
 							>
-								<Ionicons name="leaf" size={20} color={colors.primary} />
-								<Text style={styles.dietaryText}>
+								<Ionicons
+									name="leaf"
+									size={20}
+									color={
+										currentDish?.isVegetarian
+											? colors.quaternary
+											: colors.primary
+									}
+								/>
+								<Text
+									style={[
+										styles.dietaryText,
+										currentDish?.isVegetarian && styles.dietaryTextSelected,
+									]}
+								>
 									{t('menuCreation.dietary.vegetarian')}
 								</Text>
 							</TouchableOpacity>
@@ -491,8 +574,19 @@ export default function MenuCreationModal({
 									}
 								}}
 							>
-								<Ionicons name="flame" size={20} color={colors.primary} />
-								<Text style={styles.dietaryText}>
+								<Ionicons
+									name="flame"
+									size={20}
+									color={
+										currentDish?.isSpicy ? colors.quaternary : colors.primary
+									}
+								/>
+								<Text
+									style={[
+										styles.dietaryText,
+										currentDish?.isSpicy && styles.dietaryTextSelected,
+									]}
+								>
 									{t('menuCreation.dietary.spicy')}
 								</Text>
 							</TouchableOpacity>
@@ -712,6 +806,14 @@ const styles = StyleSheet.create({
 		fontWeight: '600',
 		color: colors.primary,
 	},
+	deleteIcon: {
+		width: 40,
+		height: 40,
+		borderRadius: 8,
+		backgroundColor: colors.quaternary,
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
 	addDishButton: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -830,6 +932,9 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '500',
 		color: colors.primary,
+	},
+	dietaryTextSelected: {
+		color: colors.quaternary,
 	},
 	addDescriptionButton: {
 		backgroundColor: colors.primary,
