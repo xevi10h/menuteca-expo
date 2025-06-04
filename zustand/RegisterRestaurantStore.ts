@@ -8,6 +8,7 @@ export interface IRegisterRestaurant {
 	profileImage?: string;
 	images?: string[];
 	menus?: MenuData[];
+	tags?: string[]; // Nueva propiedad para las categorías/tags
 	coordinates?: {
 		latitude: number;
 		longitude: number;
@@ -21,6 +22,7 @@ export const defaultRegisterRestaurant: IRegisterRestaurant = {
 	profileImage: undefined,
 	images: [],
 	menus: [],
+	tags: [], // Inicializar como array vacío
 	coordinates: {
 		latitude: 41.3851,
 		longitude: 2.1734,
@@ -38,6 +40,7 @@ interface RegisterRestaurantState {
 	addRegisterRestaurantMenu: (menu: MenuData) => void;
 	updateRegisterRestaurantMenu: (index: number, menu: MenuData) => void;
 	removeRegisterRestaurantMenu: (index: number) => void;
+	setRegisterRestaurantTags: (tags: string[]) => void; // Nueva función para tags
 	setRegisterRestaurantCoordinates: (coordinates: {
 		latitude: number;
 		longitude: number;
@@ -123,6 +126,14 @@ export const useRegisterRestaurantStore = create<RegisterRestaurantState>(
 					...state.registerRestaurant,
 					menus:
 						state.registerRestaurant.menus?.filter((_, i) => i !== index) || [],
+				},
+			}));
+		},
+		setRegisterRestaurantTags: (tags: string[]) => {
+			set((state) => ({
+				registerRestaurant: {
+					...state.registerRestaurant,
+					tags,
 				},
 			}));
 		},

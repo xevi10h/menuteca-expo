@@ -7,6 +7,7 @@ import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
 import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import * as Location from 'expo-location';
 import React, { useState } from 'react';
 import {
 	Alert,
@@ -21,6 +22,20 @@ import {
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
+// Tipos de tags disponibles
+const AVAILABLE_TAGS = [
+	{ id: 'vegetarian', icon: 'leaf', translation: 'restaurant.vegetarian' },
+	{
+		id: 'glutenFree',
+		icon: 'leaf-outline',
+		translation: 'restaurant.glutenFree',
+	},
+	{ id: 'vegan', icon: 'flower', translation: 'restaurant.vegan' },
+	{ id: 'organic', icon: 'earth', translation: 'restaurant.organic' },
+	{ id: 'localFood', icon: 'location', translation: 'restaurant.localFood' },
+	{ id: 'sustainable', icon: 'leaf', translation: 'restaurant.sustainable' },
+];
+
 export default function EditTab() {
 	const language = useUserStore((state) => state.user.language);
 	const { t } = useTranslation();
@@ -28,7 +43,12 @@ export default function EditTab() {
 	const [editingMenuIndex, setEditingMenuIndex] = useState<number | null>(null);
 	const [showAddressModal, setShowAddressModal] = useState(false);
 	const [showCuisineModal, setShowCuisineModal] = useState(false);
+	const [showTagsModal, setShowTagsModal] = useState(false);
 	const [tempAddress, setTempAddress] = useState('');
+	const [tempCoordinates, setTempCoordinates] = useState<{
+		latitude: number;
+		longitude: number;
+	} | null>(null);
 
 	const {
 		registerRestaurant,
@@ -39,7 +59,9 @@ export default function EditTab() {
 		updateRegisterRestaurantMenu,
 		removeRegisterRestaurantMenu,
 		setRegisterRestaurantAddress,
+		setRegisterRestaurantCoordinates,
 		setRegisterRestaurantCuisine,
+		setRegisterRestaurantTags,
 	} = useRegisterRestaurantStore();
 
 	const handlePickProfileImage = async () => {
@@ -117,20 +139,51 @@ export default function EditTab() {
 		);
 	};
 
+	const handleMapPress = (event: any) => {
+		const { latitude, longitude } = event.nativeEvent.coordinate;
+		setTempCoordinates({ latitude, longitude });
+
+		// Reverse geocoding para obtener la dirección
+		Location.reverseGeocodeAsync({ latitude, longitude })
+			.then((addresses) => {
+				if (addresses.length > 0) {
+					const address = addresses[0];
+					const formattedAddress = `${address.street || ''} ${
+						address.streetNumber || ''
+					}, ${address.city || ''}, ${address.country || ''}`.trim();
+					setTempAddress(formattedAddress);
+				}
+			})
+			.catch(() => {
+				// Si falla el reverse geocoding, solo usar las coordenadas
+				setTempAddress(`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+			});
+	};
+
 	const handleSaveAddress = () => {
 		setRegisterRestaurantAddress(tempAddress);
+		if (tempCoordinates) {
+			setRegisterRestaurantCoordinates(tempCoordinates);
+		}
 		setShowAddressModal(false);
 		setTempAddress('');
+		setTempCoordinates(null);
 	};
 
 	const handleOpenAddressModal = () => {
 		setTempAddress(registerRestaurant.address || '');
+		setTempCoordinates(registerRestaurant.coordinates || null);
 		setShowAddressModal(true);
 	};
 
 	const handleSaveCuisines = (selectedCuisine: string | null) => {
 		setRegisterRestaurantCuisine(selectedCuisine);
 		setShowCuisineModal(false);
+	};
+
+	const handleSaveTags = (selectedTags: string[]) => {
+		setRegisterRestaurantTags(selectedTags);
+		setShowTagsModal(false);
 	};
 
 	return (
@@ -204,14 +257,10 @@ export default function EditTab() {
 					<Text style={styles.sectionTitle}>
 						{t('registerRestaurant.myMenus')}
 					</Text>
-					<View
-						style={{
-							gap: 10,
-						}}
-					>
+					<View style={{ gap: 10 }}>
 						{registerRestaurant.menus?.map((menu, index) => (
 							<View style={styles.menuItem} key={index}>
-								<View key={index} style={styles.menuNameContainer}>
+								<View style={styles.menuNameContainer}>
 									<Text style={styles.menuName}>
 										{menu.name || 'Menú de mediodía'}
 									</Text>
@@ -319,10 +368,7 @@ export default function EditTab() {
 
 					<View style={styles.selectedCuisine}>
 						{registerRestaurant?.cuisineId ? (
-							<View
-								key={registerRestaurant?.cuisineId}
-								style={styles.selectedCuisineTag}
-							>
+							<View style={styles.selectedCuisineTag}>
 								<Text style={styles.selectedCuisineText}>
 									{
 										allCuisines.find(
@@ -332,13 +378,55 @@ export default function EditTab() {
 								</Text>
 							</View>
 						) : (
-							<View key={'no-cuisine'} style={styles.selectedCuisineTag}>
+							<View style={styles.selectedCuisineTag}>
 								<Text style={styles.selectedCuisineText}>
 									{t('registerRestaurant.noCuisinesSelected')}
 								</Text>
 							</View>
 						)}
 					</View>
+				</View>
+
+				{/* Tags Section */}
+				<View style={styles.tagsSection}>
+					<View style={styles.sectionHeader}>
+						<Text style={styles.sectionTitle}>Categorías</Text>
+						<TouchableOpacity
+							style={styles.editButton}
+							onPress={() => setShowTagsModal(true)}
+						>
+							<Ionicons
+								name="pencil-outline"
+								size={16}
+								color={colors.primary}
+							/>
+						</TouchableOpacity>
+					</View>
+					<Text style={styles.sectionSubtitle}>
+						Selecciona las categorías que describen tu restaurante
+					</Text>
+
+					<View style={styles.selectedTags}>
+						{registerRestaurant?.tags && registerRestaurant.tags.length > 0 ? (
+							registerRestaurant.tags.map((tagId) => {
+								const tag = AVAILABLE_TAGS.find((t) => t.id === tagId);
+								return (
+									<View key={tagId} style={styles.selectedTag}>
+										<Text style={styles.selectedTagText}>
+											{tag ? t(tag.translation) : tagId}
+										</Text>
+									</View>
+								);
+							})
+						) : (
+							<View style={styles.selectedTag}>
+								<Text style={styles.selectedTagText}>
+									No has seleccionado categorías
+								</Text>
+							</View>
+						)}
+					</View>
+
 					<View style={{ height: 50 }} />
 				</View>
 			</ScrollView>
@@ -358,7 +446,7 @@ export default function EditTab() {
 				}
 			/>
 
-			{/* Address Edit Modal */}
+			{/* Address Edit Modal with Map */}
 			<Modal
 				visible={showAddressModal}
 				animationType="slide"
@@ -377,6 +465,33 @@ export default function EditTab() {
 						</TouchableOpacity>
 					</View>
 					<View style={styles.modalContent}>
+						<Text style={styles.label}>
+							Toca en el mapa para seleccionar la ubicación
+						</Text>
+						<MapView
+							style={styles.fullMap}
+							initialRegion={{
+								latitude:
+									tempCoordinates?.latitude ||
+									registerRestaurant.coordinates?.latitude ||
+									41.3851,
+								longitude:
+									tempCoordinates?.longitude ||
+									registerRestaurant.coordinates?.longitude ||
+									2.1734,
+								latitudeDelta: 0.01,
+								longitudeDelta: 0.01,
+							}}
+							onPress={handleMapPress}
+						>
+							{tempCoordinates && (
+								<Marker
+									coordinate={tempCoordinates}
+									title="Nueva ubicación"
+									description={tempAddress}
+								/>
+							)}
+						</MapView>
 						<Text style={styles.label}>
 							{t('registerRestaurant.addressSubtitle')}
 						</Text>
@@ -397,6 +512,14 @@ export default function EditTab() {
 				onClose={() => setShowCuisineModal(false)}
 				onSave={handleSaveCuisines}
 				selectedCuisine={registerRestaurant.cuisineId}
+			/>
+
+			{/* Tags Selection Modal */}
+			<TagsSelectionModal
+				visible={showTagsModal}
+				onClose={() => setShowTagsModal(false)}
+				onSave={handleSaveTags}
+				selectedTags={registerRestaurant.tags || []}
 			/>
 		</>
 	);
@@ -487,6 +610,100 @@ function CuisineSelectionModal({
 	);
 }
 
+// Tags Selection Modal Component
+interface TagsSelectionModalProps {
+	visible: boolean;
+	onClose: () => void;
+	onSave: (tags: string[]) => void;
+	selectedTags: string[];
+}
+
+function TagsSelectionModal({
+	visible,
+	onClose,
+	onSave,
+	selectedTags,
+}: TagsSelectionModalProps) {
+	const { t } = useTranslation();
+	const [tempSelected, setTempSelected] = useState<string[]>(selectedTags);
+
+	const handleToggleTag = (tagId: string) => {
+		setTempSelected((prev) =>
+			prev.includes(tagId)
+				? prev.filter((id) => id !== tagId)
+				: [...prev, tagId],
+		);
+	};
+
+	const handleSave = () => {
+		onSave(tempSelected);
+		onClose();
+	};
+
+	React.useEffect(() => {
+		if (visible) {
+			setTempSelected(selectedTags);
+		}
+	}, [visible, selectedTags]);
+
+	return (
+		<Modal
+			visible={visible}
+			animationType="slide"
+			presentationStyle="pageSheet"
+		>
+			<View style={styles.modalContainer}>
+				<View style={styles.modalHeader}>
+					<TouchableOpacity onPress={onClose}>
+						<Text style={styles.cancelText}>{t('general.cancel')}</Text>
+					</TouchableOpacity>
+					<Text style={styles.modalTitle}>Categorías</Text>
+					<TouchableOpacity onPress={handleSave}>
+						<Text style={styles.saveText}>{t('general.save')}</Text>
+					</TouchableOpacity>
+				</View>
+				<View style={styles.modalContent}>
+					<Text style={styles.label}>
+						Selecciona las categorías que describen tu restaurante
+					</Text>
+					<View style={styles.cuisineGrid}>
+						{AVAILABLE_TAGS.map((tag) => (
+							<TouchableOpacity
+								key={tag.id}
+								style={[
+									styles.cuisineButton,
+									tempSelected.includes(tag.id) && styles.cuisineButtonSelected,
+								]}
+								onPress={() => handleToggleTag(tag.id)}
+							>
+								<Ionicons
+									name={tag.icon as any}
+									size={16}
+									color={
+										tempSelected.includes(tag.id)
+											? colors.quaternary
+											: colors.primary
+									}
+									style={{ marginRight: 5 }}
+								/>
+								<Text
+									style={[
+										styles.cuisineButtonText,
+										tempSelected.includes(tag.id) &&
+											styles.cuisineButtonTextSelected,
+									]}
+								>
+									{t(tag.translation)}
+								</Text>
+							</TouchableOpacity>
+						))}
+					</View>
+				</View>
+			</View>
+		</Modal>
+	);
+}
+
 const styles = StyleSheet.create({
 	content: {
 		flex: 1,
@@ -545,6 +762,11 @@ const styles = StyleSheet.create({
 		overflow: 'hidden',
 		marginBottom: 10,
 	},
+	fullMap: {
+		height: 300,
+		borderRadius: 10,
+		marginBottom: 20,
+	},
 	addressText: {
 		fontSize: 14,
 		fontFamily: 'Manrope',
@@ -594,10 +816,7 @@ const styles = StyleSheet.create({
 		gap: 8,
 		elevation: 1,
 		shadowColor: '#000',
-		shadowOffset: {
-			width: 2,
-			height: 2,
-		},
+		shadowOffset: { width: 2, height: 2 },
 		shadowOpacity: 0.2,
 		shadowRadius: 4,
 	},
@@ -651,10 +870,7 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		elevation: 5,
 		shadowColor: '#000',
-		shadowOffset: {
-			width: 2,
-			height: 2,
-		},
+		shadowOffset: { width: 2, height: 2 },
 		shadowOpacity: 0.3,
 		shadowRadius: 4,
 		width: '100%',
@@ -682,6 +898,26 @@ const styles = StyleSheet.create({
 		borderRadius: 15,
 	},
 	selectedCuisineText: {
+		fontSize: 12,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		color: colors.quaternary,
+	},
+	tagsSection: {
+		marginVertical: 15,
+	},
+	selectedTags: {
+		flexDirection: 'row',
+		flexWrap: 'wrap',
+		gap: 8,
+	},
+	selectedTag: {
+		backgroundColor: colors.primary,
+		paddingHorizontal: 12,
+		paddingVertical: 6,
+		borderRadius: 15,
+	},
+	selectedTagText: {
 		fontSize: 12,
 		fontFamily: 'Manrope',
 		fontWeight: '500',
@@ -754,6 +990,8 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: colors.primary,
 		borderRadius: 12,
+		flexDirection: 'row',
+		alignItems: 'center',
 	},
 	cuisineButtonSelected: {
 		backgroundColor: colors.primary,

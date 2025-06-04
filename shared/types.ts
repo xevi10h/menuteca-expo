@@ -13,6 +13,7 @@ export type Restaurant = {
 	images: string[];
 	distance: number;
 	address: string;
+	tags?: string[]; // Nueva propiedad para las categorías/tags
 	coordinates: {
 		latitude: number;
 		longitude: number;

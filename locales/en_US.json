@@ -77,6 +77,8 @@
 	},
 	"menuCreation": {
 		"menuName": "Menu name",
+		"editMenu": "Edit menu",
+		"createMenu": "Create menu",
 		"menuNamePlaceholder": "e.g: lunch menu",
 		"whatDays": "What days does the menu apply?",
 		"whatTime": "What time is it available?",
@@ -90,7 +92,8 @@
 		"dishPlaceholder": "e.g: caesar salad",
 		"addFirstCourse": "add another first course",
 		"addSecondCourse": "add second course",
-		"addManually": "Add manually",
+		"addManualMenu": "Add manually",
+		"addPhotoMenu": "Add a photo of the menu",
 		"uploadMenuPhoto": "Upload menu photo",
 		"addDishDescription": "Add a description of the dish and/or ingredient",
 		"dishDescriptionPlaceholder": "e.g: Tomato, mozzarella, chicken...",

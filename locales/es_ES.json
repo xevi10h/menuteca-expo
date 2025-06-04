@@ -77,6 +77,8 @@
 	},
 	"menuCreation": {
 		"menuName": "Nombre del menú",
+		"editMenu": "Editar menú",
+		"createMenu": "Crear menú",
 		"menuNamePlaceholder": "ej: menú de mediodía",
 		"whatDays": "¿Qué días aplica el menú?",
 		"whatTime": "¿De qué hora a que hora esta disponible?",
@@ -90,7 +92,8 @@
 		"dishPlaceholder": "ej: ensalada cesar",
 		"addFirstCourse": "añadir otro primero",
 		"addSecondCourse": "añadir segundo",
-		"addManually": "Añadir manualmente",
+		"addManualMenu": "Añadir manualmente",
+		"addPhotoMenu": "Añadir una foto del menú",
 		"uploadMenuPhoto": "Subir foto del menú",
 		"addDishDescription": "Añade una descripción del plato y/o ingrediente",
 		"dishDescriptionPlaceholder": "ej: Tomate, mozarella, pollo...",

@@ -3,9 +3,11 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { Days, DishCategory } from '@/shared/enums';
 import { Dish, MenuData } from '@/shared/types';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useEffect, useState } from 'react';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import React, { useCallback, useState } from 'react';
 import {
 	Modal,
+	Platform,
 	ScrollView,
 	StyleSheet,
 	Text,
@@ -13,6 +15,7 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native';
+import DividerWithCircle from './general/DividerWithCircle';
 
 interface MenuCreationModalProps {
 	visible: boolean;
@@ -28,6 +31,8 @@ export default function MenuCreationModal({
 	editingMenu,
 }: MenuCreationModalProps) {
 	const { t } = useTranslation();
+
+	// Estados básicos del menú
 	const [menuName, setMenuName] = useState('');
 	const [selectedDays, setSelectedDays] = useState<string[]>([]);
 	const [startTime, setStartTime] = useState('00:00');
@@ -35,88 +40,96 @@ export default function MenuCreationModal({
 	const [price, setPrice] = useState('');
 	const [dishes, setDishes] = useState<Dish[]>([]);
 
+	// Estados para el time picker
+	const [showStartTimePicker, setShowStartTimePicker] = useState(false);
+	const [showEndTimePicker, setShowEndTimePicker] = useState(false);
+
+	// Estados para modales secundarios
 	const [showDishModal, setShowDishModal] = useState(false);
 	const [showSupplementModal, setShowSupplementModal] = useState(false);
 	const [currentDish, setCurrentDish] = useState<Dish | null>(null);
 	const [supplementPrice, setSupplementPrice] = useState('');
 
-	// Initialize form with editing menu data
-	useEffect(() => {
+	// Inicializar solo cuando el modal se abre
+	React.useEffect(() => {
 		if (visible) {
 			if (editingMenu) {
 				setMenuName(editingMenu.name);
-				setSelectedDays(editingMenu.days);
+				setSelectedDays([...editingMenu.days]);
 				setStartTime(editingMenu.startTime);
 				setEndTime(editingMenu.endTime);
 				setPrice(editingMenu.price.toString());
-				setDishes(editingMenu.dishes);
+				setDishes([...editingMenu.dishes]);
 			} else {
-				// Reset form for new menu
-				setMenuName('');
-				setSelectedDays([]);
-				setStartTime('00:00');
-				setEndTime('00:00');
-				setPrice('');
-				setDishes([
-					{
-						id: '1',
-						name: t('menuCreation.dishPlaceholder'),
-						description: '',
-						extraPrice: 0,
-						isVegetarian: false,
-						isLactoseFree: false,
-						isSpicy: false,
-						isGlutenFree: false,
-						category: DishCategory.APPETIZERS,
-					},
-					{
-						id: '2',
-						name: t('menuCreation.dishPlaceholder'),
-						description: '',
-						extraPrice: 0,
-						isVegetarian: false,
-						isLactoseFree: false,
-						isSpicy: false,
-						isGlutenFree: false,
-						category: DishCategory.APPETIZERS,
-					},
-					{
-						id: '3',
-						name: t('menuCreation.dishPlaceholder'),
-						description: '',
-						extraPrice: 0,
-						isVegetarian: false,
-						isLactoseFree: false,
-						isSpicy: false,
-						isGlutenFree: false,
-						category: DishCategory.APPETIZERS,
-					},
-					{
-						id: '4',
-						name: t('menuCreation.dishPlaceholder'),
-						description: '',
-						extraPrice: 0,
-						isVegetarian: false,
-						isLactoseFree: false,
-						isSpicy: false,
-						isGlutenFree: false,
-						category: DishCategory.APPETIZERS,
-					},
-				]);
+				resetForm();
 			}
 		}
-	}, [visible, editingMenu, t]);
+	}, [visible, editingMenu?.id]); // Solo depende de visible y el ID del menú
 
-	const toggleDay = (day: string) => {
+	const resetForm = useCallback(() => {
+		setMenuName('');
+		setSelectedDays([]);
+		setStartTime('00:00');
+		setEndTime('00:00');
+		setPrice('');
+		setDishes([
+			{
+				id: '1',
+				name: 'ej: ensalada cesar',
+				description: '',
+				extraPrice: 0,
+				isVegetarian: false,
+				isLactoseFree: false,
+				isSpicy: false,
+				isGlutenFree: false,
+				category: DishCategory.APPETIZERS,
+			},
+			{
+				id: '2',
+				name: 'ej: ensalada cesar',
+				description: '',
+				extraPrice: 0,
+				isVegetarian: false,
+				isLactoseFree: false,
+				isSpicy: false,
+				isGlutenFree: false,
+				category: DishCategory.APPETIZERS,
+			},
+			{
+				id: '3',
+				name: 'ej: ensalada cesar',
+				description: '',
+				extraPrice: 0,
+				isVegetarian: false,
+				isLactoseFree: false,
+				isSpicy: false,
+				isGlutenFree: false,
+				category: DishCategory.APPETIZERS,
+			},
+			{
+				id: '4',
+				name: 'ej: ensalada cesar',
+				description: '',
+				extraPrice: 0,
+				isVegetarian: false,
+				isLactoseFree: false,
+				isSpicy: false,
+				isGlutenFree: false,
+				category: DishCategory.APPETIZERS,
+			},
+		]);
+	}, []);
+
+	const toggleDay = useCallback((day: string) => {
 		setSelectedDays((prev) =>
 			prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
 		);
-	};
+	}, []);
 
-	const addDish = (category: DishCategory) => {
+	const addDish = useCallback((category: DishCategory) => {
 		const newDish: Dish = {
 			id: Date.now().toString(),
-			name: t('menuCreation.dishPlaceholder'),
+			name: 'ej: ensalada cesar',
 			description: '',
 			extraPrice: 0,
 			isVegetarian: false,
@@ -126,32 +139,34 @@ export default function MenuCreationModal({
 			category,
 		};
 		setDishes((prev) => [...prev, newDish]);
-	};
+	}, []);
 
-	const removeDish = (dishId: string) => {
-		setDishes((prev) => prev.filter((dish) => dish.id !== dishId));
-	};
+	const updateDishName = useCallback((dishId: string, name: string) => {
+		setDishes((prev) =>
+			prev.map((d) => (d.id === dishId ? { ...d, name } : d)),
+		);
+	}, []);
 
-	const openDishModal = (dish: Dish) => {
+	const openDishModal = useCallback((dish: Dish) => {
 		setCurrentDish(dish);
 		setShowDishModal(true);
-	};
+	}, []);
 
-	const openSupplementModal = (dish: Dish) => {
+	const openSupplementModal = useCallback((dish: Dish) => {
 		setCurrentDish(dish);
 		setSupplementPrice(dish.extraPrice > 0 ? dish.extraPrice.toString() : '');
 		setShowSupplementModal(true);
-	};
+	}, []);
 
-	const saveDish = (updatedDish: Dish) => {
+	const saveDish = useCallback((updatedDish: Dish) => {
 		setDishes((prev) =>
 			prev.map((d) => (d.id === updatedDish.id ? updatedDish : d)),
 		);
 		setShowDishModal(false);
 		setCurrentDish(null);
-	};
+	}, []);
 
-	const addSupplement = () => {
+	const addSupplement = useCallback(() => {
 		if (currentDish && supplementPrice) {
 			const updatedDish = {
 				...currentDish,
@@ -164,9 +179,47 @@ export default function MenuCreationModal({
 		setShowSupplementModal(false);
 		setSupplementPrice('');
 		setCurrentDish(null);
-	};
+	}, [currentDish, supplementPrice]);
 
-	const handleSave = () => {
+	// Funciones para manejar time picker
+	const createTimeFromString = useCallback((timeString: string) => {
+		const [hours, minutes] = timeString
+			.split(':')
+			.map((num) => parseInt(num, 10));
+		const date = new Date();
+		date.setHours(hours, minutes, 0, 0);
+		return date;
+	}, []);
+
+	const formatTimeFromDate = useCallback((date: Date) => {
+		const hours = date.getHours().toString().padStart(2, '0');
+		const minutes = date.getMinutes().toString().padStart(2, '0');
+		return `${hours}:${minutes}`;
+	}, []);
+
+	const handleStartTimeChange = useCallback(
+		(event: any, selectedDate?: Date) => {
+			setShowStartTimePicker(false);
+			if (selectedDate) {
+				const timeString = formatTimeFromDate(selectedDate);
+				setStartTime(timeString);
+			}
+		},
+		[formatTimeFromDate],
+	);
+
+	const handleEndTimeChange = useCallback(
+		(event: any, selectedDate?: Date) => {
+			setShowEndTimePicker(false);
+			if (selectedDate) {
+				const timeString = formatTimeFromDate(selectedDate);
+				setEndTime(timeString);
+			}
+		},
+		[formatTimeFromDate],
+	);
+
+	const handleSave = useCallback(() => {
 		const menu: MenuData = {
 			id: editingMenu?.id || Date.now().toString(),
 			name: menuName,
@@ -175,18 +228,43 @@ export default function MenuCreationModal({
 			endTime,
 			price: parseFloat(price) || 0,
 			dishes: dishes.filter(
-				(dish) =>
-					dish.name.trim() !== '' &&
-					dish.name !== t('menuCreation.dishPlaceholder'),
+				(dish) => dish.name.trim() !== '' && dish.name !== 'ej: ensalada cesar',
 			),
 		};
 		onSave(menu);
 		onClose();
-	};
+	}, [
+		menuName,
+		selectedDays,
+		startTime,
+		endTime,
+		price,
+		dishes,
+		editingMenu?.id,
+		onSave,
+		onClose,
+	]);
 
-	const handleClose = () => {
+	const handleClose = useCallback(() => {
 		onClose();
-	};
+	}, [onClose]);
+
+	const toggleDietaryOption = useCallback(
+		(
+			option: keyof Pick<
+				Dish,
+				'isGlutenFree' | 'isLactoseFree' | 'isVegetarian' | 'isSpicy'
+			>,
+		) => {
+			if (currentDish) {
+				setCurrentDish({
+					...currentDish,
+					[option]: !currentDish[option],
+				});
+			}
+		},
+		[currentDish],
+	);
 
 	return (
 		<>
@@ -197,13 +275,18 @@ export default function MenuCreationModal({
 			>
 				<View style={styles.modalContainer}>
 					<View style={styles.modalHeader}>
-						<TouchableOpacity onPress={handleClose}>
+						<TouchableOpacity onPress={handleClose} style={{ flex: 1 }}>
 							<Text style={styles.cancelText}>{t('general.cancel')}</Text>
 						</TouchableOpacity>
-						<Text style={styles.modalTitle}>
-							{editingMenu ? 'Editar Menú' : 'Sant Francesc Restaurant'}
-						</Text>
-						<TouchableOpacity onPress={handleSave}>
+
+						<View style={{ flex: 2 }}>
+							<Text style={styles.modalTitle}>
+								{editingMenu
+									? t('menuCreation.editMenu')
+									: t('menuCreation.createMenu')}
+							</Text>
+						</View>
+						<TouchableOpacity onPress={handleSave} style={{ flex: 1 }}>
 							<Text style={styles.saveText}>{t('general.save')}</Text>
 						</TouchableOpacity>
 					</View>
@@ -252,24 +335,53 @@ export default function MenuCreationModal({
 						{/* Time */}
 						<View style={styles.section}>
 							<Text style={styles.label}>{t('menuCreation.whatTime')}</Text>
-							<View style={styles.timeContainer}>
-								<Text style={styles.timeLabel}>
-									{t('menuCreation.timeFrom')}
-								</Text>
-								<TextInput
-									style={styles.timeInput}
-									value={startTime}
-									onChangeText={setStartTime}
-									placeholder="00:00"
+							{showStartTimePicker || showEndTimePicker ? (
+								<DateTimePicker
+									value={createTimeFromString(
+										showStartTimePicker ? startTime : endTime,
+									)}
+									mode="time"
+									is24Hour={true}
+									display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+									onChange={
+										showStartTimePicker
+											? handleStartTimeChange
+											: handleEndTimeChange
+									}
 								/>
-								<Text style={styles.timeLabel}>{t('menuCreation.timeTo')}</Text>
-								<TextInput
-									style={styles.timeInput}
-									value={endTime}
-									onChangeText={setEndTime}
-									placeholder="00:00"
-								/>
-							</View>
+							) : (
+								<View style={styles.timeSection}>
+									<Text style={styles.timeLabel}>
+										{t('menuCreation.timeFrom')}
+									</Text>
+
+									<TouchableOpacity
+										style={styles.timeInputButton}
+										onPress={() => setShowStartTimePicker(true)}
+									>
+										<Text style={styles.timeInputText}>{startTime}</Text>
+										<Ionicons
+											name="time-outline"
+											size={16}
+											color={colors.primary}
+										/>
+									</TouchableOpacity>
+
+									<Text style={styles.timeTo}>{t('menuCreation.timeTo')}</Text>
+
+									<TouchableOpacity
+										style={styles.timeInputButton}
+										onPress={() => setShowEndTimePicker(true)}
+									>
+										<Text style={styles.timeInputText}>{endTime}</Text>
+										<Ionicons
+											name="time-outline"
+											size={16}
+											color={colors.primary}
+										/>
+									</TouchableOpacity>
+								</View>
+							)}
 						</View>
 
 						{/* Price */}
@@ -284,6 +396,9 @@ export default function MenuCreationModal({
 							/>
 						</View>
 
+						{/* Divider */}
+						<View style={styles.divider} />
+
 						{/* Menu Section */}
 						<View style={styles.menuSection}>
 							<Text style={styles.menuTitle}>
@@ -291,7 +406,7 @@ export default function MenuCreationModal({
 							</Text>
 
 							{/* First Courses */}
-							<View style={styles.courseSection}>
+							{/* <View style={styles.courseSection}>
 								<Text style={styles.courseTitle}>
 									{t('menuCreation.firstCourses')}
 								</Text>
@@ -302,13 +417,8 @@ export default function MenuCreationModal({
 											<TextInput
 												style={styles.dishInput}
 												value={dish.name}
-												onChangeText={(text) => {
-													setDishes((prev) =>
-														prev.map((d) =>
-															d.id === dish.id ? { ...d, name: text } : d,
-														),
-													);
-												}}
+												onChangeText={(text) => updateDishName(dish.id, text)}
+												placeholder="ej: ensalada cesar"
 											/>
 											<TouchableOpacity
 												style={styles.dishIcon}
@@ -325,16 +435,6 @@ export default function MenuCreationModal({
 												onPress={() => openSupplementModal(dish)}
 											>
 												<Text style={styles.priceIconText}>€+</Text>
-											</TouchableOpacity>
-											<TouchableOpacity
-												style={styles.deleteIcon}
-												onPress={() => removeDish(dish.id)}
-											>
-												<Ionicons
-													name="trash"
-													size={16}
-													color={colors.primary}
-												/>
 											</TouchableOpacity>
 										</View>
 									))}
@@ -347,83 +447,22 @@ export default function MenuCreationModal({
 										{t('menuCreation.addFirstCourse')}
 									</Text>
 								</TouchableOpacity>
-							</View>
-
-							{/* Second Courses */}
-							<View style={styles.courseSection}>
-								<Text style={styles.courseTitle}>
-									{t('menuCreation.secondCourses')}
-								</Text>
-								{dishes
-									.filter((d) => d.category === DishCategory.MAIN_COURSES)
-									.map((dish) => (
-										<View key={dish.id} style={styles.dishItem}>
-											<TextInput
-												style={styles.dishInput}
-												value={dish.name}
-												onChangeText={(text) => {
-													setDishes((prev) =>
-														prev.map((d) =>
-															d.id === dish.id ? { ...d, name: text } : d,
-														),
-													);
-												}}
-											/>
-											<TouchableOpacity
-												style={styles.dishIcon}
-												onPress={() => openDishModal(dish)}
-											>
-												<Ionicons
-													name="restaurant"
-													size={20}
-													color={colors.primary}
-												/>
-											</TouchableOpacity>
-											<TouchableOpacity
-												style={styles.priceIcon}
-												onPress={() => openSupplementModal(dish)}
-											>
-												<Text style={styles.priceIconText}>€+</Text>
-											</TouchableOpacity>
-											<TouchableOpacity
-												style={styles.deleteIcon}
-												onPress={() => removeDish(dish.id)}
-											>
-												<Ionicons
-													name="trash"
-													size={16}
-													color={colors.primary}
-												/>
-											</TouchableOpacity>
-										</View>
-									))}
-								<TouchableOpacity
-									style={styles.addDishButton}
-									onPress={() => addDish(DishCategory.MAIN_COURSES)}
-								>
-									<Ionicons name="add" size={20} color={colors.primary} />
-									<Text style={styles.addDishText}>
-										{t('menuCreation.addSecondCourse')}
-									</Text>
-								</TouchableOpacity>
-							</View>
+							</View> */}
 						</View>
 
 						{/* Add Menu Button */}
-						<TouchableOpacity style={styles.addMenuButton}>
-							<Text style={styles.addMenuText}>
-								{t('menuCreation.addManually')}
+						<TouchableOpacity style={styles.addManualMenuButton}>
+							<Text style={styles.addManualMenuText}>
+								{t('menuCreation.addManualMenu')}
 							</Text>
 						</TouchableOpacity>
-
-						<View style={styles.divider} />
-
-						{/* Upload Photo Button */}
-						<TouchableOpacity style={styles.uploadPhotoButton}>
-							<Text style={styles.uploadPhotoText}>
-								{t('menuCreation.uploadMenuPhoto')}
+						<DividerWithCircle color={colors.primary} marginVertical={20} />
+						<TouchableOpacity style={styles.addPhotoMenuButton}>
+							<Text style={styles.addPhotoMenuText}>
+								{t('menuCreation.addPhotoMenu')}
 							</Text>
 						</TouchableOpacity>
+						<View style={{ height: 100 }} />
 					</ScrollView>
 				</View>
 			</Modal>
@@ -466,14 +505,7 @@ export default function MenuCreationModal({
 									styles.dietaryOption,
 									currentDish?.isGlutenFree && styles.dietaryOptionSelected,
 								]}
-								onPress={() => {
-									if (currentDish) {
-										setCurrentDish({
-											...currentDish,
-											isGlutenFree: !currentDish.isGlutenFree,
-										});
-									}
-								}}
+								onPress={() => toggleDietaryOption('isGlutenFree')}
 							>
 								<Ionicons
 									name="leaf-outline"
@@ -499,14 +531,7 @@ export default function MenuCreationModal({
 									styles.dietaryOption,
 									currentDish?.isLactoseFree && styles.dietaryOptionSelected,
 								]}
-								onPress={() => {
-									if (currentDish) {
-										setCurrentDish({
-											...currentDish,
-											isLactoseFree: !currentDish.isLactoseFree,
-										});
-									}
-								}}
+								onPress={() => toggleDietaryOption('isLactoseFree')}
 							>
 								<Ionicons
 									name="water-outline"
@@ -532,14 +557,7 @@ export default function MenuCreationModal({
 									styles.dietaryOption,
 									currentDish?.isVegetarian && styles.dietaryOptionSelected,
 								]}
-								onPress={() => {
-									if (currentDish) {
-										setCurrentDish({
-											...currentDish,
-											isVegetarian: !currentDish.isVegetarian,
-										});
-									}
-								}}
+								onPress={() => toggleDietaryOption('isVegetarian')}
 							>
 								<Ionicons
 									name="leaf"
@@ -565,14 +583,7 @@ export default function MenuCreationModal({
 									styles.dietaryOption,
 									currentDish?.isSpicy && styles.dietaryOptionSelected,
 								]}
-								onPress={() => {
-									if (currentDish) {
-										setCurrentDish({
-											...currentDish,
-											isSpicy: !currentDish.isSpicy,
-										});
-									}
-								}}
+								onPress={() => toggleDietaryOption('isSpicy')}
 							>
 								<Ionicons
 									name="flame"
@@ -659,24 +670,28 @@ const styles = StyleSheet.create({
 		paddingVertical: 15,
 		borderBottomWidth: 1,
 		borderBottomColor: '#E5E5E5',
+		gap: 10,
 	},
 	cancelText: {
 		color: colors.primary,
 		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '400',
+		textAlign: 'left',
 	},
 	modalTitle: {
 		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.primary,
+		textAlign: 'center',
 	},
 	saveText: {
 		color: colors.primary,
 		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '600',
+		textAlign: 'right',
 	},
 	modalContent: {
 		flex: 1,
@@ -686,24 +701,27 @@ const styles = StyleSheet.create({
 		marginVertical: 15,
 	},
 	label: {
-		fontSize: 14,
+		fontSize: 12,
 		fontFamily: 'Manrope',
-		fontWeight: '500',
-		color: colors.primary,
+		fontWeight: '300',
+		color: colors.tertiary,
 		marginBottom: 10,
 	},
 	input: {
-		backgroundColor: colors.quaternary,
-		borderRadius: 8,
-		paddingHorizontal: 15,
-		paddingVertical: 12,
+		borderRadius: 12,
+		paddingHorizontal: 20,
+		paddingVertical: 15,
 		fontSize: 16,
 		fontFamily: 'Manrope',
+		fontWeight: '300',
 		color: colors.primary,
+		borderWidth: 1,
+		borderColor: colors.primary,
 	},
 	daysContainer: {
 		flexDirection: 'row',
 		gap: 10,
+		justifyContent: 'space-between',
 	},
 	dayButton: {
 		width: 40,
@@ -713,12 +731,29 @@ const styles = StyleSheet.create({
 		borderColor: colors.primary,
 		justifyContent: 'center',
 		alignItems: 'center',
+		backgroundColor: colors.secondary,
+		elevation: 2,
+		shadowColor: '#000',
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.4,
+		shadowRadius: 4,
 	},
 	dayButtonSelected: {
 		backgroundColor: colors.primary,
+		elevation: 2,
+		shadowColor: '#000',
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.4,
+		shadowRadius: 4,
 	},
 	dayText: {
-		fontSize: 14,
+		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '500',
 		color: colors.primary,
@@ -726,36 +761,54 @@ const styles = StyleSheet.create({
 	dayTextSelected: {
 		color: colors.quaternary,
 	},
-	timeContainer: {
+	timeSection: {
 		flexDirection: 'row',
 		alignItems: 'center',
+		justifyContent: 'center',
 		gap: 15,
 	},
 	timeLabel: {
-		fontSize: 16,
+		fontSize: 12,
 		fontFamily: 'Manrope',
-		fontWeight: '400',
-		color: colors.primary,
+		fontWeight: '300',
+		color: colors.tertiary,
 	},
-	timeInput: {
-		backgroundColor: colors.quaternary,
-		borderRadius: 8,
+	timeTo: {
+		fontSize: 12,
+		fontFamily: 'Manrope',
+		fontWeight: '300',
+		color: colors.tertiary,
+	},
+	timeInputButton: {
+		borderRadius: 12,
 		paddingHorizontal: 15,
-		paddingVertical: 8,
+		paddingVertical: 12,
+		borderWidth: 1,
+		borderColor: colors.primary,
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+	},
+	timeInputText: {
 		fontSize: 16,
 		fontFamily: 'Manrope',
 		color: colors.primary,
-		width: 80,
-		textAlign: 'center',
+		marginRight: 8,
+		fontWeight: '300',
+	},
+	divider: {
+		height: 1,
+		backgroundColor: colors.primary,
+		marginVertical: 20,
 	},
 	menuSection: {
-		marginTop: 20,
+		marginTop: 10,
 	},
 	menuTitle: {
-		fontSize: 18,
+		fontSize: 24,
 		fontFamily: 'Manrope',
-		fontWeight: '600',
-		color: colors.primary,
+		fontWeight: '300',
+		color: colors.tertiary,
 		marginBottom: 20,
 	},
 	courseSection: {
@@ -777,42 +830,40 @@ const styles = StyleSheet.create({
 	dishInput: {
 		flex: 1,
 		backgroundColor: colors.quaternary,
-		borderRadius: 8,
-		paddingHorizontal: 15,
-		paddingVertical: 12,
+		borderRadius: 12,
+		paddingHorizontal: 20,
+		paddingVertical: 15,
 		fontSize: 14,
 		fontFamily: 'Manrope',
 		color: colors.primary,
+		borderWidth: 1,
+		borderColor: colors.primaryLight,
 	},
 	dishIcon: {
-		width: 40,
-		height: 40,
-		borderRadius: 8,
+		width: 50,
+		height: 50,
+		borderRadius: 12,
 		backgroundColor: colors.quaternary,
 		justifyContent: 'center',
 		alignItems: 'center',
+		borderWidth: 1,
+		borderColor: colors.primaryLight,
 	},
 	priceIcon: {
-		width: 40,
-		height: 40,
-		borderRadius: 8,
+		width: 50,
+		height: 50,
+		borderRadius: 12,
 		backgroundColor: colors.quaternary,
 		justifyContent: 'center',
 		alignItems: 'center',
+		borderWidth: 1,
+		borderColor: colors.primaryLight,
 	},
 	priceIconText: {
 		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.primary,
-	},
-	deleteIcon: {
-		width: 40,
-		height: 40,
-		borderRadius: 8,
-		backgroundColor: colors.quaternary,
-		justifyContent: 'center',
-		alignItems: 'center',
 	},
 	addDishButton: {
 		flexDirection: 'row',
@@ -822,8 +873,9 @@ const styles = StyleSheet.create({
 		borderWidth: 2,
 		borderColor: colors.primary,
 		borderStyle: 'dashed',
-		borderRadius: 8,
+		borderRadius: 12,
 		gap: 8,
+		marginTop: 10,
 	},
 	addDishText: {
 		fontSize: 14,
@@ -831,36 +883,49 @@ const styles = StyleSheet.create({
 		fontWeight: '500',
 		color: colors.primary,
 	},
-	addMenuButton: {
+	addManualMenuButton: {
 		backgroundColor: colors.primary,
 		paddingVertical: 15,
-		borderRadius: 8,
+		borderRadius: 24,
 		alignItems: 'center',
-		marginVertical: 20,
+		borderWidth: 1,
+		borderColor: colors.quaternary,
+		elevation: 2,
+		shadowColor: '#000',
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.4,
+		shadowRadius: 4,
 	},
-	addMenuText: {
+	addManualMenuText: {
 		color: colors.quaternary,
 		fontSize: 16,
 		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontWeight: '300',
 	},
-	divider: {
-		height: 1,
-		backgroundColor: '#E5E5E5',
-		marginVertical: 20,
-	},
-	uploadPhotoButton: {
-		backgroundColor: colors.quaternary,
+	addPhotoMenuButton: {
+		backgroundColor: colors.secondary,
 		paddingVertical: 15,
-		borderRadius: 8,
+		borderRadius: 24,
 		alignItems: 'center',
-		marginBottom: 40,
+		borderWidth: 1,
+		borderColor: colors.primary,
+		elevation: 2,
+		shadowColor: '#000',
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.4,
+		shadowRadius: 4,
 	},
-	uploadPhotoText: {
+	addPhotoMenuText: {
 		color: colors.primary,
 		fontSize: 16,
 		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontWeight: '300',
 	},
 	overlayContainer: {
 		flex: 1,
@@ -898,6 +963,7 @@ const styles = StyleSheet.create({
 		color: colors.primary,
 		textAlignVertical: 'top',
 		marginBottom: 20,
+		minHeight: 100,
 	},
 	dietaryLabel: {
 		fontSize: 12,

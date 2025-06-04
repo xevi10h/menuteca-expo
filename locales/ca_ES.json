@@ -77,6 +77,8 @@
 	},
 	"menuCreation": {
 		"menuName": "Nom del menú",
+		"editMenu": "Editar menú",
+		"createMenu": "Crear menú",
 		"menuNamePlaceholder": "ex: menú de migdia",
 		"whatDays": "Quins dies s'aplica el menú?",
 		"whatTime": "De quina hora a quina hora està disponible?",
@@ -90,7 +92,8 @@
 		"dishPlaceholder": "ex: amanida cessar",
 		"addFirstCourse": "afegir un altre primer",
 		"addSecondCourse": "afegir segon",
-		"addManually": "Afegir manualment",
+		"addManualMenu": "Afegir manualment",
+		"addPhotoMenu": "Afegeix una foto del menú",
 		"uploadMenuPhoto": "Pujar foto del menú",
 		"addDishDescription": "Afegeix una descripció del plat i/o ingredient",
 		"dishDescriptionPlaceholder": "ex: Tomàquet, mozzarella, pollastre...",
