@@ -31,40 +31,7 @@ export default function ManualMenuSection({
 		return [
 			{
 				id: '1',
-				name: 'ej: ensalada cesar',
-				description: '',
-				extraPrice: 0,
-				isVegetarian: false,
-				isLactoseFree: false,
-				isSpicy: false,
-				isGlutenFree: false,
-				category: DishCategory.APPETIZERS,
-			},
-			{
-				id: '2',
-				name: 'ej: ensalada cesar',
-				description: '',
-				extraPrice: 0,
-				isVegetarian: false,
-				isLactoseFree: false,
-				isSpicy: false,
-				isGlutenFree: false,
-				category: DishCategory.APPETIZERS,
-			},
-			{
-				id: '3',
-				name: 'ej: ensalada cesar',
-				description: '',
-				extraPrice: 0,
-				isVegetarian: false,
-				isLactoseFree: false,
-				isSpicy: false,
-				isGlutenFree: false,
-				category: DishCategory.APPETIZERS,
-			},
-			{
-				id: '4',
-				name: 'ej: ensalada cesar',
+				name: '',
 				description: '',
 				extraPrice: 0,
 				isVegetarian: false,
@@ -85,7 +52,7 @@ export default function ManualMenuSection({
 	const addDish = useCallback((category: DishCategory) => {
 		const newDish: Dish = {
 			id: Date.now().toString(),
-			name: 'ej: ensalada cesar',
+			name: '',
 			description: '',
 			extraPrice: 0,
 			isVegetarian: false,
@@ -151,7 +118,7 @@ export default function ManualMenuSection({
 			<View style={styles.courseSection}>
 				<Text style={styles.courseTitle}>{t('menuCreation.firstCourses')}</Text>
 				{dishes
-					.filter((d) => d.category === DishCategory.APPETIZERS)
+					.filter((d) => d.category === DishCategory.FIRST_COURSES)
 					.map((dish) => (
 						<View key={dish.id} style={styles.dishItem}>
 							<TextInput
@@ -231,7 +198,6 @@ const styles = StyleSheet.create({
 	},
 	dishInput: {
 		flex: 1,
-		backgroundColor: colors.quaternary,
 		borderRadius: 12,
 		paddingHorizontal: 20,
 		paddingVertical: 15,
@@ -245,7 +211,6 @@ const styles = StyleSheet.create({
 		width: 50,
 		height: 50,
 		borderRadius: 12,
-		backgroundColor: colors.quaternary,
 		justifyContent: 'center',
 		alignItems: 'center',
 		borderWidth: 1,
@@ -255,7 +220,6 @@ const styles = StyleSheet.create({
 		width: 50,
 		height: 50,
 		borderRadius: 12,
-		backgroundColor: colors.quaternary,
 		justifyContent: 'center',
 		alignItems: 'center',
 		borderWidth: 1,
@@ -268,21 +232,31 @@ const styles = StyleSheet.create({
 		color: colors.primary,
 	},
 	addDishButton: {
+		backgroundColor: colors.secondary,
 		flexDirection: 'row',
 		alignItems: 'center',
-		justifyContent: 'center',
+		justifyContent: 'flex-start',
+		paddingHorizontal: 10,
 		paddingVertical: 15,
-		borderWidth: 2,
+		borderWidth: 1,
 		borderColor: colors.primary,
 		borderStyle: 'dashed',
 		borderRadius: 12,
 		gap: 8,
 		marginTop: 10,
+		elevation: 2,
+		shadowColor: '#000',
+		shadowOffset: {
+			width: 2,
+			height: 2,
+		},
+		shadowOpacity: 0.5,
+		shadowRadius: 4,
 	},
 	addDishText: {
 		fontSize: 14,
 		fontFamily: 'Manrope',
 		fontWeight: '500',
-		color: colors.primary,
+		color: colors.primaryLight,
 	},
 });

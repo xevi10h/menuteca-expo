@@ -99,9 +99,6 @@ export default function TimeSelector({
 			<Modal visible={showStartTimePicker} transparent animationType="fade">
 				<View style={styles.overlayContainer}>
 					<View style={styles.timePickerModal}>
-						<Text style={styles.timePickerTitle}>
-							{t('menuCreation.timeFrom')}
-						</Text>
 						<DateTimePicker
 							value={tempTime}
 							mode="time"
@@ -136,9 +133,6 @@ export default function TimeSelector({
 			<Modal visible={showEndTimePicker} transparent animationType="fade">
 				<View style={styles.overlayContainer}>
 					<View style={styles.timePickerModal}>
-						<Text style={styles.timePickerTitle}>
-							{t('menuCreation.timeTo')}
-						</Text>
 						<DateTimePicker
 							value={tempTime}
 							mode="time"

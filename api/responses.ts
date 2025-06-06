@@ -1,6 +1,31 @@
 import { DishCategory } from '@/shared/enums';
 import { Cuisine, MenuData, Restaurant } from '@/shared/types';
 
+export const allRestaurantTags: RestaurantTags[] = [
+	{
+		id: '1',
+		name: {
+			en_US: 'Popular',
+			es_ES: 'Popular',
+			ca_ES: 'Popular',
+			fr_FR: 'Populaire',
+		},
+		iconName:
+			'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=600',
+	},
+	{
+		id: '2',
+		name: {
+			en_US: 'New',
+			es_ES: 'Nuevo',
+			ca_ES: 'Nou',
+			fr_FR: 'Nouveau',
+		},
+		image:
+			'https://images.pexels.com/photos/2092507/pexels-photo-2092507.jpeg?auto=compress&cs=tinysrgb&w=600',
+	},
+];
+
 export const allRestaurants: Restaurant[] = [
 	{
 		id: '1',

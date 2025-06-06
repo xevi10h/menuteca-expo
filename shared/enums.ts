@@ -24,3 +24,27 @@ export enum DishCategory {
 	DESSERTS = 'desserts',
 	DRINKS = 'drinks',
 }
+
+export enum RestaurantTag {
+	VEGETARIAN = 'vegetarian',
+	VEGAN = 'vegan',
+	GLUTEN_FREE = 'glutenFree',
+	HALAL = 'halal',
+	KOSHER = 'kosher',
+	SPICY = 'spicy',
+	DELIVERY = 'delivery',
+	TAKE_AWAY = 'takeAway',
+	OUTDOOR_SEATING = 'outdoorSeating',
+	PARKING = 'parking',
+	WIFI = 'wifi',
+	CREDIT_CARDS = 'creditCards',
+	RESERVATIONS = 'reservations',
+	LIVE_MUSIC = 'liveMusic',
+	PET_FRIENDLY = 'petFriendly',
+	AIR_CONDITIONING = 'airConditioning',
+	SMOKING_AREA = 'smokingArea',
+	WHEELCHAIR_ACCESSIBLE = 'wheelchairAccessible',
+	FAMILY_FRIENDLY = 'familyFriendly',
+	ROMANTIC = 'romantic',
+	BUSINESS_FRIENDLY = 'businessFriendly',
+}

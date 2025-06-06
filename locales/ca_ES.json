@@ -136,5 +136,28 @@
 		"desserts": "Postres",
 		"coffes": "Cafès",
 		"drinks": "Begudes"
+	},
+	"resturantTags": {
+		"vegetarian": "Vegetarià",
+		"vegan": "Vegà",
+		"glutenFree": "Sense gluten",
+		"halal": "Halal",
+		"kosher": "Kosher",
+		"spicy": "Picant",
+		"delivery": "Entrega a domicili",
+		"takeAway": "Per emportar",
+		"outdoorSeating": "Terrassa",
+		"parking": "Aparcament",
+		"wifi": "Wifi",
+		"creditCards": "Targetes de crèdit",
+		"reservations": "Reserves",
+		"liveMusic": "Música en viu",
+		"petFriendly": "Admet mascotes",
+		"airConditioning": "Climatització",
+		"smokingArea": "Zona fumadors",
+		"wheelchairAccessible": "Accessible en cadira de rodes",
+		"familyFriendly": "Per a famílies",
+		"romantic": "Romàntic",
+		"businessFriendly": "Per a negocis"
 	}
 }

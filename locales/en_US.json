@@ -136,5 +136,28 @@
 		"desserts": "Desserts",
 		"coffes": "Coffees",
 		"drinks": "Drinks"
+	},
+	"resturantTags": {
+		"vegetarian": "Vegetarian",
+		"vegan": "Vegan",
+		"glutenFree": "Gluten-free",
+		"halal": "Halal",
+		"kosher": "Kosher",
+		"spicy": "Spicy",
+		"delivery": "Delivery",
+		"takeAway": "Take away",
+		"outdoorSeating": "Outdoor seating",
+		"parking": "Parking",
+		"wifi": "Wifi",
+		"creditCards": "Credit cards",
+		"reservations": "Reservations",
+		"liveMusic": "Live music",
+		"petFriendly": "Pet-friendly",
+		"airConditioning": "Air conditioning",
+		"smokingArea": "Smoking area",
+		"wheelchairAccessible": "Wheelchair accessible",
+		"familyFriendly": "Family-friendly",
+		"romantic": "Romantic",
+		"businessFriendly": "Business-friendly"
 	}
 }
