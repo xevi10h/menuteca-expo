@@ -38,7 +38,32 @@ export default function ManualMenuSection({
 				isLactoseFree: false,
 				isSpicy: false,
 				isGlutenFree: false,
-				category: DishCategory.APPETIZERS,
+				isVegan: false,
+				category: DishCategory.FIRST_COURSES,
+			},
+			{
+				id: '2',
+				name: '',
+				description: '',
+				extraPrice: 0,
+				isVegetarian: false,
+				isLactoseFree: false,
+				isSpicy: false,
+				isGlutenFree: false,
+				isVegan: false,
+				category: DishCategory.SECOND_COURSES,
+			},
+			{
+				id: '3',
+				name: '',
+				description: '',
+				extraPrice: 0,
+				isVegetarian: false,
+				isLactoseFree: false,
+				isSpicy: false,
+				isGlutenFree: false,
+				isVegan: false,
+				category: DishCategory.DESSERTS,
 			},
 		];
 	});
@@ -59,6 +84,7 @@ export default function ManualMenuSection({
 			isLactoseFree: false,
 			isSpicy: false,
 			isGlutenFree: false,
+			isVegan: false,
 			category,
 		};
 		setDishes((prev) => [...prev, newDish]);
@@ -125,7 +151,7 @@ export default function ManualMenuSection({
 								style={styles.dishInput}
 								value={dish.name}
 								onChangeText={(text) => updateDishName(dish.id, text)}
-								placeholder="ej: ensalada cesar"
+								placeholder={t('menuCreation.firstCoursePlaceholder')}
 							/>
 							<TouchableOpacity
 								style={styles.dishIcon}
@@ -143,12 +169,84 @@ export default function ManualMenuSection({
 					))}
 				<TouchableOpacity
 					style={styles.addDishButton}
-					onPress={() => addDish(DishCategory.APPETIZERS)}
+					onPress={() => addDish(DishCategory.FIRST_COURSES)}
 				>
 					<Ionicons name="add" size={20} color={colors.primary} />
 					<Text style={styles.addDishText}>
 						{t('menuCreation.addFirstCourse')}
 					</Text>
+				</TouchableOpacity>
+			</View>
+			<View style={styles.courseSection}>
+				<Text style={styles.courseTitle}>
+					{t('menuCreation.secondCourses')}
+				</Text>
+				{dishes
+					.filter((d) => d.category === DishCategory.SECOND_COURSES)
+					.map((dish) => (
+						<View key={dish.id} style={styles.dishItem}>
+							<TextInput
+								style={styles.dishInput}
+								value={dish.name}
+								onChangeText={(text) => updateDishName(dish.id, text)}
+								placeholder={t('menuCreation.secondCoursePlaceholder')}
+							/>
+							<TouchableOpacity
+								style={styles.dishIcon}
+								onPress={() => openDishModal(dish)}
+							>
+								<Ionicons name="restaurant" size={20} color={colors.primary} />
+							</TouchableOpacity>
+							<TouchableOpacity
+								style={styles.priceIcon}
+								onPress={() => openSupplementModal(dish)}
+							>
+								<Text style={styles.priceIconText}>€+</Text>
+							</TouchableOpacity>
+						</View>
+					))}
+				<TouchableOpacity
+					style={styles.addDishButton}
+					onPress={() => addDish(DishCategory.SECOND_COURSES)}
+				>
+					<Ionicons name="add" size={20} color={colors.primary} />
+					<Text style={styles.addDishText}>
+						{t('menuCreation.addSecondCourse')}
+					</Text>
+				</TouchableOpacity>
+			</View>
+			<View style={styles.courseSection}>
+				<Text style={styles.courseTitle}>{t('menuCreation.desserts')}</Text>
+				{dishes
+					.filter((d) => d.category === DishCategory.DESSERTS)
+					.map((dish) => (
+						<View key={dish.id} style={styles.dishItem}>
+							<TextInput
+								style={styles.dishInput}
+								value={dish.name}
+								onChangeText={(text) => updateDishName(dish.id, text)}
+								placeholder={t('menuCreation.dessertPlaceholder')}
+							/>
+							<TouchableOpacity
+								style={styles.dishIcon}
+								onPress={() => openDishModal(dish)}
+							>
+								<Ionicons name="restaurant" size={20} color={colors.primary} />
+							</TouchableOpacity>
+							<TouchableOpacity
+								style={styles.priceIcon}
+								onPress={() => openSupplementModal(dish)}
+							>
+								<Text style={styles.priceIconText}>€+</Text>
+							</TouchableOpacity>
+						</View>
+					))}
+				<TouchableOpacity
+					style={styles.addDishButton}
+					onPress={() => addDish(DishCategory.DESSERTS)}
+				>
+					<Ionicons name="add" size={20} color={colors.primary} />
+					<Text style={styles.addDishText}>{t('menuCreation.addDessert')}</Text>
 				</TouchableOpacity>
 			</View>
 

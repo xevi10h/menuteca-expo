@@ -4,37 +4,12 @@ import { RestaurantTag } from '@/shared/enums';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { renderTagIcon } from './TagsSelectionModal';
 
 interface TagsSectionProps {
 	selectedTags: string[];
 	onEditPress: () => void;
 }
-
-// Mapeo de tags a iconos
-export const TAG_ICONS: Record<RestaurantTag, keyof typeof Ionicons.glyphMap> =
-	{
-		[RestaurantTag.VEGETARIAN]: 'leaf',
-		[RestaurantTag.VEGAN]: 'flower-outline',
-		[RestaurantTag.GLUTEN_FREE]: 'leaf-outline',
-		[RestaurantTag.HALAL]: 'restaurant',
-		[RestaurantTag.KOSHER]: 'restaurant-outline',
-		[RestaurantTag.SPICY]: 'flame',
-		[RestaurantTag.DELIVERY]: 'bicycle',
-		[RestaurantTag.TAKE_AWAY]: 'bag-handle',
-		[RestaurantTag.OUTDOOR_SEATING]: 'sunny',
-		[RestaurantTag.PARKING]: 'car',
-		[RestaurantTag.WIFI]: 'wifi',
-		[RestaurantTag.CREDIT_CARDS]: 'card',
-		[RestaurantTag.RESERVATIONS]: 'calendar',
-		[RestaurantTag.LIVE_MUSIC]: 'musical-notes',
-		[RestaurantTag.PET_FRIENDLY]: 'paw',
-		[RestaurantTag.AIR_CONDITIONING]: 'snow',
-		[RestaurantTag.SMOKING_AREA]: 'cloud',
-		[RestaurantTag.WHEELCHAIR_ACCESSIBLE]: 'accessibility',
-		[RestaurantTag.FAMILY_FRIENDLY]: 'people',
-		[RestaurantTag.ROMANTIC]: 'heart',
-		[RestaurantTag.BUSINESS_FRIENDLY]: 'briefcase',
-	};
 
 export default function TagsSection({
 	selectedTags,
@@ -60,15 +35,9 @@ export default function TagsSection({
 				{selectedTags.length > 0 ? (
 					selectedTags.map((tagId) => {
 						const tagKey = tagId as RestaurantTag;
-						const iconName = TAG_ICONS[tagKey];
 						return (
 							<View key={tagId} style={styles.selectedTag}>
-								<Ionicons
-									name={iconName}
-									size={12}
-									color={colors.quaternary}
-									style={{ marginRight: 4 }}
-								/>
+								{renderTagIcon(tagKey, colors.quaternary, 12)}
 								<Text style={styles.selectedTagText}>
 									{t(`restaurantTags.${tagId}`)}
 								</Text>
@@ -125,6 +94,7 @@ const styles = StyleSheet.create({
 		borderRadius: 15,
 		flexDirection: 'row',
 		alignItems: 'center',
+		gap: 4,
 	},
 	selectedTagText: {
 		fontSize: 12,

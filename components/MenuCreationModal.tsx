@@ -16,6 +16,7 @@ import DaysSelector from './menuCreation/DaysSelector';
 import ManualMenuSection from './menuCreation/ManualMenuSection';
 import PriceInput from './menuCreation/PriceInput';
 import TimeSelector from './menuCreation/TimeSelector';
+import HeaderModal from './restaurantCreation/HeaderModal';
 
 interface MenuCreationModalProps {
 	visible: boolean;
@@ -117,23 +118,15 @@ export default function MenuCreationModal({
 			presentationStyle="pageSheet"
 		>
 			<View style={styles.modalContainer}>
-				<View style={styles.modalHeader}>
-					<TouchableOpacity onPress={handleClose} style={{ flex: 1 }}>
-						<Text style={styles.cancelText}>{t('general.cancel')}</Text>
-					</TouchableOpacity>
-
-					<View style={{ flex: 2 }}>
-						<Text style={styles.modalTitle}>
-							{editingMenu
-								? t('menuCreation.editMenu')
-								: t('menuCreation.createMenu')}
-						</Text>
-					</View>
-					<TouchableOpacity onPress={handleSave} style={{ flex: 1 }}>
-						<Text style={styles.saveText}>{t('general.save')}</Text>
-					</TouchableOpacity>
-				</View>
-
+				<HeaderModal
+					title={
+						editingMenu
+							? t('menuCreation.editMenu')
+							: t('menuCreation.createMenu')
+					}
+					handleClose={handleClose}
+					handleSave={handleSave}
+				/>
 				<ScrollView
 					style={styles.modalContent}
 					showsVerticalScrollIndicator={false}
@@ -218,37 +211,6 @@ const styles = StyleSheet.create({
 	modalContainer: {
 		flex: 1,
 		backgroundColor: colors.secondary,
-	},
-	modalHeader: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		paddingHorizontal: 20,
-		paddingVertical: 15,
-		borderBottomWidth: 1,
-		borderBottomColor: '#E5E5E5',
-		gap: 10,
-	},
-	cancelText: {
-		color: colors.primary,
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
-		textAlign: 'left',
-	},
-	modalTitle: {
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
-		color: colors.primary,
-		textAlign: 'center',
-	},
-	saveText: {
-		color: colors.primary,
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
-		textAlign: 'right',
 	},
 	modalContent: {
 		flex: 1,

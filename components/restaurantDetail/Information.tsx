@@ -39,13 +39,17 @@ const Information: React.FC<InformationProps> = ({
 					</Text>
 				</View>
 				<View style={styles.tag}>
-					<Text style={styles.tagText}>{t('restaurant.vegetarian')}</Text>
+					<Text style={styles.tagText}>
+						{t('restaurant.dietary.vegetarian')}
+					</Text>
 				</View>
 				<View style={styles.tag}>
-					<Text style={styles.tagText}>{t('restaurant.glutenFree')}</Text>
+					<Text style={styles.tagText}>
+						{t('restaurant.dietary.glutenFree')}
+					</Text>
 				</View>
 				<View style={styles.tag}>
-					<Text style={styles.tagText}>{t('restaurant.vegan')}</Text>
+					<Text style={styles.tagText}>{t('restaurant.dietary.vegan')}</Text>
 				</View>
 			</View>
 

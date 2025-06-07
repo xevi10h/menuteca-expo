@@ -42,8 +42,6 @@ export enum RestaurantTag {
 	LIVE_MUSIC = 'liveMusic',
 	PET_FRIENDLY = 'petFriendly',
 	AIR_CONDITIONING = 'airConditioning',
-	SMOKING_AREA = 'smokingArea',
-	WHEELCHAIR_ACCESSIBLE = 'wheelchairAccessible',
 	FAMILY_FRIENDLY = 'familyFriendly',
 	ROMANTIC = 'romantic',
 	BUSINESS_FRIENDLY = 'businessFriendly',

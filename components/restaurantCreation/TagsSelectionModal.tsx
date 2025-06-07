@@ -1,7 +1,10 @@
+import GlutenFreeIcon from '@/assets/icons/GlutenFreeIcon';
+import SpicyIcon from '@/assets/icons/SpicyIcon';
+import VeganIcon from '@/assets/icons/VeganIcon';
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { RestaurantTag } from '@/shared/enums';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import {
 	Modal,
@@ -11,7 +14,7 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native';
-import { TAG_ICONS } from './TagsSection';
+import HeaderModal from './HeaderModal';
 
 interface TagsSelectionModalProps {
 	visible: boolean;
@@ -19,6 +22,62 @@ interface TagsSelectionModalProps {
 	onSave: (tags: string[]) => void;
 	selectedTags: string[];
 }
+
+// Función para renderizar el icono correcto según el tag
+export const renderTagIcon = (
+	tag: RestaurantTag,
+	color: string,
+	size: number = 12,
+) => {
+	switch (tag) {
+		case RestaurantTag.KOSHER:
+			return (
+				<MaterialCommunityIcons name="food-kosher" size={size} color={color} />
+			);
+		case RestaurantTag.HALAL:
+			return (
+				<MaterialCommunityIcons name="food-halal" size={size} color={color} />
+			);
+		case RestaurantTag.VEGAN:
+			return <VeganIcon width={size} height={size} color={color} />;
+		case RestaurantTag.GLUTEN_FREE:
+			return <GlutenFreeIcon width={size} height={size} color={color} />;
+		case RestaurantTag.SPICY:
+			return <SpicyIcon width={size} height={size} color={color} />;
+		case RestaurantTag.VEGETARIAN:
+			return <Ionicons name="leaf-outline" size={size} color={color} />;
+		case RestaurantTag.DELIVERY:
+			return <Ionicons name="bicycle-outline" size={size} color={color} />;
+		case RestaurantTag.TAKE_AWAY:
+			return <Ionicons name="bag-handle-outline" size={size} color={color} />;
+		case RestaurantTag.OUTDOOR_SEATING:
+			return <Ionicons name="sunny-outline" size={size} color={color} />;
+		case RestaurantTag.PARKING:
+			return <Ionicons name="car-outline" size={size} color={color} />;
+		case RestaurantTag.WIFI:
+			return <Ionicons name="wifi-outline" size={size} color={color} />;
+		case RestaurantTag.CREDIT_CARDS:
+			return <Ionicons name="card-outline" size={size} color={color} />;
+		case RestaurantTag.RESERVATIONS:
+			return <Ionicons name="calendar-outline" size={size} color={color} />;
+		case RestaurantTag.LIVE_MUSIC:
+			return (
+				<Ionicons name="musical-notes-outline" size={size} color={color} />
+			);
+		case RestaurantTag.PET_FRIENDLY:
+			return <Ionicons name="paw-outline" size={size} color={color} />;
+		case RestaurantTag.AIR_CONDITIONING:
+			return <Ionicons name="snow-outline" size={size} color={color} />;
+		case RestaurantTag.FAMILY_FRIENDLY:
+			return <Ionicons name="people-outline" size={size} color={color} />;
+		case RestaurantTag.ROMANTIC:
+			return <Ionicons name="heart-outline" size={size} color={color} />;
+		case RestaurantTag.BUSINESS_FRIENDLY:
+			return <Ionicons name="briefcase-outline" size={size} color={color} />;
+		default:
+			return <Ionicons name="restaurant-outline" size={size} color={color} />;
+	}
+};
 
 export default function TagsSelectionModal({
 	visible,
@@ -55,24 +114,17 @@ export default function TagsSelectionModal({
 			presentationStyle="pageSheet"
 		>
 			<View style={styles.modalContainer}>
-				<View style={styles.modalHeader}>
-					<TouchableOpacity onPress={onClose}>
-						<Text style={styles.cancelText}>{t('general.cancel')}</Text>
-					</TouchableOpacity>
-					<Text style={styles.modalTitle}>
-						{t('registerRestaurant.categories')}
-					</Text>
-					<TouchableOpacity onPress={handleSave}>
-						<Text style={styles.saveText}>{t('general.save')}</Text>
-					</TouchableOpacity>
-				</View>
+				<HeaderModal
+					title={t('registerRestaurant.categories')}
+					handleClose={onClose}
+					handleSave={handleSave}
+				/>
 				<ScrollView style={styles.modalContent}>
 					<Text style={styles.label}>
 						{t('registerRestaurant.categoriesDescription')}
 					</Text>
 					<View style={styles.tagsGrid}>
 						{Object.values(RestaurantTag).map((tag) => {
-							const iconName = TAG_ICONS[tag];
 							return (
 								<TouchableOpacity
 									key={tag}
@@ -82,16 +134,13 @@ export default function TagsSelectionModal({
 									]}
 									onPress={() => handleToggleTag(tag)}
 								>
-									<Ionicons
-										name={iconName}
-										size={16}
-										color={
-											tempSelected.includes(tag)
-												? colors.quaternary
-												: colors.primary
-										}
-										style={{ marginRight: 5 }}
-									/>
+									{renderTagIcon(
+										tag,
+										tempSelected.includes(tag)
+											? colors.quaternary
+											: colors.primary,
+										14,
+									)}
 									<Text
 										style={[
 											styles.tagButtonText,
@@ -116,33 +165,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: colors.secondary,
 	},
-	modalHeader: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		paddingHorizontal: 20,
-		paddingVertical: 15,
-		borderBottomWidth: 1,
-		borderBottomColor: '#E5E5E5',
-	},
-	cancelText: {
-		color: colors.primary,
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
-	},
-	modalTitle: {
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
-		color: colors.primary,
-	},
-	saveText: {
-		color: colors.primary,
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
-	},
+
 	modalContent: {
 		flex: 1,
 		paddingHorizontal: 20,
@@ -171,6 +194,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		marginBottom: 8,
+		gap: 5,
 	},
 	tagButtonSelected: {
 		backgroundColor: colors.primary,

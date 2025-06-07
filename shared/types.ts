@@ -91,5 +91,6 @@ export type Dish = {
 	isLactoseFree: boolean;
 	isSpicy: boolean;
 	isGlutenFree: boolean;
+	isVegan: boolean;
 	category: DishCategory;
 };

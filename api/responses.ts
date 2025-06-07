@@ -206,6 +206,7 @@ export const getMenusByRestaurantId = (id: string): MenuData[] => {
 					isLactoseFree: false,
 					isSpicy: false,
 					isGlutenFree: false,
+					isVegan: true,
 				},
 				{
 					id: '2',
@@ -218,6 +219,7 @@ export const getMenusByRestaurantId = (id: string): MenuData[] => {
 					isLactoseFree: true,
 					isSpicy: false,
 					isGlutenFree: true,
+					isVegan: true,
 				},
 				{
 					id: '3',
@@ -230,6 +232,7 @@ export const getMenusByRestaurantId = (id: string): MenuData[] => {
 					isLactoseFree: true,
 					isSpicy: true,
 					isGlutenFree: false,
+					isVegan: true,
 				},
 				{
 					id: '4',
@@ -242,6 +245,7 @@ export const getMenusByRestaurantId = (id: string): MenuData[] => {
 					isLactoseFree: false,
 					isSpicy: false,
 					isGlutenFree: false,
+					isVegan: false,
 				},
 				{
 					id: '5',
@@ -254,6 +258,7 @@ export const getMenusByRestaurantId = (id: string): MenuData[] => {
 					isLactoseFree: true,
 					isSpicy: false,
 					isGlutenFree: true,
+					isVegan: false,
 				},
 				{
 					id: '6',
@@ -266,6 +271,7 @@ export const getMenusByRestaurantId = (id: string): MenuData[] => {
 					isLactoseFree: true,
 					isSpicy: false,
 					isGlutenFree: true,
+					isVegan: false,
 				},
 				{
 					id: '7',
@@ -277,6 +283,7 @@ export const getMenusByRestaurantId = (id: string): MenuData[] => {
 					isLactoseFree: false,
 					isSpicy: false,
 					isGlutenFree: false,
+					isVegan: false,
 				},
 				{
 					id: '8',
@@ -288,6 +295,7 @@ export const getMenusByRestaurantId = (id: string): MenuData[] => {
 					isLactoseFree: false,
 					isSpicy: false,
 					isGlutenFree: false,
+					isVegan: false,
 				},
 			],
 		},
@@ -318,6 +326,7 @@ export const getMenusByRestaurantId = (id: string): MenuData[] => {
 					isLactoseFree: false,
 					isSpicy: false,
 					isGlutenFree: false,
+					isVegan: false,
 				},
 				{
 					id: '10',
@@ -330,6 +339,7 @@ export const getMenusByRestaurantId = (id: string): MenuData[] => {
 					isLactoseFree: false,
 					isSpicy: false,
 					isGlutenFree: false,
+					isVegan: false,
 				},
 				{
 					id: '11',
@@ -342,6 +352,7 @@ export const getMenusByRestaurantId = (id: string): MenuData[] => {
 					isLactoseFree: true,
 					isSpicy: true,
 					isGlutenFree: true,
+					isVegan: false,
 				},
 				{
 					id: '12',
@@ -353,6 +364,7 @@ export const getMenusByRestaurantId = (id: string): MenuData[] => {
 					isLactoseFree: true,
 					isSpicy: false,
 					isGlutenFree: true,
+					isVegan: false,
 				},
 			],
 		},
@@ -375,6 +387,7 @@ export const getMenusByRestaurantId = (id: string): MenuData[] => {
 					isLactoseFree: true,
 					isSpicy: false,
 					isGlutenFree: true,
+					isVegan: false,
 				},
 				{
 					id: '14',
@@ -387,6 +400,7 @@ export const getMenusByRestaurantId = (id: string): MenuData[] => {
 					isLactoseFree: false,
 					isSpicy: false,
 					isGlutenFree: true,
+					isVegan: false,
 				},
 			],
 		},

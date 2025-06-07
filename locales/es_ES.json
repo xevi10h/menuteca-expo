@@ -42,9 +42,6 @@
 	"restaurant": {
 		"information": "Información",
 		"menu": "Menú",
-		"vegetarian": "Vegetariano",
-		"glutenFree": "Sin gluten",
-		"vegan": "Vegano",
 		"photos": "Fotos",
 		"reviews": "Qué opinan los usuarios",
 		"mapPlaceholder": "Mapa del restaurante",
@@ -102,9 +99,13 @@
 		"menuTitle": "Vamos con el menú",
 		"firstCourses": "Primeros",
 		"secondCourses": "Segundos",
-		"dishPlaceholder": "ej: ensalada cesar",
+		"desserts": "Postres",
+		"firstCoursePlaceholder": "ej: Ensalada Cesar",
+		"secondCoursePlaceholder": "ej: Solomillo de ternera",
+		"dessertPlaceholder": "ej: Tarta de queso",
 		"addFirstCourse": "añadir otro primero",
-		"addSecondCourse": "añadir segundo",
+		"addSecondCourse": "añadir otro segundo",
+		"addDessert": "añadir otro postre",
 		"addManualMenu": "Añadir manualmente",
 		"addPhotoMenu": "Añadir una foto del menú",
 		"uploadMenuPhoto": "Subir foto del menú",
@@ -116,10 +117,11 @@
 		"supplementPlaceholder": "ej: 3€",
 		"addSupplementButton": "Añadir suplemento",
 		"dietary": {
-			"glutenFree": "sin gluten",
-			"lactoseFree": "sin lactosa",
-			"vegetarian": "vegetariano",
-			"spicy": "picante"
+			"glutenFree": "Sin gluten",
+			"lactoseFree": "Sin lactosa",
+			"vegetarian": "Vegetariano",
+			"spicy": "Picante",
+			"vegan": "Vegano"
 		}
 	},
 	"days": {
@@ -167,8 +169,6 @@
 		"liveMusic": "Música en vivo",
 		"petFriendly": "Admite mascotas",
 		"airConditioning": "Climatización",
-		"smokingArea": "Zona de fumadores",
-		"wheelchairAccessible": "Accesible en silla de ruedas",
 		"familyFriendly": "Para familias",
 		"romantic": "Romántico",
 		"businessFriendly": "Para negocios"

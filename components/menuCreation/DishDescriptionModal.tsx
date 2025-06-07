@@ -1,3 +1,7 @@
+import GlutenFreeIcon from '@/assets/icons/GlutenFreeIcon';
+import LactoseFreeIcon from '@/assets/icons/LactoseFreeIcon';
+import SpicyIcon from '@/assets/icons/SpicyIcon';
+import VeganIcon from '@/assets/icons/VeganIcon';
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Dish } from '@/shared/types';
@@ -37,7 +41,7 @@ export default function DishDescriptionModal({
 	const toggleDietaryOption = (
 		option: keyof Pick<
 			Dish,
-			'isGlutenFree' | 'isLactoseFree' | 'isVegetarian' | 'isSpicy'
+			'isGlutenFree' | 'isLactoseFree' | 'isVegetarian' | 'isSpicy' | 'isVegan'
 		>,
 	) => {
 		if (currentDish) {
@@ -91,9 +95,8 @@ export default function DishDescriptionModal({
 							]}
 							onPress={() => toggleDietaryOption('isGlutenFree')}
 						>
-							<Ionicons
-								name="leaf-outline"
-								size={20}
+							<GlutenFreeIcon
+								width={20}
 								color={
 									currentDish.isGlutenFree ? colors.quaternary : colors.primary
 								}
@@ -115,9 +118,8 @@ export default function DishDescriptionModal({
 							]}
 							onPress={() => toggleDietaryOption('isLactoseFree')}
 						>
-							<Ionicons
-								name="water-outline"
-								size={20}
+							<LactoseFreeIcon
+								width={20}
 								color={
 									currentDish.isLactoseFree ? colors.quaternary : colors.primary
 								}
@@ -135,12 +137,32 @@ export default function DishDescriptionModal({
 						<TouchableOpacity
 							style={[
 								styles.dietaryOption,
+								currentDish.isSpicy && styles.dietaryOptionSelected,
+							]}
+							onPress={() => toggleDietaryOption('isSpicy')}
+						>
+							<SpicyIcon
+								width={20}
+								color={currentDish.isSpicy ? colors.quaternary : colors.primary}
+							/>
+							<Text
+								style={[
+									styles.dietaryText,
+									currentDish.isSpicy && styles.dietaryTextSelected,
+								]}
+							>
+								{t('menuCreation.dietary.spicy')}
+							</Text>
+						</TouchableOpacity>
+						<TouchableOpacity
+							style={[
+								styles.dietaryOption,
 								currentDish.isVegetarian && styles.dietaryOptionSelected,
 							]}
 							onPress={() => toggleDietaryOption('isVegetarian')}
 						>
 							<Ionicons
-								name="leaf"
+								name="leaf-outline"
 								size={20}
 								color={
 									currentDish.isVegetarian ? colors.quaternary : colors.primary
@@ -155,26 +177,24 @@ export default function DishDescriptionModal({
 								{t('menuCreation.dietary.vegetarian')}
 							</Text>
 						</TouchableOpacity>
-
 						<TouchableOpacity
 							style={[
 								styles.dietaryOption,
-								currentDish.isSpicy && styles.dietaryOptionSelected,
+								currentDish.isVegan && styles.dietaryOptionSelected,
 							]}
-							onPress={() => toggleDietaryOption('isSpicy')}
+							onPress={() => toggleDietaryOption('isVegan')}
 						>
-							<Ionicons
-								name="flame"
-								size={20}
-								color={currentDish.isSpicy ? colors.quaternary : colors.primary}
+							<VeganIcon
+								width={20}
+								color={currentDish.isVegan ? colors.quaternary : colors.primary}
 							/>
 							<Text
 								style={[
 									styles.dietaryText,
-									currentDish.isSpicy && styles.dietaryTextSelected,
+									currentDish.isVegan && styles.dietaryTextSelected,
 								]}
 							>
-								{t('menuCreation.dietary.spicy')}
+								{t('menuCreation.dietary.vegan')}
 							</Text>
 						</TouchableOpacity>
 					</View>

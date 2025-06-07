@@ -42,9 +42,6 @@
 	"restaurant": {
 		"information": "Informació",
 		"menu": "Menú",
-		"vegetarian": "Vegetarià",
-		"glutenFree": "Sense gluten",
-		"vegan": "Vegà",
 		"photos": "Fotos",
 		"reviews": "Què opinen els usuaris",
 		"mapPlaceholder": "Mapa del restaurant",
@@ -102,9 +99,13 @@
 		"menuTitle": "Anem amb el menú",
 		"firstCourses": "Primers",
 		"secondCourses": "Segons",
-		"dishPlaceholder": "ex: amanida cessar",
+		"desserts": "Postres",
+		"firstCoursePlaceholder": "ex: Amanida Cessar",
+		"secondCoursePlaceholder": "ex: Filet de vedella",
+		"dessertPlaceholder": "ex: Pastís de formatge",
 		"addFirstCourse": "afegir un altre primer",
-		"addSecondCourse": "afegir segon",
+		"addSecondCourse": "afegir un altre segon",
+		"addDessert": "afegir un altre postre",
 		"addManualMenu": "Afegir manualment",
 		"addPhotoMenu": "Afegeix una foto del menú",
 		"uploadMenuPhoto": "Pujar foto del menú",
@@ -116,10 +117,11 @@
 		"supplementPlaceholder": "ex: 3€",
 		"addSupplementButton": "Afegir suplement",
 		"dietary": {
-			"glutenFree": "sense gluten",
-			"lactoseFree": "sense lactosa",
-			"vegetarian": "vegetarià",
-			"spicy": "picant"
+			"glutenFree": "Sense gluten",
+			"lactoseFree": "Sense lactosa",
+			"vegetarian": "Vegetarià",
+			"spicy": "Picant",
+			"vegan": "Vegà"
 		}
 	},
 	"days": {
@@ -167,8 +169,6 @@
 		"liveMusic": "Música en viu",
 		"petFriendly": "Admet mascotes",
 		"airConditioning": "Climatització",
-		"smokingArea": "Zona fumadors",
-		"wheelchairAccessible": "Accessible en cadira de rodes",
 		"familyFriendly": "Per a famílies",
 		"romantic": "Romàntic",
 		"businessFriendly": "Per a negocis"

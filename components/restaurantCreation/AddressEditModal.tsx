@@ -2,15 +2,9 @@ import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import * as Location from 'expo-location';
 import React, { useState } from 'react';
-import {
-	Modal,
-	StyleSheet,
-	Text,
-	TextInput,
-	TouchableOpacity,
-	View,
-} from 'react-native';
+import { Modal, StyleSheet, Text, TextInput, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import HeaderModal from './HeaderModal';
 
 interface AddressEditModalProps {
 	visible: boolean;
@@ -83,17 +77,11 @@ export default function AddressEditModal({
 			presentationStyle="pageSheet"
 		>
 			<View style={styles.modalContainer}>
-				<View style={styles.modalHeader}>
-					<TouchableOpacity onPress={handleCancel}>
-						<Text style={styles.cancelText}>{t('general.cancel')}</Text>
-					</TouchableOpacity>
-					<Text style={styles.modalTitle}>
-						{t('registerRestaurant.address')}
-					</Text>
-					<TouchableOpacity onPress={handleSave}>
-						<Text style={styles.saveText}>{t('general.save')}</Text>
-					</TouchableOpacity>
-				</View>
+				<HeaderModal
+					title={t('registerRestaurant.address')}
+					handleClose={handleCancel}
+					handleSave={handleSave}
+				/>
 				<View style={styles.modalContent}>
 					<Text style={styles.label}>
 						{t('registerRestaurant.mapTapInstruction')}
@@ -142,33 +130,6 @@ const styles = StyleSheet.create({
 	modalContainer: {
 		flex: 1,
 		backgroundColor: colors.secondary,
-	},
-	modalHeader: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		paddingHorizontal: 20,
-		paddingVertical: 15,
-		borderBottomWidth: 1,
-		borderBottomColor: '#E5E5E5',
-	},
-	cancelText: {
-		color: colors.primary,
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
-	},
-	modalTitle: {
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
-		color: colors.primary,
-	},
-	saveText: {
-		color: colors.primary,
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
 	},
 	modalContent: {
 		flex: 1,

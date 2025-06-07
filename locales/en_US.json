@@ -42,9 +42,6 @@
 	"restaurant": {
 		"information": "Information",
 		"menu": "Menu",
-		"vegetarian": "Vegetarian",
-		"glutenFree": "Gluten Free",
-		"vegan": "Vegan",
 		"photos": "Photos",
 		"reviews": "What users think",
 		"mapPlaceholder": "Restaurant map",
@@ -102,9 +99,13 @@
 		"menuTitle": "Let's go with the menu",
 		"firstCourses": "First courses",
 		"secondCourses": "Second courses",
-		"dishPlaceholder": "e.g: caesar salad",
+		"desserts": "Desserts",
+		"firstCoursePlaceholder": "e.g: Caesar salad",
+		"secondCoursePlaceholder": "e.g: Grilled chicken with vegetables",
+		"dessertPlaceholder": "e.g: Cheesecake",
 		"addFirstCourse": "add another first course",
-		"addSecondCourse": "add second course",
+		"addSecondCourse": "add another second course",
+		"addDessert": "add another dessert",
 		"addManualMenu": "Add manually",
 		"addPhotoMenu": "Add a photo of the menu",
 		"uploadMenuPhoto": "Upload menu photo",
@@ -116,10 +117,11 @@
 		"supplementPlaceholder": "e.g: 3€",
 		"addSupplementButton": "Add supplement",
 		"dietary": {
-			"glutenFree": "gluten free",
-			"lactoseFree": "lactose free",
-			"vegetarian": "vegetarian",
-			"spicy": "spicy"
+			"glutenFree": "Gluten free",
+			"lactoseFree": "Lactose free",
+			"vegetarian": "Vegetarian",
+			"spicy": "Spicy",
+			"vegan": "Vegan"
 		}
 	},
 	"days": {
@@ -167,8 +169,7 @@
 		"liveMusic": "Live music",
 		"petFriendly": "Pet-friendly",
 		"airConditioning": "Air conditioning",
-		"smokingArea": "Smoking area",
-		"wheelchairAccessible": "Wheelchair accessible",
+
 		"familyFriendly": "Family-friendly",
 		"romantic": "Romantic",
 		"businessFriendly": "Business-friendly"

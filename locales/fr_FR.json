@@ -42,9 +42,6 @@
 	"restaurant": {
 		"information": "Information",
 		"menu": "Menu",
-		"vegetarian": "Végétarien",
-		"glutenFree": "Sans gluten",
-		"vegan": "Végétalien",
 		"photos": "Photos",
 		"reviews": "Avis des utilisateurs",
 		"mapPlaceholder": "Carte du restaurant",
@@ -102,9 +99,13 @@
 		"menuTitle": "Allons-y avec le menu",
 		"firstCourses": "Entrées",
 		"secondCourses": "Plats principaux",
-		"dishPlaceholder": "ex: salade césar",
+		"desserts": "Desserts",
+		"firstCoursePlaceholder": "ex: Salade César",
+		"secondCoursePlaceholder": "ex: Poulet grillé avec légumes",
+		"dessertPlaceholder": "ex: Cheesecake",
 		"addFirstCourse": "ajouter une autre entrée",
-		"addSecondCourse": "ajouter un plat principal",
+		"addSecondCourse": "ajouter une autre plat principal",
+		"addDessert": "ajouter une autre dessert",
 		"addManualMenu": "Ajouter manuellement",
 		"addPhotoMenu": "Ajouter une photo du menu",
 		"uploadMenuPhoto": "Télécharger la photo du menu",
@@ -116,10 +117,11 @@
 		"supplementPlaceholder": "ex: 3€",
 		"addSupplementButton": "Ajouter un supplément",
 		"dietary": {
-			"glutenFree": "sans gluten",
-			"lactoseFree": "sans lactose",
-			"vegetarian": "végétarien",
-			"spicy": "épicé"
+			"glutenFree": "Sans gluten",
+			"lactoseFree": "Sans lactose",
+			"vegetarian": "Végétarien",
+			"spicy": "Epicé",
+			"vegan": "Végétalien"
 		}
 	},
 	"days": {
@@ -167,8 +169,7 @@
 		"liveMusic": "Musique live",
 		"petFriendly": "Animaux acceptés",
 		"airConditioning": "Climatisation",
-		"smokingArea": "Zone fumeurs",
-		"wheelchairAccessible": "Accessible aux fauteuils roulants",
+
 		"familyFriendly": "Idéal pour les familles",
 		"romantic": "Romantique",
 		"businessFriendly": "Idéal pour les affaires"

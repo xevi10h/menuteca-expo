@@ -66,15 +66,6 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 			<View style={styles.menuItemHeader}>
 				<Text style={styles.menuItemName}>{item.name}</Text>
 				<View style={styles.menuItemIcons}>
-					{item.isVegetarian && (
-						<View style={styles.dietIcon}>
-							<Image
-								source={require('@/assets/images/vegetarian_icon.png')}
-								style={{ width: 18, height: 18 }}
-								resizeMode="contain"
-							/>
-						</View>
-					)}
 					{item.isLactoseFree && (
 						<View style={styles.dietIcon}>
 							<Image
@@ -97,6 +88,20 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 						<View style={styles.dietIcon}>
 							<Image
 								source={require('@/assets/images/gluten_free_icon.png')}
+								style={{ width: 18, height: 18 }}
+								resizeMode="contain"
+							/>
+						</View>
+					)}
+					{item.isVegetarian && (
+						<View style={styles.dietIcon}>
+							<Ionicons name="leaf-outline" size={18} color={colors.primary} />
+						</View>
+					)}
+					{item.isVegan && (
+						<View style={styles.dietIcon}>
+							<Image
+								source={require('@/assets/images/vegetarian_icon.png')}
 								style={{ width: 18, height: 18 }}
 								resizeMode="contain"
 							/>

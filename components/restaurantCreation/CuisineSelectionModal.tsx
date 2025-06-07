@@ -4,6 +4,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { useUserStore } from '@/zustand/UserStore';
 import React, { useEffect, useState } from 'react';
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import HeaderModal from './HeaderModal';
 
 interface CuisineSelectionModalProps {
 	visible: boolean;
@@ -46,17 +47,11 @@ export default function CuisineSelectionModal({
 			presentationStyle="pageSheet"
 		>
 			<View style={styles.modalContainer}>
-				<View style={styles.modalHeader}>
-					<TouchableOpacity onPress={onClose}>
-						<Text style={styles.cancelText}>{t('general.cancel')}</Text>
-					</TouchableOpacity>
-					<Text style={styles.modalTitle}>
-						{t('registerRestaurant.foodType')}
-					</Text>
-					<TouchableOpacity onPress={handleSave}>
-						<Text style={styles.saveText}>{t('general.save')}</Text>
-					</TouchableOpacity>
-				</View>
+				<HeaderModal
+					title={t('registerRestaurant.foodType')}
+					handleClose={onClose}
+					handleSave={handleSave}
+				/>
 				<View style={styles.modalContent}>
 					<Text style={styles.label}>
 						{t('registerRestaurant.cuisineTypesSubtitle')}
@@ -93,33 +88,6 @@ const styles = StyleSheet.create({
 	modalContainer: {
 		flex: 1,
 		backgroundColor: colors.secondary,
-	},
-	modalHeader: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		paddingHorizontal: 20,
-		paddingVertical: 15,
-		borderBottomWidth: 1,
-		borderBottomColor: '#E5E5E5',
-	},
-	cancelText: {
-		color: colors.primary,
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
-	},
-	modalTitle: {
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
-		color: colors.primary,
-	},
-	saveText: {
-		color: colors.primary,
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
 	},
 	modalContent: {
 		flex: 1,
