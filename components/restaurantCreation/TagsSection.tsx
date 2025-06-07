@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-interface RestaurantTagsSectionProps {
+interface TagsSectionProps {
 	selectedTags: string[];
 	onEditPress: () => void;
 }
@@ -36,10 +36,10 @@ export const TAG_ICONS: Record<RestaurantTag, keyof typeof Ionicons.glyphMap> =
 		[RestaurantTag.BUSINESS_FRIENDLY]: 'briefcase',
 	};
 
-export default function RestaurantTagsSection({
+export default function TagsSection({
 	selectedTags,
 	onEditPress,
-}: RestaurantTagsSectionProps) {
+}: TagsSectionProps) {
 	const { t } = useTranslation();
 
 	return (

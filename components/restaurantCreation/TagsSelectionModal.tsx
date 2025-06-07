@@ -11,7 +11,7 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native';
-import { TAG_ICONS } from './RestaurantTagsSection';
+import { TAG_ICONS } from './TagsSection';
 
 interface TagsSelectionModalProps {
 	visible: boolean;

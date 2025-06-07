@@ -7,7 +7,7 @@ import CuisineSelectionSection from '@/components/restaurantCreation/CuisineSele
 import MenusSection from '@/components/restaurantCreation/MenusSection';
 import PhotosSection from '@/components/restaurantCreation/PhotosSection';
 import ProfilePhotoSection from '@/components/restaurantCreation/ProfilePhotoSection';
-import RestaurantTagsSection from '@/components/restaurantCreation/RestaurantTagsSection';
+import TagsSection from '@/components/restaurantCreation/TagsSection';
 import TagsSelectionModal from '@/components/restaurantCreation/TagsSelectionModal';
 import { useTranslation } from '@/hooks/useTranslation';
 import { MenuData } from '@/shared/types';
@@ -133,7 +133,7 @@ export default function EditTab() {
 				/>
 
 				{/* Tags Section */}
-				<RestaurantTagsSection
+				<TagsSection
 					selectedTags={registerRestaurant.tags || []}
 					onEditPress={() => setShowTagsModal(true)}
 				/>
