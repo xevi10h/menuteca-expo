@@ -36,7 +36,8 @@
 		"yes": "SI",
 		"no": "NO",
 		"edit": "Editar",
-		"preview": "Vista previa"
+		"preview": "Vista previa",
+		"delete": "Eliminar"
 	},
 	"restaurant": {
 		"information": "Información",
@@ -47,7 +48,9 @@
 		"photos": "Fotos",
 		"reviews": "Qué opinan los usuarios",
 		"mapPlaceholder": "Mapa del restaurante",
-		"cancelOpenMap": "Cancelar"
+		"cancelOpenMap": "Cancelar",
+		"noMenuAvailable": "No hay menú disponible",
+		"noRating": "Sin valoraciones"
 	},
 	"registerRestaurant": {
 		"hasMenu": "¿Tienes un restaurante con ",
@@ -69,11 +72,21 @@
 		"selectPhoto": "Selecciona una foto de perfil para tu restaurante.",
 		"myMenus": "Mis menús",
 		"addMenu": "añade un menú",
+		"defaultMenuName": "Menú de mediodía",
 		"uploadPhotos": "Subir fotos",
 		"uploadPhotosDescription": "Añade fotos del restaurante y de platos para que los usuarios puedan conocer más tu restaurante",
 		"foodType": "Tipo de comida",
 		"address": "Dirección",
-		"noCuisinesSelected": "No has seleccionado ningún tipo de cocina"
+		"noCuisinesSelected": "No has seleccionado ningún tipo de cocina",
+		"categories": "Categorías",
+		"categoriesDescription": "Selecciona las categorías que describen tu restaurante",
+		"noTagsSelected": "No has seleccionado categorías",
+		"permissionsRequired": "Permisos necesarios",
+		"photoPermissionMessage": "Necesitamos permisos para acceder a tus fotos",
+		"deleteMenuTitle": "Eliminar menú",
+		"deleteMenuMessage": "¿Estás seguro de que quieres eliminar este menú?",
+		"mapTapInstruction": "Toca en el mapa para seleccionar la ubicación",
+		"newLocation": "Nueva ubicación"
 	},
 	"menuCreation": {
 		"menuName": "Nombre del menú",
@@ -103,10 +116,10 @@
 		"supplementPlaceholder": "ej: 3€",
 		"addSupplementButton": "Añadir suplemento",
 		"dietary": {
-			"glutenFree": "sense gluten",
-			"lactoseFree": "sense lactosa",
-			"vegetarian": "vegetarià",
-			"spicy": "picant"
+			"glutenFree": "sin gluten",
+			"lactoseFree": "sin lactosa",
+			"vegetarian": "vegetariano",
+			"spicy": "picante"
 		}
 	},
 	"days": {
@@ -137,7 +150,7 @@
 		"coffes": "Cafés",
 		"drinks": "Bebidas"
 	},
-	"resturantTags": {
+	"restaurantTags": {
 		"vegetarian": "Vegetariano",
 		"vegan": "Vegano",
 		"glutenFree": "Sin gluten",

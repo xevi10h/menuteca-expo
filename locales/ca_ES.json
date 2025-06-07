@@ -36,7 +36,8 @@
 		"yes": "SÍ",
 		"no": "NO",
 		"edit": "Editar",
-		"preview": "Vista prèvia"
+		"preview": "Vista prèvia",
+		"delete": "Eliminar"
 	},
 	"restaurant": {
 		"information": "Informació",
@@ -47,7 +48,9 @@
 		"photos": "Fotos",
 		"reviews": "Què opinen els usuaris",
 		"mapPlaceholder": "Mapa del restaurant",
-		"cancelOpenMap": "Cancel·lar"
+		"cancelOpenMap": "Cancel·lar",
+		"noMenuAvailable": "No hi ha menú disponible",
+		"noRating": "Sense valoracions"
 	},
 	"registerRestaurant": {
 		"hasMenu": "Tens un restaurant amb ",
@@ -69,11 +72,21 @@
 		"selectPhoto": "Selecciona una foto de perfil pel teu restaurant.",
 		"myMenus": "Els meus menús",
 		"addMenu": "afegeix un menú",
+		"defaultMenuName": "Menú de migdia",
 		"uploadPhotos": "Pujar fotos",
 		"uploadPhotosDescription": "Afegeix fotos del restaurant i de plats perquè els usuaris puguin conèixer més el teu restaurant",
 		"foodType": "Tipus de menjar",
 		"address": "Adreça",
-		"noCuisinesSelected": "No has seleccionat cap tipus de cuina"
+		"noCuisinesSelected": "No has seleccionat cap tipus de cuina",
+		"categories": "Categories",
+		"categoriesDescription": "Selecciona les categories que descriuen el teu restaurant",
+		"noTagsSelected": "No has seleccionat categories",
+		"permissionsRequired": "Permisos necessaris",
+		"photoPermissionMessage": "Necessitem permisos per accedir a les teves fotos",
+		"deleteMenuTitle": "Eliminar menú",
+		"deleteMenuMessage": "Estàs segur que vols eliminar aquest menú?",
+		"mapTapInstruction": "Toca al mapa per seleccionar la ubicació",
+		"newLocation": "Nova ubicació"
 	},
 	"menuCreation": {
 		"menuName": "Nom del menú",
@@ -137,7 +150,7 @@
 		"coffes": "Cafès",
 		"drinks": "Begudes"
 	},
-	"resturantTags": {
+	"restaurantTags": {
 		"vegetarian": "Vegetarià",
 		"vegan": "Vegà",
 		"glutenFree": "Sense gluten",

@@ -36,7 +36,8 @@
 		"yes": "YES",
 		"no": "NO",
 		"edit": "Edit",
-		"preview": "Preview"
+		"preview": "Preview",
+		"delete": "Delete"
 	},
 	"restaurant": {
 		"information": "Information",
@@ -47,7 +48,9 @@
 		"photos": "Photos",
 		"reviews": "What users think",
 		"mapPlaceholder": "Restaurant map",
-		"cancelOpenMap": "Cancel"
+		"cancelOpenMap": "Cancel",
+		"noMenuAvailable": "No menu available",
+		"noRating": "No ratings"
 	},
 	"registerRestaurant": {
 		"hasMenu": "Do you have a restaurant with ",
@@ -69,11 +72,21 @@
 		"selectPhoto": "Select a profile photo for your restaurant.",
 		"myMenus": "My menus",
 		"addMenu": "add a menu",
+		"defaultMenuName": "Lunch menu",
 		"uploadPhotos": "Upload photos",
 		"uploadPhotosDescription": "Add photos of the restaurant and dishes so users can learn more about your restaurant",
 		"foodType": "Food type",
 		"address": "Address",
-		"noCuisinesSelected": "You have not selected any type of cuisine"
+		"noCuisinesSelected": "You have not selected any type of cuisine",
+		"categories": "Categories",
+		"categoriesDescription": "Select the categories that describe your restaurant",
+		"noTagsSelected": "You have not selected any categories",
+		"permissionsRequired": "Permissions required",
+		"photoPermissionMessage": "We need permissions to access your photos",
+		"deleteMenuTitle": "Delete menu",
+		"deleteMenuMessage": "Are you sure you want to delete this menu?",
+		"mapTapInstruction": "Tap on the map to select the location",
+		"newLocation": "New location"
 	},
 	"menuCreation": {
 		"menuName": "Menu name",
@@ -137,7 +150,7 @@
 		"coffes": "Coffees",
 		"drinks": "Drinks"
 	},
-	"resturantTags": {
+	"restaurantTags": {
 		"vegetarian": "Vegetarian",
 		"vegan": "Vegan",
 		"glutenFree": "Gluten-free",

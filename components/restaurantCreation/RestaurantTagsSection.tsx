@@ -1,0 +1,135 @@
+import { colors } from '@/assets/styles/colors';
+import { useTranslation } from '@/hooks/useTranslation';
+import { RestaurantTag } from '@/shared/enums';
+import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+interface RestaurantTagsSectionProps {
+	selectedTags: string[];
+	onEditPress: () => void;
+}
+
+// Mapeo de tags a iconos
+export const TAG_ICONS: Record<RestaurantTag, keyof typeof Ionicons.glyphMap> =
+	{
+		[RestaurantTag.VEGETARIAN]: 'leaf',
+		[RestaurantTag.VEGAN]: 'flower-outline',
+		[RestaurantTag.GLUTEN_FREE]: 'leaf-outline',
+		[RestaurantTag.HALAL]: 'restaurant',
+		[RestaurantTag.KOSHER]: 'restaurant-outline',
+		[RestaurantTag.SPICY]: 'flame',
+		[RestaurantTag.DELIVERY]: 'bicycle',
+		[RestaurantTag.TAKE_AWAY]: 'bag-handle',
+		[RestaurantTag.OUTDOOR_SEATING]: 'sunny',
+		[RestaurantTag.PARKING]: 'car',
+		[RestaurantTag.WIFI]: 'wifi',
+		[RestaurantTag.CREDIT_CARDS]: 'card',
+		[RestaurantTag.RESERVATIONS]: 'calendar',
+		[RestaurantTag.LIVE_MUSIC]: 'musical-notes',
+		[RestaurantTag.PET_FRIENDLY]: 'paw',
+		[RestaurantTag.AIR_CONDITIONING]: 'snow',
+		[RestaurantTag.SMOKING_AREA]: 'cloud',
+		[RestaurantTag.WHEELCHAIR_ACCESSIBLE]: 'accessibility',
+		[RestaurantTag.FAMILY_FRIENDLY]: 'people',
+		[RestaurantTag.ROMANTIC]: 'heart',
+		[RestaurantTag.BUSINESS_FRIENDLY]: 'briefcase',
+	};
+
+export default function RestaurantTagsSection({
+	selectedTags,
+	onEditPress,
+}: RestaurantTagsSectionProps) {
+	const { t } = useTranslation();
+
+	return (
+		<View style={styles.tagsSection}>
+			<View style={styles.sectionHeader}>
+				<Text style={styles.sectionTitle}>
+					{t('registerRestaurant.categories')}
+				</Text>
+				<TouchableOpacity style={styles.editButton} onPress={onEditPress}>
+					<Ionicons name="pencil-outline" size={16} color={colors.primary} />
+				</TouchableOpacity>
+			</View>
+			<Text style={styles.sectionSubtitle}>
+				{t('registerRestaurant.categoriesDescription')}
+			</Text>
+
+			<View style={styles.selectedTags}>
+				{selectedTags.length > 0 ? (
+					selectedTags.map((tagId) => {
+						const tagKey = tagId as RestaurantTag;
+						const iconName = TAG_ICONS[tagKey];
+						return (
+							<View key={tagId} style={styles.selectedTag}>
+								<Ionicons
+									name={iconName}
+									size={12}
+									color={colors.quaternary}
+									style={{ marginRight: 4 }}
+								/>
+								<Text style={styles.selectedTagText}>
+									{t(`restaurantTags.${tagId}`)}
+								</Text>
+							</View>
+						);
+					})
+				) : (
+					<View style={styles.selectedTag}>
+						<Text style={styles.selectedTagText}>
+							{t('registerRestaurant.noTagsSelected')}
+						</Text>
+					</View>
+				)}
+			</View>
+		</View>
+	);
+}
+
+const styles = StyleSheet.create({
+	tagsSection: {
+		marginVertical: 15,
+	},
+	sectionHeader: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+	},
+	sectionTitle: {
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.primary,
+		marginBottom: 10,
+	},
+	editButton: {
+		padding: 5,
+	},
+	sectionSubtitle: {
+		fontSize: 12,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primary,
+		marginBottom: 10,
+	},
+	selectedTags: {
+		flexDirection: 'row',
+		flexWrap: 'wrap',
+		gap: 8,
+	},
+	selectedTag: {
+		backgroundColor: colors.primary,
+		paddingHorizontal: 12,
+		paddingVertical: 6,
+		borderRadius: 15,
+		flexDirection: 'row',
+		alignItems: 'center',
+	},
+	selectedTagText: {
+		fontSize: 12,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		color: colors.quaternary,
+	},
+});

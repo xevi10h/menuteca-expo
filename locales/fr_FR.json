@@ -36,7 +36,8 @@
 		"yes": "OUI",
 		"no": "NON",
 		"edit": "Modifier",
-		"preview": "Aperçu"
+		"preview": "Aperçu",
+		"delete": "Supprimer"
 	},
 	"restaurant": {
 		"information": "Information",
@@ -47,7 +48,9 @@
 		"photos": "Photos",
 		"reviews": "Avis des utilisateurs",
 		"mapPlaceholder": "Carte du restaurant",
-		"cancelOpenMap": "Annuler"
+		"cancelOpenMap": "Annuler",
+		"noMenuAvailable": "Aucun menu disponible",
+		"noRating": "Aucune évaluation"
 	},
 	"registerRestaurant": {
 		"hasMenu": "Avez-vous un restaurant avec ",
@@ -69,11 +72,21 @@
 		"selectPhoto": "Sélectionnez une photo de profil pour votre restaurant.",
 		"myMenus": "Mes menus",
 		"addMenu": "ajouter un menu",
+		"defaultMenuName": "Menu du midi",
 		"uploadPhotos": "Télécharger des photos",
 		"uploadPhotosDescription": "Ajoutez des photos du restaurant et des plats pour que les utilisateurs puissent mieux connaître votre restaurant",
 		"foodType": "Type de nourriture",
 		"address": "Adresse",
-		"noCuisinesSelected": "Vous n'avez sélectionné aucun type de cuisine"
+		"noCuisinesSelected": "Vous n'avez sélectionné aucun type de cuisine",
+		"categories": "Catégories",
+		"categoriesDescription": "Sélectionnez les catégories qui décrivent votre restaurant",
+		"noTagsSelected": "Vous n'avez sélectionné aucune catégorie",
+		"permissionsRequired": "Autorisations requises",
+		"photoPermissionMessage": "Nous avons besoin d'autorisations pour accéder à vos photos",
+		"deleteMenuTitle": "Supprimer le menu",
+		"deleteMenuMessage": "Êtes-vous sûr de vouloir supprimer ce menu?",
+		"mapTapInstruction": "Appuyez sur la carte pour sélectionner l'emplacement",
+		"newLocation": "Nouvel emplacement"
 	},
 	"menuCreation": {
 		"menuName": "Nom du menu",
@@ -135,9 +148,9 @@
 		"sides": "Accompagnements",
 		"desserts": "Desserts",
 		"coffes": "Cafés",
-		"drinks": "Beverages"
+		"drinks": "Boissons"
 	},
-	"resturantTags": {
+	"restaurantTags": {
 		"vegetarian": "Végétarien",
 		"vegan": "Végétalien",
 		"glutenFree": "Sans gluten",
