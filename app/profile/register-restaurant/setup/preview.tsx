@@ -3,7 +3,6 @@ import RestaurantBasicInformation from '@/components/RestaurantBasicInformation'
 import Information from '@/components/restaurantDetail/Information';
 import Menu from '@/components/restaurantDetail/Menu';
 import { useTranslation } from '@/hooks/useTranslation';
-import { Restaurant } from '@/shared/types';
 import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
 import React, { useMemo, useState } from 'react';
 import {
@@ -54,46 +53,13 @@ export default function PreviewTab() {
 	const tabIndicatorX = useSharedValue(0);
 	const tabIndicatorWidth = useSharedValue(0);
 
-	// Crear un restaurante mock con los datos del formulario
-	const previewRestaurant: Restaurant = useMemo(
-		() => ({
-			id: 'preview',
-			name: registerRestaurant.name || 'Tu Restaurante',
-			minimumPrice:
-				registerRestaurant.menus && registerRestaurant.menus.length > 0
-					? Math.min(...registerRestaurant.menus.map((m) => m.price))
-					: 15,
-			cuisine: registerRestaurant.cuisineId || 'mediterranean',
-			rating: 4.5,
-			mainImage:
-				registerRestaurant.images?.[0] ||
-				'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
-			profileImage: registerRestaurant.profileImage,
-			images:
-				registerRestaurant.images && registerRestaurant.images.length > 0
-					? registerRestaurant.images
-					: [
-							'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
-							'https://images.pexels.com/photos/2092507/pexels-photo-2092507.jpeg',
-							'https://images.pexels.com/photos/1907228/pexels-photo-1907228.jpeg',
-					  ],
-			distance: 0,
-			address: registerRestaurant.address || 'Tu dirección',
-			coordinates: registerRestaurant.coordinates || {
-				latitude: 41.3851,
-				longitude: 2.1734,
-			},
-		}),
-		[registerRestaurant],
-	);
-
 	// Menús del restaurante provisional
 	const previewMenus = registerRestaurant.menus || [];
 
 	// Referencias a los componentes para evitar re-renders
 	const informationComponent = useMemo(
-		() => <Information restaurant={previewRestaurant} onMapPress={() => {}} />,
-		[previewRestaurant],
+		() => <Information restaurant={registerRestaurant} onMapPress={() => {}} />,
+		[registerRestaurant],
 	);
 
 	const menuComponent = useMemo(() => {
@@ -177,16 +143,18 @@ export default function PreviewTab() {
 		<View style={styles.container}>
 			{/* Header Image */}
 			<View style={styles.imageContainer}>
-				<Image
-					source={{ uri: previewRestaurant.mainImage }}
-					style={styles.headerImage}
-					resizeMode="cover"
-				/>
+				{registerRestaurant?.images?.[0] && (
+					<Image
+						source={{ uri: registerRestaurant.images[0] }}
+						style={styles.headerImage}
+						resizeMode="cover"
+					/>
+				)}
 				<View style={styles.imageOverlay} />
 
 				<View style={styles.restaurantInfo}>
 					<RestaurantBasicInformation
-						restaurant={previewRestaurant}
+						restaurant={registerRestaurant}
 						color={colors.quaternary}
 					/>
 				</View>

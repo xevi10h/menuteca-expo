@@ -1,28 +1,19 @@
-import { MenuData } from '@/shared/types';
+import { MenuData, Restaurant } from '@/shared/types';
 import { create } from 'zustand';
 
-export interface IRegisterRestaurant {
-	name: string;
-	address?: string;
-	cuisineId?: string;
-	profileImage?: string;
-	images?: string[];
-	menus?: MenuData[];
-	tags?: string[]; // Nueva propiedad para las categorías/tags
-	coordinates?: {
-		latitude: number;
-		longitude: number;
-	};
-}
-
-export const defaultRegisterRestaurant: IRegisterRestaurant = {
+export const defaultRegisterRestaurant: Restaurant = {
+	id: '',
 	name: '',
 	address: '',
-	cuisineId: undefined,
+	cuisine: '',
 	profileImage: undefined,
 	images: [],
 	menus: [],
-	tags: [], // Inicializar como array vacío
+	tags: [],
+	minimumPrice: 0,
+	rating: undefined,
+	mainImage: '',
+	distance: 0,
 	coordinates: {
 		latitude: 41.3851,
 		longitude: 2.1734,
@@ -30,7 +21,7 @@ export const defaultRegisterRestaurant: IRegisterRestaurant = {
 };
 
 interface RegisterRestaurantState {
-	registerRestaurant: IRegisterRestaurant;
+	registerRestaurant: Restaurant;
 	setRegisterRestaurantCuisine: (cuisine: string | null) => void;
 	setRegisterRestaurantAddress: (address: string) => void;
 	setRegisterRestaurantName: (name: string) => void;

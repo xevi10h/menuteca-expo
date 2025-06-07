@@ -37,6 +37,8 @@ export default function EditTab() {
 		setRegisterRestaurantTags,
 	} = useRegisterRestaurantStore();
 
+	console.log('registerrestaurant', registerRestaurant);
+
 	const handleAddImages = (imageUris: string[]) => {
 		imageUris.forEach((uri) => {
 			addRegisterRestaurantImage(uri);
@@ -128,7 +130,7 @@ export default function EditTab() {
 
 				{/* Food Types Section */}
 				<CuisineSelectionSection
-					selectedCuisineId={registerRestaurant.cuisineId}
+					selectedCuisineId={registerRestaurant.cuisine}
 					onEditPress={() => setShowCuisineModal(true)}
 				/>
 
@@ -170,7 +172,7 @@ export default function EditTab() {
 				visible={showCuisineModal}
 				onClose={() => setShowCuisineModal(false)}
 				onSave={handleSaveCuisines}
-				selectedCuisine={registerRestaurant.cuisineId}
+				selectedCuisine={registerRestaurant.cuisine}
 			/>
 
 			{/* Tags Selection Modal */}

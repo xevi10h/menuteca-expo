@@ -7,13 +7,14 @@ export type Restaurant = {
 	name: string;
 	minimumPrice: number;
 	cuisine: string;
-	rating: number;
+	rating?: number;
 	mainImage: string;
 	profileImage?: string;
 	images: string[];
 	distance: number;
 	address: string;
-	tags?: string[]; // Nueva propiedad para las categorías/tags
+	tags?: string[];
+	menus: MenuData[];
 	coordinates: {
 		latitude: number;
 		longitude: number;

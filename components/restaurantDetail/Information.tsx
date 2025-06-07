@@ -28,29 +28,20 @@ const Information: React.FC<InformationProps> = ({
 }) => {
 	const { t } = useTranslation();
 	const progressValue = useSharedValue<number>(0);
-
+	console.log('restauranttags', restaurant);
 	return (
 		<>
 			{/* Tags */}
 			<View style={styles.tagsContainer}>
-				<View style={styles.tag}>
-					<Text style={styles.tagText}>
-						{t(`cuisinesRestaurants.${restaurant.cuisine}`)}
-					</Text>
-				</View>
-				<View style={styles.tag}>
-					<Text style={styles.tagText}>
-						{t('restaurant.dietary.vegetarian')}
-					</Text>
-				</View>
-				<View style={styles.tag}>
-					<Text style={styles.tagText}>
-						{t('restaurant.dietary.glutenFree')}
-					</Text>
-				</View>
-				<View style={styles.tag}>
-					<Text style={styles.tagText}>{t('restaurant.dietary.vegan')}</Text>
-				</View>
+				{restaurant.tags?.map((tag) => {
+					return (
+						<View key={tag} style={styles.tag}>
+							<Text style={styles.tagText}>
+								{t(`menuCreation.dietary.${tag}`)}
+							</Text>
+						</View>
+					);
+				})}
 			</View>
 
 			{/* Address */}
