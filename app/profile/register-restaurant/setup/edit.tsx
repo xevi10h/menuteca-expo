@@ -1,3 +1,5 @@
+// app/profile/register-restaurant/setup/edit.tsx - Updated
+
 import { colors } from '@/assets/styles/colors';
 import MenuCreationModal from '@/components/MenuCreationModal';
 import AddressEditModal from '@/components/restaurantCreation/AddressEditModal';
@@ -11,7 +13,7 @@ import TagsSection from '@/components/restaurantCreation/TagsSection';
 import TagsSelectionModal from '@/components/restaurantCreation/TagsSelectionModal';
 import { useTranslation } from '@/hooks/useTranslation';
 import { RestaurantTag } from '@/shared/enums';
-import { MenuData } from '@/shared/types';
+import { Address, MenuData } from '@/shared/types';
 import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
@@ -23,16 +25,6 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native';
-
-// Interface for enhanced address components
-interface AddressComponents {
-	street: string;
-	number: string;
-	additionalNumber: string;
-	city: string;
-	postalCode: string;
-	country: string;
-}
 
 export default function EditTab() {
 	const { t } = useTranslation();
@@ -51,7 +43,6 @@ export default function EditTab() {
 		updateRegisterRestaurantMenu,
 		removeRegisterRestaurantMenu,
 		setRegisterRestaurantAddress,
-		setRegisterRestaurantCoordinates,
 		setRegisterRestaurantCuisine,
 		setRegisterRestaurantTags,
 	} = useRegisterRestaurantStore();
@@ -92,17 +83,8 @@ export default function EditTab() {
 		);
 	};
 
-	const handleSaveAddress = (
-		address: string,
-		coordinates?: { latitude: number; longitude: number },
-		addressComponents?: AddressComponents,
-	) => {
+	const handleSaveAddress = (address: Address) => {
 		setRegisterRestaurantAddress(address);
-		if (coordinates) {
-			setRegisterRestaurantCoordinates(coordinates);
-		}
-		// You could also store the addressComponents if needed for more detailed address info
-		console.log('Address components:', addressComponents);
 	};
 
 	const handleSaveCuisines = (selectedCuisine: string | null) => {
@@ -136,10 +118,9 @@ export default function EditTab() {
 					onImageSelected={setRegisterRestaurantProfileImage}
 				/>
 
-				{/* Address Section */}
+				{/* Address Section - UPDATED */}
 				<AddressSection
-					address={registerRestaurant.address}
-					coordinates={registerRestaurant.coordinates}
+					address={registerRestaurant.address.formattedAddress}
 					restaurantName={registerRestaurant.name}
 					onEditPress={() => setShowAddressModal(true)}
 				/>
@@ -240,13 +221,12 @@ export default function EditTab() {
 				}
 			/>
 
-			{/* Enhanced Address Edit Modal */}
+			{/* Address Edit Modal - UPDATED */}
 			<AddressEditModal
 				visible={showAddressModal}
 				onClose={() => setShowAddressModal(false)}
 				onSave={handleSaveAddress}
 				initialAddress={registerRestaurant.address}
-				initialCoordinates={registerRestaurant.coordinates}
 			/>
 
 			{/* Cuisine Selection Modal */}

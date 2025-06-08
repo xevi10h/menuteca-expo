@@ -56,7 +56,9 @@ const Information: React.FC<InformationProps> = ({
 							size={16}
 							color={colors.primary}
 						/>
-						<Text style={styles.addressText}>{restaurant.address}</Text>
+						<Text style={styles.addressText}>
+							{restaurant.address.formattedAddress}
+						</Text>
 					</TouchableOpacity>
 
 					{/* Map */}
@@ -65,8 +67,8 @@ const Information: React.FC<InformationProps> = ({
 							<MapView
 								style={styles.map}
 								initialRegion={{
-									latitude: restaurant.coordinates.latitude,
-									longitude: restaurant.coordinates.longitude,
+									latitude: restaurant.address.coordinates.latitude,
+									longitude: restaurant.address.coordinates.longitude,
 									latitudeDelta: 0.01,
 									longitudeDelta: 0.01,
 								}}
@@ -77,11 +79,11 @@ const Information: React.FC<InformationProps> = ({
 							>
 								<Marker
 									coordinate={{
-										latitude: restaurant.coordinates.latitude,
-										longitude: restaurant.coordinates.longitude,
+										latitude: restaurant.address.coordinates.latitude,
+										longitude: restaurant.address.coordinates.longitude,
 									}}
 									title={restaurant.name}
-									description={restaurant.address}
+									description={restaurant.address.formattedAddress}
 								/>
 							</MapView>
 							<View style={styles.mapOverlay}>

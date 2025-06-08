@@ -71,7 +71,7 @@ export default function Index() {
 
 	const centerCoordinatesMarker = async (restaurant: Restaurant) => {
 		try {
-			const { longitude, latitude } = restaurant.coordinates;
+			const { longitude, latitude } = restaurant.address.coordinates;
 			if (longitude && latitude && mapViewRef.current) {
 				const newCamera: Camera = {
 					center: {
@@ -190,8 +190,8 @@ export default function Index() {
 						<Marker
 							key={restaurant.id}
 							coordinate={{
-								latitude: restaurant.coordinates.latitude,
-								longitude: restaurant.coordinates.longitude,
+								latitude: restaurant.address.coordinates.latitude,
+								longitude: restaurant.address.coordinates.longitude,
 							}}
 							onPress={async () => handleMarkerPress(restaurant)}
 						>

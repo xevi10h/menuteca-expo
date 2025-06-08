@@ -1,5 +1,6 @@
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
+import { Address, createEmptyAddress, formatAddress } from '@/shared/types';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import React, { useCallback, useRef, useState } from 'react';
@@ -23,22 +24,8 @@ const GOOGLE_PLACES_API_KEY = 'AIzaSyBcxDX2wGSzlkbmVa83je1_hRqQEOMnC7Q';
 interface AddressEditModalProps {
 	visible: boolean;
 	onClose: () => void;
-	onSave: (
-		address: string,
-		coordinates?: { latitude: number; longitude: number },
-		addressComponents?: AddressComponents,
-	) => void;
-	initialAddress?: string;
-	initialCoordinates?: { latitude: number; longitude: number };
-}
-
-interface AddressComponents {
-	street: string;
-	number: string;
-	additionalNumber: string;
-	city: string;
-	postalCode: string;
-	country: string;
+	onSave: (address: Address) => void;
+	initialAddress?: Address;
 }
 
 interface GooglePlacesPrediction {
@@ -90,39 +77,23 @@ interface AddressSuggestion {
 	description: string;
 	mainText: string;
 	subtitle: string;
-	coordinates?: { latitude: number; longitude: number };
-	addressComponents?: AddressComponents;
 	placeId: string;
 }
-
-const defaultAddressComponents: AddressComponents = {
-	street: '',
-	number: '',
-	additionalNumber: '',
-	city: '',
-	postalCode: '',
-	country: '',
-};
 
 export default function AddressEditModal({
 	visible,
 	onClose,
 	onSave,
-	initialAddress = '',
-	initialCoordinates,
+	initialAddress,
 }: AddressEditModalProps) {
 	const { t } = useTranslation();
 	const [isManualMode, setIsManualMode] = useState(false);
 	const [searchQuery, setSearchQuery] = useState('');
 	const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
 	const [isSearching, setIsSearching] = useState(false);
-	const [addressComponents, setAddressComponents] = useState<AddressComponents>(
-		defaultAddressComponents,
+	const [currentAddress, setCurrentAddress] = useState<Address>(
+		createEmptyAddress(),
 	);
-	const [selectedCoordinates, setSelectedCoordinates] = useState<{
-		latitude: number;
-		longitude: number;
-	} | null>(initialCoordinates || null);
 	const [mapRef, setMapRef] = useState<MapView | null>(null);
 	const [hasSelectedSuggestion, setHasSelectedSuggestion] = useState(false);
 
@@ -183,19 +154,18 @@ export default function AddressEditModal({
 		}
 		lastSearchRef.current = query;
 
-		// Rate limiting for Google Places API (recommended: not more than 10 requests per second)
+		// Rate limiting for Google Places API
 		if (!checkRateLimit('GOOGLE_PLACES', 30, 60 * 1000)) {
 			console.warn('⚠️ Rate limit exceeded for Google Places API');
 			return [];
 		}
 
-		// Build the API URL for Places Autocomplete
 		const params = new URLSearchParams({
 			input: query,
 			key: GOOGLE_PLACES_API_KEY,
-			types: 'address', // Focus on addresses
-			components: 'country:es', // Restrict to Spain
-			language: 'es', // Spanish language
+			types: 'address',
+			components: 'country:es',
+			language: 'es',
 		});
 
 		const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?${params}`;
@@ -214,14 +184,6 @@ export default function AddressEditModal({
 				return [];
 			}
 
-			console.log(
-				'📍 Google Places found:',
-				data.predictions.length,
-				'results for:',
-				query,
-			);
-
-			// Process and improve the results
 			const processedResults: AddressSuggestion[] = data.predictions
 				.map((prediction: GooglePlacesPrediction) => {
 					return {
@@ -232,10 +194,8 @@ export default function AddressEditModal({
 						placeId: prediction.place_id,
 					};
 				})
-				// Limit to 5 results
 				.slice(0, 5);
 
-			console.log('✅ Processed to:', processedResults.length, 'suggestions');
 			return processedResults;
 		} catch (error) {
 			console.error('❌ Error searching addresses with Google Places:', error);
@@ -244,17 +204,11 @@ export default function AddressEditModal({
 	};
 
 	// Google Places Details API
-	const getPlaceDetails = async (
-		placeId: string,
-	): Promise<{
-		coordinates: { latitude: number; longitude: number };
-		addressComponents: AddressComponents;
-		formattedAddress: string;
-	} | null> => {
+	const getPlaceDetails = async (placeId: string): Promise<Address | null> => {
 		const params = new URLSearchParams({
 			place_id: placeId,
 			key: GOOGLE_PLACES_API_KEY,
-			fields: 'geometry,address_components,formatted_address', // Only request needed fields
+			fields: 'geometry,address_components,formatted_address',
 			language: 'es',
 		});
 
@@ -288,8 +242,8 @@ export default function AddressEditModal({
 			);
 
 			return {
+				...addressComponents,
 				coordinates,
-				addressComponents,
 				formattedAddress: result.formatted_address,
 			};
 		} catch (error) {
@@ -305,13 +259,13 @@ export default function AddressEditModal({
 			short_name: string;
 			types: string[];
 		}[],
-	): AddressComponents => {
-		const result: AddressComponents = {
+	): Omit<Address, 'coordinates'> => {
+		const result: Omit<Address, 'coordinates'> = {
 			street: '',
 			number: '',
-			additionalNumber: '',
-			city: '',
+			additionalInformation: '',
 			postalCode: '',
+			city: '',
 			country: '',
 		};
 
@@ -357,41 +311,23 @@ export default function AddressEditModal({
 		}
 	}, []);
 
-	// Parsear dirección inicial
-	const parseAddressToComponents = (
-		addressString: string,
-	): AddressComponents => {
-		const parts = addressString.split(',').map((part) => part.trim());
-		const streetPart = parts[0] || '';
-		const streetMatch = streetPart.match(/^(.+?)(?:\s+(\d+\w*))?$/);
-
-		return {
-			street: streetMatch?.[1] || streetPart,
-			number: streetMatch?.[2] || '',
-			additionalNumber: '',
-			city: parts[1] || '',
-			postalCode: parts.find((part) => /^\d{5}$/.test(part)) || '',
-			country: parts[parts.length - 1] || 'España',
-		};
-	};
-
 	React.useEffect(() => {
 		if (visible) {
 			if (initialAddress) {
-				setSearchQuery(initialAddress);
-				setAddressComponents(parseAddressToComponents(initialAddress));
+				setCurrentAddress(initialAddress);
+				setSearchQuery(
+					initialAddress.formattedAddress || formatAddress(initialAddress),
+				);
 			} else {
 				resetForm();
 			}
-			setSelectedCoordinates(initialCoordinates || null);
 		}
-	}, [visible, initialAddress, initialCoordinates]);
+	}, [visible, initialAddress]);
 
 	const resetForm = () => {
 		setSearchQuery('');
 		setSuggestions([]);
-		setAddressComponents(defaultAddressComponents);
-		setSelectedCoordinates(null);
+		setCurrentAddress(createEmptyAddress());
 		setIsManualMode(false);
 		setHasSelectedSuggestion(false);
 		lastSearchRef.current = '';
@@ -399,7 +335,7 @@ export default function AddressEditModal({
 
 	const handleSearchInputChange = (text: string) => {
 		setSearchQuery(text);
-		setHasSelectedSuggestion(false); // Reset cuando el usuario escribe
+		setHasSelectedSuggestion(false);
 
 		if (searchTimeoutRef.current) {
 			clearTimeout(searchTimeoutRef.current);
@@ -414,36 +350,24 @@ export default function AddressEditModal({
 		setIsSearching(true);
 
 		// Get detailed information about the selected place
-		const placeDetails = await getPlaceDetails(suggestion.placeId);
+		const addressDetails = await getPlaceDetails(suggestion.placeId);
 
-		if (placeDetails) {
-			// Use the formatted address from Google
-			setSearchQuery(placeDetails.formattedAddress);
+		if (addressDetails) {
+			setCurrentAddress(addressDetails);
+			setSearchQuery(addressDetails.formattedAddress || suggestion.description);
 			setSuggestions([]);
 			setHasSelectedSuggestion(true);
 
-			// Set coordinates
-			setSelectedCoordinates(placeDetails.coordinates);
+			// Center map on coordinates
 			centerMapOnCoordinates(
-				placeDetails.coordinates.latitude,
-				placeDetails.coordinates.longitude,
+				addressDetails.coordinates.latitude,
+				addressDetails.coordinates.longitude,
 			);
-
-			// Set address components
-			setAddressComponents(placeDetails.addressComponents);
 		} else {
 			// Fallback to basic suggestion info
-			const fullAddress = suggestion.subtitle
-				? `${suggestion.description}`
-				: suggestion.description;
-
-			setSearchQuery(fullAddress);
+			setSearchQuery(suggestion.description);
 			setSuggestions([]);
 			setHasSelectedSuggestion(true);
-
-			// Fallback al parsing básico
-			const components = parseAddressToComponents(fullAddress);
-			setAddressComponents(components);
 		}
 
 		setIsSearching(false);
@@ -451,7 +375,12 @@ export default function AddressEditModal({
 
 	const handleMapPress = async (event: any) => {
 		const { latitude, longitude } = event.nativeEvent.coordinate;
-		setSelectedCoordinates({ latitude, longitude });
+
+		// Update coordinates
+		setCurrentAddress((prev) => ({
+			...prev,
+			coordinates: { latitude, longitude },
+		}));
 
 		try {
 			const addresses = await Location.reverseGeocodeAsync({
@@ -463,62 +392,46 @@ export default function AddressEditModal({
 				const formattedAddress = `${address.street || ''} ${
 					address.streetNumber || ''
 				}, ${address.city || ''}, ${address.country || ''}`.trim();
-				setSearchQuery(formattedAddress);
 
-				setAddressComponents({
+				setSearchQuery(formattedAddress);
+				setCurrentAddress((prev) => ({
+					...prev,
 					street: address.street || '',
 					number: address.streetNumber || '',
-					additionalNumber: '',
 					city: address.city || '',
 					postalCode: address.postalCode || '',
 					country: address.country || '',
-				});
+					formattedAddress: formattedAddress,
+				}));
 			}
 		} catch (error) {
 			console.error('Error reverse geocoding:', error);
 		}
 	};
 
-	const updateAddressComponent = (
-		key: keyof AddressComponents,
+	const updateAddressField = (
+		field: keyof Omit<Address, 'coordinates'>,
 		value: string,
 	) => {
-		setAddressComponents((prev) => ({ ...prev, [key]: value }));
-
-		const components = { ...addressComponents, [key]: value };
-		const manualAddress = buildAddressFromComponents(components);
-		setSearchQuery(manualAddress);
-	};
-
-	const buildAddressFromComponents = (
-		components: AddressComponents,
-	): string => {
-		const parts = [];
-
-		if (components.street) {
-			let streetPart = components.street;
-			if (components.number) {
-				streetPart += ` ${components.number}`;
-			}
-			if (components.additionalNumber) {
-				streetPart += ` ${components.additionalNumber}`;
-			}
-			parts.push(streetPart);
-		}
-
-		if (components.city) parts.push(components.city);
-		if (components.postalCode) parts.push(components.postalCode);
-		if (components.country) parts.push(components.country);
-
-		return parts.join(', ');
+		setCurrentAddress((prev) => {
+			const updated = { ...prev, [field]: value };
+			const formatted = formatAddress(updated);
+			setSearchQuery(formatted);
+			return {
+				...updated,
+				formattedAddress: formatted,
+			};
+		});
 	};
 
 	const handleSave = () => {
-		const finalAddress = isManualMode
-			? buildAddressFromComponents(addressComponents)
-			: searchQuery;
+		// Validate address
+		const hasRequiredFields =
+			currentAddress.street ||
+			currentAddress.city ||
+			currentAddress.formattedAddress;
 
-		if (!finalAddress.trim()) {
+		if (!hasRequiredFields) {
 			Alert.alert(
 				t('registerRestaurant.error'),
 				t('registerRestaurant.addressRequired'),
@@ -526,7 +439,14 @@ export default function AddressEditModal({
 			return;
 		}
 
-		onSave(finalAddress, selectedCoordinates || undefined, addressComponents);
+		// Ensure formatted address is up to date
+		const finalAddress: Address = {
+			...currentAddress,
+			formattedAddress:
+				currentAddress.formattedAddress || formatAddress(currentAddress),
+		};
+
+		onSave(finalAddress);
 		onClose();
 	};
 
@@ -635,7 +555,7 @@ export default function AddressEditModal({
 								)}
 							</View>
 
-							{/* Suggestions - Using ScrollView instead of FlatList */}
+							{/* Suggestions */}
 							{suggestions.length > 0 && (
 								<View style={styles.suggestionsContainer}>
 									<ScrollView
@@ -645,6 +565,28 @@ export default function AddressEditModal({
 									>
 										{suggestions.map(renderSuggestion)}
 									</ScrollView>
+								</View>
+							)}
+
+							{/* Additional Information Field - IMPROVEMENT */}
+							{hasSelectedSuggestion && (
+								<View style={styles.additionalInfoSection}>
+									<Text style={styles.label}>
+										{t('registerRestaurant.additionalNumber')} (opcional)
+									</Text>
+									<TextInput
+										style={styles.input}
+										placeholder={t(
+											'registerRestaurant.additionalNumberPlaceholder',
+										)}
+										value={currentAddress.additionalInformation}
+										onChangeText={(text) =>
+											updateAddressField('additionalInformation', text)
+										}
+									/>
+									<Text style={styles.helperText}>
+										Añade información como piso, puerta, local, etc.
+									</Text>
 								</View>
 							)}
 
@@ -686,9 +628,9 @@ export default function AddressEditModal({
 										<TextInput
 											style={styles.input}
 											placeholder={t('registerRestaurant.streetPlaceholder')}
-											value={addressComponents.street}
+											value={currentAddress.street}
 											onChangeText={(text) =>
-												updateAddressComponent('street', text)
+												updateAddressField('street', text)
 											}
 										/>
 									</View>
@@ -699,9 +641,9 @@ export default function AddressEditModal({
 										<TextInput
 											style={styles.input}
 											placeholder="123"
-											value={addressComponents.number}
+											value={currentAddress.number}
 											onChangeText={(text) =>
-												updateAddressComponent('number', text)
+												updateAddressField('number', text)
 											}
 										/>
 									</View>
@@ -716,9 +658,9 @@ export default function AddressEditModal({
 										placeholder={t(
 											'registerRestaurant.additionalNumberPlaceholder',
 										)}
-										value={addressComponents.additionalNumber}
+										value={currentAddress.additionalInformation}
 										onChangeText={(text) =>
-											updateAddressComponent('additionalNumber', text)
+											updateAddressField('additionalInformation', text)
 										}
 									/>
 								</View>
@@ -731,10 +673,8 @@ export default function AddressEditModal({
 										<TextInput
 											style={styles.input}
 											placeholder={t('registerRestaurant.cityPlaceholder')}
-											value={addressComponents.city}
-											onChangeText={(text) =>
-												updateAddressComponent('city', text)
-											}
+											value={currentAddress.city}
+											onChangeText={(text) => updateAddressField('city', text)}
 										/>
 									</View>
 									<View style={[styles.inputContainer, { flex: 1 }]}>
@@ -744,9 +684,9 @@ export default function AddressEditModal({
 										<TextInput
 											style={styles.input}
 											placeholder="08001"
-											value={addressComponents.postalCode}
+											value={currentAddress.postalCode}
 											onChangeText={(text) =>
-												updateAddressComponent('postalCode', text)
+												updateAddressField('postalCode', text)
 											}
 										/>
 									</View>
@@ -759,10 +699,8 @@ export default function AddressEditModal({
 									<TextInput
 										style={styles.input}
 										placeholder={t('registerRestaurant.countryPlaceholder')}
-										value={addressComponents.country}
-										onChangeText={(text) =>
-											updateAddressComponent('country', text)
-										}
+										value={currentAddress.country}
+										onChangeText={(text) => updateAddressField('country', text)}
 									/>
 								</View>
 							</View>
@@ -777,22 +715,17 @@ export default function AddressEditModal({
 						ref={setMapRef}
 						style={styles.fullMap}
 						initialRegion={{
-							latitude:
-								selectedCoordinates?.latitude ||
-								initialCoordinates?.latitude ||
-								41.3851,
-							longitude:
-								selectedCoordinates?.longitude ||
-								initialCoordinates?.longitude ||
-								2.1734,
+							latitude: currentAddress.coordinates.latitude || 41.3851,
+							longitude: currentAddress.coordinates.longitude || 2.1734,
 							latitudeDelta: 0.01,
 							longitudeDelta: 0.01,
 						}}
 						onPress={handleMapPress}
 					>
-						{selectedCoordinates && (
+						{(currentAddress.coordinates.latitude !== 0 ||
+							currentAddress.coordinates.longitude !== 0) && (
 							<Marker
-								coordinate={selectedCoordinates}
+								coordinate={currentAddress.coordinates}
 								title={t('registerRestaurant.selectedLocation')}
 								description={searchQuery}
 							/>
@@ -805,11 +738,15 @@ export default function AddressEditModal({
 							<Text style={styles.previewLabel}>
 								{t('registerRestaurant.addressPreview')}
 							</Text>
-							<Text style={styles.previewText}>{searchQuery}</Text>
-							{selectedCoordinates && (
+							<Text style={styles.previewText}>
+								{currentAddress.formattedAddress ||
+									formatAddress(currentAddress)}
+							</Text>
+							{(currentAddress.coordinates.latitude !== 0 ||
+								currentAddress.coordinates.longitude !== 0) && (
 								<Text style={styles.coordinatesText}>
-									📍 {selectedCoordinates.latitude.toFixed(6)},{' '}
-									{selectedCoordinates.longitude.toFixed(6)}
+									📍 {currentAddress.coordinates.latitude.toFixed(6)},{' '}
+									{currentAddress.coordinates.longitude.toFixed(6)}
 								</Text>
 							)}
 						</View>
@@ -939,6 +876,25 @@ const styles = StyleSheet.create({
 		padding: 4,
 		borderWidth: 1,
 		borderColor: colors.primary,
+	},
+	// NEW: Additional Information Section
+	additionalInfoSection: {
+		marginBottom: 20,
+		backgroundColor: colors.quaternary,
+		padding: 15,
+		borderRadius: 8,
+		borderWidth: 1,
+		borderColor: colors.primary,
+		borderLeftWidth: 4,
+		borderLeftColor: colors.primary,
+	},
+	helperText: {
+		fontSize: 11,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primaryLight,
+		marginTop: 5,
+		fontStyle: 'italic',
 	},
 	noResultsContainer: {
 		alignItems: 'center',

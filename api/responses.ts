@@ -18,10 +18,19 @@ export const allRestaurants: Restaurant[] = [
 			'https://images.pexels.com/photos/1907228/pexels-photo-1907228.jpeg',
 		],
 		distance: 2.5,
-		address: 'Rector Ubach 50, Barcelona',
-		coordinates: {
-			latitude: 41.3951,
-			longitude: 2.1834,
+		address: {
+			street: 'Carrer Rector Ubach',
+			number: '50',
+			additionalInformation: '2º A',
+			postalCode: '08006',
+			city: 'Barcelona',
+			country: 'España',
+			coordinates: {
+				latitude: 41.3951,
+				longitude: 2.1834,
+			},
+			formattedAddress:
+				'Carrer Rector Ubach, 50, 2º A, 08006 Barcelona, España',
 		},
 		tags: [
 			RestaurantTag.AIR_CONDITIONING,
@@ -46,10 +55,19 @@ export const allRestaurants: Restaurant[] = [
 			'https://images.pexels.com/photos/1907228/pexels-photo-1907228.jpeg',
 		],
 		distance: 3.0,
-		address: 'Rector Ubach 50, Barcelona',
-		coordinates: {
-			latitude: 41.4051,
-			longitude: 2.1934,
+		address: {
+			street: 'Carrer de la Pau',
+			number: '25',
+			additionalInformation: 'Local 3',
+			postalCode: '08001',
+			city: 'Barcelona',
+			country: 'España',
+			coordinates: {
+				latitude: 41.4051,
+				longitude: 2.1934,
+			},
+			formattedAddress:
+				'Carrer de la Pau, 25, Local 3, 08001 Barcelona, España',
 		},
 		tags: [
 			RestaurantTag.AIR_CONDITIONING,
@@ -66,17 +84,27 @@ export const allRestaurants: Restaurant[] = [
 		rating: 4.8,
 		mainImage:
 			'https://images.pexels.com/photos/1907228/pexels-photo-1907228.jpeg',
-
+		profileImage:
+			'https://visitbegur.cat/wp-content/uploads/2021/06/mooma-1024x813.jpg',
 		images: [
 			'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
 			'https://images.pexels.com/photos/2092507/pexels-photo-2092507.jpeg',
 			'https://images.pexels.com/photos/1907228/pexels-photo-1907228.jpeg',
 		],
 		distance: 1.5,
-		address: 'Rector Ubach 50, Barcelona',
-		coordinates: {
-			latitude: 41.3851,
-			longitude: 2.1734,
+		address: {
+			street: 'Avinguda Diagonal',
+			number: '123',
+			additionalInformation: 'Baix B',
+			postalCode: '08028',
+			city: 'Barcelona',
+			country: 'España',
+			coordinates: {
+				latitude: 41.3851,
+				longitude: 2.1734,
+			},
+			formattedAddress:
+				'Avinguda Diagonal, 123, Baix B, 08028 Barcelona, España',
 		},
 		tags: [
 			RestaurantTag.AIR_CONDITIONING,

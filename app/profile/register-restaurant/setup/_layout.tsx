@@ -159,6 +159,7 @@ export default function SetupLayout(): React.JSX.Element {
 	const provisionalRegisterRestaurant = useRegisterRestaurantStore(
 		(store) => store.registerRestaurant,
 	);
+	console.log('provisionalRegisterRestaurant', provisionalRegisterRestaurant);
 	const validation = useRegisterRestaurantStore((store) => store.validation);
 	const [currentTab, setCurrentTab] = useState<'edit' | 'preview'>('edit');
 

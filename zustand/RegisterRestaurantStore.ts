@@ -1,11 +1,16 @@
 import { RestaurantTag } from '@/shared/enums';
-import { MenuData, Restaurant } from '@/shared/types';
+import {
+	Address,
+	MenuData,
+	Restaurant,
+	createEmptyAddress,
+} from '@/shared/types';
 import { create } from 'zustand';
 
 export const defaultRegisterRestaurant: Restaurant = {
 	id: '',
 	name: '',
-	address: '',
+	address: createEmptyAddress(),
 	cuisine: '',
 	profileImage: undefined,
 	images: [],
@@ -15,10 +20,6 @@ export const defaultRegisterRestaurant: Restaurant = {
 	rating: undefined,
 	mainImage: '',
 	distance: 0,
-	coordinates: {
-		latitude: 41.3851,
-		longitude: 2.1734,
-	},
 };
 
 interface RegisterRestaurantValidation {
@@ -28,6 +29,7 @@ interface RegisterRestaurantValidation {
 		hasMenus: boolean;
 		hasCuisine: boolean;
 		tooManyTags: boolean;
+		hasAddress: boolean;
 	};
 }
 
@@ -35,7 +37,7 @@ interface RegisterRestaurantState {
 	registerRestaurant: Restaurant;
 	validation: RegisterRestaurantValidation;
 	setRegisterRestaurantCuisine: (cuisine: string | null) => void;
-	setRegisterRestaurantAddress: (address: string) => void;
+	setRegisterRestaurantAddress: (address: Address) => void;
 	setRegisterRestaurantName: (name: string) => void;
 	setRegisterRestaurantProfileImage: (image: string) => void;
 	addRegisterRestaurantImage: (image: string) => void;
@@ -44,10 +46,6 @@ interface RegisterRestaurantState {
 	updateRegisterRestaurantMenu: (index: number, menu: MenuData) => void;
 	removeRegisterRestaurantMenu: (index: number) => void;
 	setRegisterRestaurantTags: (tags: RestaurantTag[]) => void;
-	setRegisterRestaurantCoordinates: (coordinates: {
-		latitude: number;
-		longitude: number;
-	}) => void;
 	resetRegisterRestaurant: () => void;
 	validateRestaurant: () => RegisterRestaurantValidation;
 }
@@ -62,15 +60,22 @@ const validateRestaurant = (
 		restaurant.cuisine !== null &&
 		restaurant.cuisine !== undefined;
 	const tooManyTags = restaurant.tags && restaurant.tags.length > 3;
+	const hasAddress =
+		restaurant.address &&
+		(restaurant.address.street !== '' ||
+			restaurant.address.city !== '' ||
+			restaurant.address.formattedAddress !== '');
 
 	const errors = {
 		hasPhotos: !hasPhotos,
 		hasMenus: !hasMenus,
 		hasCuisine: !hasCuisine,
 		tooManyTags: tooManyTags || false,
+		hasAddress: !hasAddress,
 	};
 
-	const isValid = hasPhotos && hasMenus && hasCuisine && !tooManyTags;
+	const isValid =
+		hasPhotos && hasMenus && hasCuisine && !tooManyTags && hasAddress;
 
 	return {
 		isValid,
@@ -96,7 +101,7 @@ export const useRegisterRestaurantStore = create<RegisterRestaurantState>(
 			});
 		},
 
-		setRegisterRestaurantAddress: (address: string) => {
+		setRegisterRestaurantAddress: (address: Address) => {
 			set((state) => {
 				const newRestaurant = {
 					...state.registerRestaurant,
@@ -211,22 +216,6 @@ export const useRegisterRestaurantStore = create<RegisterRestaurantState>(
 				const newRestaurant = {
 					...state.registerRestaurant,
 					tags,
-				};
-				return {
-					registerRestaurant: newRestaurant,
-					validation: validateRestaurant(newRestaurant),
-				};
-			});
-		},
-
-		setRegisterRestaurantCoordinates: (coordinates: {
-			latitude: number;
-			longitude: number;
-		}) => {
-			set((state) => {
-				const newRestaurant = {
-					...state.registerRestaurant,
-					coordinates,
 				};
 				return {
 					registerRestaurant: newRestaurant,
