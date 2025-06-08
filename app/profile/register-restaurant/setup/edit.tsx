@@ -10,6 +10,7 @@ import ProfilePhotoSection from '@/components/restaurantCreation/ProfilePhotoSec
 import TagsSection from '@/components/restaurantCreation/TagsSection';
 import TagsSelectionModal from '@/components/restaurantCreation/TagsSelectionModal';
 import { useTranslation } from '@/hooks/useTranslation';
+import { RestaurantTag } from '@/shared/enums';
 import { MenuData } from '@/shared/types';
 import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
 import React, { useState } from 'react';
@@ -89,7 +90,7 @@ export default function EditTab() {
 		setRegisterRestaurantCuisine(selectedCuisine);
 	};
 
-	const handleSaveTags = (selectedTags: string[]) => {
+	const handleSaveTags = (selectedTags: RestaurantTag[]) => {
 		setRegisterRestaurantTags(selectedTags);
 	};
 

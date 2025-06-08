@@ -1,3 +1,4 @@
+import { RestaurantTag } from '@/shared/enums';
 import { MenuData, Restaurant } from '@/shared/types';
 import { create } from 'zustand';
 
@@ -31,7 +32,7 @@ interface RegisterRestaurantState {
 	addRegisterRestaurantMenu: (menu: MenuData) => void;
 	updateRegisterRestaurantMenu: (index: number, menu: MenuData) => void;
 	removeRegisterRestaurantMenu: (index: number) => void;
-	setRegisterRestaurantTags: (tags: string[]) => void; // Nueva función para tags
+	setRegisterRestaurantTags: (tags: RestaurantTag[]) => void;
 	setRegisterRestaurantCoordinates: (coordinates: {
 		latitude: number;
 		longitude: number;
@@ -120,7 +121,7 @@ export const useRegisterRestaurantStore = create<RegisterRestaurantState>(
 				},
 			}));
 		},
-		setRegisterRestaurantTags: (tags: string[]) => {
+		setRegisterRestaurantTags: (tags: RestaurantTag[]) => {
 			set((state) => ({
 				registerRestaurant: {
 					...state.registerRestaurant,

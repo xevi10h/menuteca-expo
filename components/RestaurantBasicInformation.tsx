@@ -41,25 +41,29 @@ export default function RestaurantBasicInformation({
 					>
 						{restaurant.name}
 					</Text>
-					<Text style={[styles.cuisineText, { color: colorToUse }]}>
-						{t(`cuisinesRestaurants.${restaurant.cuisine}`)}
-					</Text>
+					{restaurant.cuisine && (
+						<Text style={[styles.cuisineText, { color: colorToUse }]}>
+							{t(`cuisinesRestaurants.${restaurant.cuisine}`)}
+						</Text>
+					)}
 				</View>
 				<View>
-					<View style={{ alignItems: 'flex-end', marginBottom: 5 }}>
-						<View style={[styles.ratingBadge, { borderColor: colorToUse }]}>
-							<Text
-								style={[
-									styles.ratingText,
-									{
-										color: colorToUse,
-									},
-								]}
-							>
-								{restaurant.rating} ★
-							</Text>
+					{restaurant.rating && (
+						<View style={{ alignItems: 'flex-end', marginBottom: 5 }}>
+							<View style={[styles.ratingBadge, { borderColor: colorToUse }]}>
+								<Text
+									style={[
+										styles.ratingText,
+										{
+											color: colorToUse,
+										},
+									]}
+								>
+									{restaurant.rating} ★
+								</Text>
+							</View>
 						</View>
-					</View>
+					)}
 					<View
 						style={{
 							flexDirection: 'row',

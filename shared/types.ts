@@ -1,4 +1,4 @@
-import { DishCategory } from './enums';
+import { DishCategory, RestaurantTag } from './enums';
 
 export type Language = 'en_US' | 'es_ES' | 'ca_ES' | 'fr_FR';
 
@@ -13,7 +13,7 @@ export type Restaurant = {
 	images: string[];
 	distance: number;
 	address: string;
-	tags?: string[];
+	tags?: RestaurantTag[];
 	menus: MenuData[];
 	coordinates: {
 		latitude: number;

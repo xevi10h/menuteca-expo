@@ -19,11 +19,10 @@ import HeaderModal from './HeaderModal';
 interface TagsSelectionModalProps {
 	visible: boolean;
 	onClose: () => void;
-	onSave: (tags: string[]) => void;
-	selectedTags: string[];
+	onSave: (tags: RestaurantTag[]) => void;
+	selectedTags: RestaurantTag[];
 }
 
-// Función para renderizar el icono correcto según el tag
 export const renderTagIcon = (
 	tag: RestaurantTag,
 	color: string,
@@ -46,18 +45,10 @@ export const renderTagIcon = (
 			return <SpicyIcon width={size} height={size} color={color} />;
 		case RestaurantTag.VEGETARIAN:
 			return <Ionicons name="leaf-outline" size={size} color={color} />;
-		case RestaurantTag.DELIVERY:
-			return <Ionicons name="bicycle-outline" size={size} color={color} />;
-		case RestaurantTag.TAKE_AWAY:
-			return <Ionicons name="bag-handle-outline" size={size} color={color} />;
 		case RestaurantTag.OUTDOOR_SEATING:
 			return <Ionicons name="sunny-outline" size={size} color={color} />;
-		case RestaurantTag.PARKING:
-			return <Ionicons name="car-outline" size={size} color={color} />;
 		case RestaurantTag.WIFI:
 			return <Ionicons name="wifi-outline" size={size} color={color} />;
-		case RestaurantTag.CREDIT_CARDS:
-			return <Ionicons name="card-outline" size={size} color={color} />;
 		case RestaurantTag.RESERVATIONS:
 			return <Ionicons name="calendar-outline" size={size} color={color} />;
 		case RestaurantTag.LIVE_MUSIC:
@@ -86,9 +77,10 @@ export default function TagsSelectionModal({
 	selectedTags,
 }: TagsSelectionModalProps) {
 	const { t } = useTranslation();
-	const [tempSelected, setTempSelected] = useState<string[]>(selectedTags);
+	const [tempSelected, setTempSelected] =
+		useState<RestaurantTag[]>(selectedTags);
 
-	const handleToggleTag = (tagId: string) => {
+	const handleToggleTag = (tagId: RestaurantTag) => {
 		setTempSelected((prev) =>
 			prev.includes(tagId)
 				? prev.filter((id) => id !== tagId)

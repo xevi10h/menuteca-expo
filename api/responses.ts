@@ -1,4 +1,4 @@
-import { DishCategory } from '@/shared/enums';
+import { DishCategory, RestaurantTag } from '@/shared/enums';
 import { Cuisine, MenuData, Restaurant } from '@/shared/types';
 
 export const allRestaurants: Restaurant[] = [
@@ -23,6 +23,12 @@ export const allRestaurants: Restaurant[] = [
 			latitude: 41.3951,
 			longitude: 2.1834,
 		},
+		tags: [
+			RestaurantTag.AIR_CONDITIONING,
+			RestaurantTag.VEGETARIAN,
+			RestaurantTag.FAMILY_FRIENDLY,
+		],
+		menus: [],
 	},
 	{
 		id: '2',
@@ -45,6 +51,12 @@ export const allRestaurants: Restaurant[] = [
 			latitude: 41.4051,
 			longitude: 2.1934,
 		},
+		tags: [
+			RestaurantTag.AIR_CONDITIONING,
+			RestaurantTag.GLUTEN_FREE,
+			RestaurantTag.LIVE_MUSIC,
+		],
+		menus: [],
 	},
 	{
 		id: '3',
@@ -66,6 +78,12 @@ export const allRestaurants: Restaurant[] = [
 			latitude: 41.3851,
 			longitude: 2.1734,
 		},
+		tags: [
+			RestaurantTag.AIR_CONDITIONING,
+			RestaurantTag.RESERVATIONS,
+			RestaurantTag.PET_FRIENDLY,
+		],
+		menus: [],
 	},
 ];
 

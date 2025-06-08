@@ -14,6 +14,7 @@ import {
 import MapView, { Marker } from 'react-native-maps';
 import { useSharedValue } from 'react-native-reanimated';
 import Carousel, { Pagination } from 'react-native-reanimated-carousel';
+import { renderTagIcon } from '../restaurantCreation/TagsSelectionModal';
 
 const width = Dimensions.get('window').width;
 
@@ -36,54 +37,64 @@ const Information: React.FC<InformationProps> = ({
 				{restaurant.tags?.map((tag) => {
 					return (
 						<View key={tag} style={styles.tag}>
-							<Text style={styles.tagText}>
-								{t(`menuCreation.dietary.${tag}`)}
-							</Text>
+							{renderTagIcon(tag, colors.quaternary, 14)}
+							<Text style={styles.tagText}>{t(`restaurantTags.${tag}`)}</Text>
 						</View>
 					);
 				})}
 			</View>
 
-			{/* Address */}
-			<TouchableOpacity style={styles.addressContainer} onPress={onMapPress}>
-				<Ionicons name="location-outline" size={16} color={colors.primary} />
-				<Text style={styles.addressText}>{restaurant.address}</Text>
-			</TouchableOpacity>
-
-			{/* Map */}
-			<TouchableOpacity onPress={onMapPress}>
-				<View style={styles.mapContainer}>
-					<MapView
-						style={styles.map}
-						initialRegion={{
-							latitude: restaurant.coordinates.latitude,
-							longitude: restaurant.coordinates.longitude,
-							latitudeDelta: 0.01,
-							longitudeDelta: 0.01,
-						}}
-						scrollEnabled={false}
-						zoomEnabled={false}
-						pitchEnabled={false}
-						rotateEnabled={false}
+			{/* Address containe */}
+			{restaurant.address && (
+				<>
+					<TouchableOpacity
+						style={styles.addressContainer}
+						onPress={onMapPress}
 					>
-						<Marker
-							coordinate={{
-								latitude: restaurant.coordinates.latitude,
-								longitude: restaurant.coordinates.longitude,
-							}}
-							title={restaurant.name}
-							description={restaurant.address}
-						/>
-					</MapView>
-					<View style={styles.mapOverlay}>
 						<Ionicons
-							name="navigate-outline"
-							size={24}
-							color={colors.quaternary}
+							name="location-outline"
+							size={16}
+							color={colors.primary}
 						/>
-					</View>
-				</View>
-			</TouchableOpacity>
+						<Text style={styles.addressText}>{restaurant.address}</Text>
+					</TouchableOpacity>
+
+					{/* Map */}
+					<TouchableOpacity onPress={onMapPress}>
+						<View style={styles.mapContainer}>
+							<MapView
+								style={styles.map}
+								initialRegion={{
+									latitude: restaurant.coordinates.latitude,
+									longitude: restaurant.coordinates.longitude,
+									latitudeDelta: 0.01,
+									longitudeDelta: 0.01,
+								}}
+								scrollEnabled={false}
+								zoomEnabled={false}
+								pitchEnabled={false}
+								rotateEnabled={false}
+							>
+								<Marker
+									coordinate={{
+										latitude: restaurant.coordinates.latitude,
+										longitude: restaurant.coordinates.longitude,
+									}}
+									title={restaurant.name}
+									description={restaurant.address}
+								/>
+							</MapView>
+							<View style={styles.mapOverlay}>
+								<Ionicons
+									name="navigate-outline"
+									size={24}
+									color={colors.quaternary}
+								/>
+							</View>
+						</View>
+					</TouchableOpacity>
+				</>
+			)}
 
 			{/* Photos Section */}
 			<View style={styles.photosSection}>
@@ -150,6 +161,9 @@ const styles = StyleSheet.create({
 		borderRadius: 15,
 		marginRight: 8,
 		marginBottom: 8,
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: 5,
 	},
 	tagText: {
 		fontSize: 12,
