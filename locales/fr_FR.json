@@ -128,7 +128,8 @@
 		"error": "Erreur",
 		"addressRequired": "L'adresse est obligatoire",
 		"noResultsFound": "Aucun résultat trouvé pour \"%{query}\"",
-		"noResultsSubtext": "Essayez une recherche plus spécifique ou utilisez le mode manuel"
+		"noResultsSubtext": "Essayez une recherche plus spécifique ou utilisez le mode manuel",
+		"noResultsSubtextAddressScreen": "Essayez une recherche plus spécifique"
 	},
 	"menuCreation": {
 		"menuName": "Nom du menu",

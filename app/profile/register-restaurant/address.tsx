@@ -1,5 +1,7 @@
 import { colors } from '@/assets/styles/colors';
+import AddressSearchInput from '@/components/restaurantCreation/AddressSearchInput';
 import { useTranslation } from '@/hooks/useTranslation';
+import { Address } from '@/shared/types';
 import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -9,7 +11,6 @@ import {
 	Image,
 	StyleSheet,
 	Text,
-	TextInput,
 	TouchableOpacity,
 	View,
 } from 'react-native';
@@ -21,9 +22,13 @@ export default function AddressScreen() {
 	const { t } = useTranslation();
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
-	const [address, setAddress] = useState('');
+	const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
+	const [additionalInfo, setAdditionalInfo] = useState('');
 	const setRegisterRestaurantAddress = useRegisterRestaurantStore(
 		(state) => state.setRegisterRestaurantAddress,
+	);
+	const currentAddress = useRegisterRestaurantStore(
+		(state) => state.registerRestaurant.address,
 	);
 	const [isNextDisabled, setIsNextDisabled] = useState(true);
 
@@ -32,18 +37,45 @@ export default function AddressScreen() {
 	};
 
 	const handleNext = () => {
-		setRegisterRestaurantAddress(address);
+		if (selectedAddress) {
+			// Update the address with additional information if provided
+			const finalAddress: Address = {
+				...selectedAddress,
+				additionalInformation: additionalInfo,
+			};
+			setRegisterRestaurantAddress(finalAddress);
+		}
 		router.push('/profile/register-restaurant/cuisine-types');
 	};
 
+	const handleSkip = () => {
+		router.push('/profile/register-restaurant/cuisine-types');
+	};
+
+	const handleAddressSelected = (address: Address) => {
+		setSelectedAddress(address);
+	};
+
+	const handleAdditionalInfoChange = (value: string) => {
+		setAdditionalInfo(value);
+	};
+
 	useEffect(() => {
-		// Check if the address is valid (not empty)
-		if (address.trim().length > 0) {
+		// Enable next button if we have a selected address
+		if (selectedAddress) {
 			setIsNextDisabled(false);
 		} else {
 			setIsNextDisabled(true);
 		}
-	}, [address, router]);
+	}, [selectedAddress]);
+
+	// Initialize with current address if exists
+	useEffect(() => {
+		if (currentAddress?.formattedAddress) {
+			setSelectedAddress(currentAddress);
+			setAdditionalInfo(currentAddress.additionalInformation || '');
+		}
+	}, [currentAddress]);
 
 	return (
 		<View style={[styles.container, { paddingTop: insets.top }]}>
@@ -71,24 +103,50 @@ export default function AddressScreen() {
 				<View style={styles.questionContainer}>
 					<Text style={styles.question}>{t('registerRestaurant.whereIs')}</Text>
 				</View>
+
 				<View style={styles.labelContainer}>
 					<Text style={styles.label}>
 						{t('registerRestaurant.addressSubtitle')}
 					</Text>
 				</View>
-				<TextInput
-					style={styles.textInput}
+
+				{/* Address Search Input */}
+				<AddressSearchInput
+					onAddressSelected={handleAddressSelected}
 					placeholder={t('registerRestaurant.addressPlaceholder')}
-					placeholderTextColor={colors.primaryLight}
-					value={address}
-					onChangeText={setAddress}
+					initialValue={currentAddress?.formattedAddress || ''}
+					showAdditionalInfo={true}
+					additionalInfoValue={additionalInfo}
+					onAdditionalInfoChange={handleAdditionalInfoChange}
 				/>
-				<TouchableOpacity onPress={handleNext}>
+
+				{/* Selected Address Preview */}
+				{selectedAddress && (
+					<View style={styles.previewContainer}>
+						<Text style={styles.previewLabel}>
+							{t('registerRestaurant.addressPreview')}
+						</Text>
+						<Text style={styles.previewText}>
+							{selectedAddress.formattedAddress}
+							{additionalInfo ? `, ${additionalInfo}` : ''}
+						</Text>
+						{(selectedAddress.coordinates.latitude !== 0 ||
+							selectedAddress.coordinates.longitude !== 0) && (
+							<Text style={styles.coordinatesText}>
+								📍 {selectedAddress.coordinates.latitude.toFixed(6)},{' '}
+								{selectedAddress.coordinates.longitude.toFixed(6)}
+							</Text>
+						)}
+					</View>
+				)}
+
+				<TouchableOpacity onPress={handleSkip}>
 					<Text style={styles.skipButtonText}>
 						{t('registerRestaurant.configureLater')}
 					</Text>
 				</TouchableOpacity>
 			</View>
+
 			<TouchableOpacity
 				style={[
 					styles.nextButton,
@@ -164,27 +222,50 @@ const styles = StyleSheet.create({
 		fontWeight: '300',
 		color: colors.secondary,
 	},
-	textInput: {
-		width: '100%',
-		height: 50,
+	previewContainer: {
 		backgroundColor: colors.secondary,
 		borderRadius: 12,
-		paddingHorizontal: 20,
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		color: colors.primary,
-		marginBottom: 40,
+		padding: 15,
+		marginTop: 20,
+		marginBottom: 20,
+		borderWidth: 1,
+		borderColor: colors.secondary,
+		borderLeftWidth: 4,
+		borderLeftColor: colors.secondary,
+		width: '100%',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.3,
 		shadowRadius: 4,
 		elevation: 5,
 	},
+	previewLabel: {
+		fontSize: 12,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.primary,
+		marginBottom: 5,
+	},
+	previewText: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		color: colors.primary,
+		lineHeight: 20,
+		marginBottom: 5,
+	},
+	coordinatesText: {
+		fontSize: 11,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primaryLight,
+		fontStyle: 'italic',
+	},
 	skipButtonText: {
 		color: colors.secondary,
 		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '500',
+		marginTop: 20,
 	},
 	nextButton: {
 		position: 'absolute',

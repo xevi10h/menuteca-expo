@@ -128,7 +128,8 @@
 		"error": "Error",
 		"addressRequired": "L'adreça és obligatòria",
 		"noResultsFound": "No s'han trobat resultats per \"%{query}\"",
-		"noResultsSubtext": "Prova amb una cerca més específica o usa el mode manual"
+		"noResultsSubtext": "Prova amb una cerca més específica o usa el mode manual",
+		"noResultsSubtextAddressScreen": "Prova amb una cerca més específica"
 	},
 	"menuCreation": {
 		"menuName": "Nom del menú",
