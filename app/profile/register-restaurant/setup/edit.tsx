@@ -120,7 +120,7 @@ export default function EditTab() {
 
 				{/* Address Section - UPDATED */}
 				<AddressSection
-					address={registerRestaurant.address.formattedAddress}
+					address={registerRestaurant.address}
 					restaurantName={registerRestaurant.name}
 					onEditPress={() => setShowAddressModal(true)}
 				/>

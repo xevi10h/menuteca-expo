@@ -29,7 +29,7 @@ const Information: React.FC<InformationProps> = ({
 }) => {
 	const { t } = useTranslation();
 	const progressValue = useSharedValue<number>(0);
-	console.log('restauranttags', restaurant);
+
 	return (
 		<>
 			{/* Tags */}

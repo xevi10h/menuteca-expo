@@ -24,6 +24,7 @@ export default function AddressScreen() {
 	const insets = useSafeAreaInsets();
 	const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
 	const [additionalInfo, setAdditionalInfo] = useState('');
+	const [hasSelectedSuggestion, setHasSelectedSuggestion] = useState(false);
 	const setRegisterRestaurantAddress = useRegisterRestaurantStore(
 		(state) => state.setRegisterRestaurantAddress,
 	);
@@ -54,6 +55,7 @@ export default function AddressScreen() {
 
 	const handleAddressSelected = (address: Address) => {
 		setSelectedAddress(address);
+		setHasSelectedSuggestion(true);
 	};
 
 	const handleAdditionalInfoChange = (value: string) => {
@@ -74,6 +76,7 @@ export default function AddressScreen() {
 		if (currentAddress?.formattedAddress) {
 			setSelectedAddress(currentAddress);
 			setAdditionalInfo(currentAddress.additionalInformation || '');
+			setHasSelectedSuggestion(true);
 		}
 	}, [currentAddress]);
 
@@ -115,9 +118,6 @@ export default function AddressScreen() {
 					onAddressSelected={handleAddressSelected}
 					placeholder={t('registerRestaurant.addressPlaceholder')}
 					initialValue={currentAddress?.formattedAddress || ''}
-					showAdditionalInfo={true}
-					additionalInfoValue={additionalInfo}
-					onAdditionalInfoChange={handleAdditionalInfoChange}
 				/>
 
 				{/* Selected Address Preview */}
@@ -130,13 +130,6 @@ export default function AddressScreen() {
 							{selectedAddress.formattedAddress}
 							{additionalInfo ? `, ${additionalInfo}` : ''}
 						</Text>
-						{(selectedAddress.coordinates.latitude !== 0 ||
-							selectedAddress.coordinates.longitude !== 0) && (
-							<Text style={styles.coordinatesText}>
-								📍 {selectedAddress.coordinates.latitude.toFixed(6)},{' '}
-								{selectedAddress.coordinates.longitude.toFixed(6)}
-							</Text>
-						)}
 					</View>
 				)}
 
@@ -221,6 +214,48 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '300',
 		color: colors.secondary,
+	},
+	additionalInfoSection: {
+		marginTop: 20,
+		backgroundColor: colors.secondary,
+		padding: 15,
+		borderRadius: 12,
+		borderWidth: 1,
+		borderColor: colors.secondary,
+		borderLeftWidth: 4,
+		borderLeftColor: colors.secondary,
+		width: '100%',
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.3,
+		shadowRadius: 4,
+		elevation: 5,
+	},
+	additionalInfoLabel: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		color: colors.primary,
+		marginBottom: 10,
+	},
+	additionalInfoInput: {
+		backgroundColor: colors.secondary,
+		borderRadius: 8,
+		paddingHorizontal: 15,
+		paddingVertical: 12,
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		color: colors.primary,
+		borderWidth: 1,
+		borderColor: colors.primaryLight,
+	},
+	helperText: {
+		fontSize: 11,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primaryLight,
+		marginTop: 5,
+		fontStyle: 'italic',
 	},
 	previewContainer: {
 		backgroundColor: colors.secondary,

@@ -1,30 +1,26 @@
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
+import { Address } from '@/shared/types';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
 interface AddressSectionProps {
-	address?: string;
-	coordinates?: {
-		latitude: number;
-		longitude: number;
-	};
+	address?: Address;
 	restaurantName: string;
 	onEditPress: () => void;
 }
 
 export default function AddressSection({
 	address,
-	coordinates,
 	restaurantName,
 	onEditPress,
 }: AddressSectionProps) {
 	const { t } = useTranslation();
 
-	const displayAddress = address || t('registerRestaurant.noAddressSelected');
-	const hasAddress = Boolean(address);
+	const displayAddress =
+		address?.formattedAddress || t('registerRestaurant.noAddressSelected');
 
 	return (
 		<View style={styles.addressSection}>
@@ -37,13 +33,15 @@ export default function AddressSection({
 				</TouchableOpacity>
 			</View>
 
-			{hasAddress && coordinates ? (
+			{address &&
+			address.coordinates.latitude &&
+			address.coordinates.longitude ? (
 				<>
 					<MapView
 						style={styles.miniMap}
 						initialRegion={{
-							latitude: coordinates.latitude,
-							longitude: coordinates.longitude,
+							latitude: address.coordinates.latitude,
+							longitude: address.coordinates.longitude,
 							latitudeDelta: 0.01,
 							longitudeDelta: 0.01,
 						}}
@@ -52,11 +50,11 @@ export default function AddressSection({
 					>
 						<Marker
 							coordinate={{
-								latitude: coordinates.latitude,
-								longitude: coordinates.longitude,
+								latitude: address.coordinates.latitude,
+								longitude: address.coordinates.longitude,
 							}}
 							title={restaurantName}
-							description={address}
+							description={address?.formattedAddress}
 						/>
 					</MapView>
 					<Text style={styles.addressText}>{displayAddress}</Text>
