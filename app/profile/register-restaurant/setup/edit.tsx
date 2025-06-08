@@ -24,6 +24,16 @@ import {
 	View,
 } from 'react-native';
 
+// Interface for enhanced address components
+interface AddressComponents {
+	street: string;
+	number: string;
+	additionalNumber: string;
+	city: string;
+	postalCode: string;
+	country: string;
+}
+
 export default function EditTab() {
 	const { t } = useTranslation();
 	const [showMenuModal, setShowMenuModal] = useState(false);
@@ -85,11 +95,14 @@ export default function EditTab() {
 	const handleSaveAddress = (
 		address: string,
 		coordinates?: { latitude: number; longitude: number },
+		addressComponents?: AddressComponents,
 	) => {
 		setRegisterRestaurantAddress(address);
 		if (coordinates) {
 			setRegisterRestaurantCoordinates(coordinates);
 		}
+		// You could also store the addressComponents if needed for more detailed address info
+		console.log('Address components:', addressComponents);
 	};
 
 	const handleSaveCuisines = (selectedCuisine: string | null) => {
@@ -227,7 +240,7 @@ export default function EditTab() {
 				}
 			/>
 
-			{/* Address Edit Modal */}
+			{/* Enhanced Address Edit Modal */}
 			<AddressEditModal
 				visible={showAddressModal}
 				onClose={() => setShowAddressModal(false)}

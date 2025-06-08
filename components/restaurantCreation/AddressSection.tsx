@@ -23,6 +23,9 @@ export default function AddressSection({
 }: AddressSectionProps) {
 	const { t } = useTranslation();
 
+	const displayAddress = address || t('registerRestaurant.noAddressSelected');
+	const hasAddress = Boolean(address);
+
 	return (
 		<View style={styles.addressSection}>
 			<View style={styles.sectionHeader}>
@@ -33,27 +36,47 @@ export default function AddressSection({
 					<Ionicons name="pencil-outline" size={16} color={colors.primary} />
 				</TouchableOpacity>
 			</View>
-			<MapView
-				style={styles.miniMap}
-				initialRegion={{
-					latitude: coordinates?.latitude || 41.3851,
-					longitude: coordinates?.longitude || 2.1734,
-					latitudeDelta: 0.01,
-					longitudeDelta: 0.01,
-				}}
-				scrollEnabled={false}
-				zoomEnabled={false}
-			>
-				<Marker
-					coordinate={{
-						latitude: coordinates?.latitude || 41.3851,
-						longitude: coordinates?.longitude || 2.1734,
-					}}
-					title={restaurantName}
-					description={address}
-				/>
-			</MapView>
-			{address && <Text style={styles.addressText}>{address}</Text>}
+
+			{hasAddress && coordinates ? (
+				<>
+					<MapView
+						style={styles.miniMap}
+						initialRegion={{
+							latitude: coordinates.latitude,
+							longitude: coordinates.longitude,
+							latitudeDelta: 0.01,
+							longitudeDelta: 0.01,
+						}}
+						scrollEnabled={false}
+						zoomEnabled={false}
+					>
+						<Marker
+							coordinate={{
+								latitude: coordinates.latitude,
+								longitude: coordinates.longitude,
+							}}
+							title={restaurantName}
+							description={address}
+						/>
+					</MapView>
+					<Text style={styles.addressText}>{displayAddress}</Text>
+				</>
+			) : (
+				<TouchableOpacity
+					style={styles.emptyAddressContainer}
+					onPress={onEditPress}
+				>
+					<Ionicons
+						name="location-outline"
+						size={24}
+						color={colors.primaryLight}
+					/>
+					<Text style={styles.emptyAddressText}>{displayAddress}</Text>
+					<Text style={styles.emptyAddressSubtext}>
+						{t('registerRestaurant.tapToAddAddress')}
+					</Text>
+				</TouchableOpacity>
+			)}
 		</View>
 	);
 }
@@ -66,13 +89,13 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
+		marginBottom: 15,
 	},
 	sectionTitle: {
 		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.primary,
-		marginBottom: 10,
 	},
 	editButton: {
 		padding: 5,
@@ -88,6 +111,34 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '400',
 		color: colors.primary,
+		textAlign: 'center',
+		lineHeight: 20,
+	},
+	emptyAddressContainer: {
+		backgroundColor: colors.quaternary,
+		borderRadius: 12,
+		borderWidth: 1,
+		borderColor: colors.primaryLight,
+		borderStyle: 'dashed',
+		paddingVertical: 40,
+		paddingHorizontal: 20,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	emptyAddressText: {
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		color: colors.primaryLight,
+		marginTop: 10,
+		textAlign: 'center',
+	},
+	emptyAddressSubtext: {
+		fontSize: 12,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primaryLight,
+		marginTop: 5,
 		textAlign: 'center',
 	},
 });
