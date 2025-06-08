@@ -14,11 +14,12 @@ export default function PriceInput({ value, onChangeText }: PriceInputProps) {
 	const handlePriceChange = (text: string) => {
 		// Solo permitir números y punto decimal
 		const numericValue = text.replace(/[^0-9.]/g, '');
-		// Evitar múltiples puntos decimales
 		const parts = numericValue.split('.');
-		if (parts.length > 2) {
-			return;
+
+		if (parts.length > 2 || (parts.length === 2 && parts[1].length > 2)) {
+			return; // Evitar múltiples puntos o más de 2 decimales
 		}
+
 		onChangeText(numericValue);
 	};
 

@@ -6,7 +6,6 @@ import React, { useCallback, useRef, useState } from 'react';
 import {
 	ActivityIndicator,
 	Alert,
-	FlatList,
 	Modal,
 	ScrollView,
 	StyleSheet,
@@ -17,6 +16,9 @@ import {
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import HeaderModal from './HeaderModal';
+
+// TODO: Add your Google Places API Key here
+const GOOGLE_PLACES_API_KEY = 'AIzaSyBcxDX2wGSzlkbmVa83je1_hRqQEOMnC7Q';
 
 interface AddressEditModalProps {
 	visible: boolean;
@@ -39,47 +41,58 @@ interface AddressComponents {
 	country: string;
 }
 
+interface GooglePlacesPrediction {
+	place_id: string;
+	description: string;
+	structured_formatting: {
+		main_text: string;
+		secondary_text: string;
+		main_text_matched_substrings: {
+			offset: number;
+			length: number;
+		}[];
+	};
+	types: string[];
+}
+
+interface GooglePlacesAutocompleteResponse {
+	predictions: GooglePlacesPrediction[];
+	status: string;
+}
+
+interface GooglePlaceDetailsResponse {
+	result: {
+		place_id: string;
+		formatted_address: string;
+		geometry: {
+			location: {
+				lat: number;
+				lng: number;
+			};
+			viewport: {
+				northeast: { lat: number; lng: number };
+				southwest: { lat: number; lng: number };
+			};
+		};
+		address_components: {
+			long_name: string;
+			short_name: string;
+			types: string[];
+		}[];
+		name: string;
+		types: string[];
+	};
+	status: string;
+}
+
 interface AddressSuggestion {
 	id: string;
 	description: string;
-	placeId?: string;
+	mainText: string;
+	subtitle: string;
 	coordinates?: { latitude: number; longitude: number };
-	subtitle?: string;
 	addressComponents?: AddressComponents;
-	importance?: number;
-	addressType?: string;
-}
-
-interface NominatimResult {
-	place_id: number;
-	lat: string;
-	lon: string;
-	display_name: string;
-	class: string;
-	type: string;
-	importance: number;
-	name?: string;
-	addresstype: string;
-	place_rank: number;
-	address: {
-		road?: string;
-		house_number?: string;
-		postcode?: string;
-		city?: string;
-		town?: string;
-		village?: string;
-		hamlet?: string;
-		neighbourhood?: string;
-		suburb?: string;
-		city_district?: string;
-		county?: string;
-		province?: string;
-		state?: string;
-		country?: string;
-		country_code?: string;
-		residential?: string;
-		[key: string]: string | undefined;
-	};
+	placeId: string;
 }
 
 const defaultAddressComponents: AddressComponents = {
@@ -160,111 +173,8 @@ export default function AddressEditModal({
 		}
 	};
 
-	// Función para obtener la ciudad principal de un resultado de Nominatim
-	const getPrimaryCity = (address: NominatimResult['address']): string => {
-		return (
-			address.city ||
-			address.town ||
-			address.village ||
-			address.hamlet ||
-			address.residential ||
-			address.neighbourhood ||
-			address.suburb ||
-			''
-		);
-	};
-
-	// Función para formatear la dirección de manera legible
-	const formatNominatimAddress = (
-		result: NominatimResult,
-	): {
-		mainText: string;
-		subtitle: string;
-		components: AddressComponents;
-	} => {
-		const { address } = result;
-		const road = address.road || result.name || '';
-		const houseNumber = address.house_number || '';
-		const city = getPrimaryCity(address);
-		const province = address.province || address.county || '';
-		const postcode = address.postcode || '';
-		const country = address.country || '';
-
-		// Construir texto principal (calle + número si existe)
-		let mainText = road;
-		if (houseNumber) {
-			mainText += ` ${houseNumber}`;
-		}
-
-		// Construir subtítulo con contexto geográfico
-		const subtitleParts = [];
-
-		if (city && city !== road) {
-			subtitleParts.push(city);
-		}
-
-		if (address.city_district && address.city_district !== city) {
-			subtitleParts.push(address.city_district);
-		}
-
-		if (province && province !== city) {
-			subtitleParts.push(province);
-		}
-
-		if (postcode) {
-			subtitleParts.push(postcode);
-		}
-
-		const subtitle = subtitleParts.join(', ');
-
-		// Crear componentes estructurados
-		const components: AddressComponents = {
-			street: road,
-			number: houseNumber,
-			additionalNumber: '',
-			city: city,
-			postalCode: postcode,
-			country: country,
-		};
-
-		return { mainText, subtitle, components };
-	};
-
-	// Función para determinar la relevancia de un resultado
-	const calculateRelevance = (
-		result: NominatimResult,
-		query: string,
-	): number => {
-		let score = result.importance || 0;
-
-		// Bonus por coincidencia exacta en el nombre
-		if (
-			result.name &&
-			result.name.toLowerCase().includes(query.toLowerCase())
-		) {
-			score += 0.1;
-		}
-
-		// Bonus por tener número de casa
-		if (result.address.house_number) {
-			score += 0.05;
-		}
-
-		// Bonus por ser una carretera/calle
-		if (result.addresstype === 'road' || result.class === 'highway') {
-			score += 0.02;
-		}
-
-		// Penalty por resultados muy específicos (como amenities)
-		if (result.class === 'amenity' || result.class === 'shop') {
-			score -= 0.1;
-		}
-
-		return score;
-	};
-
-	// Función principal de búsqueda con Nominatim optimizada
-	const searchAddressesNominatim = async (
+	// Google Places Autocomplete API
+	const searchAddressesGoogle = async (
 		query: string,
 	): Promise<AddressSuggestion[]> => {
 		// Evitar búsquedas duplicadas
@@ -273,74 +183,158 @@ export default function AddressEditModal({
 		}
 		lastSearchRef.current = query;
 
-		// Rate limiting para Nominatim (1/second, 1000/day)
-		if (!checkRateLimit('NOMINATIM', 45, 60 * 1000)) {
-			console.warn('⚠️ Rate limit exceeded for Nominatim API');
+		// Rate limiting for Google Places API (recommended: not more than 10 requests per second)
+		if (!checkRateLimit('GOOGLE_PLACES', 30, 60 * 1000)) {
+			console.warn('⚠️ Rate limit exceeded for Google Places API');
 			return [];
 		}
 
-		const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-			query,
-		)}&countrycodes=es&limit=8&addressdetails=1&extratags=1&namedetails=1`;
+		// Build the API URL for Places Autocomplete
+		const params = new URLSearchParams({
+			input: query,
+			key: GOOGLE_PLACES_API_KEY,
+			types: 'address', // Focus on addresses
+			components: 'country:es', // Restrict to Spain
+			language: 'es', // Spanish language
+		});
+
+		const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?${params}`;
 
 		try {
-			const response = await fetch(url, {
-				headers: {
-					'User-Agent': 'Menuteca-App/1.0 (contact@menuteca.com)',
-					'Accept-Language': 'es,ca,en',
-				},
-			});
+			const response = await fetch(url);
 
 			if (!response.ok) {
-				throw new Error(`Nominatim API error: ${response.status}`);
+				throw new Error(`Google Places API error: ${response.status}`);
 			}
 
-			const data: NominatimResult[] = await response.json();
+			const data: GooglePlacesAutocompleteResponse = await response.json();
 
-			console.log('📍 Nominatim found:', data.length, 'results for:', query);
+			if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
+				console.error('Google Places API error:', data.status);
+				return [];
+			}
 
-			// Procesar y mejorar los resultados
-			const processedResults = data
-				.map((item: NominatimResult) => {
-					const { mainText, subtitle, components } =
-						formatNominatimAddress(item);
-					const relevance = calculateRelevance(item, query);
+			console.log(
+				'📍 Google Places found:',
+				data.predictions.length,
+				'results for:',
+				query,
+			);
 
+			// Process and improve the results
+			const processedResults: AddressSuggestion[] = data.predictions
+				.map((prediction: GooglePlacesPrediction) => {
 					return {
-						id: item.place_id.toString(),
-						description: mainText,
-						subtitle: subtitle,
-						coordinates: {
-							latitude: parseFloat(item.lat),
-							longitude: parseFloat(item.lon),
-						},
-						addressComponents: components,
-						importance: relevance,
-						addressType: item.addresstype,
-					} as AddressSuggestion;
+						id: prediction.place_id,
+						description: prediction.description,
+						mainText: prediction.structured_formatting.main_text,
+						subtitle: prediction.structured_formatting.secondary_text || '',
+						placeId: prediction.place_id,
+					};
 				})
-				// Filtrar resultados duplicados o muy similares
-				.filter((item, index, array) => {
-					return (
-						array.findIndex(
-							(other) =>
-								other.description.toLowerCase() ===
-									item.description.toLowerCase() &&
-								other.subtitle === item.subtitle,
-						) === index
-					);
-				})
-				// Ordenar por relevancia
-				.sort((a, b) => (b.importance || 0) - (a.importance || 0))
-				// Limitar a 5 resultados
+				// Limit to 5 results
 				.slice(0, 5);
 
 			console.log('✅ Processed to:', processedResults.length, 'suggestions');
 			return processedResults;
 		} catch (error) {
-			console.error('❌ Error searching addresses with Nominatim:', error);
+			console.error('❌ Error searching addresses with Google Places:', error);
 			return [];
 		}
+	};
+
+	// Google Places Details API
+	const getPlaceDetails = async (
+		placeId: string,
+	): Promise<{
+		coordinates: { latitude: number; longitude: number };
+		addressComponents: AddressComponents;
+		formattedAddress: string;
+	} | null> => {
+		const params = new URLSearchParams({
+			place_id: placeId,
+			key: GOOGLE_PLACES_API_KEY,
+			fields: 'geometry,address_components,formatted_address', // Only request needed fields
+			language: 'es',
+		});
+
+		const url = `https://maps.googleapis.com/maps/api/place/details/json?${params}`;
+
+		try {
+			const response = await fetch(url);
+
+			if (!response.ok) {
+				throw new Error(`Google Places Details API error: ${response.status}`);
+			}
+
+			const data: GooglePlaceDetailsResponse = await response.json();
+
+			if (data.status !== 'OK') {
+				console.error('Google Places Details API error:', data.status);
+				return null;
+			}
+
+			const result = data.result;
+
+			// Extract coordinates
+			const coordinates = {
+				latitude: result.geometry.location.lat,
+				longitude: result.geometry.location.lng,
+			};
+
+			// Parse address components
+			const addressComponents = parseGoogleAddressComponents(
+				result.address_components,
+			);
+
+			return {
+				coordinates,
+				addressComponents,
+				formattedAddress: result.formatted_address,
+			};
+		} catch (error) {
+			console.error('❌ Error getting place details:', error);
+			return null;
+		}
+	};
+
+	// Parse Google address components to our format
+	const parseGoogleAddressComponents = (
+		components: {
+			long_name: string;
+			short_name: string;
+			types: string[];
+		}[],
+	): AddressComponents => {
+		const result: AddressComponents = {
+			street: '',
+			number: '',
+			additionalNumber: '',
+			city: '',
+			postalCode: '',
+			country: '',
+		};
+
+		components.forEach((component) => {
+			const types = component.types;
+
+			if (types.includes('street_number')) {
+				result.number = component.long_name;
+			} else if (types.includes('route')) {
+				result.street = component.long_name;
+			} else if (
+				types.includes('locality') ||
+				types.includes('administrative_area_level_3')
+			) {
+				result.city = component.long_name;
+			} else if (types.includes('postal_code')) {
+				result.postalCode = component.long_name;
+			} else if (types.includes('country')) {
+				result.country = component.long_name;
+			}
+		});
+
+		return result;
 	};
 
 	// Función principal de búsqueda
@@ -353,7 +347,7 @@ export default function AddressEditModal({
 		setIsSearching(true);
 
 		try {
-			const results = await searchAddressesNominatim(query);
+			const results = await searchAddressesGoogle(query);
 			setSuggestions(results);
 		} catch (error) {
 			console.error('Search failed:', error);
@@ -417,32 +411,42 @@ export default function AddressEditModal({
 	};
 
 	const handleSuggestionSelect = async (suggestion: AddressSuggestion) => {
-		// Construir dirección completa
-		const fullAddress = suggestion.subtitle
-			? `${suggestion.description}, ${suggestion.subtitle}`
-			: suggestion.description;
+		setIsSearching(true);
 
-		setSearchQuery(fullAddress);
-		setSuggestions([]);
-		setHasSelectedSuggestion(true); // Marcar que se ha seleccionado una sugerencia
+		// Get detailed information about the selected place
+		const placeDetails = await getPlaceDetails(suggestion.placeId);
 
-		if (suggestion.coordinates) {
-			setSelectedCoordinates(suggestion.coordinates);
-			// Centrar el mapa en las coordenadas seleccionadas
+		if (placeDetails) {
+			// Use the formatted address from Google
+			setSearchQuery(placeDetails.formattedAddress);
+			setSuggestions([]);
+			setHasSelectedSuggestion(true);
+
+			// Set coordinates
+			setSelectedCoordinates(placeDetails.coordinates);
 			centerMapOnCoordinates(
-				suggestion.coordinates.latitude,
-				suggestion.coordinates.longitude,
+				placeDetails.coordinates.latitude,
+				placeDetails.coordinates.longitude,
 			);
-		}
 
-		// Usar los componentes ya parseados si están disponibles
-		if (suggestion.addressComponents) {
-			setAddressComponents(suggestion.addressComponents);
+			// Set address components
+			setAddressComponents(placeDetails.addressComponents);
 		} else {
+			// Fallback to basic suggestion info
+			const fullAddress = suggestion.subtitle
+				? `${suggestion.description}`
+				: suggestion.description;
+
+			setSearchQuery(fullAddress);
+			setSuggestions([]);
+			setHasSelectedSuggestion(true);
+
 			// Fallback al parsing básico
 			const components = parseAddressToComponents(fullAddress);
 			setAddressComponents(components);
 		}
+
+		setIsSearching(false);
 	};
 
 	const handleMapPress = async (event: any) => {
@@ -531,25 +535,18 @@ export default function AddressEditModal({
 		onClose();
 	};
 
-	const renderSuggestion = ({ item }: { item: AddressSuggestion }) => (
+	const renderSuggestion = (item: AddressSuggestion) => (
 		<TouchableOpacity
+			key={item.id}
 			style={styles.enhancedSuggestionItem}
 			onPress={() => handleSuggestionSelect(item)}
 		>
 			<View style={styles.suggestionIcon}>
-				<Ionicons
-					name={
-						item.addressType === 'road'
-							? 'location-outline'
-							: 'business-outline'
-					}
-					size={16}
-					color={colors.primary}
-				/>
+				<Ionicons name="location-outline" size={16} color={colors.primary} />
 			</View>
 			<View style={styles.suggestionContent}>
 				<Text style={styles.suggestionMainText} numberOfLines={1}>
-					{item.description}
+					{item.mainText}
 				</Text>
 				{item.subtitle && (
 					<Text style={styles.suggestionSubtitle} numberOfLines={1}>
@@ -557,11 +554,9 @@ export default function AddressEditModal({
 					</Text>
 				)}
 			</View>
-			{item.importance && item.importance > 0.1 && (
-				<View style={styles.relevanceIndicator}>
-					<Ionicons name="star" size={12} color={colors.primary} />
-				</View>
-			)}
+			<View style={styles.relevanceIndicator}>
+				<Ionicons name="business" size={12} color={colors.primary} />
+			</View>
 		</TouchableOpacity>
 	);
 
@@ -640,17 +635,16 @@ export default function AddressEditModal({
 								)}
 							</View>
 
-							{/* Suggestions */}
+							{/* Suggestions - Using ScrollView instead of FlatList */}
 							{suggestions.length > 0 && (
 								<View style={styles.suggestionsContainer}>
-									<FlatList
-										data={suggestions}
-										renderItem={renderSuggestion}
-										keyExtractor={(item) => item.id}
-										scrollEnabled={true}
-										nestedScrollEnabled={true}
+									<ScrollView
+										style={styles.suggestionsScrollView}
 										showsVerticalScrollIndicator={true}
-									/>
+										nestedScrollEnabled={true}
+									>
+										{suggestions.map(renderSuggestion)}
+									</ScrollView>
 								</View>
 							)}
 
@@ -903,6 +897,9 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.1,
 		shadowRadius: 3.84,
 		elevation: 5,
+	},
+	suggestionsScrollView: {
+		maxHeight: 250,
 	},
 	enhancedSuggestionItem: {
 		flexDirection: 'row',

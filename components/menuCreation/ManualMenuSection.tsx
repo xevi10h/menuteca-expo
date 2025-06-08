@@ -96,6 +96,10 @@ export default function ManualMenuSection({
 		);
 	}, []);
 
+	const removeDish = useCallback((dishId: string) => {
+		setDishes((prev) => prev.filter((d) => d.id !== dishId));
+	}, []);
+
 	const openDishModal = useCallback((dish: Dish) => {
 		setCurrentDish(dish);
 		setShowDishModal(true);
@@ -137,7 +141,76 @@ export default function ManualMenuSection({
 			(dish) => dish.name.trim() !== '' && dish.name !== 'ej: ensalada cesar',
 		);
 		onSave(validDishes);
-	}, [dishes]); // Removemos onSave de las dependencias para evitar el loop
+	}, [dishes, onSave]);
+
+	const renderDishItem = (dish: Dish) => {
+		// Función auxiliar para formatear el precio
+		const formatExtraPrice = (price: number) => {
+			if (price === 0) {
+				return '€+';
+			}
+			// Si el precio es un entero (ej. 3, 3.0), lo mostramos sin decimales
+			if (price % 1 === 0) {
+				return `+${price}€`;
+			}
+			// Si tiene decimales, lo mostramos con decimales
+			return `+${price.toFixed(2)}€`; // Aseguramos 2 decimales
+		};
+
+		const dishHasDescription =
+			dish.description.trim() !== '' ||
+			dish.isGlutenFree ||
+			dish.isLactoseFree ||
+			dish.isSpicy ||
+			dish.isVegan ||
+			dish.isVegetarian;
+
+		return (
+			<View key={dish.id} style={styles.dishItem}>
+				<TextInput
+					style={styles.dishInput}
+					value={dish.name}
+					onChangeText={(text) => updateDishName(dish.id, text)}
+					placeholder={t('menuCreation.firstCoursePlaceholder')}
+				/>
+				<TouchableOpacity
+					style={[
+						styles.dishIcon,
+						dishHasDescription && styles.dishIconHasContent,
+					]}
+					onPress={() => openDishModal(dish)}
+				>
+					<Ionicons
+						name="restaurant"
+						size={20}
+						color={dishHasDescription ? colors.quaternary : colors.primary}
+					/>
+				</TouchableOpacity>
+				<TouchableOpacity
+					style={[
+						styles.priceIcon,
+						dish.extraPrice > 0 && styles.priceIconHasContent,
+					]}
+					onPress={() => openSupplementModal(dish)}
+				>
+					<Text
+						style={[
+							styles.priceIconText,
+							dish.extraPrice > 0 && styles.priceTextHasContent,
+						]}
+					>
+						{formatExtraPrice(dish.extraPrice)}
+					</Text>
+				</TouchableOpacity>
+				<TouchableOpacity
+					style={styles.deleteDishIcon}
+					onPress={() => removeDish(dish.id)}
+				>
+					<Ionicons name="trash-outline" size={20} color={colors.primary} />
+				</TouchableOpacity>
+			</View>
+		);
+	};
 
 	return (
 		<>
@@ -145,28 +218,7 @@ export default function ManualMenuSection({
 				<Text style={styles.courseTitle}>{t('menuCreation.firstCourses')}</Text>
 				{dishes
 					.filter((d) => d.category === DishCategory.FIRST_COURSES)
-					.map((dish) => (
-						<View key={dish.id} style={styles.dishItem}>
-							<TextInput
-								style={styles.dishInput}
-								value={dish.name}
-								onChangeText={(text) => updateDishName(dish.id, text)}
-								placeholder={t('menuCreation.firstCoursePlaceholder')}
-							/>
-							<TouchableOpacity
-								style={styles.dishIcon}
-								onPress={() => openDishModal(dish)}
-							>
-								<Ionicons name="restaurant" size={20} color={colors.primary} />
-							</TouchableOpacity>
-							<TouchableOpacity
-								style={styles.priceIcon}
-								onPress={() => openSupplementModal(dish)}
-							>
-								<Text style={styles.priceIconText}>€+</Text>
-							</TouchableOpacity>
-						</View>
-					))}
+					.map(renderDishItem)}
 				<TouchableOpacity
 					style={styles.addDishButton}
 					onPress={() => addDish(DishCategory.FIRST_COURSES)}
@@ -183,28 +235,7 @@ export default function ManualMenuSection({
 				</Text>
 				{dishes
 					.filter((d) => d.category === DishCategory.SECOND_COURSES)
-					.map((dish) => (
-						<View key={dish.id} style={styles.dishItem}>
-							<TextInput
-								style={styles.dishInput}
-								value={dish.name}
-								onChangeText={(text) => updateDishName(dish.id, text)}
-								placeholder={t('menuCreation.secondCoursePlaceholder')}
-							/>
-							<TouchableOpacity
-								style={styles.dishIcon}
-								onPress={() => openDishModal(dish)}
-							>
-								<Ionicons name="restaurant" size={20} color={colors.primary} />
-							</TouchableOpacity>
-							<TouchableOpacity
-								style={styles.priceIcon}
-								onPress={() => openSupplementModal(dish)}
-							>
-								<Text style={styles.priceIconText}>€+</Text>
-							</TouchableOpacity>
-						</View>
-					))}
+					.map(renderDishItem)}
 				<TouchableOpacity
 					style={styles.addDishButton}
 					onPress={() => addDish(DishCategory.SECOND_COURSES)}
@@ -219,28 +250,7 @@ export default function ManualMenuSection({
 				<Text style={styles.courseTitle}>{t('menuCreation.desserts')}</Text>
 				{dishes
 					.filter((d) => d.category === DishCategory.DESSERTS)
-					.map((dish) => (
-						<View key={dish.id} style={styles.dishItem}>
-							<TextInput
-								style={styles.dishInput}
-								value={dish.name}
-								onChangeText={(text) => updateDishName(dish.id, text)}
-								placeholder={t('menuCreation.dessertPlaceholder')}
-							/>
-							<TouchableOpacity
-								style={styles.dishIcon}
-								onPress={() => openDishModal(dish)}
-							>
-								<Ionicons name="restaurant" size={20} color={colors.primary} />
-							</TouchableOpacity>
-							<TouchableOpacity
-								style={styles.priceIcon}
-								onPress={() => openSupplementModal(dish)}
-							>
-								<Text style={styles.priceIconText}>€+</Text>
-							</TouchableOpacity>
-						</View>
-					))}
+					.map(renderDishItem)}
 				<TouchableOpacity
 					style={styles.addDishButton}
 					onPress={() => addDish(DishCategory.DESSERTS)}
@@ -264,7 +274,7 @@ export default function ManualMenuSection({
 			{/* Supplement Modal */}
 			<SupplementModal
 				visible={showSupplementModal}
-				supplementPrice={supplementPrice}
+				dish={currentDish}
 				onSupplementPriceChange={setSupplementPrice}
 				onClose={() => {
 					setShowSupplementModal(false);
@@ -292,7 +302,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		marginBottom: 10,
-		gap: 10,
+		gap: 5,
 	},
 	dishInput: {
 		flex: 1,
@@ -314,6 +324,9 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: colors.primaryLight,
 	},
+	dishIconHasContent: {
+		backgroundColor: colors.primary,
+	},
 	priceIcon: {
 		width: 50,
 		height: 50,
@@ -323,11 +336,27 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: colors.primaryLight,
 	},
+	priceIconHasContent: {
+		backgroundColor: colors.primary,
+	},
 	priceIconText: {
 		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.primary,
+	},
+	priceTextHasContent: {
+		color: colors.quaternary,
+		fontSize: 12,
+	},
+	deleteDishIcon: {
+		width: 50,
+		height: 50,
+		borderRadius: 12,
+		justifyContent: 'center',
+		alignItems: 'center',
+		borderWidth: 1,
+		borderColor: colors.primaryLight,
 	},
 	addDishButton: {
 		backgroundColor: colors.secondary,

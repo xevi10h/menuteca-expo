@@ -1,57 +1,65 @@
 {
-	"expo": {
-		"name": "menuteca-expo",
-		"slug": "menuteca-expo",
-		"version": "1.0.0",
-		"orientation": "portrait",
-		"icon": "./assets/images/icon_white_splash_screen.png",
-		"scheme": "menutecaexpo",
-		"userInterfaceStyle": "automatic",
-		"newArchEnabled": true,
-		"ios": {
-			"supportsTablet": true
-		},
-		"android": {
-			"adaptiveIcon": {
-				"foregroundImage": "./assets/images/icon_white_splash_screen.png",
-				"backgroundColor": "#48280E"
-			},
-			"edgeToEdgeEnabled": true
-		},
-		"web": {
-			"bundler": "metro",
-			"output": "static",
-			"favicon": "./assets/images/icon_white_splash_screen.png"
-		},
-		"plugins": [
-			"expo-router",
-			[
-				"expo-splash-screen",
-				{
-					"backgroundColor": "#48280E",
-					"image": "./assets/images/icon_white_splash_screen.png",
-					"imageWidth": 100,
-					"resizeMode": "contain",
-					"ios": {
-						"imageWidth": 200,
-						"imageHeight": 200
-					},
-					"dark": {
-						"image": "./assets/images/icon_white_splash_screen.png",
-						"backgroundColor": "#48280E"
-					}
-				}
-			],
-			[
-				"expo-font",
-				{
-					"fonts": ["./assets/fonts/Manrope-VariableFont_wght"]
-				}
-			],
-			"expo-localization"
-		],
-		"experiments": {
-			"typedRoutes": true
-		}
-	}
+  "expo": {
+    "name": "menuteca-expo",
+    "slug": "menuteca-expo",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon_white_splash_screen.png",
+    "scheme": "menutecaexpo",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon_white_splash_screen.png",
+        "backgroundColor": "#48280E"
+      },
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/icon_white_splash_screen.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#48280E",
+          "image": "./assets/images/icon_white_splash_screen.png",
+          "imageWidth": 100,
+          "resizeMode": "contain",
+          "ios": {
+            "imageWidth": 200,
+            "imageHeight": 200
+          },
+          "dark": {
+            "image": "./assets/images/icon_white_splash_screen.png",
+            "backgroundColor": "#48280E"
+          }
+        }
+      ],
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/Manrope-VariableFont_wght"
+          ]
+        }
+      ],
+      "expo-localization"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "0e63dd55-f93e-4d03-80e4-c56bb2c9e671"
+      }
+    }
+  }
 }

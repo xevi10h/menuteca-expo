@@ -69,7 +69,8 @@ export default function DishDescriptionModal({
 					</TouchableOpacity>
 
 					<Text style={styles.dishModalTitle}>
-						{t('menuCreation.addDishDescription')}
+						{t('menuCreation.addDishDescription')}{' '}
+						<Text style={styles.dishModalTitleName}>{dish?.name || ''}</Text>
 					</Text>
 
 					<TextInput
@@ -237,10 +238,16 @@ const styles = StyleSheet.create({
 	dishModalTitle: {
 		fontSize: 16,
 		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontWeight: '400',
 		color: colors.primary,
 		textAlign: 'center',
 		marginBottom: 20,
+	},
+	dishModalTitleName: {
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.primary,
 	},
 	dishDescriptionInput: {
 		backgroundColor: colors.secondary,

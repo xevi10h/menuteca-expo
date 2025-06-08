@@ -1,5 +1,6 @@
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
+import { Dish } from '@/shared/types';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
@@ -13,7 +14,7 @@ import {
 
 interface SupplementModalProps {
 	visible: boolean;
-	supplementPrice: string;
+	dish: Dish | null;
 	onSupplementPriceChange: (price: string) => void;
 	onClose: () => void;
 	onSave: () => void;
@@ -21,7 +22,7 @@ interface SupplementModalProps {
 
 export default function SupplementModal({
 	visible,
-	supplementPrice,
+	dish,
 	onSupplementPriceChange,
 	onClose,
 	onSave,
@@ -31,11 +32,12 @@ export default function SupplementModal({
 	const handlePriceChange = (text: string) => {
 		// Solo permitir números y punto decimal
 		const numericValue = text.replace(/[^0-9.]/g, '');
-		// Evitar múltiples puntos decimales
 		const parts = numericValue.split('.');
-		if (parts.length > 2) {
-			return;
+
+		if (parts.length > 2 || (parts.length === 2 && parts[1].length > 2)) {
+			return; // Evitar múltiples puntos o más de 2 decimales
 		}
+
 		onSupplementPriceChange(numericValue);
 	};
 
@@ -48,14 +50,15 @@ export default function SupplementModal({
 					</TouchableOpacity>
 
 					<Text style={styles.supplementTitle}>
-						{t('menuCreation.addSupplement')}
+						{t('menuCreation.addSupplement')}{' '}
+						<Text style={styles.supplementNameDish}>{dish?.name || ''}</Text>
 					</Text>
 
 					<View style={styles.priceContainer}>
 						<TextInput
 							style={styles.supplementInput}
 							placeholder={t('menuCreation.supplementPlaceholder')}
-							value={supplementPrice}
+							value={dish?.extraPrice.toString() || ''}
 							onChangeText={handlePriceChange}
 							keyboardType="numeric"
 						/>
@@ -99,10 +102,16 @@ const styles = StyleSheet.create({
 	supplementTitle: {
 		fontSize: 16,
 		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontWeight: '400',
 		color: colors.primary,
 		textAlign: 'center',
 		marginBottom: 20,
+	},
+	supplementNameDish: {
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.primary,
 	},
 	priceContainer: {
 		flexDirection: 'row',
