@@ -12,8 +12,9 @@ import type {
 	TabNavigationState,
 } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, { useState } from 'react';
 import {
+	Alert,
 	Animated,
 	Dimensions,
 	StyleSheet,
@@ -52,6 +53,30 @@ function CustomTabBar({
 	position,
 }: CustomTabBarProps) {
 	const { t } = useTranslation();
+	const validation = useRegisterRestaurantStore((store) => store.validation);
+
+	const showValidationAlert = () => {
+		const errors: string[] = [];
+
+		if (validation.errors.hasPhotos) {
+			errors.push(t('registerRestaurant.validation.needPhotos'));
+		}
+		if (validation.errors.hasMenus) {
+			errors.push(t('registerRestaurant.validation.needMenus'));
+		}
+		if (validation.errors.hasCuisine) {
+			errors.push(t('registerRestaurant.validation.needCuisine'));
+		}
+		if (validation.errors.tooManyTags) {
+			errors.push(t('registerRestaurant.validation.tooManyTags'));
+		}
+
+		Alert.alert(
+			t('registerRestaurant.validation.incomplete'),
+			errors.join('\n'),
+			[{ text: t('general.ok'), style: 'default' }],
+		);
+	};
 
 	return (
 		<View style={styles.tabContainer}>
@@ -83,7 +108,16 @@ function CustomTabBar({
 						options.tabBarLabel || options.title || route.name;
 					const isFocused: boolean = state.index === index;
 
+					// Check if preview tab and validation fails
+					const isPreviewTab = route.name === 'preview';
+
 					const onPress = (): void => {
+						// Show alert if trying to go to preview with validation errors
+						if (isPreviewTab && !validation.isValid) {
+							showValidationAlert();
+							return;
+						}
+
 						const event = navigation.emit({
 							type: 'tabPress',
 							target: route.key,
@@ -125,13 +159,48 @@ export default function SetupLayout(): React.JSX.Element {
 	const provisionalRegisterRestaurant = useRegisterRestaurantStore(
 		(store) => store.registerRestaurant,
 	);
+	const validation = useRegisterRestaurantStore((store) => store.validation);
+	const [currentTab, setCurrentTab] = useState<'edit' | 'preview'>('edit');
 
 	const handleBack = (): void => {
 		router.back();
 	};
 
 	const handleSave = (): void => {
+		if (!validation.isValid) {
+			// Show validation errors
+			const errors: string[] = [];
+
+			if (validation.errors.hasPhotos) {
+				errors.push(t('registerRestaurant.validation.needPhotos'));
+			}
+			if (validation.errors.hasMenus) {
+				errors.push(t('registerRestaurant.validation.needMenus'));
+			}
+			if (validation.errors.hasCuisine) {
+				errors.push(t('registerRestaurant.validation.needCuisine'));
+			}
+			if (validation.errors.tooManyTags) {
+				errors.push(t('registerRestaurant.validation.tooManyTags'));
+			}
+
+			Alert.alert(
+				t('registerRestaurant.validation.incomplete'),
+				errors.join('\n'),
+				[{ text: t('general.ok'), style: 'default' }],
+			);
+			return;
+		}
+
 		router.dismissAll();
+	};
+
+	// Handle tab state change
+	const handleTabStateChange = (state: any) => {
+		const currentRouteName = state.routes[state.index]?.name;
+		if (currentRouteName) {
+			setCurrentTab(currentRouteName as 'edit' | 'preview');
+		}
 	};
 
 	return (
@@ -151,14 +220,21 @@ export default function SetupLayout(): React.JSX.Element {
 				</TouchableOpacity>
 			</View>
 
+			{/* Validation Status Indicator - Removed */}
+
 			{/* Tab Navigator with Custom Tab Bar */}
 			<Tab.Navigator
 				tabBar={(props: MaterialTopTabBarProps) => <CustomTabBar {...props} />}
 				screenOptions={{
-					swipeEnabled: true,
+					swipeEnabled: true, // Always enable swipe
 					animationEnabled: true,
 					lazy: true,
 					lazyPreloadDistance: 1,
+				}}
+				screenListeners={{
+					state: (e) => {
+						handleTabStateChange(e.data.state);
+					},
 				}}
 			>
 				<Tab.Screen
@@ -219,6 +295,20 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		textAlign: 'right',
+	},
+	validationContainer: {
+		backgroundColor: '#FFE5E5',
+		paddingHorizontal: 20,
+		paddingVertical: 10,
+		borderBottomWidth: 1,
+		borderBottomColor: '#FFB3B3',
+	},
+	validationText: {
+		color: '#D32F2F',
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		textAlign: 'center',
 	},
 	tabContainer: {
 		paddingHorizontal: 20,

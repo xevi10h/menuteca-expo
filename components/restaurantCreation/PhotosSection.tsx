@@ -17,12 +17,14 @@ interface PhotosSectionProps {
 	images?: string[];
 	onImagesAdded: (imageUris: string[]) => void;
 	onImageRemoved: (index: number) => void;
+	showTitle?: boolean; // Nueva prop para controlar si mostrar el título
 }
 
 export default function PhotosSection({
 	images = [],
 	onImagesAdded,
 	onImageRemoved,
+	showTitle = false,
 }: PhotosSectionProps) {
 	const { t } = useTranslation();
 
@@ -50,9 +52,11 @@ export default function PhotosSection({
 
 	return (
 		<View style={styles.photosSection}>
-			<Text style={styles.sectionTitle}>
-				{t('registerRestaurant.uploadPhotos')}
-			</Text>
+			{showTitle && (
+				<Text style={styles.sectionTitle}>
+					{t('registerRestaurant.uploadPhotos')}
+				</Text>
+			)}
 			<Text style={styles.sectionSubtitle}>
 				{t('registerRestaurant.uploadPhotosDescription')}
 			</Text>
@@ -88,7 +92,7 @@ export default function PhotosSection({
 
 const styles = StyleSheet.create({
 	photosSection: {
-		paddingVertical: 20,
+		paddingVertical: 0, // Removed vertical padding since parent handles it
 	},
 	sectionTitle: {
 		fontSize: 16,

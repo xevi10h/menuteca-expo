@@ -13,8 +13,16 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { RestaurantTag } from '@/shared/enums';
 import { MenuData } from '@/shared/types';
 import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import {
+	Alert,
+	ScrollView,
+	StyleSheet,
+	Text,
+	TouchableOpacity,
+	View,
+} from 'react-native';
 
 export default function EditTab() {
 	const { t } = useTranslation();
@@ -37,8 +45,6 @@ export default function EditTab() {
 		setRegisterRestaurantCuisine,
 		setRegisterRestaurantTags,
 	} = useRegisterRestaurantStore();
-
-	console.log('registerrestaurant', registerRestaurant);
 
 	const handleAddImages = (imageUris: string[]) => {
 		imageUris.forEach((uri) => {
@@ -94,6 +100,20 @@ export default function EditTab() {
 		setRegisterRestaurantTags(selectedTags);
 	};
 
+	// Helper component for required field indicator with red asterisk
+	const RequiredFieldLabel = ({
+		children,
+		required = false,
+	}: {
+		children: React.ReactNode;
+		required?: boolean;
+	}) => (
+		<View style={styles.labelContainer}>
+			<Text style={styles.sectionTitle}>{children}</Text>
+			{required && <Text style={styles.requiredAsterisk}> *</Text>}
+		</View>
+	);
+
 	return (
 		<>
 			<ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -112,34 +132,82 @@ export default function EditTab() {
 				/>
 
 				{/* Menus Section */}
-				<MenusSection
-					menus={registerRestaurant.menus}
-					onEditMenu={handleEditMenu}
-					onDeleteMenu={handleDeleteMenu}
-					onAddMenu={() => {
-						setEditingMenuIndex(null);
-						setShowMenuModal(true);
-					}}
-				/>
+				<View style={styles.sectionContainer}>
+					<RequiredFieldLabel required={true}>
+						{t('registerRestaurant.myMenus')}
+					</RequiredFieldLabel>
+					<MenusSection
+						menus={registerRestaurant.menus}
+						onEditMenu={handleEditMenu}
+						onDeleteMenu={handleDeleteMenu}
+						onAddMenu={() => {
+							setEditingMenuIndex(null);
+							setShowMenuModal(true);
+						}}
+						showTitle={false}
+					/>
+				</View>
 
 				{/* Photos Section */}
-				<PhotosSection
-					images={registerRestaurant.images}
-					onImagesAdded={handleAddImages}
-					onImageRemoved={removeRegisterRestaurantImage}
-				/>
+				<View style={styles.sectionContainer}>
+					<RequiredFieldLabel required={true}>
+						{t('registerRestaurant.uploadPhotos')}
+					</RequiredFieldLabel>
+					<PhotosSection
+						images={registerRestaurant.images}
+						onImagesAdded={handleAddImages}
+						onImageRemoved={removeRegisterRestaurantImage}
+						showTitle={false}
+					/>
+				</View>
 
 				{/* Food Types Section */}
-				<CuisineSelectionSection
-					selectedCuisineId={registerRestaurant.cuisine}
-					onEditPress={() => setShowCuisineModal(true)}
-				/>
+				<View style={styles.sectionContainer}>
+					<View style={styles.sectionHeaderWithEdit}>
+						<RequiredFieldLabel required={true}>
+							{t('registerRestaurant.foodType')}
+						</RequiredFieldLabel>
+						<TouchableOpacity
+							style={styles.editButton}
+							onPress={() => setShowCuisineModal(true)}
+						>
+							<Ionicons
+								name="pencil-outline"
+								size={16}
+								color={colors.primary}
+							/>
+						</TouchableOpacity>
+					</View>
+					<CuisineSelectionSection
+						selectedCuisineId={registerRestaurant.cuisine}
+						onEditPress={() => setShowCuisineModal(true)}
+						showTitle={false}
+					/>
+				</View>
 
 				{/* Tags Section */}
-				<TagsSection
-					selectedTags={registerRestaurant.tags || []}
-					onEditPress={() => setShowTagsModal(true)}
-				/>
+				<View style={styles.sectionContainer}>
+					<View style={styles.sectionHeaderWithEdit}>
+						<RequiredFieldLabel required={false}>
+							{t('registerRestaurant.categories')}
+						</RequiredFieldLabel>
+						<TouchableOpacity
+							style={styles.editButton}
+							onPress={() => setShowTagsModal(true)}
+						>
+							<Ionicons
+								name="pencil-outline"
+								size={16}
+								color={colors.primary}
+							/>
+						</TouchableOpacity>
+					</View>
+					<TagsSection
+						selectedTags={registerRestaurant.tags || []}
+						onEditPress={() => setShowTagsModal(true)}
+						showTitle={false}
+					/>
+				</View>
 
 				<View style={{ height: 50 }} />
 			</ScrollView>
@@ -192,5 +260,33 @@ const styles = StyleSheet.create({
 		flex: 1,
 		paddingHorizontal: 20,
 		backgroundColor: colors.secondary,
+	},
+	sectionContainer: {
+		marginVertical: 15,
+	},
+	labelContainer: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		marginBottom: 10,
+	},
+	sectionHeaderWithEdit: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+	},
+	sectionTitle: {
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.primary,
+	},
+	requiredAsterisk: {
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: '#D32F2F',
+	},
+	editButton: {
+		padding: 5,
 	},
 });

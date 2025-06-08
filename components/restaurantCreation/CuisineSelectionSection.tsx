@@ -9,11 +9,13 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 interface CuisineSelectionSectionProps {
 	selectedCuisineId?: string;
 	onEditPress: () => void;
+	showTitle?: boolean; // Nueva prop para controlar si mostrar el título
 }
 
 export default function CuisineSelectionSection({
 	selectedCuisineId,
 	onEditPress,
+	showTitle = false,
 }: CuisineSelectionSectionProps) {
 	const { t } = useTranslation();
 	const language = useUserStore((state) => state.user.language);
@@ -22,14 +24,16 @@ export default function CuisineSelectionSection({
 
 	return (
 		<View style={styles.foodTypesSection}>
-			<View style={styles.sectionHeader}>
-				<Text style={styles.sectionTitle}>
-					{t('registerRestaurant.foodType')}
-				</Text>
-				<TouchableOpacity style={styles.editButton} onPress={onEditPress}>
-					<Ionicons name="pencil-outline" size={16} color={colors.primary} />
-				</TouchableOpacity>
-			</View>
+			{showTitle && (
+				<View style={styles.sectionHeader}>
+					<Text style={styles.sectionTitle}>
+						{t('registerRestaurant.foodType')}
+					</Text>
+					<TouchableOpacity style={styles.editButton} onPress={onEditPress}>
+						<Ionicons name="pencil-outline" size={16} color={colors.primary} />
+					</TouchableOpacity>
+				</View>
+			)}
 			<Text style={styles.sectionSubtitle}>
 				{t('registerRestaurant.cuisineTypes')}
 			</Text>
@@ -49,7 +53,7 @@ export default function CuisineSelectionSection({
 
 const styles = StyleSheet.create({
 	foodTypesSection: {
-		marginVertical: 15,
+		marginVertical: 0, // Removed vertical margin since parent handles it
 	},
 	sectionHeader: {
 		flexDirection: 'row',

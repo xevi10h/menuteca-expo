@@ -37,7 +37,8 @@
 		"no": "NO",
 		"edit": "Editar",
 		"preview": "Vista prèvia",
-		"delete": "Eliminar"
+		"delete": "Eliminar",
+		"ok": "D'acord"
 	},
 	"restaurant": {
 		"information": "Informació",
@@ -83,7 +84,27 @@
 		"deleteMenuTitle": "Eliminar menú",
 		"deleteMenuMessage": "Estàs segur que vols eliminar aquest menú?",
 		"mapTapInstruction": "Toca al mapa per seleccionar la ubicació",
-		"newLocation": "Nova ubicació"
+		"newLocation": "Nova ubicació",
+		"tagsSelected": "{{count}}/{{max}} categories seleccionades",
+		"validation": {
+			"incomplete": "Informació incompleta",
+			"needPhotos": "• Has d'afegir almenys una foto",
+			"needMenus": "• Has de crear almenys un menú",
+			"needCuisine": "• Has de seleccionar un tipus de cuina",
+			"tooManyTags": "• Màxim 3 categories permeses",
+			"completeRequired": "Completa els camps obligatoris per continuar",
+			"requiredFields": "Camps obligatoris pendents:",
+			"photos": "Fotos del restaurant",
+			"menus": "Menús",
+			"cuisine": "Tipus de cuina",
+			"maxTags": "Màxim 3 categories",
+			"photosRequired": "Has d'afegir almenys una foto del restaurant",
+			"menusRequired": "Has de crear almenys un menú",
+			"cuisineRequired": "Has de seleccionar un tipus de cuina",
+			"tooManyTagsTitle": "Massa categories",
+			"tooManyTagsMessage": "Només pots seleccionar un màxim de {{max}} categories",
+			"tooManyTagsError": "Has seleccionat massa categories (màxim 3)"
+		}
 	},
 	"menuCreation": {
 		"menuName": "Nom del menú",

@@ -9,24 +9,28 @@ import { renderTagIcon } from './TagsSelectionModal';
 interface TagsSectionProps {
 	selectedTags: string[];
 	onEditPress: () => void;
+	showTitle?: boolean; // Nueva prop para controlar si mostrar el título
 }
 
 export default function TagsSection({
 	selectedTags,
 	onEditPress,
+	showTitle = false,
 }: TagsSectionProps) {
 	const { t } = useTranslation();
 
 	return (
 		<View style={styles.tagsSection}>
-			<View style={styles.sectionHeader}>
-				<Text style={styles.sectionTitle}>
-					{t('registerRestaurant.categories')}
-				</Text>
-				<TouchableOpacity style={styles.editButton} onPress={onEditPress}>
-					<Ionicons name="pencil-outline" size={16} color={colors.primary} />
-				</TouchableOpacity>
-			</View>
+			{showTitle && (
+				<View style={styles.sectionHeader}>
+					<Text style={styles.sectionTitle}>
+						{t('registerRestaurant.categories')}
+					</Text>
+					<TouchableOpacity style={styles.editButton} onPress={onEditPress}>
+						<Ionicons name="pencil-outline" size={16} color={colors.primary} />
+					</TouchableOpacity>
+				</View>
+			)}
 			<Text style={styles.sectionSubtitle}>
 				{t('registerRestaurant.categoriesDescription')}
 			</Text>
@@ -58,7 +62,7 @@ export default function TagsSection({
 
 const styles = StyleSheet.create({
 	tagsSection: {
-		marginVertical: 15,
+		marginVertical: 0,
 	},
 	sectionHeader: {
 		flexDirection: 'row',

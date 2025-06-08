@@ -10,6 +10,7 @@ interface MenusSectionProps {
 	onEditMenu: (index: number) => void;
 	onDeleteMenu: (index: number) => void;
 	onAddMenu: () => void;
+	showTitle?: boolean; // Nueva prop para controlar si mostrar el título
 }
 
 export default function MenusSection({
@@ -17,12 +18,17 @@ export default function MenusSection({
 	onEditMenu,
 	onDeleteMenu,
 	onAddMenu,
+	showTitle = false,
 }: MenusSectionProps) {
 	const { t } = useTranslation();
 
 	return (
 		<View style={styles.menusSection}>
-			<Text style={styles.sectionTitle}>{t('registerRestaurant.myMenus')}</Text>
+			{showTitle && (
+				<Text style={styles.sectionTitle}>
+					{t('registerRestaurant.myMenus')}
+				</Text>
+			)}
 			<View style={{ gap: 10 }}>
 				{menus.map((menu, index) => (
 					<View style={styles.menuItem} key={index}>
@@ -62,7 +68,7 @@ export default function MenusSection({
 
 const styles = StyleSheet.create({
 	menusSection: {
-		marginVertical: 15,
+		marginVertical: 0, // Removed vertical margin since parent handles it
 	},
 	sectionTitle: {
 		fontSize: 16,

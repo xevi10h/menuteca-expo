@@ -37,7 +37,8 @@
 		"no": "NO",
 		"edit": "Edit",
 		"preview": "Preview",
-		"delete": "Delete"
+		"delete": "Delete",
+		"ok": "OK"
 	},
 	"restaurant": {
 		"information": "Information",
@@ -83,7 +84,27 @@
 		"deleteMenuTitle": "Delete menu",
 		"deleteMenuMessage": "Are you sure you want to delete this menu?",
 		"mapTapInstruction": "Tap on the map to select the location",
-		"newLocation": "New location"
+		"newLocation": "New location",
+		"tagsSelected": "{{count}}/{{max}} categories selected",
+		"validation": {
+			"incomplete": "Incomplete information",
+			"needPhotos": "• You must add at least one photo",
+			"needMenus": "• You must create at least one menu",
+			"needCuisine": "• You must select a cuisine type",
+			"tooManyTags": "• Maximum 3 categories allowed",
+			"completeRequired": "Complete required fields to continue",
+			"requiredFields": "Pending required fields:",
+			"photos": "Restaurant photos",
+			"menus": "Menus",
+			"cuisine": "Cuisine type",
+			"maxTags": "Maximum 3 categories",
+			"photosRequired": "You must add at least one restaurant photo",
+			"menusRequired": "You must create at least one menu",
+			"cuisineRequired": "You must select a cuisine type",
+			"tooManyTagsTitle": "Too many categories",
+			"tooManyTagsMessage": "You can only select a maximum of {{max}} categories",
+			"tooManyTagsError": "You have selected too many categories (maximum 3)"
+		}
 	},
 	"menuCreation": {
 		"menuName": "Menu name",
