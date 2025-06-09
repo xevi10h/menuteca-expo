@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import HeaderModal from '@/components/restaurantCreation/HeaderModal';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
 import type {
@@ -18,7 +19,6 @@ import {
 	Animated,
 	Dimensions,
 	StyleSheet,
-	Text,
 	TouchableOpacity,
 	View,
 } from 'react-native';
@@ -207,21 +207,12 @@ export default function SetupLayout(): React.JSX.Element {
 	return (
 		<View style={[styles.container, { paddingTop: insets.top }]}>
 			{/* Header */}
-			<View style={styles.header}>
-				<TouchableOpacity onPress={handleBack} style={styles.cancelButton}>
-					<Text style={styles.cancelText}>{t('general.cancel')}</Text>
-				</TouchableOpacity>
-				<View style={{ flex: 2 }}>
-					<Text style={styles.title} numberOfLines={1}>
-						{provisionalRegisterRestaurant.name}
-					</Text>
-				</View>
-				<TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-					<Text style={styles.saveText}>{t('general.save')}</Text>
-				</TouchableOpacity>
-			</View>
-
-			{/* Validation Status Indicator - Removed */}
+			<HeaderModal
+				title={provisionalRegisterRestaurant.name}
+				handleClose={handleBack}
+				handleSave={handleSave}
+				saveDisabled={!validation.isValid}
+			/>
 
 			{/* Tab Navigator with Custom Tab Bar */}
 			<Tab.Navigator
@@ -261,41 +252,6 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: colors.secondary,
-	},
-	header: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		paddingHorizontal: 20,
-		paddingVertical: 15,
-		gap: 10,
-		width: '100%',
-	},
-	cancelButton: {
-		flex: 1,
-	},
-	cancelText: {
-		color: colors.primary,
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
-	},
-	title: {
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
-		color: colors.primary,
-		textAlign: 'center',
-	},
-	saveButton: {
-		flex: 1,
-	},
-	saveText: {
-		color: colors.primary,
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
-		textAlign: 'right',
 	},
 	validationContainer: {
 		backgroundColor: '#FFE5E5',

@@ -18,14 +18,22 @@ import SupplementModal from './SupplementModal';
 interface ManualMenuSectionProps {
 	editingMenu?: MenuData;
 	onSave: (dishes: Dish[], menuOptions: Partial<MenuData>) => void;
+	initialDishes?: Dish[];
+	initialMenuOptions?: Partial<MenuData>;
 }
 
 export default function ManualMenuSection({
 	editingMenu,
 	onSave,
+	initialDishes = [],
+	initialMenuOptions = {},
 }: ManualMenuSectionProps) {
 	const { t } = useTranslation();
 	const [dishes, setDishes] = useState<Dish[]>(() => {
+		// Prioridad: 1. initialDishes (desde foto), 2. editingMenu, 3. platos por defecto
+		if (initialDishes && initialDishes.length > 0) {
+			return [...initialDishes];
+		}
 		if (editingMenu && editingMenu.dishes.length > 0) {
 			return [...editingMenu.dishes];
 		}
@@ -69,30 +77,44 @@ export default function ManualMenuSection({
 		];
 	});
 
-	// New state for menu options
+	// New state for menu options con valores iniciales desde props
 	const [firstCoursesToShare, setFirstCoursesToShare] = useState(
-		editingMenu?.firstCoursesToShare || false,
+		initialMenuOptions?.firstCoursesToShare ||
+			editingMenu?.firstCoursesToShare ||
+			false,
 	);
 	const [secondCoursesToShare, setSecondCoursesToShare] = useState(
-		editingMenu?.secondCoursesToShare || false,
+		initialMenuOptions?.secondCoursesToShare ||
+			editingMenu?.secondCoursesToShare ||
+			false,
 	);
 	const [dessertsToShare, setDessertsToShare] = useState(
-		editingMenu?.dessertsToShare || false,
+		initialMenuOptions?.dessertsToShare ||
+			editingMenu?.dessertsToShare ||
+			false,
 	);
 	const [includesBread, setIncludesBread] = useState(
-		editingMenu?.includesBread || false,
+		initialMenuOptions?.includesBread || editingMenu?.includesBread || false,
 	);
 	const [includesDrink, setIncludesDrink] = useState(
-		editingMenu?.includesDrink || false,
+		initialMenuOptions?.includesDrink || editingMenu?.includesDrink || false,
 	);
 	const [includesCoffeeAndDessert, setIncludesCoffeeAndDessert] = useState<
 		'none' | 'coffee' | 'dessert' | 'both'
-	>(editingMenu?.includesCoffeeAndDessert || 'none');
+	>(
+		initialMenuOptions?.includesCoffeeAndDessert ||
+			editingMenu?.includesCoffeeAndDessert ||
+			'none',
+	);
 	const [hasMinimumPeople, setHasMinimumPeople] = useState(
-		editingMenu?.hasMinimumPeople || false,
+		initialMenuOptions?.hasMinimumPeople ||
+			editingMenu?.hasMinimumPeople ||
+			false,
 	);
 	const [minimumPeople, setMinimumPeople] = useState(
-		editingMenu?.minimumPeople?.toString() || '2',
+		(
+			initialMenuOptions?.minimumPeople || editingMenu?.minimumPeople
+		)?.toString() || '2',
 	);
 
 	// Estados para modales
@@ -100,6 +122,63 @@ export default function ManualMenuSection({
 	const [showSupplementModal, setShowSupplementModal] = useState(false);
 	const [currentDish, setCurrentDish] = useState<Dish | null>(null);
 	const [supplementPrice, setSupplementPrice] = useState('');
+
+	// Usar useRef para evitar bucles infinitos
+	const prevInitialDishesRef = React.useRef<Dish[]>([]);
+	const prevInitialMenuOptionsRef = React.useRef<Partial<MenuData>>({});
+
+	// Efecto para actualizar dishes cuando se reciben initialDishes (desde foto)
+	React.useEffect(() => {
+		if (initialDishes && initialDishes.length > 0) {
+			// Solo actualizar si realmente han cambiado
+			const hasChanged =
+				JSON.stringify(initialDishes) !==
+				JSON.stringify(prevInitialDishesRef.current);
+			if (hasChanged) {
+				setDishes([...initialDishes]);
+				prevInitialDishesRef.current = [...initialDishes];
+			}
+		}
+	}, [initialDishes?.length]); // Solo depende de la longitud
+
+	// Efecto para actualizar opciones del menú cuando se reciben initialMenuOptions
+	React.useEffect(() => {
+		if (initialMenuOptions && Object.keys(initialMenuOptions).length > 0) {
+			// Solo actualizar si realmente han cambiado
+			const hasChanged =
+				JSON.stringify(initialMenuOptions) !==
+				JSON.stringify(prevInitialMenuOptionsRef.current);
+			if (hasChanged) {
+				if (initialMenuOptions.firstCoursesToShare !== undefined) {
+					setFirstCoursesToShare(initialMenuOptions.firstCoursesToShare);
+				}
+				if (initialMenuOptions.secondCoursesToShare !== undefined) {
+					setSecondCoursesToShare(initialMenuOptions.secondCoursesToShare);
+				}
+				if (initialMenuOptions.dessertsToShare !== undefined) {
+					setDessertsToShare(initialMenuOptions.dessertsToShare);
+				}
+				if (initialMenuOptions.includesBread !== undefined) {
+					setIncludesBread(initialMenuOptions.includesBread);
+				}
+				if (initialMenuOptions.includesDrink !== undefined) {
+					setIncludesDrink(initialMenuOptions.includesDrink);
+				}
+				if (initialMenuOptions.includesCoffeeAndDessert !== undefined) {
+					setIncludesCoffeeAndDessert(
+						initialMenuOptions.includesCoffeeAndDessert,
+					);
+				}
+				if (initialMenuOptions.hasMinimumPeople !== undefined) {
+					setHasMinimumPeople(initialMenuOptions.hasMinimumPeople);
+				}
+				if (initialMenuOptions.minimumPeople !== undefined) {
+					setMinimumPeople(initialMenuOptions.minimumPeople.toString());
+				}
+				prevInitialMenuOptionsRef.current = { ...initialMenuOptions };
+			}
+		}
+	}, [Object.keys(initialMenuOptions || {}).length]); // Solo depende del número de keys
 
 	const addDish = useCallback((category: DishCategory) => {
 		const newDish: Dish = {
@@ -161,6 +240,9 @@ export default function ManualMenuSection({
 		setCurrentDish(null);
 	}, [currentDish, supplementPrice]);
 
+	// Optimizar el useEffect que actualiza el parent para evitar bucles
+	const stableOnSave = React.useCallback(onSave, []);
+
 	// Actualizar el parent cuando cambien los dishes o las opciones
 	React.useEffect(() => {
 		const validDishes = dishes.filter(
@@ -180,7 +262,7 @@ export default function ManualMenuSection({
 				: undefined,
 		};
 
-		onSave(validDishes, menuOptions);
+		stableOnSave(validDishes, menuOptions);
 	}, [
 		dishes,
 		firstCoursesToShare,
@@ -191,7 +273,7 @@ export default function ManualMenuSection({
 		includesCoffeeAndDessert,
 		hasMinimumPeople,
 		minimumPeople,
-		onSave,
+		stableOnSave,
 	]);
 
 	const renderDishItem = (dish: Dish) => {
@@ -305,9 +387,12 @@ export default function ManualMenuSection({
 			{/* First Courses Section */}
 			<View style={styles.courseSection}>
 				<View style={styles.courseTitleRow}>
-					<Text style={styles.courseTitle}>
-						{t('menuCreation.firstCourses')}
-					</Text>
+					<View style={styles.labelContainer}>
+						<Text style={styles.courseTitle}>
+							{t('menuCreation.firstCourses')}
+						</Text>
+						<Text style={styles.requiredAsterisk}> *</Text>
+					</View>
 					<View style={styles.shareToggle}>
 						<Text style={styles.shareLabel}>{t('menuCreation.toShare')}</Text>
 						<Switch
@@ -335,9 +420,12 @@ export default function ManualMenuSection({
 			{/* Second Courses Section */}
 			<View style={styles.courseSection}>
 				<View style={styles.courseTitleRow}>
-					<Text style={styles.courseTitle}>
-						{t('menuCreation.secondCourses')}
-					</Text>
+					<View style={styles.labelContainer}>
+						<Text style={styles.courseTitle}>
+							{t('menuCreation.secondCourses')}
+						</Text>
+						<Text style={styles.requiredAsterisk}> *</Text>
+					</View>
 					<View style={styles.shareToggle}>
 						<Text style={styles.shareLabel}>{t('menuCreation.toShare')}</Text>
 						<Switch
@@ -494,11 +582,21 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		marginBottom: 10,
 	},
+	labelContainer: {
+		flexDirection: 'row',
+		alignItems: 'center',
+	},
 	courseTitle: {
 		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.primary,
+	},
+	requiredAsterisk: {
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: '#D32F2F',
 	},
 	shareToggle: {
 		flexDirection: 'row',

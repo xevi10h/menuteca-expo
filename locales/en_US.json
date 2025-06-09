@@ -187,6 +187,13 @@
 			"coffee": "Coffee only",
 			"dessert": "Dessert only",
 			"coffeeAndDessert": "Coffee and dessert"
+		},
+		"validation": {
+			"incomplete": "Incomplete menu information",
+			"needName": "• The menu must have a valid name",
+			"needValidPrice": "• The menu must have a price greater than €0",
+			"needFirstCourse": "• The menu must have at least one first course",
+			"needSecondCourse": "• The menu must have at least one second course"
 		}
 	},
 	"days": {

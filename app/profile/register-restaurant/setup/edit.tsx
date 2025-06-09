@@ -261,6 +261,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		marginBottom: 10,
+		gap: 2,
 	},
 	sectionHeaderWithEdit: {
 		flexDirection: 'row',

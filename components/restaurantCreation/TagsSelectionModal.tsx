@@ -110,6 +110,7 @@ export default function TagsSelectionModal({
 					title={t('registerRestaurant.categories')}
 					handleClose={onClose}
 					handleSave={handleSave}
+					hasBorderBottom={true}
 				/>
 				<ScrollView style={styles.modalContent}>
 					<Text style={styles.label}>

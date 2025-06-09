@@ -187,6 +187,13 @@
 			"coffee": "Només cafè",
 			"dessert": "Només postre",
 			"coffeeAndDessert": "Cafè i postre"
+		},
+		"validation": {
+			"incomplete": "Informació del menú incompleta",
+			"needName": "• El menú ha de tenir un nom vàlid",
+			"needValidPrice": "• El menú ha de tenir un preu superior a 0€",
+			"needFirstCourse": "• El menú ha de tenir almenys un primer plat",
+			"needSecondCourse": "• El menú ha de tenir almenys un segon plat"
 		}
 	},
 	"days": {

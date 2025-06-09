@@ -187,6 +187,13 @@
 			"coffee": "Solo café",
 			"dessert": "Solo postre",
 			"coffeeAndDessert": "Café y postre"
+		},
+		"validation": {
+			"incomplete": "Información del menú incompleta",
+			"needName": "• El menú debe tener un nombre válido",
+			"needValidPrice": "• El menú debe tener un precio mayor a 0€",
+			"needFirstCourse": "• El menú debe tener al menos un primer plato",
+			"needSecondCourse": "• El menú debe tener al menos un segundo plato"
 		}
 	},
 	"days": {

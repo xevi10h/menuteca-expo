@@ -6,23 +6,47 @@ interface HeaderModalProps {
 	title: string;
 	handleClose: () => void;
 	handleSave: () => void;
+	saveDisabled?: boolean;
+	hasBorderBottom?: boolean;
 }
+
 export default function HeaderModal({
 	title,
 	handleClose,
 	handleSave,
+	saveDisabled = false,
+	hasBorderBottom = false,
 }: HeaderModalProps) {
 	const { t } = useTranslation();
+
 	return (
-		<View style={styles.modalHeader}>
-			<TouchableOpacity onPress={handleClose}>
+		<View
+			style={[
+				styles.modalHeader,
+				hasBorderBottom && {
+					borderBottomWidth: 1,
+					borderBottomColor: '#E5E5E5',
+				},
+			]}
+		>
+			<TouchableOpacity onPress={handleClose} style={styles.leftButton}>
 				<Text style={styles.cancelText}>{t('general.cancel')}</Text>
 			</TouchableOpacity>
-			<View>
+
+			<View style={styles.titleContainer}>
 				<Text style={styles.modalTitle}>{title}</Text>
 			</View>
-			<TouchableOpacity onPress={handleSave}>
-				<Text style={styles.saveText}>{t('general.save')}</Text>
+
+			<TouchableOpacity
+				onPress={handleSave}
+				disabled={saveDisabled}
+				style={styles.rightButton}
+			>
+				<Text
+					style={[styles.saveText, saveDisabled && styles.saveTextDisabled]}
+				>
+					{t('general.save')}
+				</Text>
 			</TouchableOpacity>
 		</View>
 	);
@@ -35,20 +59,32 @@ const styles = StyleSheet.create({
 	},
 	modalHeader: {
 		flexDirection: 'row',
-		justifyContent: 'space-between',
 		alignItems: 'center',
 		paddingHorizontal: 20,
 		paddingVertical: 15,
-		borderBottomWidth: 1,
-		borderBottomColor: '#E5E5E5',
-		gap: 10,
+
+		position: 'relative',
+	},
+	leftButton: {
+		flex: 1,
+		alignItems: 'flex-start',
+	},
+	titleContainer: {
+		position: 'absolute',
+		left: 0,
+		right: 0,
+		alignItems: 'center',
+		pointerEvents: 'none',
+	},
+	rightButton: {
+		flex: 1,
+		alignItems: 'flex-end',
 	},
 	cancelText: {
 		color: colors.primary,
 		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '400',
-		textAlign: 'left',
 	},
 	modalTitle: {
 		fontSize: 16,
@@ -62,6 +98,9 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '600',
-		textAlign: 'right',
+	},
+	saveTextDisabled: {
+		opacity: 0.5,
+		color: colors.primaryLight,
 	},
 });

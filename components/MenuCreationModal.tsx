@@ -23,6 +23,84 @@ import PriceInput from './menuCreation/PriceInput';
 import TimeSelector from './menuCreation/TimeSelector';
 import HeaderModal from './restaurantCreation/HeaderModal';
 
+// Interfaz para la validación del menú
+interface MenuValidation {
+	isValid: boolean;
+	errors: {
+		hasName: boolean;
+		hasValidPrice: boolean;
+		hasFirstCourse: boolean;
+		hasSecondCourse: boolean;
+	};
+}
+
+// Lista de nombres de platos por defecto que no cuentan como válidos
+const DEFAULT_DISH_NAMES = [
+	'',
+	'ej: ensalada cesar',
+	'ej: solomillo de ternera',
+	'ej: tarta de queso',
+	'ex: ensalada cesar',
+	'ex: solomillo de ternera',
+	'ex: tarta de queso',
+	'ejemplo: ensalada cesar',
+	'ejemplo: solomillo de ternera',
+	'ejemplo: tarta de queso',
+];
+
+// Función para validar un menú
+const validateMenu = (
+	menuName: string,
+	price: string,
+	dishes: Dish[],
+): MenuValidation => {
+	// Validar nombre del menú
+	const hasName =
+		menuName.trim() !== '' &&
+		menuName.trim() !== 'ej: menú de mediodía' &&
+		menuName.trim() !== 'ex: menú de mediodía' &&
+		menuName.trim() !== 'ejemplo: menú de mediodía';
+
+	// Validar precio
+	const priceNumber = parseFloat(price);
+	const hasValidPrice = !isNaN(priceNumber) && priceNumber > 0;
+
+	// Filtrar platos válidos (que no sean ejemplos ni vacíos)
+	const validDishes = dishes.filter((dish) => {
+		const dishName = dish.name.trim().toLowerCase();
+		return (
+			dishName !== '' &&
+			!DEFAULT_DISH_NAMES.some(
+				(defaultName) => dishName === defaultName.toLowerCase(),
+			)
+		);
+	});
+
+	// Validar que tenga al menos un primer plato
+	const hasFirstCourse = validDishes.some(
+		(dish) => dish.category === DishCategory.FIRST_COURSES,
+	);
+
+	// Validar que tenga al menos un segundo plato
+	const hasSecondCourse = validDishes.some(
+		(dish) => dish.category === DishCategory.SECOND_COURSES,
+	);
+
+	const errors = {
+		hasName: !hasName,
+		hasValidPrice: !hasValidPrice,
+		hasFirstCourse: !hasFirstCourse,
+		hasSecondCourse: !hasSecondCourse,
+	};
+
+	const isValid = hasName && hasValidPrice && hasFirstCourse && hasSecondCourse;
+
+	return {
+		isValid,
+		errors,
+	};
+};
+
 interface MenuCreationModalProps {
 	visible: boolean;
 	onClose: () => void;
@@ -54,6 +132,17 @@ export default function MenuCreationModal({
 
 	// New state for menu options
 	const [menuOptions, setMenuOptions] = useState<Partial<MenuData>>({});
+
+	// Estado para la validación del menú
+	const [validation, setValidation] = useState<MenuValidation>({
+		isValid: false,
+		errors: {
+			hasName: true,
+			hasValidPrice: true,
+			hasFirstCourse: true,
+			hasSecondCourse: true,
+		},
+	});
 
 	// Simular un menú generado por el backend
 	const generateSimulatedMenu = (): {
@@ -235,8 +324,12 @@ export default function MenuCreationModal({
 			if (success) {
 				// Si el procesamiento es exitoso, generar menú simulado
 				const { dishes, menuData } = generateSimulatedMenu();
+
+				// Establecer los datos ANTES de mostrar el manual menu
 				setMenuDishes(dishes);
 				setMenuOptions(menuData);
+
+				// Luego mostrar el manual menu
 				setShowManualMenu(true);
 
 				// Mostrar mensaje de éxito
@@ -325,10 +418,42 @@ export default function MenuCreationModal({
 			setMenuDishes(dishes);
 			setMenuOptions(options);
 		},
-		[],
+		[], // Sin dependencias ya que solo estamos seteando estado
 	);
 
+	// Actualizar validación cuando cambien los campos
+	React.useEffect(() => {
+		const newValidation = validateMenu(menuName, price, menuDishes);
+		setValidation(newValidation);
+	}, [menuName, price, menuDishes]);
+
 	const handleSave = useCallback(() => {
+		// Validar el menú antes de guardar
+		const currentValidation = validateMenu(menuName, price, menuDishes);
+
+		if (!currentValidation.isValid) {
+			// Mostrar errores de validación
+			const errors: string[] = [];
+
+			if (currentValidation.errors.hasName) {
+				errors.push(t('menuCreation.validation.needName'));
+			}
+			if (currentValidation.errors.hasValidPrice) {
+				errors.push(t('menuCreation.validation.needValidPrice'));
+			}
+			if (currentValidation.errors.hasFirstCourse) {
+				errors.push(t('menuCreation.validation.needFirstCourse'));
+			}
+			if (currentValidation.errors.hasSecondCourse) {
+				errors.push(t('menuCreation.validation.needSecondCourse'));
+			}
+
+			Alert.alert(t('menuCreation.validation.incomplete'), errors.join('\n'), [
+				{ text: t('general.ok'), style: 'default' },
+			]);
+			return;
+		}
+
 		const menu: MenuData = {
 			id: editingMenu?.id || Date.now().toString(),
 			name: menuName,
@@ -352,6 +477,7 @@ export default function MenuCreationModal({
 		editingMenu?.id,
 		onSave,
 		onClose,
+		t,
 	]);
 
 	const handleClose = useCallback(() => {
@@ -377,6 +503,8 @@ export default function MenuCreationModal({
 					}
 					handleClose={handleClose}
 					handleSave={handleSave}
+					saveDisabled={!validation.isValid}
+					hasBorderBottom={true}
 				/>
 				<ScrollView
 					style={styles.modalContent}
@@ -384,7 +512,10 @@ export default function MenuCreationModal({
 				>
 					{/* Menu Name */}
 					<View style={styles.section}>
-						<Text style={styles.label}>{t('menuCreation.menuName')}</Text>
+						<View style={styles.labelContainer}>
+							<Text style={styles.label}>{t('menuCreation.menuName')}</Text>
+							<Text style={styles.requiredAsterisk}> *</Text>
+						</View>
 						<TextInput
 							style={styles.input}
 							placeholder={t('menuCreation.menuNamePlaceholder')}
@@ -412,7 +543,10 @@ export default function MenuCreationModal({
 
 					{/* Price */}
 					<View style={styles.section}>
-						<Text style={styles.label}>{t('menuCreation.price')}</Text>
+						<View style={styles.labelContainer}>
+							<Text style={styles.label}>{t('menuCreation.price')}</Text>
+							<Text style={styles.requiredAsterisk}> *</Text>
+						</View>
 						<PriceInput value={price} onChangeText={setPrice} />
 					</View>
 
@@ -421,7 +555,15 @@ export default function MenuCreationModal({
 
 					{/* Menu Section */}
 					<View style={styles.menuSection}>
-						<Text style={styles.menuTitle}>{t('menuCreation.menuTitle')}</Text>
+						<View style={styles.labelContainer}>
+							<Text style={styles.menuTitle}>
+								{t('menuCreation.menuTitle')}
+							</Text>
+							<Text style={[styles.requiredAsterisk, { fontSize: 24 }]}>
+								{' '}
+								*
+							</Text>
+						</View>
 
 						{/* Photo Upload Button */}
 						<TouchableOpacity
@@ -460,6 +602,8 @@ export default function MenuCreationModal({
 							<ManualMenuSection
 								editingMenu={editingMenu}
 								onSave={handleDishesAndOptionsChange}
+								initialDishes={menuDishes}
+								initialMenuOptions={menuOptions}
 							/>
 						)}
 
@@ -495,12 +639,23 @@ const styles = StyleSheet.create({
 	section: {
 		marginVertical: 15,
 	},
+	labelContainer: {
+		flexDirection: 'row',
+		alignItems: 'flex-start',
+		gap: 2,
+	},
 	label: {
 		fontSize: 12,
 		fontFamily: 'Manrope',
 		fontWeight: '300',
 		color: colors.tertiary,
 		marginBottom: 10,
+	},
+	requiredAsterisk: {
+		fontSize: 12,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: '#D32F2F',
 	},
 	input: {
 		borderRadius: 12,

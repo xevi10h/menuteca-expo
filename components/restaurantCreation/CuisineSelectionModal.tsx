@@ -51,6 +51,7 @@ export default function CuisineSelectionModal({
 					title={t('registerRestaurant.foodType')}
 					handleClose={onClose}
 					handleSave={handleSave}
+					hasBorderBottom={true}
 				/>
 				<View style={styles.modalContent}>
 					<Text style={styles.label}>

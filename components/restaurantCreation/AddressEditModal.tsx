@@ -174,6 +174,7 @@ export default function AddressEditModal({
 					title={t('registerRestaurant.editAddress')}
 					handleClose={handleCancel}
 					handleSave={handleSave}
+					hasBorderBottom={true}
 				/>
 
 				<ScrollView
