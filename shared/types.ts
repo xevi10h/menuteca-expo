@@ -93,6 +93,14 @@ export type MenuData = {
 	subtitle?: string;
 	price: number;
 	dishes: Dish[];
+	firstCoursesToShare?: boolean;
+	secondCoursesToShare?: boolean;
+	dessertsToShare?: boolean;
+	includesBread?: boolean;
+	includesDrink?: boolean;
+	includesCoffeeAndDessert?: 'none' | 'coffee' | 'dessert' | 'both';
+	minimumPeople?: number;
+	hasMinimumPeople?: boolean;
 };
 
 export type Dish = {

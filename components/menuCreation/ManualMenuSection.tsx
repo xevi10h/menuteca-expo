@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useState } from 'react';
 import {
 	StyleSheet,
+	Switch,
 	Text,
 	TextInput,
 	TouchableOpacity,
@@ -16,7 +17,7 @@ import SupplementModal from './SupplementModal';
 
 interface ManualMenuSectionProps {
 	editingMenu?: MenuData;
-	onSave: (dishes: Dish[]) => void;
+	onSave: (dishes: Dish[], menuOptions: Partial<MenuData>) => void;
 }
 
 export default function ManualMenuSection({
@@ -68,6 +69,32 @@ export default function ManualMenuSection({
 		];
 	});
 
+	// New state for menu options
+	const [firstCoursesToShare, setFirstCoursesToShare] = useState(
+		editingMenu?.firstCoursesToShare || false,
+	);
+	const [secondCoursesToShare, setSecondCoursesToShare] = useState(
+		editingMenu?.secondCoursesToShare || false,
+	);
+	const [dessertsToShare, setDessertsToShare] = useState(
+		editingMenu?.dessertsToShare || false,
+	);
+	const [includesBread, setIncludesBread] = useState(
+		editingMenu?.includesBread || false,
+	);
+	const [includesDrink, setIncludesDrink] = useState(
+		editingMenu?.includesDrink || false,
+	);
+	const [includesCoffeeAndDessert, setIncludesCoffeeAndDessert] = useState<
+		'none' | 'coffee' | 'dessert' | 'both'
+	>(editingMenu?.includesCoffeeAndDessert || 'none');
+	const [hasMinimumPeople, setHasMinimumPeople] = useState(
+		editingMenu?.hasMinimumPeople || false,
+	);
+	const [minimumPeople, setMinimumPeople] = useState(
+		editingMenu?.minimumPeople?.toString() || '2',
+	);
+
 	// Estados para modales
 	const [showDishModal, setShowDishModal] = useState(false);
 	const [showSupplementModal, setShowSupplementModal] = useState(false);
@@ -107,7 +134,7 @@ export default function ManualMenuSection({
 
 	const openSupplementModal = useCallback((dish: Dish) => {
 		setCurrentDish(dish);
-		setSupplementPrice(dish.extraPrice > 0 ? dish.extraPrice.toString() : '');
+		setSupplementPrice(dish.extraPrice.toString());
 		setShowSupplementModal(true);
 	}, []);
 
@@ -134,27 +161,48 @@ export default function ManualMenuSection({
 		setCurrentDish(null);
 	}, [currentDish, supplementPrice]);
 
-	// Actualizar el parent cuando cambien los dishes
+	// Actualizar el parent cuando cambien los dishes o las opciones
 	React.useEffect(() => {
-		// Solo actualizar si hay cambios reales en los dishes
 		const validDishes = dishes.filter(
 			(dish) => dish.name.trim() !== '' && dish.name !== 'ej: ensalada cesar',
 		);
-		onSave(validDishes);
-	}, [dishes, onSave]);
+
+		const menuOptions = {
+			firstCoursesToShare,
+			secondCoursesToShare,
+			dessertsToShare,
+			includesBread,
+			includesDrink,
+			includesCoffeeAndDessert,
+			hasMinimumPeople,
+			minimumPeople: hasMinimumPeople
+				? parseInt(minimumPeople) || 2
+				: undefined,
+		};
+
+		onSave(validDishes, menuOptions);
+	}, [
+		dishes,
+		firstCoursesToShare,
+		secondCoursesToShare,
+		dessertsToShare,
+		includesBread,
+		includesDrink,
+		includesCoffeeAndDessert,
+		hasMinimumPeople,
+		minimumPeople,
+		onSave,
+	]);
 
 	const renderDishItem = (dish: Dish) => {
-		// Función auxiliar para formatear el precio
 		const formatExtraPrice = (price: number) => {
 			if (price === 0) {
 				return '€+';
 			}
-			// Si el precio es un entero (ej. 3, 3.0), lo mostramos sin decimales
 			if (price % 1 === 0) {
 				return `+${price}€`;
 			}
-			// Si tiene decimales, lo mostramos con decimales
-			return `+${price.toFixed(2)}€`; // Aseguramos 2 decimales
+			return `+${price.toFixed(2)}€`;
 		};
 
 		const dishHasDescription =
@@ -212,10 +260,64 @@ export default function ManualMenuSection({
 		);
 	};
 
+	const renderCoffeeDesertSelector = () => {
+		const options = [
+			{ key: 'none', label: t('menuCreation.options.none') },
+			{ key: 'coffee', label: t('menuCreation.options.coffee') },
+			{ key: 'dessert', label: t('menuCreation.options.dessert') },
+			{ key: 'both', label: t('menuCreation.options.coffeeAndDessert') },
+		];
+
+		return (
+			<View style={styles.selectorContainer}>
+				<Text style={styles.selectorLabel}>
+					{t('menuCreation.coffeeAndDessertOptions')}
+				</Text>
+				<View style={styles.optionsContainer}>
+					{options.map((option) => (
+						<TouchableOpacity
+							key={option.key}
+							style={[
+								styles.optionButton,
+								includesCoffeeAndDessert === option.key &&
+									styles.optionButtonSelected,
+							]}
+							onPress={() => setIncludesCoffeeAndDessert(option.key as any)}
+						>
+							<Text
+								style={[
+									styles.optionButtonText,
+									includesCoffeeAndDessert === option.key &&
+										styles.optionButtonTextSelected,
+								]}
+							>
+								{option.label}
+							</Text>
+						</TouchableOpacity>
+					))}
+				</View>
+			</View>
+		);
+	};
+
 	return (
 		<>
+			{/* First Courses Section */}
 			<View style={styles.courseSection}>
-				<Text style={styles.courseTitle}>{t('menuCreation.firstCourses')}</Text>
+				<View style={styles.courseTitleRow}>
+					<Text style={styles.courseTitle}>
+						{t('menuCreation.firstCourses')}
+					</Text>
+					<View style={styles.shareToggle}>
+						<Text style={styles.shareLabel}>{t('menuCreation.toShare')}</Text>
+						<Switch
+							value={firstCoursesToShare}
+							onValueChange={setFirstCoursesToShare}
+							trackColor={{ false: colors.primaryLight, true: colors.primary }}
+							thumbColor={colors.quaternary}
+						/>
+					</View>
+				</View>
 				{dishes
 					.filter((d) => d.category === DishCategory.FIRST_COURSES)
 					.map(renderDishItem)}
@@ -229,10 +331,23 @@ export default function ManualMenuSection({
 					</Text>
 				</TouchableOpacity>
 			</View>
+
+			{/* Second Courses Section */}
 			<View style={styles.courseSection}>
-				<Text style={styles.courseTitle}>
-					{t('menuCreation.secondCourses')}
-				</Text>
+				<View style={styles.courseTitleRow}>
+					<Text style={styles.courseTitle}>
+						{t('menuCreation.secondCourses')}
+					</Text>
+					<View style={styles.shareToggle}>
+						<Text style={styles.shareLabel}>{t('menuCreation.toShare')}</Text>
+						<Switch
+							value={secondCoursesToShare}
+							onValueChange={setSecondCoursesToShare}
+							trackColor={{ false: colors.primaryLight, true: colors.primary }}
+							thumbColor={colors.quaternary}
+						/>
+					</View>
+				</View>
 				{dishes
 					.filter((d) => d.category === DishCategory.SECOND_COURSES)
 					.map(renderDishItem)}
@@ -246,8 +361,21 @@ export default function ManualMenuSection({
 					</Text>
 				</TouchableOpacity>
 			</View>
+
+			{/* Desserts Section */}
 			<View style={styles.courseSection}>
-				<Text style={styles.courseTitle}>{t('menuCreation.desserts')}</Text>
+				<View style={styles.courseTitleRow}>
+					<Text style={styles.courseTitle}>{t('menuCreation.desserts')}</Text>
+					<View style={styles.shareToggle}>
+						<Text style={styles.shareLabel}>{t('menuCreation.toShare')}</Text>
+						<Switch
+							value={dessertsToShare}
+							onValueChange={setDessertsToShare}
+							trackColor={{ false: colors.primaryLight, true: colors.primary }}
+							thumbColor={colors.quaternary}
+						/>
+					</View>
+				</View>
 				{dishes
 					.filter((d) => d.category === DishCategory.DESSERTS)
 					.map(renderDishItem)}
@@ -258,6 +386,74 @@ export default function ManualMenuSection({
 					<Ionicons name="add" size={20} color={colors.primary} />
 					<Text style={styles.addDishText}>{t('menuCreation.addDessert')}</Text>
 				</TouchableOpacity>
+			</View>
+
+			{/* Menu Options Section */}
+			<View style={styles.optionsSection}>
+				<Text style={styles.optionsSectionTitle}>
+					{t('menuCreation.menuOptions')}
+				</Text>
+
+				{/* Bread Option */}
+				<View style={styles.optionRow}>
+					<Text style={styles.optionLabel}>
+						{t('menuCreation.includesBread')}
+					</Text>
+					<Switch
+						value={includesBread}
+						onValueChange={setIncludesBread}
+						trackColor={{ false: colors.primaryLight, true: colors.primary }}
+						thumbColor={colors.quaternary}
+					/>
+				</View>
+
+				{/* Drink Option */}
+				<View style={styles.optionRow}>
+					<Text style={styles.optionLabel}>
+						{t('menuCreation.includesDrink')}
+					</Text>
+					<Switch
+						value={includesDrink}
+						onValueChange={setIncludesDrink}
+						trackColor={{ false: colors.primaryLight, true: colors.primary }}
+						thumbColor={colors.quaternary}
+					/>
+				</View>
+
+				{/* Coffee and Dessert Selector */}
+				{renderCoffeeDesertSelector()}
+
+				{/* Minimum People Option */}
+				<View style={styles.optionRow}>
+					<Text style={styles.optionLabel}>
+						{t('menuCreation.hasMinimumPeople')}
+					</Text>
+					<Switch
+						value={hasMinimumPeople}
+						onValueChange={setHasMinimumPeople}
+						trackColor={{ false: colors.primaryLight, true: colors.primary }}
+						thumbColor={colors.quaternary}
+					/>
+				</View>
+
+				{/* Minimum People Input */}
+				{hasMinimumPeople && (
+					<View style={styles.minimumPeopleContainer}>
+						<Text style={styles.minimumPeopleLabel}>
+							{t('menuCreation.minimumPeopleLabel')}
+						</Text>
+						<TextInput
+							style={styles.minimumPeopleInput}
+							value={minimumPeople}
+							onChangeText={setMinimumPeople}
+							keyboardType="numeric"
+							placeholder="2"
+						/>
+						<Text style={styles.minimumPeopleUnit}>
+							{t('menuCreation.people')}
+						</Text>
+					</View>
+				)}
 			</View>
 
 			{/* Dish Description Modal */}
@@ -275,6 +471,7 @@ export default function ManualMenuSection({
 			<SupplementModal
 				visible={showSupplementModal}
 				dish={currentDish}
+				supplementPrice={supplementPrice}
 				onSupplementPriceChange={setSupplementPrice}
 				onClose={() => {
 					setShowSupplementModal(false);
@@ -291,12 +488,28 @@ const styles = StyleSheet.create({
 	courseSection: {
 		marginBottom: 20,
 	},
+	courseTitleRow: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		marginBottom: 10,
+	},
 	courseTitle: {
 		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.primary,
-		marginBottom: 10,
+	},
+	shareToggle: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: 8,
+	},
+	shareLabel: {
+		fontSize: 12,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primary,
 	},
 	dishItem: {
 		flexDirection: 'row',
@@ -385,5 +598,99 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '500',
 		color: colors.primaryLight,
+	},
+	optionsSection: {
+		backgroundColor: colors.quaternary,
+		borderRadius: 12,
+		padding: 20,
+		marginTop: 20,
+		borderWidth: 1,
+		borderColor: colors.primaryLight,
+	},
+	optionsSectionTitle: {
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.primary,
+		marginBottom: 15,
+	},
+	optionRow: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		marginBottom: 15,
+	},
+	optionLabel: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primary,
+		flex: 1,
+	},
+	selectorContainer: {
+		marginBottom: 15,
+	},
+	selectorLabel: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primary,
+		marginBottom: 10,
+	},
+	optionsContainer: {
+		flexDirection: 'row',
+		flexWrap: 'wrap',
+		gap: 8,
+	},
+	optionButton: {
+		paddingHorizontal: 12,
+		paddingVertical: 8,
+		borderRadius: 20,
+		borderWidth: 1,
+		borderColor: colors.primary,
+		backgroundColor: 'transparent',
+	},
+	optionButtonSelected: {
+		backgroundColor: colors.primary,
+	},
+	optionButtonText: {
+		fontSize: 12,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		color: colors.primary,
+	},
+	optionButtonTextSelected: {
+		color: colors.quaternary,
+	},
+	minimumPeopleContainer: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: 10,
+		marginTop: 10,
+	},
+	minimumPeopleLabel: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primary,
+		flex: 1,
+	},
+	minimumPeopleInput: {
+		borderWidth: 1,
+		borderColor: colors.primaryLight,
+		borderRadius: 8,
+		paddingHorizontal: 12,
+		paddingVertical: 8,
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		color: colors.primary,
+		textAlign: 'center',
+		minWidth: 60,
+	},
+	minimumPeopleUnit: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primary,
 	},
 });

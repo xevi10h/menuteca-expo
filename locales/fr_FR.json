@@ -168,6 +168,20 @@
 			"vegetarian": "Végétarien",
 			"spicy": "Epicé",
 			"vegan": "Végétalien"
+		},
+		"toShare": "À partager",
+		"menuOptions": "Options du menu",
+		"includesBread": "Inclut le pain",
+		"includesDrink": "Inclut la boisson",
+		"coffeeAndDessertOptions": "Café et/ou dessert",
+		"hasMinimumPeople": "Minimum de personnes",
+		"minimumPeopleLabel": "Minimum de personnes:",
+		"people": "personnes",
+		"options": {
+			"none": "Aucun",
+			"coffee": "Café seulement",
+			"dessert": "Dessert seulement",
+			"coffeeAndDessert": "Café et dessert"
 		}
 	},
 	"days": {

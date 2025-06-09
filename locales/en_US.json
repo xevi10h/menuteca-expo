@@ -168,6 +168,20 @@
 			"vegetarian": "Vegetarian",
 			"spicy": "Spicy",
 			"vegan": "Vegan"
+		},
+		"toShare": "To share",
+		"menuOptions": "Menu options",
+		"includesBread": "Includes bread",
+		"includesDrink": "Includes drink",
+		"coffeeAndDessertOptions": "Coffee and/or dessert",
+		"hasMinimumPeople": "Minimum people",
+		"minimumPeopleLabel": "Minimum people:",
+		"people": "people",
+		"options": {
+			"none": "None",
+			"coffee": "Coffee only",
+			"dessert": "Dessert only",
+			"coffeeAndDessert": "Coffee and dessert"
 		}
 	},
 	"days": {

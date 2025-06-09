@@ -42,6 +42,9 @@ export default function MenuCreationModal({
 	const [showManualMenu, setShowManualMenu] = useState(false);
 	const [menuDishes, setMenuDishes] = useState<Dish[]>([]);
 
+	// New state for menu options
+	const [menuOptions, setMenuOptions] = useState<Partial<MenuData>>({});
+
 	// Inicializar solo cuando el modal se abre
 	React.useEffect(() => {
 		if (visible) {
@@ -53,6 +56,16 @@ export default function MenuCreationModal({
 				setPrice(editingMenu.price.toString());
 				setShowManualMenu(editingMenu.dishes.length > 0);
 				setMenuDishes([...editingMenu.dishes]);
+				setMenuOptions({
+					firstCoursesToShare: editingMenu.firstCoursesToShare,
+					secondCoursesToShare: editingMenu.secondCoursesToShare,
+					dessertsToShare: editingMenu.dessertsToShare,
+					includesBread: editingMenu.includesBread,
+					includesDrink: editingMenu.includesDrink,
+					includesCoffeeAndDessert: editingMenu.includesCoffeeAndDessert,
+					hasMinimumPeople: editingMenu.hasMinimumPeople,
+					minimumPeople: editingMenu.minimumPeople,
+				});
 			} else {
 				resetForm();
 			}
@@ -67,6 +80,7 @@ export default function MenuCreationModal({
 		setPrice('');
 		setShowManualMenu(false);
 		setMenuDishes([]);
+		setMenuOptions({});
 	}, []);
 
 	const toggleDay = useCallback((day: string) => {
@@ -75,9 +89,13 @@ export default function MenuCreationModal({
 		);
 	}, []);
 
-	const handleDishesChange = useCallback((dishes: Dish[]) => {
-		setMenuDishes(dishes);
-	}, []);
+	const handleDishesAndOptionsChange = useCallback(
+		(dishes: Dish[], options: Partial<MenuData>) => {
+			setMenuDishes(dishes);
+			setMenuOptions(options);
+		},
+		[],
+	);
 
 	const handleSave = useCallback(() => {
 		const menu: MenuData = {
@@ -88,6 +106,7 @@ export default function MenuCreationModal({
 			endTime,
 			price: parseFloat(price) || 0,
 			dishes: menuDishes,
+			...menuOptions, // Spread the new menu options
 		};
 		onSave(menu);
 		onClose();
@@ -98,6 +117,7 @@ export default function MenuCreationModal({
 		endTime,
 		price,
 		menuDishes,
+		menuOptions,
 		editingMenu?.id,
 		onSave,
 		onClose,
@@ -176,7 +196,7 @@ export default function MenuCreationModal({
 						{showManualMenu && (
 							<ManualMenuSection
 								editingMenu={editingMenu}
-								onSave={handleDishesChange}
+								onSave={handleDishesAndOptionsChange}
 							/>
 						)}
 

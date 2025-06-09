@@ -168,6 +168,20 @@
 			"vegetarian": "Vegetarià",
 			"spicy": "Picant",
 			"vegan": "Vegà"
+		},
+		"toShare": "Per compartir",
+		"menuOptions": "Opcions del menú",
+		"includesBread": "Inclou pa",
+		"includesDrink": "Inclou beguda",
+		"coffeeAndDessertOptions": "Cafè i/o postre",
+		"hasMinimumPeople": "Mínim de persones",
+		"minimumPeopleLabel": "Mínim de persones:",
+		"people": "persones",
+		"options": {
+			"none": "Cap",
+			"coffee": "Només cafè",
+			"dessert": "Només postre",
+			"coffeeAndDessert": "Cafè i postre"
 		}
 	},
 	"days": {

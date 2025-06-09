@@ -15,6 +15,7 @@ import {
 interface SupplementModalProps {
 	visible: boolean;
 	dish: Dish | null;
+	supplementPrice: string;
 	onSupplementPriceChange: (price: string) => void;
 	onClose: () => void;
 	onSave: () => void;
@@ -23,6 +24,7 @@ interface SupplementModalProps {
 export default function SupplementModal({
 	visible,
 	dish,
+	supplementPrice,
 	onSupplementPriceChange,
 	onClose,
 	onSave,
@@ -33,9 +35,11 @@ export default function SupplementModal({
 		// Solo permitir números y punto decimal
 		const numericValue = text.replace(/[^0-9.]/g, '');
 		const parts = numericValue.split('.');
+		console.log('numericValue', parts);
 
 		if (parts.length > 2 || (parts.length === 2 && parts[1].length > 2)) {
-			return; // Evitar múltiples puntos o más de 2 decimales
+			console.log('Invalid price format');
+			return;
 		}
 
 		onSupplementPriceChange(numericValue);
@@ -58,7 +62,7 @@ export default function SupplementModal({
 						<TextInput
 							style={styles.supplementInput}
 							placeholder={t('menuCreation.supplementPlaceholder')}
-							value={dish?.extraPrice.toString() || ''}
+							value={supplementPrice}
 							onChangeText={handlePriceChange}
 							keyboardType="numeric"
 						/>
