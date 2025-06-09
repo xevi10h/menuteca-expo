@@ -1,6 +1,7 @@
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Dish, MenuData } from '@/shared/types';
+import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useState } from 'react';
 import {
 	Modal,
@@ -192,6 +193,19 @@ export default function MenuCreationModal({
 					<View style={styles.menuSection}>
 						<Text style={styles.menuTitle}>{t('menuCreation.menuTitle')}</Text>
 
+						<TouchableOpacity style={styles.addPhotoMenuButton}>
+							<Ionicons
+								name="camera-outline"
+								size={16}
+								color={colors.quaternary}
+							/>
+							<Text style={styles.addPhotoMenuText}>
+								{t('menuCreation.addPhotoMenu')}
+							</Text>
+						</TouchableOpacity>
+
+						<DividerWithCircle color={colors.primary} marginVertical={20} />
+
 						{/* Manual Menu Section */}
 						{showManualMenu && (
 							<ManualMenuSection
@@ -212,13 +226,6 @@ export default function MenuCreationModal({
 							</TouchableOpacity>
 						)}
 
-						<DividerWithCircle color={colors.primary} marginVertical={20} />
-
-						<TouchableOpacity style={styles.addPhotoMenuButton}>
-							<Text style={styles.addPhotoMenuText}>
-								{t('menuCreation.addPhotoMenu')}
-							</Text>
-						</TouchableOpacity>
 						<View style={{ height: 100 }} />
 					</View>
 				</ScrollView>
@@ -273,28 +280,6 @@ const styles = StyleSheet.create({
 		marginBottom: 20,
 	},
 	addManualMenuButton: {
-		backgroundColor: colors.primary,
-		paddingVertical: 15,
-		borderRadius: 24,
-		alignItems: 'center',
-		borderWidth: 1,
-		borderColor: colors.quaternary,
-		elevation: 2,
-		shadowColor: '#000',
-		shadowOffset: {
-			width: 0,
-			height: 2,
-		},
-		shadowOpacity: 0.4,
-		shadowRadius: 4,
-	},
-	addManualMenuText: {
-		color: colors.quaternary,
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '300',
-	},
-	addPhotoMenuButton: {
 		backgroundColor: colors.secondary,
 		paddingVertical: 15,
 		borderRadius: 24,
@@ -310,8 +295,33 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.4,
 		shadowRadius: 4,
 	},
-	addPhotoMenuText: {
+	addManualMenuText: {
 		color: colors.primary,
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '300',
+	},
+	addPhotoMenuButton: {
+		backgroundColor: colors.primary,
+		paddingVertical: 15,
+		borderRadius: 24,
+		alignItems: 'center',
+		borderWidth: 1,
+		borderColor: colors.quaternary,
+		elevation: 2,
+		shadowColor: '#000',
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.4,
+		shadowRadius: 4,
+		flexDirection: 'row',
+		justifyContent: 'center',
+		gap: 10,
+	},
+	addPhotoMenuText: {
+		color: colors.quaternary,
 		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '300',
