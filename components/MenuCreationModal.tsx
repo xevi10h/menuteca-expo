@@ -1,9 +1,13 @@
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
+import { DishCategory } from '@/shared/enums';
 import { Dish, MenuData } from '@/shared/types';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import React, { useCallback, useState } from 'react';
 import {
+	ActivityIndicator,
+	Alert,
 	Modal,
 	ScrollView,
 	StyleSheet,
@@ -43,8 +47,231 @@ export default function MenuCreationModal({
 	const [showManualMenu, setShowManualMenu] = useState(false);
 	const [menuDishes, setMenuDishes] = useState<Dish[]>([]);
 
+	// Estados para el procesamiento de fotos
+	const [isProcessingPhoto, setIsProcessingPhoto] = useState(false);
+	const [photoProcessed, setPhotoProcessed] = useState(false);
+	const [photoProcessSuccess, setPhotoProcessSuccess] = useState(false);
+
 	// New state for menu options
 	const [menuOptions, setMenuOptions] = useState<Partial<MenuData>>({});
+
+	// Simular un menú generado por el backend
+	const generateSimulatedMenu = (): {
+		dishes: Dish[];
+		menuData: Partial<MenuData>;
+	} => {
+		const simulatedDishes: Dish[] = [
+			{
+				id: Date.now().toString() + '_1',
+				name: 'Ensalada mixta',
+				description:
+					'Lechuga, tomate, cebolla, aceitunas y vinagreta de la casa',
+				extraPrice: 0,
+				category: DishCategory.FIRST_COURSES,
+				isVegetarian: true,
+				isLactoseFree: true,
+				isSpicy: false,
+				isGlutenFree: true,
+				isVegan: true,
+			},
+			{
+				id: Date.now().toString() + '_2',
+				name: 'Sopa del día',
+				description:
+					'Sopa casera preparada con ingredientes frescos de temporada',
+				extraPrice: 0,
+				category: DishCategory.FIRST_COURSES,
+				isVegetarian: true,
+				isLactoseFree: false,
+				isSpicy: false,
+				isGlutenFree: false,
+				isVegan: false,
+			},
+			{
+				id: Date.now().toString() + '_3',
+				name: 'Pollo a la plancha',
+				description: 'Pechuga de pollo a la plancha con guarnición de verduras',
+				extraPrice: 0,
+				category: DishCategory.SECOND_COURSES,
+				isVegetarian: false,
+				isLactoseFree: true,
+				isSpicy: false,
+				isGlutenFree: true,
+				isVegan: false,
+			},
+			{
+				id: Date.now().toString() + '_4',
+				name: 'Merluza al horno',
+				description: 'Merluza fresca al horno con patatas panaderas',
+				extraPrice: 2.5,
+				category: DishCategory.SECOND_COURSES,
+				isVegetarian: false,
+				isLactoseFree: true,
+				isSpicy: false,
+				isGlutenFree: true,
+				isVegan: false,
+			},
+			{
+				id: Date.now().toString() + '_5',
+				name: 'Flan casero',
+				description: 'Flan casero con caramelo líquido',
+				extraPrice: 0,
+				category: DishCategory.DESSERTS,
+				isVegetarian: true,
+				isLactoseFree: false,
+				isSpicy: false,
+				isGlutenFree: true,
+				isVegan: false,
+			},
+			{
+				id: Date.now().toString() + '_6',
+				name: 'Fruta de temporada',
+				description: 'Selección de fruta fresca de temporada',
+				extraPrice: 0,
+				category: DishCategory.DESSERTS,
+				isVegetarian: true,
+				isLactoseFree: true,
+				isSpicy: false,
+				isGlutenFree: true,
+				isVegan: true,
+			},
+		];
+
+		const simulatedMenuData: Partial<MenuData> = {
+			firstCoursesToShare: false,
+			secondCoursesToShare: false,
+			dessertsToShare: false,
+			includesBread: true,
+			includesDrink: true,
+			includesCoffeeAndDessert: 'coffee',
+			hasMinimumPeople: false,
+			minimumPeople: undefined,
+		};
+
+		return { dishes: simulatedDishes, menuData: simulatedMenuData };
+	};
+
+	// Simular llamada al backend para procesar la foto
+	const simulateBackendCall = async (): Promise<boolean> => {
+		return new Promise((resolve) => {
+			setTimeout(() => {
+				// Simular 80% de éxito, 20% de error
+				const success = Math.random() > 0.2;
+				resolve(success);
+			}, 2000);
+		});
+	};
+
+	// Manejar la carga y procesamiento de la foto
+	const handlePhotoMenuUpload = async () => {
+		try {
+			// Solicitar permisos
+			const { status } =
+				await ImagePicker.requestMediaLibraryPermissionsAsync();
+			if (status !== 'granted') {
+				Alert.alert(
+					t('registerRestaurant.permissionsRequired'),
+					t('registerRestaurant.photoPermissionMessage'),
+				);
+				return;
+			}
+
+			// Mostrar opciones para tomar foto o seleccionar de galería
+			Alert.alert(t('menuCreation.uploadMenuPhoto'), '', [
+				{
+					text: t('general.cancel'),
+					style: 'cancel',
+				},
+				{
+					text: 'Cámara',
+					onPress: () => openCamera(),
+				},
+				{
+					text: 'Galería',
+					onPress: () => openGallery(),
+				},
+			]);
+		} catch (error) {
+			console.error('Error requesting permissions:', error);
+		}
+	};
+
+	const openCamera = async () => {
+		const result = await ImagePicker.launchCameraAsync({
+			mediaTypes: ImagePicker.MediaTypeOptions.Images,
+			allowsEditing: true,
+			quality: 0.8,
+		});
+
+		if (!result.canceled) {
+			processPhoto(result.assets[0].uri);
+		}
+	};
+
+	const openGallery = async () => {
+		const result = await ImagePicker.launchImageLibraryAsync({
+			mediaTypes: ImagePicker.MediaTypeOptions.Images,
+			allowsEditing: true,
+			quality: 0.8,
+		});
+
+		if (!result.canceled) {
+			processPhoto(result.assets[0].uri);
+		}
+	};
+
+	const processPhoto = async (photoUri: string) => {
+		try {
+			setIsProcessingPhoto(true);
+			setPhotoProcessed(false);
+
+			// Simular llamada al backend
+			const success = await simulateBackendCall();
+
+			setIsProcessingPhoto(false);
+			setPhotoProcessed(true);
+			setPhotoProcessSuccess(success);
+
+			if (success) {
+				// Si el procesamiento es exitoso, generar menú simulado
+				const { dishes, menuData } = generateSimulatedMenu();
+				setMenuDishes(dishes);
+				setMenuOptions(menuData);
+				setShowManualMenu(true);
+
+				// Mostrar mensaje de éxito
+				setTimeout(() => {
+					Alert.alert(
+						t('menuCreation.photoMenuSuccessTitle'),
+						t('menuCreation.photoMenuSuccess'),
+						[{ text: t('general.ok'), style: 'default' }],
+					);
+				}, 500);
+			} else {
+				// Mostrar mensaje de error
+				setTimeout(() => {
+					Alert.alert(
+						t('menuCreation.photoMenuErrorTitle'),
+						t('menuCreation.photoMenuError'),
+						[{ text: t('general.ok'), style: 'default' }],
+					);
+				}, 500);
+			}
+
+			// Resetear estados después de 3 segundos
+			setTimeout(() => {
+				setPhotoProcessed(false);
+				setPhotoProcessSuccess(false);
+			}, 3000);
+		} catch (error) {
+			console.error('Error processing photo:', error);
+			setIsProcessingPhoto(false);
+			Alert.alert(
+				t('menuCreation.photoMenuErrorTitle'),
+				t('menuCreation.photoMenuError'),
+			);
+		}
+	};
 
 	// Inicializar solo cuando el modal se abre
 	React.useEffect(() => {
@@ -82,6 +309,9 @@ export default function MenuCreationModal({
 		setShowManualMenu(false);
 		setMenuDishes([]);
 		setMenuOptions({});
+		setIsProcessingPhoto(false);
+		setPhotoProcessed(false);
+		setPhotoProcessSuccess(false);
 	}, []);
 
 	const toggleDay = useCallback((day: string) => {
@@ -107,7 +337,7 @@ export default function MenuCreationModal({
 			endTime,
 			price: parseFloat(price) || 0,
 			dishes: menuDishes,
-			...menuOptions, // Spread the new menu options
+			...menuOptions,
 		};
 		onSave(menu);
 		onClose();
@@ -193,15 +423,34 @@ export default function MenuCreationModal({
 					<View style={styles.menuSection}>
 						<Text style={styles.menuTitle}>{t('menuCreation.menuTitle')}</Text>
 
-						<TouchableOpacity style={styles.addPhotoMenuButton}>
-							<Ionicons
-								name="camera-outline"
-								size={16}
-								color={colors.quaternary}
-							/>
-							<Text style={styles.addPhotoMenuText}>
-								{t('menuCreation.addPhotoMenu')}
-							</Text>
+						{/* Photo Upload Button */}
+						<TouchableOpacity
+							style={[
+								styles.addPhotoMenuButton,
+								isProcessingPhoto && styles.addPhotoMenuButtonDisabled,
+							]}
+							onPress={handlePhotoMenuUpload}
+							disabled={isProcessingPhoto}
+						>
+							{isProcessingPhoto ? (
+								<>
+									<ActivityIndicator size="small" color={colors.quaternary} />
+									<Text style={styles.addPhotoMenuText}>
+										{t('menuCreation.processingPhoto')}
+									</Text>
+								</>
+							) : (
+								<>
+									<Ionicons
+										name="camera-outline"
+										size={16}
+										color={colors.quaternary}
+									/>
+									<Text style={styles.addPhotoMenuText}>
+										{t('menuCreation.addPhotoMenu')}
+									</Text>
+								</>
+							)}
 						</TouchableOpacity>
 
 						<DividerWithCircle color={colors.primary} marginVertical={20} />
@@ -319,6 +568,9 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'center',
 		gap: 10,
+	},
+	addPhotoMenuButtonDisabled: {
+		opacity: 0.7,
 	},
 	addPhotoMenuText: {
 		color: colors.quaternary,
