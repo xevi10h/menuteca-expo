@@ -8,6 +8,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 interface MenusSectionProps {
 	menus?: MenuData[];
 	onEditMenu: (index: number) => void;
+	onCopyMenu: (index: number) => void;
 	onDeleteMenu: (index: number) => void;
 	onAddMenu: () => void;
 	showTitle?: boolean; // Nueva prop para controlar si mostrar el título
@@ -16,6 +17,7 @@ interface MenusSectionProps {
 export default function MenusSection({
 	menus = [],
 	onEditMenu,
+	onCopyMenu,
 	onDeleteMenu,
 	onAddMenu,
 	showTitle = false,
@@ -32,23 +34,40 @@ export default function MenusSection({
 			<View style={{ gap: 10 }}>
 				{menus.map((menu, index) => (
 					<View style={styles.menuItem} key={index}>
-						<View style={styles.menuNameContainer}>
-							<Text style={styles.menuName}>
-								{menu.name || t('registerRestaurant.defaultMenuName')}
-							</Text>
-						</View>
 						<View style={styles.menuActions}>
-							<TouchableOpacity onPress={() => onEditMenu(index)}>
+							<View style={styles.menuNameContainer}>
+								<Text style={styles.menuName}>
+									{menu.name || t('registerRestaurant.defaultMenuName')}
+								</Text>
+							</View>
+
+							<TouchableOpacity
+								onPress={() => onEditMenu(index)}
+								style={styles.actionButton}
+							>
 								<Ionicons
 									name="pencil-outline"
-									size={20}
+									size={18}
 									color={colors.primary}
 								/>
 							</TouchableOpacity>
-							<TouchableOpacity onPress={() => onDeleteMenu(index)}>
+							<TouchableOpacity
+								onPress={() => onCopyMenu(index)}
+								style={styles.actionButton}
+							>
+								<Ionicons
+									name="copy-outline"
+									size={18}
+									color={colors.primary}
+								/>
+							</TouchableOpacity>
+							<TouchableOpacity
+								onPress={() => onDeleteMenu(index)}
+								style={styles.actionButton}
+							>
 								<Ionicons
 									name="trash-outline"
-									size={20}
+									size={18}
 									color={colors.primary}
 								/>
 							</TouchableOpacity>
@@ -86,10 +105,9 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 15,
 		paddingVertical: 12,
 		borderRadius: 12,
-		borderColor: colors.primary,
+		borderColor: colors.primaryLight,
 		borderWidth: 1,
 		flex: 1,
-		marginRight: 10,
 	},
 	menuName: {
 		fontSize: 14,
@@ -100,7 +118,17 @@ const styles = StyleSheet.create({
 	},
 	menuActions: {
 		flexDirection: 'row',
-		gap: 15,
+		gap: 5,
+	},
+	actionButton: {
+		padding: 8,
+		borderRadius: 12,
+		borderWidth: 1,
+		borderColor: colors.primaryLight,
+		justifyContent: 'center',
+		alignItems: 'center',
+		minWidth: 50,
+		minHeight: 50,
 	},
 	addMenuButton: {
 		backgroundColor: colors.secondary,

@@ -1,4 +1,4 @@
-import { allCuisines } from '@/api/responses';
+import { getCuisineById } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useUserStore } from '@/zustand/UserStore';
@@ -20,7 +20,9 @@ export default function CuisineSelectionSection({
 	const { t } = useTranslation();
 	const language = useUserStore((state) => state.user.language);
 
-	const selectedCuisine = allCuisines.find((c) => c.id === selectedCuisineId);
+	const selectedCuisine = selectedCuisineId
+		? getCuisineById(selectedCuisineId)
+		: undefined;
 
 	return (
 		<View style={styles.foodTypesSection}>

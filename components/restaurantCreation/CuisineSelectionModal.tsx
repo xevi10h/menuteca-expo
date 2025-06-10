@@ -1,6 +1,7 @@
 import { allCuisines } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
 import { useUserStore } from '@/zustand/UserStore';
 import React, { useEffect, useState } from 'react';
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -10,17 +11,18 @@ interface CuisineSelectionModalProps {
 	visible: boolean;
 	onClose: () => void;
 	onSave: (cuisine: string | null) => void;
-	selectedCuisine?: string;
 }
 
 export default function CuisineSelectionModal({
 	visible,
 	onClose,
 	onSave,
-	selectedCuisine,
 }: CuisineSelectionModalProps) {
 	const { t } = useTranslation();
 	const language = useUserStore((state) => state.user.language);
+	const selectedCuisine = useRegisterRestaurantStore(
+		(state) => state.registerRestaurant.cuisineId,
+	);
 	const [tempSelected, setTempSelected] = useState<string | undefined>(
 		selectedCuisine,
 	);

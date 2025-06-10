@@ -35,7 +35,6 @@ export default function SupplementModal({
 		// Solo permitir números y punto decimal
 		const numericValue = text.replace(/[^0-9.]/g, '');
 		const parts = numericValue.split('.');
-		console.log('numericValue', parts);
 
 		if (parts.length > 2 || (parts.length === 2 && parts[1].length > 2)) {
 			console.log('Invalid price format');

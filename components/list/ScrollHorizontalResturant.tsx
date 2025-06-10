@@ -29,6 +29,8 @@ export default function ScrollHorizontalResturant({
 		router.push(`/restaurant/${restaurantId}`);
 	};
 
+	const cuisineId = allRestaurants[0]?.cuisineId || '';
+
 	return (
 		<View style={styles.container}>
 			<View style={{ marginLeft: 24 }}>
@@ -134,9 +136,7 @@ export default function ScrollHorizontalResturant({
 									fontWeight: '500',
 									color: colors.primary,
 								}}
-							>
-								{t(`cuisinesRestaurants.${restaurant.cuisine}`)}
-							</Text>
+							></Text>
 							<Text
 								style={{
 									fontSize: 10,

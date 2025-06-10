@@ -19,9 +19,11 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
 	Alert,
+	Modal,
 	ScrollView,
 	StyleSheet,
 	Text,
+	TextInput,
 	TouchableOpacity,
 	View,
 } from 'react-native';
@@ -33,6 +35,11 @@ export default function EditTab() {
 	const [showAddressModal, setShowAddressModal] = useState(false);
 	const [showCuisineModal, setShowCuisineModal] = useState(false);
 	const [showTagsModal, setShowTagsModal] = useState(false);
+
+	// Estados para el modal de copiar menú
+	const [showCopyMenuModal, setShowCopyMenuModal] = useState(false);
+	const [copyingMenuIndex, setCopyingMenuIndex] = useState<number | null>(null);
+	const [newMenuName, setNewMenuName] = useState('');
 
 	const {
 		registerRestaurant,
@@ -68,12 +75,50 @@ export default function EditTab() {
 		setShowMenuModal(true);
 	};
 
+	const handleCopyMenu = (index: number) => {
+		const menuToCopy = registerRestaurant.menus?.[index];
+		if (menuToCopy) {
+			setCopyingMenuIndex(index);
+			setNewMenuName(`${menuToCopy.name} - Copia`);
+			setShowCopyMenuModal(true);
+		}
+	};
+
+	const handleConfirmCopyMenu = () => {
+		if (copyingMenuIndex !== null && newMenuName.trim()) {
+			const menuToCopy = registerRestaurant.menus?.[copyingMenuIndex];
+			if (menuToCopy) {
+				const copiedMenu: MenuData = {
+					...menuToCopy,
+					id: Date.now().toString(), // Nuevo ID único
+					name: newMenuName.trim(),
+				};
+				addRegisterRestaurantMenu(copiedMenu);
+			}
+		}
+		setShowCopyMenuModal(false);
+		setCopyingMenuIndex(null);
+		setNewMenuName('');
+	};
+
+	const handleCancelCopyMenu = () => {
+		setShowCopyMenuModal(false);
+		setCopyingMenuIndex(null);
+		setNewMenuName('');
+	};
+
 	const handleDeleteMenu = (index: number) => {
+		const menuToDelete = registerRestaurant.menus?.[index];
 		Alert.alert(
 			t('registerRestaurant.deleteMenuTitle'),
-			t('registerRestaurant.deleteMenuMessage'),
+			t('registerRestaurant.deleteMenuMessage', {
+				menuName: menuToDelete?.name || '',
+			}),
 			[
-				{ text: t('general.cancel'), style: 'cancel' },
+				{
+					text: t('general.cancel'),
+					style: 'cancel',
+				},
 				{
 					text: t('general.delete'),
 					style: 'destructive',
@@ -133,6 +178,7 @@ export default function EditTab() {
 					<MenusSection
 						menus={registerRestaurant.menus}
 						onEditMenu={handleEditMenu}
+						onCopyMenu={handleCopyMenu}
 						onDeleteMenu={handleDeleteMenu}
 						onAddMenu={() => {
 							setEditingMenuIndex(null);
@@ -173,7 +219,7 @@ export default function EditTab() {
 						</TouchableOpacity>
 					</View>
 					<CuisineSelectionSection
-						selectedCuisineId={registerRestaurant.cuisine}
+						selectedCuisineId={registerRestaurant.cuisineId}
 						onEditPress={() => setShowCuisineModal(true)}
 						showTitle={false}
 					/>
@@ -221,6 +267,67 @@ export default function EditTab() {
 				}
 			/>
 
+			{/* Copy Menu Modal */}
+			<Modal visible={showCopyMenuModal} animationType="fade" transparent>
+				<View style={styles.modalOverlay}>
+					<View style={styles.copyMenuModal}>
+						<View style={styles.copyMenuHeader}>
+							<Text style={styles.copyMenuTitle}>
+								{t('registerRestaurant.copyMenuTitle')}
+							</Text>
+						</View>
+
+						<Text style={styles.copyMenuDescription}>
+							{t('registerRestaurant.copyMenuDescription')}
+						</Text>
+
+						<View style={styles.inputContainer}>
+							<Text style={styles.inputLabel}>
+								{t('registerRestaurant.newMenuName')}
+							</Text>
+							<TextInput
+								style={styles.copyMenuInput}
+								value={newMenuName}
+								onChangeText={setNewMenuName}
+								placeholder={t('registerRestaurant.menuNamePlaceholder')}
+								placeholderTextColor={colors.primaryLight}
+								autoFocus
+							/>
+						</View>
+
+						<View style={styles.copyMenuButtons}>
+							<TouchableOpacity
+								style={[styles.copyMenuButton, styles.cancelButton]}
+								onPress={handleCancelCopyMenu}
+							>
+								<Text style={styles.cancelButtonText}>
+									{t('general.cancel')}
+								</Text>
+							</TouchableOpacity>
+
+							<TouchableOpacity
+								style={[
+									styles.copyMenuButton,
+									styles.confirmButton,
+									!newMenuName.trim() && styles.confirmButtonDisabled,
+								]}
+								onPress={handleConfirmCopyMenu}
+								disabled={!newMenuName.trim()}
+							>
+								<Text
+									style={[
+										styles.confirmButtonText,
+										!newMenuName.trim() && styles.confirmButtonTextDisabled,
+									]}
+								>
+									{t('registerRestaurant.copyMenu')}
+								</Text>
+							</TouchableOpacity>
+						</View>
+					</View>
+				</View>
+			</Modal>
+
 			{/* Address Edit Modal - UPDATED */}
 			<AddressEditModal
 				visible={showAddressModal}
@@ -234,7 +341,6 @@ export default function EditTab() {
 				visible={showCuisineModal}
 				onClose={() => setShowCuisineModal(false)}
 				onSave={handleSaveCuisines}
-				selectedCuisine={registerRestaurant.cuisine}
 			/>
 
 			{/* Tags Selection Modal */}
@@ -282,5 +388,108 @@ const styles = StyleSheet.create({
 	},
 	editButton: {
 		padding: 5,
+	},
+	// Estilos para el modal de copiar menú
+	modalOverlay: {
+		flex: 1,
+		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingHorizontal: 20,
+	},
+	copyMenuModal: {
+		backgroundColor: colors.quaternary,
+		borderRadius: 15,
+		padding: 20,
+		width: '100%',
+		maxWidth: 400,
+		shadowColor: '#000',
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.25,
+		shadowRadius: 4,
+		elevation: 5,
+	},
+	copyMenuHeader: {
+		alignItems: 'center',
+		marginBottom: 15,
+	},
+	copyMenuTitle: {
+		fontSize: 18,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.primary,
+		textAlign: 'center',
+	},
+	copyMenuDescription: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primary,
+		textAlign: 'center',
+		marginBottom: 20,
+		lineHeight: 20,
+	},
+	inputContainer: {
+		marginBottom: 25,
+	},
+	inputLabel: {
+		fontSize: 12,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		color: colors.primary,
+		marginBottom: 8,
+	},
+	copyMenuInput: {
+		backgroundColor: colors.secondary,
+		borderRadius: 8,
+		paddingHorizontal: 15,
+		paddingVertical: 12,
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		color: colors.primary,
+		borderWidth: 1,
+		borderColor: colors.primaryLight,
+	},
+	copyMenuButtons: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		gap: 15,
+	},
+	copyMenuButton: {
+		flex: 1,
+		paddingVertical: 12,
+		borderRadius: 8,
+		alignItems: 'center',
+	},
+	cancelButton: {
+		backgroundColor: 'transparent',
+		borderWidth: 1,
+		borderColor: colors.primary,
+	},
+	confirmButton: {
+		backgroundColor: colors.primary,
+	},
+	confirmButtonDisabled: {
+		backgroundColor: colors.primaryLight,
+		opacity: 0.6,
+	},
+	cancelButtonText: {
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		color: colors.primary,
+	},
+	confirmButtonText: {
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		color: colors.quaternary,
+	},
+	confirmButtonTextDisabled: {
+		color: colors.quaternary,
+		opacity: 0.7,
 	},
 });

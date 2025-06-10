@@ -11,7 +11,7 @@ export const defaultRegisterRestaurant: Restaurant = {
 	id: '',
 	name: '',
 	address: createEmptyAddress(),
-	cuisine: '',
+	cuisineId: '',
 	profileImage: undefined,
 	images: [],
 	menus: [],
@@ -56,10 +56,10 @@ const validateRestaurant = (
 	const hasPhotos = restaurant.images && restaurant.images.length > 0;
 	const hasMenus = restaurant.menus && restaurant.menus.length > 0;
 	const hasCuisine =
-		restaurant.cuisine !== '' &&
-		restaurant.cuisine !== null &&
-		restaurant.cuisine !== undefined;
-	const tooManyTags = restaurant.tags && restaurant.tags.length > 3;
+		restaurant.cuisineId !== '' &&
+		restaurant.cuisineId !== null &&
+		restaurant.cuisineId !== undefined;
+	const tooManyTags = restaurant.tags && restaurant.tags.length > 5; // Cambiado de 3 a 5
 	const hasAddress =
 		restaurant.address &&
 		(restaurant.address.street !== '' ||

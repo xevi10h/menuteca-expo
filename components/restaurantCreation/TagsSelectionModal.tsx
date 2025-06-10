@@ -7,6 +7,7 @@ import { RestaurantTag } from '@/shared/enums';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import {
+	Alert,
 	Modal,
 	ScrollView,
 	StyleSheet,
@@ -22,6 +23,8 @@ interface TagsSelectionModalProps {
 	onSave: (tags: RestaurantTag[]) => void;
 	selectedTags: RestaurantTag[];
 }
+
+const MAX_TAGS = 5;
 
 export const renderTagIcon = (
 	tag: RestaurantTag,
@@ -81,11 +84,27 @@ export default function TagsSelectionModal({
 		useState<RestaurantTag[]>(selectedTags);
 
 	const handleToggleTag = (tagId: RestaurantTag) => {
-		setTempSelected((prev) =>
-			prev.includes(tagId)
-				? prev.filter((id) => id !== tagId)
-				: [...prev, tagId],
-		);
+		setTempSelected((prev) => {
+			if (prev.includes(tagId)) {
+				// Si ya está seleccionado, lo quitamos
+				return prev.filter((id) => id !== tagId);
+			} else {
+				// Si no está seleccionado, verificamos si podemos añadirlo
+				if (prev.length >= MAX_TAGS) {
+					// Mostrar alerta si se intenta seleccionar más del máximo
+					Alert.alert(
+						t('registerRestaurant.validation.tooManyTagsTitle'),
+						t('registerRestaurant.validation.tooManyTagsMessage', {
+							max: MAX_TAGS,
+						}),
+						[{ text: t('general.ok'), style: 'default' }],
+					);
+					return prev;
+				}
+				// Lo añadimos
+				return [...prev, tagId];
+			}
+		});
 	};
 
 	const handleSave = () => {
@@ -116,29 +135,47 @@ export default function TagsSelectionModal({
 					<Text style={styles.label}>
 						{t('registerRestaurant.categoriesDescription')}
 					</Text>
+
+					{/* Contador de tags seleccionados */}
+					<View style={styles.counterContainer}>
+						<Text style={styles.counterText}>
+							{t('registerRestaurant.tagsSelected', {
+								count: tempSelected.length,
+								max: MAX_TAGS,
+							})}
+						</Text>
+					</View>
+
 					<View style={styles.tagsGrid}>
 						{Object.values(RestaurantTag).map((tag) => {
+							const isSelected = tempSelected.includes(tag);
+							const isDisabled = !isSelected && tempSelected.length >= MAX_TAGS;
+
 							return (
 								<TouchableOpacity
 									key={tag}
 									style={[
 										styles.tagButton,
-										tempSelected.includes(tag) && styles.tagButtonSelected,
+										isSelected && styles.tagButtonSelected,
+										isDisabled && styles.tagButtonDisabled,
 									]}
 									onPress={() => handleToggleTag(tag)}
+									disabled={isDisabled}
 								>
 									{renderTagIcon(
 										tag,
-										tempSelected.includes(tag)
+										isSelected
 											? colors.quaternary
+											: isDisabled
+											? colors.primaryLight
 											: colors.primary,
 										14,
 									)}
 									<Text
 										style={[
 											styles.tagButtonText,
-											tempSelected.includes(tag) &&
-												styles.tagButtonTextSelected,
+											isSelected && styles.tagButtonTextSelected,
+											isDisabled && styles.tagButtonTextDisabled,
 										]}
 									>
 										{t(`restaurantTags.${tag}`)}
@@ -158,7 +195,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: colors.secondary,
 	},
-
 	modalContent: {
 		flex: 1,
 		paddingHorizontal: 20,
@@ -170,6 +206,21 @@ const styles = StyleSheet.create({
 		fontWeight: '500',
 		color: colors.primary,
 		marginBottom: 20,
+	},
+	counterContainer: {
+		backgroundColor: colors.quaternary,
+		borderRadius: 8,
+		padding: 12,
+		marginBottom: 20,
+		borderLeftWidth: 4,
+		borderLeftColor: colors.primary,
+	},
+	counterText: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		color: colors.primary,
+		textAlign: 'center',
 	},
 	tagsGrid: {
 		flexDirection: 'row',
@@ -192,6 +243,10 @@ const styles = StyleSheet.create({
 	tagButtonSelected: {
 		backgroundColor: colors.primary,
 	},
+	tagButtonDisabled: {
+		borderColor: colors.primaryLight,
+		opacity: 0.5,
+	},
 	tagButtonText: {
 		color: colors.primary,
 		fontSize: 12,
@@ -200,5 +255,8 @@ const styles = StyleSheet.create({
 	},
 	tagButtonTextSelected: {
 		color: colors.quaternary,
+	},
+	tagButtonTextDisabled: {
+		color: colors.primaryLight,
 	},
 });

@@ -1,6 +1,8 @@
+import { getCuisineById } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Restaurant } from '@/shared/types';
+import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect } from 'react';
 import {
@@ -37,6 +39,10 @@ export default function MapRestaurantModal({
 	const insets = useSafeAreaInsets();
 	const translateY = useSharedValue(SCREEN_HEIGHT);
 	const opacity = useSharedValue(0);
+	const selectedCuisine = restaurant?.cuisineId
+		? getCuisineById(restaurant?.cuisineId)
+		: null;
+	const language = useUserStore((state) => state.user.language);
 
 	const handleClose = () => {
 		opacity.value = withTiming(0, { duration: 200 });
@@ -117,9 +123,11 @@ export default function MapRestaurantModal({
 						<View style={styles.restaurantDetails}>
 							<View style={{ flex: 1, width: '50%' }}>
 								<Text style={styles.restaurantName}>{restaurant.name}</Text>
-								<Text style={styles.cuisineText}>
-									{t(`cuisinesRestaurants.${restaurant.cuisine}`)}
-								</Text>
+								{selectedCuisine?.name && (
+									<Text style={styles.cuisineText}>
+										{selectedCuisine.name[language]}
+									</Text>
+								)}
 							</View>
 							<View>
 								<View style={{ alignItems: 'flex-end', marginBottom: 5 }}>

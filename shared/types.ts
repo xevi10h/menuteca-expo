@@ -21,7 +21,7 @@ export type Restaurant = {
 	id: string;
 	name: string;
 	minimumPrice: number;
-	cuisine: string;
+	cuisineId: string;
 	rating?: number;
 	mainImage: string;
 	profileImage?: string;

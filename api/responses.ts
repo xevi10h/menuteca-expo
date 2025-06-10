@@ -6,7 +6,7 @@ export const allRestaurants: Restaurant[] = [
 		id: '1',
 		name: 'Sant Francesc Restaurant',
 		minimumPrice: 15,
-		cuisine: 'mediterranean',
+		cuisineId: '1', // Mediterranean
 		rating: 4.5,
 		mainImage:
 			'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
@@ -43,7 +43,7 @@ export const allRestaurants: Restaurant[] = [
 		id: '2',
 		name: 'Tika Tacos',
 		minimumPrice: 12,
-		cuisine: 'mexican',
+		cuisineId: '4', // Mexican
 		rating: 4.0,
 		mainImage:
 			'https://images.pexels.com/photos/2092507/pexels-photo-2092507.jpeg',
@@ -80,7 +80,7 @@ export const allRestaurants: Restaurant[] = [
 		id: '3',
 		name: 'El gran sol',
 		minimumPrice: 10,
-		cuisine: 'chinese',
+		cuisineId: '6', // Chinese
 		rating: 4.8,
 		mainImage:
 			'https://images.pexels.com/photos/1907228/pexels-photo-1907228.jpeg',
@@ -224,6 +224,11 @@ export const allCuisines: Cuisine[] = [
 			'https://images.unsplash.com/photo-1577106263724-2c8e03bfe9cf?fm=jpg&q=60&w=3000',
 	},
 ];
+
+// Mock data - en producción esto vendría de una API
+export const getCuisineById = (id: string): Cuisine | undefined => {
+	return allCuisines.find((r) => r.id === id);
+};
 
 // Mock data - en producción esto vendría de una API
 export const getRestaurantById = (id: string): Restaurant => {
