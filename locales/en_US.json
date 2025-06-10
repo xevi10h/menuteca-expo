@@ -77,7 +77,7 @@
 		"address": "Address",
 		"noCuisinesSelected": "You have not selected any type of cuisine",
 		"categories": "Categories",
-		"categoriesDescription": "Select the categories that describe your restaurant (maximum 5)",
+		"categoriesDescription": "Select the categories that describe your restaurant",
 		"noTagsSelected": "You have not selected any categories",
 		"permissionsRequired": "Permissions required",
 		"photoPermissionMessage": "We need permissions to access your photos",

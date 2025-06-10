@@ -77,7 +77,7 @@
 		"address": "Adreça",
 		"noCuisinesSelected": "No has seleccionat cap tipus de cuina",
 		"categories": "Categories",
-		"categoriesDescription": "Selecciona les categories que descriuen el teu restaurant (màxim 5)",
+		"categoriesDescription": "Selecciona les categories que descriuen el teu restaurant",
 		"noTagsSelected": "No has seleccionat categories",
 		"permissionsRequired": "Permisos necessaris",
 		"photoPermissionMessage": "Necessitem permisos per accedir a les teves fotos",
