@@ -240,7 +240,6 @@ export const getMenusByRestaurantId = (id: string): MenuData[] => {
 		{
 			id: '1',
 			name: 'Menú mediodía',
-			subtitle: 'des de 12,95€',
 			startTime: '12:00',
 			endTime: '16:00',
 			days: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
@@ -353,7 +352,6 @@ export const getMenusByRestaurantId = (id: string): MenuData[] => {
 		{
 			id: '2',
 			name: 'Menú cena',
-			subtitle: 'des de 18,95€',
 			startTime: '19:00',
 			endTime: '23:00',
 			days: [
@@ -422,7 +420,6 @@ export const getMenusByRestaurantId = (id: string): MenuData[] => {
 		{
 			id: '3',
 			name: 'Especial fin de semana',
-			subtitle: 'des de 22,95€',
 			startTime: '19:00',
 			endTime: '23:30',
 			days: ['saturday', 'sunday'],

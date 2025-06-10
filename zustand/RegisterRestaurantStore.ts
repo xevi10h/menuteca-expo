@@ -36,7 +36,7 @@ interface RegisterRestaurantValidation {
 interface RegisterRestaurantState {
 	registerRestaurant: Restaurant;
 	validation: RegisterRestaurantValidation;
-	setRegisterRestaurantCuisine: (cuisine: string | null) => void;
+	setRegisterRestaurantCuisineId: (cuisineId: string | null) => void;
 	setRegisterRestaurantAddress: (address: Address) => void;
 	setRegisterRestaurantName: (name: string) => void;
 	setRegisterRestaurantProfileImage: (image: string) => void;
@@ -114,11 +114,11 @@ export const useRegisterRestaurantStore = create<RegisterRestaurantState>(
 			});
 		},
 
-		setRegisterRestaurantCuisine: (cuisine: string | null) => {
+		setRegisterRestaurantCuisineId: (cuisineId: string | null) => {
 			set((state) => {
 				const newRestaurant = {
 					...state.registerRestaurant,
-					cuisine: cuisine || '',
+					cuisineId: cuisineId || '',
 				};
 				return {
 					registerRestaurant: newRestaurant,

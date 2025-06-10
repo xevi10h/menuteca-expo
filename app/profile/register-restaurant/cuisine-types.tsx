@@ -25,8 +25,8 @@ export default function CuisineTypesScreen() {
 	const insets = useSafeAreaInsets();
 	const [selectedCuisine, setSelectedCuisine] = useState<string | null>(null);
 	const [isNextDisabled, setIsNextDisabled] = useState(true);
-	const setRegisterRestaurantCuisines = useRegisterRestaurantStore(
-		(state) => state.setRegisterRestaurantCuisine,
+	const setRegisterRestaurantCuisineId = useRegisterRestaurantStore(
+		(state) => state.setRegisterRestaurantCuisineId,
 	);
 
 	const handleBack = () => {
@@ -34,7 +34,7 @@ export default function CuisineTypesScreen() {
 	};
 
 	const handleNext = () => {
-		setRegisterRestaurantCuisines(selectedCuisine);
+		setRegisterRestaurantCuisineId(selectedCuisine);
 		router.push('/profile/register-restaurant/setup/edit');
 	};
 

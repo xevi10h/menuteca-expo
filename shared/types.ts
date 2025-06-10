@@ -90,7 +90,6 @@ export type MenuData = {
 	days: string[];
 	startTime: string;
 	endTime: string;
-	subtitle?: string;
 	price: number;
 	dishes: Dish[];
 	firstCoursesToShare?: boolean;

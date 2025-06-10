@@ -20,11 +20,11 @@ export default function CuisineSelectionModal({
 }: CuisineSelectionModalProps) {
 	const { t } = useTranslation();
 	const language = useUserStore((state) => state.user.language);
-	const selectedCuisine = useRegisterRestaurantStore(
+	const selectedCuisineId = useRegisterRestaurantStore(
 		(state) => state.registerRestaurant.cuisineId,
 	);
 	const [tempSelected, setTempSelected] = useState<string | undefined>(
-		selectedCuisine,
+		selectedCuisineId,
 	);
 
 	const handleToggleCuisine = (cuisineId: string) => {
@@ -38,9 +38,9 @@ export default function CuisineSelectionModal({
 
 	useEffect(() => {
 		if (visible) {
-			setTempSelected(selectedCuisine);
+			setTempSelected(selectedCuisineId);
 		}
-	}, [visible, selectedCuisine]);
+	}, [visible, selectedCuisineId]);
 
 	return (
 		<Modal

@@ -1,7 +1,7 @@
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { DishCategory } from '@/shared/enums';
-import { Dish, MenuData } from '@/shared/types.js';
+import { Dish, MenuData } from '@/shared/types';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
@@ -41,6 +41,47 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 		if (canGoRight) {
 			setCurrentMenuIndex(currentMenuIndex + 1);
 		}
+	};
+
+	// Función para formatear los días
+	const formatDays = (days: string[]): string => {
+		if (!days || days.length === 0) return '';
+
+		const sortedDays = days.sort((a, b) => {
+			const dayOrder = [
+				'monday',
+				'tuesday',
+				'wednesday',
+				'thursday',
+				'friday',
+				'saturday',
+				'sunday',
+			];
+			return dayOrder.indexOf(a) - dayOrder.indexOf(b);
+		});
+
+		const dayTranslations = sortedDays.map((day) => t(`days.${day}`));
+		return dayTranslations.join(', ');
+	};
+
+	// Función para formatear horarios
+	const formatSchedule = (startTime: string, endTime: string): string => {
+		// Si ambos horarios son 00:00, no mostrar horario
+		if (startTime === '00:00' && endTime === '00:00') {
+			return '';
+		}
+		return `${startTime} - ${endTime}`;
+	};
+
+	// Función para formatear coffee/dessert option
+	const formatCoffeeDesert = (
+		option: 'none' | 'coffee' | 'dessert' | 'both' | undefined,
+	): string => {
+		if (!option || option === 'none') return '';
+		if (option === 'coffee') return t('menuCreation.includesCoffee');
+		if (option === 'dessert') return t('menuCreation.includesDessert');
+		if (option === 'both') return t('menuCreation.includesCoffeeAndDessert');
+		return '';
 	};
 
 	// Función para agrupar platos por categoría
@@ -120,9 +161,30 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 		</View>
 	);
 
+	const renderCategoryHeader = ({ item }: { item: GroupedDishes }) => {
+		const isToShare =
+			(item.category === DishCategory.FIRST_COURSES &&
+				currentMenu.firstCoursesToShare) ||
+			(item.category === DishCategory.SECOND_COURSES &&
+				currentMenu.secondCoursesToShare) ||
+			(item.category === DishCategory.DESSERTS && currentMenu.dessertsToShare);
+
+		return (
+			<View style={styles.categoryHeaderContainer}>
+				<Text style={styles.menuCategoryTitle}>{item.categoryName}</Text>
+				{isToShare && (
+					<View style={styles.shareTag}>
+						<Ionicons name="people-outline" size={12} color={colors.primary} />
+						<Text style={styles.shareTagText}>{t('menuCreation.toShare')}</Text>
+					</View>
+				)}
+			</View>
+		);
+	};
+
 	const renderMenuCategory = ({ item }: { item: GroupedDishes }) => (
 		<View style={styles.menuCategory}>
-			<Text style={styles.menuCategoryTitle}>{item.categoryName}</Text>
+			{renderCategoryHeader({ item })}
 			<FlatList
 				data={item.dishes}
 				renderItem={renderMenuItem}
@@ -160,7 +222,9 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 
 				<View style={styles.menuHeaderContainer}>
 					<Text style={styles.menuHeader}>{currentMenu.name}</Text>
-					<Text style={styles.menuSubHeader}>{currentMenu.subtitle}</Text>
+					<Text style={styles.menuSubHeader}>{`${t('general.from')} ${
+						currentMenu.price
+					}€`}</Text>
 				</View>
 
 				<TouchableOpacity
@@ -190,6 +254,92 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 					))}
 				</View>
 			)}
+
+			{/* Menu Details Section */}
+			<View style={styles.menuDetailsSection}>
+				{/* Schedule and Days */}
+				<View style={styles.scheduleContainer}>
+					{formatDays(currentMenu.days) && (
+						<View style={styles.scheduleItem}>
+							<Ionicons
+								name="calendar-outline"
+								size={16}
+								color={colors.primary}
+							/>
+							<Text style={styles.scheduleText}>
+								{formatDays(currentMenu.days)}
+							</Text>
+						</View>
+					)}
+					{formatSchedule(currentMenu.startTime, currentMenu.endTime) && (
+						<View style={[styles.scheduleItem]}>
+							<Ionicons name="time-outline" size={16} color={colors.primary} />
+							<Text style={styles.scheduleText}>
+								{formatSchedule(currentMenu.startTime, currentMenu.endTime)}
+							</Text>
+						</View>
+					)}
+				</View>
+
+				{/* Menu Includes Section */}
+				<View style={styles.includesContainer}>
+					<Text style={styles.includesTitle}>
+						{t('menuCreation.menuOptions')}
+					</Text>
+					<View style={styles.includesGrid}>
+						{currentMenu.includesBread && (
+							<View style={styles.includeTag}>
+								<Ionicons
+									name="restaurant-outline"
+									size={12}
+									color={colors.quaternary}
+								/>
+								<Text style={styles.includeTagText}>
+									{t('menuCreation.includesBread')}
+								</Text>
+							</View>
+						)}
+						{currentMenu.includesDrink && (
+							<View style={styles.includeTag}>
+								<Ionicons
+									name="wine-outline"
+									size={12}
+									color={colors.quaternary}
+								/>
+								<Text style={styles.includeTagText}>
+									{t('menuCreation.includesDrink')}
+								</Text>
+							</View>
+						)}
+						{currentMenu.includesCoffeeAndDessert &&
+							currentMenu.includesCoffeeAndDessert !== 'none' && (
+								<View style={styles.includeTag}>
+									<Ionicons
+										name="cafe-outline"
+										size={12}
+										color={colors.quaternary}
+									/>
+									<Text style={styles.includeTagText}>
+										{formatCoffeeDesert(currentMenu.includesCoffeeAndDessert)}
+									</Text>
+								</View>
+							)}
+						{currentMenu.hasMinimumPeople && currentMenu.minimumPeople && (
+							<View style={styles.includeTag}>
+								<Ionicons
+									name="people-outline"
+									size={12}
+									color={colors.quaternary}
+								/>
+								<Text style={styles.includeTagText}>
+									{t('menuCreation.minimumPeopleLabel')}{' '}
+									{currentMenu.minimumPeople}
+								</Text>
+							</View>
+						)}
+					</View>
+				</View>
+			</View>
 
 			{/* Menu Categories */}
 			<FlatList
@@ -271,6 +421,70 @@ const styles = StyleSheet.create({
 		backgroundColor: colors.primary,
 		width: 16,
 	},
+	// New styles for menu details
+	menuDetailsSection: {
+		backgroundColor: colors.quaternary,
+		borderRadius: 15,
+		padding: 15,
+		marginBottom: 20,
+		shadowColor: '#000',
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.05,
+		shadowRadius: 3.84,
+		elevation: 2,
+	},
+	scheduleContainer: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		marginBottom: 15,
+		gap: 10,
+	},
+	scheduleItem: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		flex: 1,
+		gap: 8,
+	},
+	scheduleText: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		color: colors.primary,
+		flex: 1,
+	},
+	includesContainer: {
+		marginTop: 10,
+	},
+	includesTitle: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.primary,
+		marginBottom: 10,
+	},
+	includesGrid: {
+		flexDirection: 'row',
+		flexWrap: 'wrap',
+		gap: 8,
+	},
+	includeTag: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		backgroundColor: colors.primary,
+		paddingHorizontal: 10,
+		paddingVertical: 6,
+		borderRadius: 12,
+		gap: 4,
+	},
+	includeTagText: {
+		fontSize: 11,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		color: colors.quaternary,
+	},
 	menuContent: {
 		paddingBottom: 20,
 	},
@@ -288,17 +502,35 @@ const styles = StyleSheet.create({
 		shadowRadius: 3.84,
 		elevation: 3,
 	},
+	categoryHeaderContainer: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		backgroundColor: colors.primary,
+		paddingHorizontal: 20,
+		paddingVertical: 15,
+	},
 	menuCategoryTitle: {
 		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '700',
 		color: colors.quaternary,
-		backgroundColor: colors.primary,
-		paddingHorizontal: 20,
-		paddingVertical: 15,
-		textAlign: 'left',
-		borderBottomWidth: 1,
-		borderBottomColor: '#E8F0E8',
+		flex: 1,
+	},
+	shareTag: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		backgroundColor: colors.secondary,
+		paddingHorizontal: 8,
+		paddingVertical: 4,
+		borderRadius: 10,
+		gap: 4,
+	},
+	shareTagText: {
+		fontSize: 10,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		color: colors.primary,
 	},
 	menuItem: {
 		backgroundColor: colors.quaternary,
@@ -331,9 +563,6 @@ const styles = StyleSheet.create({
 		height: 18,
 		justifyContent: 'center',
 		alignItems: 'center',
-	},
-	dietIconText: {
-		fontSize: 12,
 	},
 	menuItemDescription: {
 		fontSize: 13,

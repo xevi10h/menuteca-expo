@@ -50,7 +50,7 @@ export default function EditTab() {
 		updateRegisterRestaurantMenu,
 		removeRegisterRestaurantMenu,
 		setRegisterRestaurantAddress,
-		setRegisterRestaurantCuisine,
+		setRegisterRestaurantCuisineId,
 		setRegisterRestaurantTags,
 	} = useRegisterRestaurantStore();
 
@@ -133,7 +133,7 @@ export default function EditTab() {
 	};
 
 	const handleSaveCuisines = (selectedCuisine: string | null) => {
-		setRegisterRestaurantCuisine(selectedCuisine);
+		setRegisterRestaurantCuisineId(selectedCuisine);
 	};
 
 	const handleSaveTags = (selectedTags: RestaurantTag[]) => {

@@ -56,9 +56,19 @@ export default function PreviewTab() {
 	// Menús del restaurante provisional
 	const previewMenus = registerRestaurant.menus || [];
 
+	// Función mock para onMapPress ya que no tenemos navegación real
+	const handleMapPress = () => {
+		console.log('Map pressed - navigation would open here');
+	};
+
 	// Referencias a los componentes para evitar re-renders
 	const informationComponent = useMemo(
-		() => <Information restaurant={registerRestaurant} onMapPress={() => {}} />,
+		() => (
+			<Information
+				restaurant={registerRestaurant}
+				onMapPress={handleMapPress}
+			/>
+		),
 		[registerRestaurant],
 	);
 
@@ -106,7 +116,7 @@ export default function PreviewTab() {
 
 		setIsTransitioning(true);
 
-		const targetX = tab === 'information' ? 0 : -(screenWidth - 40);
+		const targetX = tab === 'information' ? 0 : -screenWidth;
 
 		const currentTabMeasurement = tabMeasurements[tab];
 		if (currentTabMeasurement.width > 0) {
@@ -166,58 +176,67 @@ export default function PreviewTab() {
 				style={styles.contentBackground}
 				imageStyle={styles.backgroundImage}
 			>
-				<ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-					{/* Tab Container */}
-					<View style={styles.tabContainer}>
-						<TouchableOpacity
-							onPress={() => handleTabChange('information')}
-							disabled={isTransitioning}
-							onLayout={(event) => handleTabLayout('information', event)}
+				{/* Tab Container */}
+				<View style={styles.tabContainer}>
+					<TouchableOpacity
+						onPress={() => handleTabChange('information')}
+						disabled={isTransitioning}
+						onLayout={(event) => handleTabLayout('information', event)}
+					>
+						<Text
+							style={[
+								styles.tabText,
+								activeTab === 'information' && styles.activeTabText,
+							]}
 						>
-							<Text
-								style={[
-									styles.tabText,
-									activeTab === 'information' && styles.activeTabText,
-								]}
-							>
-								{t('restaurant.information')}
-							</Text>
-						</TouchableOpacity>
-						<TouchableOpacity
-							onPress={() => handleTabChange('menu')}
-							disabled={isTransitioning}
-							onLayout={(event) => handleTabLayout('menu', event)}
+							{t('restaurant.information')}
+						</Text>
+					</TouchableOpacity>
+					<TouchableOpacity
+						onPress={() => handleTabChange('menu')}
+						disabled={isTransitioning}
+						onLayout={(event) => handleTabLayout('menu', event)}
+					>
+						<Text
+							style={[
+								styles.tabText,
+								activeTab === 'menu' && styles.activeTabText,
+							]}
 						>
-							<Text
-								style={[
-									styles.tabText,
-									activeTab === 'menu' && styles.activeTabText,
-								]}
-							>
-								{t('restaurant.menu')}
-							</Text>
-						</TouchableOpacity>
+							{t('restaurant.menu')}
+						</Text>
+					</TouchableOpacity>
 
-						{/* Animated tab indicator */}
-						<Animated.View style={[styles.tabIndicator, tabIndicatorStyle]} />
-					</View>
+					{/* Animated tab indicator */}
+					<Animated.View style={[styles.tabIndicator, tabIndicatorStyle]} />
+				</View>
 
-					{/* Animated Content Container */}
-					<View style={styles.animatedContentContainer}>
-						<Animated.View
-							style={[styles.slidingContent, contentAnimatedStyle]}
+				{/* Content Container with individual ScrollViews */}
+				<View style={styles.contentContainer}>
+					{/* Information Tab Content */}
+					{activeTab === 'information' && (
+						<ScrollView
+							style={styles.tabScrollView}
+							showsVerticalScrollIndicator={false}
+							contentContainerStyle={styles.scrollContent}
 						>
-							{/* Information Tab Content */}
-							<View style={styles.tabContent}>{informationComponent}</View>
+							{informationComponent}
+							<View style={{ height: 100 }} />
+						</ScrollView>
+					)}
 
-							{/* Menu Tab Content */}
-							<View style={styles.tabContent}>{menuComponent}</View>
-						</Animated.View>
-					</View>
-
-					{/* Bottom spacing */}
-					<View style={{ height: 100 }} />
-				</ScrollView>
+					{/* Menu Tab Content */}
+					{activeTab === 'menu' && (
+						<ScrollView
+							style={styles.tabScrollView}
+							showsVerticalScrollIndicator={false}
+							contentContainerStyle={styles.scrollContent}
+						>
+							{menuComponent}
+							<View style={{ height: 100 }} />
+						</ScrollView>
+					)}
+				</View>
 			</ImageBackground>
 		</View>
 	);
@@ -258,16 +277,13 @@ const styles = StyleSheet.create({
 	backgroundImage: {
 		opacity: 1,
 	},
-	content: {
-		flex: 1,
-		paddingHorizontal: 20,
-	},
 	tabContainer: {
 		flexDirection: 'row',
 		marginVertical: 20,
 		paddingBottom: 10,
 		justifyContent: 'center',
 		gap: 40,
+		paddingHorizontal: 20,
 	},
 	tabText: {
 		fontSize: 16,
@@ -278,16 +294,15 @@ const styles = StyleSheet.create({
 	activeTabText: {
 		color: colors.primary,
 	},
-	animatedContentContainer: {
-		overflow: 'hidden',
+	contentContainer: {
+		flex: 1,
 	},
-	slidingContent: {
-		flexDirection: 'row',
-		width: (screenWidth - 40) * 2,
+	tabScrollView: {
+		flex: 1,
+		paddingHorizontal: 20,
 	},
-	tabContent: {
-		width: screenWidth - 40,
-		paddingRight: 0,
+	scrollContent: {
+		flexGrow: 1,
 	},
 	tabIndicator: {
 		position: 'absolute',
