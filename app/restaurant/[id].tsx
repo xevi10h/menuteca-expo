@@ -1,12 +1,15 @@
 import { getMenusByRestaurantId, getRestaurantById } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
+import NotFoundRestaurant from '@/components/NotFoundRestaurant';
 import RestaurantBasicInformation from '@/components/RestaurantBasicInformation';
 import { useTranslation } from '@/hooks/useTranslation';
+import { MenuData, Restaurant } from '@/shared/types';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
+	ActivityIndicator,
 	Dimensions,
 	Image,
 	ImageBackground,
@@ -28,11 +31,113 @@ import Menu from '../../components/restaurantDetail/Menu';
 
 const { width: screenWidth } = Dimensions.get('window');
 
+// Simular estados de la API
+type LoadingState = 'loading' | 'success' | 'error' | 'not-found';
+
 // Interface para las medidas de los tabs
 interface TabMeasurements {
 	information: { x: number; width: number };
 	menu: { x: number; width: number };
 }
+
+// Simular llamada a API para obtener restaurante
+const fetchRestaurantById = async (
+	id: string,
+): Promise<{
+	restaurant: Restaurant | null;
+	menus: MenuData[];
+	status: LoadingState;
+}> => {
+	// Simular delay de red
+	await new Promise((resolve) => setTimeout(resolve, 800));
+
+	// Simular posibles errores de red (5% de probabilidad)
+	if (Math.random() < 0.05) {
+		throw new Error('Network error');
+	}
+
+	// Intentar obtener el restaurante
+	const restaurant = getRestaurantById(id);
+
+	if (!restaurant) {
+		return {
+			restaurant: null,
+			menus: [],
+			status: 'not-found',
+		};
+	}
+
+	// Obtener menús
+	const menus = getMenusByRestaurantId(id);
+
+	return {
+		restaurant,
+		menus,
+		status: 'success',
+	};
+};
+
+// Componente de loading
+const LoadingScreen = () => {
+	const { t } = useTranslation();
+	const insets = useSafeAreaInsets();
+
+	return (
+		<View style={[styles.loadingContainer, { paddingTop: insets.top }]}>
+			{/* Header placeholder */}
+			<View style={styles.loadingHeader}>
+				<View style={styles.loadingBackButton} />
+			</View>
+
+			{/* Main loading content */}
+			<View style={styles.loadingContent}>
+				<ActivityIndicator size="large" color={colors.primary} />
+				<Text style={styles.loadingText}>{t('restaurant.loading')}</Text>
+			</View>
+		</View>
+	);
+};
+
+// Componente de error genérico
+const ErrorScreen = ({ onRetry }: { onRetry: () => void }) => {
+	const { t } = useTranslation();
+	const router = useRouter();
+	const insets = useSafeAreaInsets();
+
+	return (
+		<View style={[styles.errorContainer, { paddingTop: insets.top }]}>
+			{/* Header with back button */}
+			<View style={styles.header}>
+				<TouchableOpacity
+					onPress={() => router.back()}
+					style={styles.backButton}
+				>
+					<Ionicons name="chevron-back" size={24} color={colors.primary} />
+				</TouchableOpacity>
+			</View>
+
+			{/* Error content */}
+			<View style={styles.errorContent}>
+				<Ionicons name="wifi-outline" size={80} color={colors.primaryLight} />
+				<Text style={styles.errorTitle}>{t('restaurant.error.title')}</Text>
+				<Text style={styles.errorDescription}>
+					{t('restaurant.error.description')}
+				</Text>
+
+				<TouchableOpacity style={styles.retryButton} onPress={onRetry}>
+					<Ionicons
+						name="refresh-outline"
+						size={20}
+						color={colors.quaternary}
+					/>
+					<Text style={styles.retryButtonText}>
+						{t('restaurant.error.retry')}
+					</Text>
+				</TouchableOpacity>
+			</View>
+		</View>
+	);
+};
 
 export default function RestaurantDetail() {
 	const { id } = useLocalSearchParams<{ id: string }>();
@@ -41,8 +146,10 @@ export default function RestaurantDetail() {
 	const insets = useSafeAreaInsets();
 	const { showActionSheetWithOptions } = useActionSheet();
 
-	const restaurant = getRestaurantById(id!);
-	const menus = getMenusByRestaurantId(id!);
+	// Estados
+	const [loadingState, setLoadingState] = useState<LoadingState>('loading');
+	const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+	const [menus, setMenus] = useState<MenuData[]>([]);
 
 	// Estado para las pestañas
 	const [activeTab, setActiveTab] = useState<'information' | 'menu'>(
@@ -61,15 +168,42 @@ export default function RestaurantDetail() {
 	const tabIndicatorX = useSharedValue(0);
 	const tabIndicatorWidth = useSharedValue(0);
 
-	// Referencias a los componentes para evitar re-renders
-	const informationComponent = useMemo(
-		() => (
-			<Information restaurant={restaurant} onMapPress={openMapNavigation} />
-		),
-		[restaurant],
-	);
+	// Función para cargar datos del restaurante
+	const loadRestaurantData = async () => {
+		if (!id) {
+			setLoadingState('not-found');
+			return;
+		}
 
-	const menuComponent = useMemo(() => <Menu menus={menus} />, [menus]);
+		try {
+			setLoadingState('loading');
+			const result = await fetchRestaurantById(id);
+
+			setRestaurant(result.restaurant);
+			setMenus(result.menus);
+			setLoadingState(result.status);
+		} catch (error) {
+			console.error('Error loading restaurant:', error);
+			setLoadingState('error');
+		}
+	};
+
+	// Cargar datos al montar el componente
+	useEffect(() => {
+		loadRestaurantData();
+	}, [id]);
+
+	// Referencias a los componentes para evitar re-renders
+	const informationComponent = useMemo(() => {
+		if (!restaurant) return null;
+		return (
+			<Information restaurant={restaurant} onMapPress={openMapNavigation} />
+		);
+	}, [restaurant]);
+
+	const menuComponent = useMemo(() => {
+		return <Menu menus={menus} />;
+	}, [menus]);
 
 	const handleTabLayout = (tab: 'information' | 'menu', event: any) => {
 		const { width } = event.nativeEvent.layout;
@@ -95,42 +229,49 @@ export default function RestaurantDetail() {
 	};
 
 	const openMapNavigation = async () => {
-		const result = await getApps({
-			latitude: restaurant?.address.coordinates.latitude!,
-			longitude: restaurant?.address.coordinates.longitude!,
-			title: restaurant?.name,
-			googleForceLatLon: false,
-			alwaysIncludeGoogle: true,
-			appsWhiteList: ['google-maps', 'apple-maps', 'waze'],
-		});
-		showActionSheetWithOptions(
-			{
-				options: [
-					...result.map((app) => app.name),
-					t('restaurant.cancelOpenMap'),
-				],
-				textStyle: { fontFamily: 'Montserrat-Regular' },
-				cancelButtonIndex: result.length,
-				icons: [
-					...result.map((app, index) => (
-						<Image
-							key={`icon-${app.name}-${index}`}
-							source={app.icon}
-							style={{ width: 24, height: 24 }}
-						/>
-					)),
-					<Ionicons
-						key={'icon-cancel-map'}
-						name="close"
-						size={24}
-						color={colors.quaternary}
-					/>,
-				],
-			},
-			(buttonIndex) => {
-				buttonIndex !== undefined && result[buttonIndex]?.open();
-			},
-		);
+		if (!restaurant) return;
+
+		try {
+			const result = await getApps({
+				latitude: restaurant.address.coordinates.latitude,
+				longitude: restaurant.address.coordinates.longitude,
+				title: restaurant.name,
+				googleForceLatLon: false,
+				alwaysIncludeGoogle: true,
+				appsWhiteList: ['google-maps', 'apple-maps', 'waze'],
+			});
+
+			showActionSheetWithOptions(
+				{
+					options: [
+						...result.map((app) => app.name),
+						t('restaurant.cancelOpenMap'),
+					],
+					textStyle: { fontFamily: 'Montserrat-Regular' },
+					cancelButtonIndex: result.length,
+					icons: [
+						...result.map((app, index) => (
+							<Image
+								key={`icon-${app.name}-${index}`}
+								source={app.icon}
+								style={{ width: 24, height: 24 }}
+							/>
+						)),
+						<Ionicons
+							key={'icon-cancel-map'}
+							name="close"
+							size={24}
+							color={colors.quaternary}
+						/>,
+					],
+				},
+				(buttonIndex) => {
+					buttonIndex !== undefined && result[buttonIndex]?.open();
+				},
+			);
+		} catch (error) {
+			console.error('Error opening map navigation:', error);
+		}
 	};
 
 	const handleTabChange = (tab: 'information' | 'menu') => {
@@ -171,6 +312,20 @@ export default function RestaurantDetail() {
 		};
 	});
 
+	// Renderizar según el estado
+	if (loadingState === 'loading') {
+		return <LoadingScreen />;
+	}
+
+	if (loadingState === 'error') {
+		return <ErrorScreen onRetry={loadRestaurantData} />;
+	}
+
+	if (loadingState === 'not-found' || !restaurant) {
+		return <NotFoundRestaurant restaurantId={id} />;
+	}
+
+	// Renderizar restaurante exitosamente cargado
 	return (
 		<View style={styles.container}>
 			{/* Header Image */}
@@ -295,6 +450,82 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: colors.secondary,
 	},
+
+	// Loading styles
+	loadingContainer: {
+		flex: 1,
+		backgroundColor: colors.secondary,
+	},
+	loadingHeader: {
+		height: 60,
+		justifyContent: 'center',
+		paddingHorizontal: 20,
+	},
+	loadingBackButton: {
+		width: 40,
+		height: 40,
+		borderRadius: 20,
+		backgroundColor: colors.primaryLight,
+		opacity: 0.3,
+	},
+	loadingContent: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		gap: 20,
+	},
+	loadingText: {
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		color: colors.primary,
+	},
+
+	// Error styles
+	errorContainer: {
+		flex: 1,
+		backgroundColor: colors.secondary,
+	},
+	errorContent: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingHorizontal: 40,
+		gap: 20,
+	},
+	errorTitle: {
+		fontSize: 24,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.primary,
+		textAlign: 'center',
+	},
+	errorDescription: {
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primary,
+		textAlign: 'center',
+		lineHeight: 24,
+	},
+	retryButton: {
+		backgroundColor: colors.primary,
+		paddingVertical: 15,
+		paddingHorizontal: 25,
+		borderRadius: 25,
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: 10,
+		marginTop: 10,
+	},
+	retryButtonText: {
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.quaternary,
+	},
+
+	// Main restaurant styles
 	imageContainer: {
 		position: 'relative',
 	},
@@ -308,6 +539,11 @@ const styles = StyleSheet.create({
 		right: 0,
 		bottom: 0,
 		backgroundColor: 'rgba(0, 0, 0, 0.4)',
+	},
+	header: {
+		height: 60,
+		justifyContent: 'center',
+		paddingHorizontal: 20,
 	},
 	backButton: {
 		position: 'absolute',

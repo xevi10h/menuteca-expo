@@ -66,7 +66,22 @@
 		"noMenuAvailable": "No hi ha menú disponible",
 		"noRating": "Sense valoracions",
 		"callRestaurant": "Trucar al restaurant",
-		"makeReservation": "Fer reserva"
+		"makeReservation": "Fer reserva",
+		"loading": "Carregant restaurant...",
+		"error": {
+			"title": "Error de connexió",
+			"description": "No hem pogut carregar la informació del restaurant. Verifica la teva connexió a internet i torna-ho a intentar.",
+			"retry": "Intentar de nou"
+		}
+	},
+	"notFound": {
+		"restaurant": {
+			"title": "Restaurant no trobat",
+			"description": "Ho sentim, però no hem pogut trobar el restaurant que cerques. És possible que hagi estat eliminat o que l'adreça sigui incorrecta.",
+			"goHome": "Anar a l'inici",
+			"goBack": "Tornar enrere",
+			"helpText": "Si creus que això és un error, si us plau contacta amb el nostre equip de suport."
+		}
 	},
 	"registerRestaurant": {
 		"phone": "Telèfon",

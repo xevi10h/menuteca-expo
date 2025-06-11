@@ -66,7 +66,22 @@
 		"noMenuAvailable": "Aucun menu disponible",
 		"noRating": "Aucune évaluation",
 		"callRestaurant": "Appeler le restaurant",
-		"makeReservation": "Faire une réservation"
+		"makeReservation": "Faire une réservation",
+		"loading": "Chargement du restaurant...",
+		"error": {
+			"title": "Erreur de connexion",
+			"description": "Nous n'avons pas pu charger les informations du restaurant. Vérifiez votre connexion internet et réessayez.",
+			"retry": "Réessayer"
+		}
+	},
+	"notFound": {
+		"restaurant": {
+			"title": "Restaurant introuvable",
+			"description": "Désolé, nous n'avons pas pu trouver le restaurant que vous cherchez. Il a peut-être été supprimé ou l'adresse est incorrecte.",
+			"goHome": "Aller à l'accueil",
+			"goBack": "Retour",
+			"helpText": "Si vous pensez qu'il s'agit d'une erreur, veuillez contacter notre équipe d'assistance."
+		}
 	},
 	"registerRestaurant": {
 		"phone": "Téléphone",
