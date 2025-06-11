@@ -1,5 +1,6 @@
 import { getMenusByRestaurantId, getRestaurantById } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
+import LoadingScreen from '@/components/LoadingScreen';
 import NotFoundRestaurant from '@/components/NotFoundRestaurant';
 import RestaurantBasicInformation from '@/components/RestaurantBasicInformation';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -9,7 +10,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-	ActivityIndicator,
 	Dimensions,
 	Image,
 	ImageBackground,
@@ -75,27 +75,6 @@ const fetchRestaurantById = async (
 		menus,
 		status: 'success',
 	};
-};
-
-// Componente de loading
-const LoadingScreen = () => {
-	const { t } = useTranslation();
-	const insets = useSafeAreaInsets();
-
-	return (
-		<View style={[styles.loadingContainer, { paddingTop: insets.top }]}>
-			{/* Header placeholder */}
-			<View style={styles.loadingHeader}>
-				<View style={styles.loadingBackButton} />
-			</View>
-
-			{/* Main loading content */}
-			<View style={styles.loadingContent}>
-				<ActivityIndicator size="large" color={colors.primary} />
-				<Text style={styles.loadingText}>{t('restaurant.loading')}</Text>
-			</View>
-		</View>
-	);
 };
 
 // Componente de error genérico
