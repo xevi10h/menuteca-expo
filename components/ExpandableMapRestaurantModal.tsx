@@ -9,7 +9,6 @@ import {
 	Dimensions,
 	Image,
 	ImageBackground,
-	ScrollView,
 	StyleSheet,
 	Text,
 	TouchableOpacity,
@@ -220,7 +219,7 @@ export default function ExpandableMapRestaurantModal({
 
 		setIsTransitioning(true);
 
-		const targetX = tab === 'information' ? 0 : -(SCREEN_WIDTH - 40);
+		const targetX = tab === 'information' ? 0 : -SCREEN_WIDTH;
 
 		const currentTabMeasurement = tabMeasurements[tab];
 		if (currentTabMeasurement.width > 0) {
@@ -397,63 +396,77 @@ export default function ExpandableMapRestaurantModal({
 							style={styles.contentBackground}
 							imageStyle={styles.backgroundImage}
 						>
-							<ScrollView
-								style={styles.scrollContent}
-								showsVerticalScrollIndicator={false}
-							>
-								{/* Tab Container */}
-								<View style={styles.tabContainer}>
-									<TouchableOpacity
-										onPress={() => handleTabChange('information')}
-										disabled={isTransitioning}
-										onLayout={(event) => handleTabLayout('information', event)}
+							{/* Tab Container */}
+							<View style={styles.tabContainer}>
+								<TouchableOpacity
+									onPress={() => handleTabChange('information')}
+									disabled={isTransitioning}
+									onLayout={(event) => handleTabLayout('information', event)}
+								>
+									<Text
+										style={[
+											styles.tabText,
+											activeTab === 'information' && styles.activeTabText,
+										]}
 									>
-										<Text
-											style={[
-												styles.tabText,
-												activeTab === 'information' && styles.activeTabText,
-											]}
-										>
-											{t('restaurant.information')}
-										</Text>
-									</TouchableOpacity>
-									<TouchableOpacity
-										onPress={() => handleTabChange('menu')}
-										disabled={isTransitioning}
-										onLayout={(event) => handleTabLayout('menu', event)}
+										{t('restaurant.information')}
+									</Text>
+								</TouchableOpacity>
+								<TouchableOpacity
+									onPress={() => handleTabChange('menu')}
+									disabled={isTransitioning}
+									onLayout={(event) => handleTabLayout('menu', event)}
+								>
+									<Text
+										style={[
+											styles.tabText,
+											activeTab === 'menu' && styles.activeTabText,
+										]}
 									>
-										<Text
-											style={[
-												styles.tabText,
-												activeTab === 'menu' && styles.activeTabText,
-											]}
-										>
-											{t('restaurant.menu')}
-										</Text>
-									</TouchableOpacity>
+										{t('restaurant.menu')}
+									</Text>
+								</TouchableOpacity>
 
-									{/* Animated tab indicator */}
-									<Animated.View
-										style={[styles.tabIndicator, tabIndicatorStyle]}
-									/>
-								</View>
+								{/* Animated tab indicator */}
+								<Animated.View
+									style={[styles.tabIndicator, tabIndicatorStyle]}
+								/>
+							</View>
 
-								{/* Animated Content Container */}
-								<View style={styles.animatedContentContainer}>
-									<Animated.View
-										style={[styles.slidingContent, contentAnimatedStyle]}
-									>
-										{/* Information Tab Content */}
-										<View style={styles.tabContent}>
+							{/* Animated Content Container */}
+							<View style={styles.animatedContentContainer}>
+								<Animated.View
+									style={[styles.slidingContent, contentAnimatedStyle]}
+								>
+									{/* Information Tab Content with its own ScrollView */}
+									<View style={styles.tabContent}>
+										<Animated.ScrollView
+											style={styles.tabScrollView}
+											showsVerticalScrollIndicator={false}
+											contentContainerStyle={styles.scrollContent}
+											nestedScrollEnabled={true}
+											scrollEnabled={activeTab === 'information'}
+										>
 											{informationComponent}
-										</View>
+											<View style={{ height: 100 }} />
+										</Animated.ScrollView>
+									</View>
 
-										{/* Menu Tab Content */}
-										<View style={styles.tabContent}>{menuComponent}</View>
-									</Animated.View>
-								</View>
-								<View style={{ height: 100 }} />
-							</ScrollView>
+									{/* Menu Tab Content with its own ScrollView */}
+									<View style={styles.tabContent}>
+										<Animated.ScrollView
+											style={styles.tabScrollView}
+											showsVerticalScrollIndicator={false}
+											contentContainerStyle={styles.scrollContent}
+											nestedScrollEnabled={true}
+											scrollEnabled={activeTab === 'menu'}
+										>
+											{menuComponent}
+											<View style={{ height: 100 }} />
+										</Animated.ScrollView>
+									</View>
+								</Animated.View>
+							</View>
 						</ImageBackground>
 					</Animated.View>
 				</Animated.View>
@@ -538,16 +551,13 @@ const styles = StyleSheet.create({
 	backgroundImage: {
 		opacity: 1,
 	},
-	scrollContent: {
-		flex: 1,
-		paddingHorizontal: 20,
-	},
 	tabContainer: {
 		flexDirection: 'row',
 		marginVertical: 20,
 		paddingBottom: 10,
 		justifyContent: 'center',
 		gap: 40,
+		paddingHorizontal: 20,
 	},
 	tabText: {
 		fontSize: 16,
@@ -559,16 +569,24 @@ const styles = StyleSheet.create({
 		color: colors.primary,
 	},
 	animatedContentContainer: {
+		flex: 1,
 		overflow: 'hidden',
 	},
 	slidingContent: {
 		flexDirection: 'row',
-		width: (SCREEN_WIDTH - 40) * 2,
+		width: SCREEN_WIDTH * 2,
+		height: '100%',
 	},
-
 	tabContent: {
-		width: SCREEN_WIDTH - 40,
-		paddingRight: 0,
+		width: SCREEN_WIDTH,
+		flex: 1,
+	},
+	tabScrollView: {
+		flex: 1,
+		paddingHorizontal: 20,
+	},
+	scrollContent: {
+		flexGrow: 1,
 	},
 	tabIndicator: {
 		position: 'absolute',

@@ -2,6 +2,7 @@ import { colors } from '@/assets/styles/colors';
 import MenuCreationModal from '@/components/MenuCreationModal';
 import AddressEditModal from '@/components/restaurantCreation/AddressEditModal';
 import AddressSection from '@/components/restaurantCreation/AddressSection';
+import ContactInfoSection from '@/components/restaurantCreation/ContactInfoSection';
 import CuisineSelectionModal from '@/components/restaurantCreation/CuisineSelectionModal';
 import CuisineSelectionSection from '@/components/restaurantCreation/CuisineSelectionSection';
 import MenusSection from '@/components/restaurantCreation/MenusSection';
@@ -50,6 +51,8 @@ export default function EditTab() {
 		setRegisterRestaurantAddress,
 		setRegisterRestaurantCuisineId,
 		setRegisterRestaurantTags,
+		setRegisterRestaurantPhone,
+		setRegisterRestaurantReservationLink,
 	} = useRegisterRestaurantStore();
 
 	const handleAddImages = (imageUris: string[]) => {
@@ -160,6 +163,20 @@ export default function EditTab() {
 					profileImage={registerRestaurant.profileImage}
 					onImageSelected={setRegisterRestaurantProfileImage}
 				/>
+				<View style={styles.sectionContainer}>
+					<View style={styles.labelContainer}>
+						<Text style={styles.sectionTitle}>
+							{t('registerRestaurant.contactInfo')}
+						</Text>
+					</View>
+					<ContactInfoSection
+						phone={registerRestaurant.phone || ''}
+						reservationLink={registerRestaurant.reservationLink || ''}
+						onPhoneChange={setRegisterRestaurantPhone}
+						onReservationLinkChange={setRegisterRestaurantReservationLink}
+						showTitle={false}
+					/>
+				</View>
 
 				<View style={styles.sectionContainer}>
 					<View style={styles.sectionHeaderWithEdit}>

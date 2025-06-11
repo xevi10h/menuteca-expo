@@ -10,7 +10,6 @@ import {
 	Dimensions,
 	Image,
 	ImageBackground,
-	ScrollView,
 	StyleSheet,
 	Text,
 	TouchableOpacity,
@@ -139,7 +138,7 @@ export default function RestaurantDetail() {
 
 		setIsTransitioning(true);
 
-		const targetX = tab === 'information' ? 0 : -(screenWidth - 40);
+		const targetX = tab === 'information' ? 0 : -screenWidth;
 
 		const currentTabMeasurement = tabMeasurements[tab];
 		if (currentTabMeasurement.width > 0) {
@@ -221,58 +220,71 @@ export default function RestaurantDetail() {
 				style={styles.contentBackground}
 				imageStyle={styles.backgroundImage}
 			>
-				<ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-					{/* Tab Container */}
-					<View style={styles.tabContainer}>
-						<TouchableOpacity
-							onPress={() => handleTabChange('information')}
-							disabled={isTransitioning}
-							onLayout={(event) => handleTabLayout('information', event)}
+				{/* Tab Container */}
+				<View style={styles.tabContainer}>
+					<TouchableOpacity
+						onPress={() => handleTabChange('information')}
+						disabled={isTransitioning}
+						onLayout={(event) => handleTabLayout('information', event)}
+					>
+						<Text
+							style={[
+								styles.tabText,
+								activeTab === 'information' && styles.activeTabText,
+							]}
 						>
-							<Text
-								style={[
-									styles.tabText,
-									activeTab === 'information' && styles.activeTabText,
-								]}
+							{t('restaurant.information')}
+						</Text>
+					</TouchableOpacity>
+					<TouchableOpacity
+						onPress={() => handleTabChange('menu')}
+						disabled={isTransitioning}
+						onLayout={(event) => handleTabLayout('menu', event)}
+					>
+						<Text
+							style={[
+								styles.tabText,
+								activeTab === 'menu' && styles.activeTabText,
+							]}
+						>
+							{t('restaurant.menu')}
+						</Text>
+					</TouchableOpacity>
+
+					{/* Animated tab indicator */}
+					<Animated.View style={[styles.tabIndicator, tabIndicatorStyle]} />
+				</View>
+
+				{/* Animated Content Container */}
+				<View style={styles.animatedContentContainer}>
+					<Animated.View style={[styles.slidingContent, contentAnimatedStyle]}>
+						{/* Information Tab Content with its own ScrollView */}
+						<View style={styles.tabContent}>
+							<Animated.ScrollView
+								style={styles.tabScrollView}
+								showsVerticalScrollIndicator={false}
+								contentContainerStyle={styles.scrollContent}
+								scrollEnabled={activeTab === 'information'}
 							>
-								{t('restaurant.information')}
-							</Text>
-						</TouchableOpacity>
-						<TouchableOpacity
-							onPress={() => handleTabChange('menu')}
-							disabled={isTransitioning}
-							onLayout={(event) => handleTabLayout('menu', event)}
-						>
-							<Text
-								style={[
-									styles.tabText,
-									activeTab === 'menu' && styles.activeTabText,
-								]}
+								{informationComponent}
+								<View style={{ height: 100 }} />
+							</Animated.ScrollView>
+						</View>
+
+						{/* Menu Tab Content with its own ScrollView */}
+						<View style={styles.tabContent}>
+							<Animated.ScrollView
+								style={styles.tabScrollView}
+								showsVerticalScrollIndicator={false}
+								contentContainerStyle={styles.scrollContent}
+								scrollEnabled={activeTab === 'menu'}
 							>
-								{t('restaurant.menu')}
-							</Text>
-						</TouchableOpacity>
-
-						{/* Animated tab indicator */}
-						<Animated.View style={[styles.tabIndicator, tabIndicatorStyle]} />
-					</View>
-
-					{/* Animated Content Container */}
-					<View style={styles.animatedContentContainer}>
-						<Animated.View
-							style={[styles.slidingContent, contentAnimatedStyle]}
-						>
-							{/* Information Tab Content */}
-							<View style={styles.tabContent}>{informationComponent}</View>
-
-							{/* Menu Tab Content */}
-							<View style={styles.tabContent}>{menuComponent}</View>
-						</Animated.View>
-					</View>
-
-					{/* Bottom spacing */}
-					<View style={{ height: 100 }} />
-				</ScrollView>
+								{menuComponent}
+								<View style={{ height: 100 }} />
+							</Animated.ScrollView>
+						</View>
+					</Animated.View>
+				</View>
 			</ImageBackground>
 		</View>
 	);
@@ -323,70 +335,13 @@ const styles = StyleSheet.create({
 	backgroundImage: {
 		opacity: 1,
 	},
-	content: {
-		flex: 1,
-		paddingHorizontal: 20,
-	},
-	headerInfo: {
-		position: 'absolute',
-		flexDirection: 'row',
-		bottom: 50,
-		justifyContent: 'center',
-		paddingHorizontal: 25,
-	},
-	restaurantIcon: {
-		width: 60,
-		height: 60,
-		borderRadius: 30,
-		backgroundColor: colors.primary,
-		justifyContent: 'center',
-		alignItems: 'center',
-		marginRight: 15,
-	},
-	restaurantIconText: {
-		color: colors.quaternary,
-		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
-	},
-	restaurantDetails: {
-		flex: 1,
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-	},
-	restaurantName: {
-		fontSize: 20,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
-		color: colors.quaternary,
-		marginBottom: 5,
-	},
-	cuisineText: {
-		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
-		color: colors.quaternary,
-		marginBottom: 5,
-	},
-	priceFromText: {
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
-		color: colors.quaternary,
-	},
-	priceText: {
-		fontSize: 24,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
-		color: colors.quaternary,
-	},
 	tabContainer: {
 		flexDirection: 'row',
 		marginVertical: 20,
 		paddingBottom: 10,
 		justifyContent: 'center',
 		gap: 40,
+		paddingHorizontal: 20,
 	},
 	tabText: {
 		fontSize: 16,
@@ -398,15 +353,24 @@ const styles = StyleSheet.create({
 		color: colors.primary,
 	},
 	animatedContentContainer: {
+		flex: 1,
 		overflow: 'hidden',
 	},
 	slidingContent: {
 		flexDirection: 'row',
-		width: (screenWidth - 40) * 2,
+		width: screenWidth * 2,
+		height: '100%',
 	},
 	tabContent: {
-		width: screenWidth - 40,
-		paddingRight: 0,
+		width: screenWidth,
+		flex: 1,
+	},
+	tabScrollView: {
+		flex: 1,
+		paddingHorizontal: 20,
+	},
+	scrollContent: {
+		flexGrow: 1,
 	},
 	tabIndicator: {
 		position: 'absolute',

@@ -38,6 +38,8 @@ export const allRestaurants: Restaurant[] = [
 			RestaurantTag.FAMILY_FRIENDLY,
 		],
 		menus: [],
+		phone: '+34 123 456 789',
+		reservationLink: 'https://reservas.santfrancesc.com',
 	},
 	{
 		id: '2',
@@ -75,6 +77,7 @@ export const allRestaurants: Restaurant[] = [
 			RestaurantTag.LIVE_MUSIC,
 		],
 		menus: [],
+		phone: '+34 987 654 321',
 	},
 	{
 		id: '3',
@@ -112,6 +115,7 @@ export const allRestaurants: Restaurant[] = [
 			RestaurantTag.PET_FRIENDLY,
 		],
 		menus: [],
+		reservationLink: 'https://elgransol.opentable.com',
 	},
 ];
 

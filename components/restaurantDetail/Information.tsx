@@ -6,6 +6,7 @@ import React from 'react';
 import {
 	Dimensions,
 	Image,
+	Linking,
 	StyleSheet,
 	Text,
 	TouchableOpacity,
@@ -30,19 +31,62 @@ const Information: React.FC<InformationProps> = ({
 	const { t } = useTranslation();
 	const progressValue = useSharedValue<number>(0);
 
+	const handleCallRestaurant = (phone: string) => {
+		if (phone) {
+			Linking.openURL(`tel:${phone}`);
+		}
+	};
+
+	const handleMakeReservation = (reservationLink: string) => {
+		if (reservationLink) {
+			Linking.openURL(reservationLink);
+		}
+	};
+
 	return (
 		<>
 			{/* Tags */}
-			<View style={styles.tagsContainer}>
-				{restaurant.tags?.map((tag) => {
-					return (
-						<View key={tag} style={styles.tag}>
-							{renderTagIcon(tag, colors.quaternary, 14)}
-							<Text style={styles.tagText}>{t(`restaurantTags.${tag}`)}</Text>
-						</View>
-					);
-				})}
-			</View>
+			{restaurant.tags && restaurant.tags.length > 0 && (
+				<View style={styles.tagsContainer}>
+					{restaurant.tags.map((tag) => {
+						return (
+							<View key={tag} style={styles.tag}>
+								{renderTagIcon(tag, colors.quaternary, 14)}
+								<Text style={styles.tagText}>{t(`restaurantTags.${tag}`)}</Text>
+							</View>
+						);
+					})}
+				</View>
+			)}
+
+			{/* Contact Information */}
+			{(restaurant.phone || restaurant.reservationLink) && (
+				<View style={styles.contactContainer}>
+					{restaurant.phone && (
+						<TouchableOpacity
+							style={styles.contactButton}
+							onPress={() => handleCallRestaurant(restaurant.phone!)}
+						>
+							<Ionicons name="call" size={20} color={colors.quaternary} />
+							<Text style={styles.contactText}>
+								{t('restaurant.callRestaurant')}
+							</Text>
+						</TouchableOpacity>
+					)}
+
+					{restaurant.reservationLink && (
+						<TouchableOpacity
+							style={styles.contactButton}
+							onPress={() => handleMakeReservation(restaurant.reservationLink!)}
+						>
+							<Ionicons name="calendar" size={20} color={colors.quaternary} />
+							<Text style={styles.contactText}>
+								{t('restaurant.makeReservation')}
+							</Text>
+						</TouchableOpacity>
+					)}
+				</View>
+			)}
 
 			{/* Address containe */}
 			{restaurant.address && (
@@ -151,6 +195,30 @@ const Information: React.FC<InformationProps> = ({
 };
 
 const styles = StyleSheet.create({
+	contactContainer: {
+		flexDirection: 'row',
+		gap: 10,
+		marginBottom: 20,
+		flexWrap: 'wrap',
+	},
+	contactButton: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		backgroundColor: colors.primary,
+		paddingHorizontal: 16,
+		paddingVertical: 12,
+		borderRadius: 25,
+		gap: 8,
+		flex: 1,
+		minWidth: '45%',
+		justifyContent: 'center',
+	},
+	contactText: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.quaternary,
+	},
 	tagsContainer: {
 		flexDirection: 'row',
 		flexWrap: 'wrap',

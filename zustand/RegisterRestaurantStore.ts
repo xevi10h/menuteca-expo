@@ -21,6 +21,8 @@ export const defaultRegisterRestaurant: Restaurant = {
 	rating: undefined,
 	mainImage: '',
 	distance: 0,
+	phone: '',
+	reservationLink: '',
 };
 
 interface RegisterRestaurantValidation {
@@ -49,6 +51,8 @@ interface RegisterRestaurantState {
 	setRegisterRestaurantTags: (tags: RestaurantTag[]) => void;
 	resetRegisterRestaurant: () => void;
 	validateRestaurant: () => RegisterRestaurantValidation;
+	setRegisterRestaurantPhone: (phone: string) => void;
+	setRegisterRestaurantReservationLink: (link: string) => void;
 }
 
 const validateRestaurant = (
@@ -246,6 +250,32 @@ export const useRegisterRestaurantStore = create<RegisterRestaurantState>(
 				const newRestaurant = {
 					...state.registerRestaurant,
 					tags,
+				};
+				return {
+					registerRestaurant: newRestaurant,
+					validation: validateRestaurant(newRestaurant),
+				};
+			});
+		},
+
+		setRegisterRestaurantPhone: (phone: string) => {
+			set((state) => {
+				const newRestaurant = {
+					...state.registerRestaurant,
+					phone,
+				};
+				return {
+					registerRestaurant: newRestaurant,
+					validation: validateRestaurant(newRestaurant),
+				};
+			});
+		},
+
+		setRegisterRestaurantReservationLink: (reservationLink: string) => {
+			set((state) => {
+				const newRestaurant = {
+					...state.registerRestaurant,
+					reservationLink,
 				};
 				return {
 					registerRestaurant: newRestaurant,

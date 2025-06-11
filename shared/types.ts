@@ -29,6 +29,8 @@ export type Restaurant = {
 	address: Address;
 	tags?: RestaurantTag[];
 	menus: MenuData[];
+	phone?: string;
+	reservationLink?: string;
 };
 
 export type Cuisine = {

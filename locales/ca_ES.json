@@ -64,9 +64,18 @@
 		"mapPlaceholder": "Mapa del restaurant",
 		"cancelOpenMap": "Cancel·lar",
 		"noMenuAvailable": "No hi ha menú disponible",
-		"noRating": "Sense valoracions"
+		"noRating": "Sense valoracions",
+		"callRestaurant": "Trucar al restaurant",
+		"makeReservation": "Fer reserva"
 	},
 	"registerRestaurant": {
+		"phone": "Telèfon",
+		"phoneSubtitle": "Número de telèfon del restaurant",
+		"phonePlaceholder": "ex: +34 123 456 789",
+		"reservationLink": "Enllaç de reserves",
+		"reservationLinkSubtitle": "Enllaç per fer reserves online",
+		"reservationLinkPlaceholder": "ex: https://reserves.elmeureserturant.com",
+		"contactInfo": "Informació de contacte",
 		"hasMenu": "Tens un restaurant amb ",
 		"questionMenu": "menú?",
 		"restaurantName": "Com es diu?",

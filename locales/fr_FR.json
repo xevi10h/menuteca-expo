@@ -64,9 +64,18 @@
 		"mapPlaceholder": "Carte du restaurant",
 		"cancelOpenMap": "Annuler",
 		"noMenuAvailable": "Aucun menu disponible",
-		"noRating": "Aucune évaluation"
+		"noRating": "Aucune évaluation",
+		"callRestaurant": "Appeler le restaurant",
+		"makeReservation": "Faire une réservation"
 	},
 	"registerRestaurant": {
+		"phone": "Téléphone",
+		"phoneSubtitle": "Numéro de téléphone du restaurant",
+		"phonePlaceholder": "ex: +34 123 456 789",
+		"reservationLink": "Lien de réservation",
+		"reservationLinkSubtitle": "Lien pour faire des réservations en ligne",
+		"reservationLinkPlaceholder": "ex: https://reservations.monrestaurant.com",
+		"contactInfo": "Informations de contact",
 		"hasMenu": "Avez-vous un restaurant avec ",
 		"questionMenu": "menu?",
 		"restaurantName": "Comment s'appelle-t-il?",
