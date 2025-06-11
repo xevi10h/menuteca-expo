@@ -9,7 +9,6 @@ import {
 	Dimensions,
 	Image,
 	ImageBackground,
-	ScrollView,
 	StyleSheet,
 	Text,
 	TouchableOpacity,
@@ -211,31 +210,35 @@ export default function PreviewTab() {
 					<Animated.View style={[styles.tabIndicator, tabIndicatorStyle]} />
 				</View>
 
-				{/* Content Container with individual ScrollViews */}
-				<View style={styles.contentContainer}>
-					{/* Information Tab Content */}
-					{activeTab === 'information' && (
-						<ScrollView
-							style={styles.tabScrollView}
-							showsVerticalScrollIndicator={false}
-							contentContainerStyle={styles.scrollContent}
-						>
-							{informationComponent}
-							<View style={{ height: 100 }} />
-						</ScrollView>
-					)}
+				{/* Animated Content Container */}
+				<View style={styles.animatedContentContainer}>
+					<Animated.View style={[styles.slidingContent, contentAnimatedStyle]}>
+						{/* Information Tab Content with its own ScrollView */}
+						<View style={styles.tabContent}>
+							<Animated.ScrollView
+								style={styles.tabScrollView}
+								showsVerticalScrollIndicator={false}
+								contentContainerStyle={styles.scrollContent}
+								scrollEnabled={activeTab === 'information'}
+							>
+								{informationComponent}
+								<View style={{ height: 100 }} />
+							</Animated.ScrollView>
+						</View>
 
-					{/* Menu Tab Content */}
-					{activeTab === 'menu' && (
-						<ScrollView
-							style={styles.tabScrollView}
-							showsVerticalScrollIndicator={false}
-							contentContainerStyle={styles.scrollContent}
-						>
-							{menuComponent}
-							<View style={{ height: 100 }} />
-						</ScrollView>
-					)}
+						{/* Menu Tab Content with its own ScrollView */}
+						<View style={styles.tabContent}>
+							<Animated.ScrollView
+								style={styles.tabScrollView}
+								showsVerticalScrollIndicator={false}
+								contentContainerStyle={styles.scrollContent}
+								scrollEnabled={activeTab === 'menu'}
+							>
+								{menuComponent}
+								<View style={{ height: 100 }} />
+							</Animated.ScrollView>
+						</View>
+					</Animated.View>
 				</View>
 			</ImageBackground>
 		</View>
@@ -294,7 +297,17 @@ const styles = StyleSheet.create({
 	activeTabText: {
 		color: colors.primary,
 	},
-	contentContainer: {
+	animatedContentContainer: {
+		flex: 1,
+		overflow: 'hidden',
+	},
+	slidingContent: {
+		flexDirection: 'row',
+		width: screenWidth * 2,
+		height: '100%',
+	},
+	tabContent: {
+		width: screenWidth,
 		flex: 1,
 	},
 	tabScrollView: {

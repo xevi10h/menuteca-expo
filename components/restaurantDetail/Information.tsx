@@ -45,20 +45,6 @@ const Information: React.FC<InformationProps> = ({
 
 	return (
 		<>
-			{/* Tags */}
-			{restaurant.tags && restaurant.tags.length > 0 && (
-				<View style={styles.tagsContainer}>
-					{restaurant.tags.map((tag) => {
-						return (
-							<View key={tag} style={styles.tag}>
-								{renderTagIcon(tag, colors.quaternary, 14)}
-								<Text style={styles.tagText}>{t(`restaurantTags.${tag}`)}</Text>
-							</View>
-						);
-					})}
-				</View>
-			)}
-
 			{/* Contact Information */}
 			{(restaurant.phone || restaurant.reservationLink) && (
 				<View style={styles.contactContainer}>
@@ -67,7 +53,7 @@ const Information: React.FC<InformationProps> = ({
 							style={styles.contactButton}
 							onPress={() => handleCallRestaurant(restaurant.phone!)}
 						>
-							<Ionicons name="call" size={20} color={colors.quaternary} />
+							<Ionicons name="call" size={14} color={colors.quaternary} />
 							<Text style={styles.contactText}>
 								{t('restaurant.callRestaurant')}
 							</Text>
@@ -79,12 +65,26 @@ const Information: React.FC<InformationProps> = ({
 							style={styles.contactButton}
 							onPress={() => handleMakeReservation(restaurant.reservationLink!)}
 						>
-							<Ionicons name="calendar" size={20} color={colors.quaternary} />
+							<Ionicons name="calendar" size={14} color={colors.quaternary} />
 							<Text style={styles.contactText}>
 								{t('restaurant.makeReservation')}
 							</Text>
 						</TouchableOpacity>
 					)}
+				</View>
+			)}
+
+			{/* Tags */}
+			{restaurant.tags && restaurant.tags.length > 0 && (
+				<View style={styles.tagsContainer}>
+					{restaurant.tags.map((tag) => {
+						return (
+							<View key={tag} style={styles.tag}>
+								{renderTagIcon(tag, colors.quaternary, 14)}
+								<Text style={styles.tagText}>{t(`restaurantTags.${tag}`)}</Text>
+							</View>
+						);
+					})}
 				</View>
 			)}
 
@@ -205,16 +205,15 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		backgroundColor: colors.primary,
-		paddingHorizontal: 16,
+		paddingHorizontal: 20,
 		paddingVertical: 12,
 		borderRadius: 25,
 		gap: 8,
 		flex: 1,
-		minWidth: '45%',
 		justifyContent: 'center',
 	},
 	contactText: {
-		fontSize: 14,
+		fontSize: 12,
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.quaternary,
