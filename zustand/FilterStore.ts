@@ -1,3 +1,4 @@
+// zustand/FilterStore.ts (Updated)
 import { RestaurantTag } from '@/shared/enums';
 import { create } from 'zustand';
 
@@ -52,6 +53,7 @@ interface FilterState {
 	setTimeRange: (timeRange: { start: string; end: string } | null) => void;
 	setDistance: (distance: number | null) => void;
 	resetAllFilters: () => void;
+	resetRemovableFilters: () => void;
 }
 
 export const useFilterStore = create<FilterState>((set) => ({
@@ -85,5 +87,19 @@ export const useFilterStore = create<FilterState>((set) => ({
 	},
 	resetAllFilters: () => {
 		set({ main: defaultFilter });
+	},
+	// Reset only removable filters (keeps sort and cuisines)
+	resetRemovableFilters: () => {
+		set((state) => ({
+			main: {
+				...state.main,
+				textSearch: '',
+				priceRange: { min: 0, max: 1000 },
+				ratingRange: { min: 0, max: 5 },
+				tags: null,
+				timeRange: null,
+				distance: null,
+			},
+		}));
 	},
 }));

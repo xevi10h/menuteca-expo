@@ -96,9 +96,9 @@ export default function RestaurantDetail() {
 
 	const openMapNavigation = async () => {
 		const result = await getApps({
-			latitude: restaurant.address.coordinates.latitude!,
-			longitude: restaurant.address.coordinates.longitude!,
-			title: restaurant.name,
+			latitude: restaurant?.address.coordinates.latitude!,
+			longitude: restaurant?.address.coordinates.longitude!,
+			title: restaurant?.name,
 			googleForceLatLon: false,
 			alwaysIncludeGoogle: true,
 			appsWhiteList: ['google-maps', 'apple-maps', 'waze'],

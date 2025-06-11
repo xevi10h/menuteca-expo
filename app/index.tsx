@@ -1,7 +1,7 @@
+// app/index.tsx (Updated)
 import { allRestaurants } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import CenterLocationMapButton from '@/components/CenterLocationMapButton';
-import CuisineHorizontalScroll from '@/components/CuisineHorizontalScroll';
 import ExpandableMapRestaurantModal from '@/components/ExpandableMapRestaurantModal';
 import ListFilter from '@/components/ListFilter';
 import MainSearcher from '@/components/MainSearcher';
@@ -9,8 +9,11 @@ import ProfilePhotoButton from '@/components/ProfileButton';
 import ViewButton from '@/components/ViewButton';
 import MapView from '@/components/crossPlatformMap/MapView';
 import Marker from '@/components/crossPlatformMap/Marker';
+import CuisineFilter from '@/components/filters/CuisineFilter';
+import RestaurantList from '@/components/list/RestaurantList';
 import ScrollHorizontalResturant from '@/components/list/ScrollHorizontalResturant';
 import { Restaurant } from '@/shared/types';
+import { useFilterStore } from '@/zustand/FilterStore';
 import * as Location from 'expo-location';
 import { useRef, useState } from 'react';
 import { Image, Platform, ScrollView, Text, View } from 'react-native';
@@ -25,6 +28,19 @@ export default function Index() {
 		useState<Restaurant | null>(null);
 	const [modalVisible, setModalVisible] = useState(false);
 	const mapViewRef = useRef<MapViewType>(null);
+
+	// Get filter state to determine view mode
+	const filters = useFilterStore((state) => state.main);
+
+	// Check if any non-persistent filters are active (excludes sort and cuisines)
+	const hasActiveFilters =
+		filters.textSearch.trim() !== '' ||
+		filters.priceRange.min > 0 ||
+		filters.priceRange.max < 1000 ||
+		filters.ratingRange.min > 0 ||
+		(filters.tags && filters.tags.length > 0) ||
+		filters.timeRange !== null ||
+		filters.distance !== null;
 
 	const handleMarkerPress = async (restaurant: Restaurant) => {
 		await centerCoordinatesMarker(restaurant);
@@ -100,6 +116,7 @@ export default function Index() {
 				zIndex: -1,
 			}}
 		>
+			{/* Header */}
 			<View
 				style={{
 					width: '100%',
@@ -139,107 +156,128 @@ export default function Index() {
 				</View>
 			</View>
 
-			<CuisineHorizontalScroll />
+			{/* Cuisine Filter */}
+			<CuisineFilter />
+
+			{/* List Filter */}
 			<ListFilter />
 
-			<ScrollView
-				showsVerticalScrollIndicator={false}
-				style={{ marginTop: 10, display: view === 'list' ? 'flex' : 'none' }}
-			>
-				<ScrollHorizontalResturant title="bestRating" sortBy="rating" />
-				<ScrollHorizontalResturant title="mostPopular" sortBy="popular" />
-				<ScrollHorizontalResturant title="newest" sortBy="createdAt" />
-				<ScrollHorizontalResturant title="closest" sortBy="distance" />
-				<ScrollHorizontalResturant title="recommended" sortBy="recommended" />
-				<ScrollHorizontalResturant title="alreadyTried" sortBy="alreadyTried" />
-				<View style={{ height: 100 }} />
-			</ScrollView>
-
-			<View
-				style={{
-					position: 'absolute',
-					top: 0,
-					left: 0,
-					right: 0,
-					bottom: 0,
-					zIndex: -2,
-					display: view === 'map' ? 'flex' : 'none',
-				}}
-			>
-				<MapView
-					provider={Platform.OS !== 'ios' ? 'google' : undefined}
-					ref={mapViewRef}
+			{/* Content Area */}
+			{view === 'list' ? (
+				hasActiveFilters ? (
+					// Show filtered list when filters are active
+					<RestaurantList />
+				) : (
+					// Show original horizontal scrolls when no filters are active
+					<ScrollView
+						showsVerticalScrollIndicator={false}
+						style={{ marginTop: 10 }}
+					>
+						<ScrollHorizontalResturant title="bestRating" sortBy="rating" />
+						<ScrollHorizontalResturant title="mostPopular" sortBy="popular" />
+						<ScrollHorizontalResturant title="newest" sortBy="createdAt" />
+						<ScrollHorizontalResturant title="closest" sortBy="distance" />
+						<ScrollHorizontalResturant
+							title="recommended"
+							sortBy="recommended"
+						/>
+						<ScrollHorizontalResturant
+							title="alreadyTried"
+							sortBy="alreadyTried"
+						/>
+						<View style={{ height: 100 }} />
+					</ScrollView>
+				)
+			) : (
+				// Map view
+				<View
 					style={{
-						flex: 1,
-					}}
-					showsUserLocation
-					showsMyLocationButton={false}
-					showsCompass={false}
-					showsBuildings={false}
-					showsIndoors={false}
-					showsScale={false}
-					showsTraffic={false}
-					showsIndoorLevelPicker={false}
-					initialRegion={{
-						latitude: 41.3851,
-						longitude: 2.1734,
-						latitudeDelta: 0.0922,
-						longitudeDelta: 0.0421,
+						position: 'absolute',
+						top: 0,
+						left: 0,
+						right: 0,
+						bottom: 0,
+						zIndex: -2,
 					}}
 				>
-					{allRestaurants.map((restaurant) => (
-						<Marker
-							key={restaurant.id}
-							coordinate={{
-								latitude: restaurant.address.coordinates.latitude,
-								longitude: restaurant.address.coordinates.longitude,
-							}}
-							onPress={async () => handleMarkerPress(restaurant)}
-						>
-							{restaurant.profileImage ? (
-								<Image
-									src={restaurant.profileImage}
-									style={{ width: 40, height: 40, borderRadius: 20 }}
-									resizeMode="cover"
-								/>
-							) : (
-								<View
-									style={{
-										width: 40,
-										height: 40,
-										borderRadius: 20,
-										backgroundColor: colors.primary,
-										justifyContent: 'center',
-										alignItems: 'center',
-									}}
-								>
-									<Text
+					<MapView
+						provider={Platform.OS !== 'ios' ? 'google' : undefined}
+						ref={mapViewRef}
+						style={{
+							flex: 1,
+						}}
+						showsUserLocation
+						showsMyLocationButton={false}
+						showsCompass={false}
+						showsBuildings={false}
+						showsIndoors={false}
+						showsScale={false}
+						showsTraffic={false}
+						showsIndoorLevelPicker={false}
+						initialRegion={{
+							latitude: 41.3851,
+							longitude: 2.1734,
+							latitudeDelta: 0.0922,
+							longitudeDelta: 0.0421,
+						}}
+					>
+						{allRestaurants.map((restaurant) => (
+							<Marker
+								key={restaurant.id}
+								coordinate={{
+									latitude: restaurant.address.coordinates.latitude,
+									longitude: restaurant.address.coordinates.longitude,
+								}}
+								onPress={async () => handleMarkerPress(restaurant)}
+							>
+								{restaurant.profileImage ? (
+									<Image
+										src={restaurant.profileImage}
+										style={{ width: 40, height: 40, borderRadius: 20 }}
+										resizeMode="cover"
+									/>
+								) : (
+									<View
 										style={{
-											color: colors.quaternary,
-											fontSize: 18,
-											fontFamily: 'Manrope',
-											fontWeight: '700',
+											width: 40,
+											height: 40,
+											borderRadius: 20,
+											backgroundColor: colors.primary,
+											justifyContent: 'center',
+											alignItems: 'center',
 										}}
 									>
-										{restaurant.name
-											.split(' ')
-											.map((word) => word[0])
-											.join('')
-											.slice(0, 2)}
-									</Text>
-								</View>
-							)}
-						</Marker>
-					))}
-				</MapView>
-			</View>
+										<Text
+											style={{
+												color: colors.quaternary,
+												fontSize: 18,
+												fontFamily: 'Manrope',
+												fontWeight: '700',
+											}}
+										>
+											{restaurant.name
+												.split(' ')
+												.map((word) => word[0])
+												.join('')
+												.slice(0, 2)}
+										</Text>
+									</View>
+								)}
+							</Marker>
+						))}
+					</MapView>
+				</View>
+			)}
 
+			{/* Map Controls */}
 			{view === 'map' && (
 				<CenterLocationMapButton
 					onPress={async () => await centerCoordinatesButtonAction()}
 					additionalBottom={140}
 				/>
 			)}
+
+			{/* View Toggle Buttons */}
 			<ViewButton
 				onPress={() => setView('list')}
 				iconName="menu-outline"

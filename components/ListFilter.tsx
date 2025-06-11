@@ -1,3 +1,4 @@
+// components/ListFilter.tsx (Complete Updated Version)
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { RestaurantTag } from '@/shared/enums';
@@ -16,6 +17,8 @@ import {
 	View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import FilterButton from './filters/FilterButton';
+import SortButton from './filters/SortButton';
 
 // Type for filter modal
 type FilterModalType =
@@ -24,7 +27,6 @@ type FilterModalType =
 	| 'tags'
 	| 'schedule'
 	| 'distance'
-	| 'sort'
 	| null;
 
 // Component for individual tag selection
@@ -69,9 +71,7 @@ export default function ListFilter() {
 		setTags,
 		setTimeRange,
 		setDistance,
-		setOrderBy,
-		setOrderDirection,
-		resetAllFilters,
+		resetRemovableFilters,
 	} = useFilterStore();
 
 	// Local state for modals
@@ -87,23 +87,21 @@ export default function ListFilter() {
 	const [startTime, setStartTime] = useState(new Date());
 	const [endTime, setEndTime] = useState(new Date());
 
-	// Check if specific filter types are active
+	// Check if specific filter types are active (excluding sort and cuisines)
 	const hasPriceFilter =
 		filters.priceRange.min > 0 || filters.priceRange.max < 1000;
 	const hasRatingFilter = filters.ratingRange.min > 0;
 	const hasTagsFilter = filters.tags && filters.tags.length > 0;
 	const hasScheduleFilter = filters.timeRange !== null;
 	const hasDistanceFilter = filters.distance !== null;
-	const hasSortFilter = filters.orderBy !== 'recommended';
 
-	// Check if any filters are active
+	// Check if any non-persistent filters are active (excludes sort and cuisines)
 	const hasActiveFilters =
 		hasPriceFilter ||
 		hasRatingFilter ||
 		hasTagsFilter ||
 		hasScheduleFilter ||
-		hasDistanceFilter ||
-		hasSortFilter;
+		hasDistanceFilter;
 
 	// Helper function to create time from string
 	const createTimeFromString = (timeString: string) => {
@@ -126,22 +124,6 @@ export default function ListFilter() {
 	const formatTime = (time: string) => {
 		if (!time) return '';
 		return time.length === 5 ? time : time + ':00';
-	};
-
-	// Get sort display text
-	const getSortDisplayText = () => {
-		if (filters.orderBy === 'recommended') return null;
-
-		switch (filters.orderBy) {
-			case 'price':
-				return filters.orderDirection === 'asc'
-					? t('filters.priceLowToHigh')
-					: t('filters.priceHighToLow');
-			case 'distance':
-				return t('filters.closest');
-			default:
-				return t('filters.recommended');
-		}
 	};
 
 	// Modal handlers
@@ -207,15 +189,6 @@ export default function ListFilter() {
 		closeModal();
 	};
 
-	const applySortFilter = (
-		orderBy: 'recommended' | 'price' | 'distance',
-		direction: 'asc' | 'desc',
-	) => {
-		setOrderBy(orderBy);
-		setOrderDirection(direction);
-		closeModal();
-	};
-
 	// Time picker handlers
 	const handleStartTimeChange = (event: any, selectedDate?: Date) => {
 		if (Platform.OS === 'android') {
@@ -250,7 +223,7 @@ export default function ListFilter() {
 		);
 	};
 
-	// Render active filters
+	// Render active filters (excluding sort and cuisines)
 	const renderActiveFilters = () => {
 		const activeFilters = [];
 
@@ -358,106 +331,65 @@ export default function ListFilter() {
 			);
 		}
 
-		// Sort filter
-		const sortText = getSortDisplayText();
-		if (sortText) {
-			activeFilters.push(
-				<TouchableOpacity
-					key="sort"
-					style={styles.activeFilterPill}
-					onPress={() => openModal('sort')}
-				>
-					<Text style={styles.activeFilterText}>{sortText}</Text>
-					<TouchableOpacity
-						onPress={() => {
-							setOrderBy('recommended');
-							setOrderDirection('desc');
-						}}
-						style={styles.removeFilterButton}
-					>
-						<Ionicons name="close" size={12} color={colors.quaternary} />
-					</TouchableOpacity>
-				</TouchableOpacity>,
-			);
-		}
-
 		return activeFilters;
 	};
 
-	// Render default filter pills (only show if not already applied)
+	// Render default filter options (only show if not already applied)
 	const renderDefaultFilters = () => {
 		const availableFilters = [];
 
 		if (!hasPriceFilter) {
 			availableFilters.push(
-				<TouchableOpacity
+				<FilterButton
 					key="price"
-					style={styles.pill}
+					label={t('filters.price')}
+					iconName="pricetag-outline"
 					onPress={() => openModal('price')}
-				>
-					<Text style={styles.pillText}>{t('filters.price')}</Text>
-				</TouchableOpacity>,
+				/>,
 			);
 		}
 
 		if (!hasRatingFilter) {
 			availableFilters.push(
-				<TouchableOpacity
+				<FilterButton
 					key="rating"
-					style={styles.pill}
+					label={t('filters.rating')}
+					iconName="star-outline"
 					onPress={() => openModal('rating')}
-				>
-					<Text style={styles.pillText}>{t('filters.rating')}</Text>
-				</TouchableOpacity>,
+				/>,
 			);
 		}
 
 		if (!hasTagsFilter) {
 			availableFilters.push(
-				<TouchableOpacity
+				<FilterButton
 					key="tags"
-					style={styles.pill}
+					label={t('filters.categories')}
+					iconName="grid-outline"
 					onPress={() => openModal('tags')}
-				>
-					<Text style={styles.pillText}>{t('filters.categories')}</Text>
-				</TouchableOpacity>,
+				/>,
 			);
 		}
 
 		if (!hasScheduleFilter) {
 			availableFilters.push(
-				<TouchableOpacity
+				<FilterButton
 					key="schedule"
-					style={styles.pill}
+					label={t('filters.schedule')}
+					iconName="time-outline"
 					onPress={() => openModal('schedule')}
-				>
-					<Text style={styles.pillText}>{t('filters.schedule')}</Text>
-				</TouchableOpacity>,
+				/>,
 			);
 		}
 
 		if (!hasDistanceFilter) {
 			availableFilters.push(
-				<TouchableOpacity
+				<FilterButton
 					key="distance"
-					style={styles.pill}
+					label={t('filters.distance')}
+					iconName="location-outline"
 					onPress={() => openModal('distance')}
-				>
-					<Text style={styles.pillText}>{t('filters.distance')}</Text>
-				</TouchableOpacity>,
-			);
-		}
-
-		// Sort always available (but not show if already applied)
-		if (!hasSortFilter) {
-			availableFilters.push(
-				<TouchableOpacity
-					key="sort"
-					style={styles.pill}
-					onPress={() => openModal('sort')}
-				>
-					<Text style={styles.pillText}>{t('filters.sortBy')}</Text>
-				</TouchableOpacity>,
+				/>,
 			);
 		}
 
@@ -471,11 +403,14 @@ export default function ListFilter() {
 				showsHorizontalScrollIndicator={false}
 				contentContainerStyle={styles.scrollContent}
 			>
-				{/* Clear all filters button (only show if filters are active) */}
+				{/* Sort Button - Always first and always visible */}
+				<SortButton />
+
+				{/* Clear all filters button (only show if removable filters are active) */}
 				{hasActiveFilters && (
 					<TouchableOpacity
 						style={styles.clearAllButton}
-						onPress={resetAllFilters}
+						onPress={resetRemovableFilters}
 					>
 						<Ionicons name="close-circle" size={16} color={colors.primary} />
 						<Text style={styles.clearAllText}>{t('filters.clearAll')}</Text>
@@ -786,107 +721,6 @@ export default function ListFilter() {
 					</View>
 				</View>
 			</Modal>
-
-			{/* Sort Filter Modal */}
-			<Modal visible={activeModal === 'sort'} transparent animationType="slide">
-				<View style={styles.modalOverlay}>
-					<View style={[styles.modalContent, { paddingBottom: bottom + 20 }]}>
-						<Text style={styles.modalTitle}>{t('filters.sortBy')}</Text>
-
-						<View style={styles.sortOptions}>
-							<TouchableOpacity
-								style={[
-									styles.sortOption,
-									filters.orderBy === 'price' &&
-										filters.orderDirection === 'asc' &&
-										styles.sortOptionSelected,
-								]}
-								onPress={() => applySortFilter('price', 'asc')}
-							>
-								<Text
-									style={[
-										styles.sortOptionText,
-										filters.orderBy === 'price' &&
-											filters.orderDirection === 'asc' &&
-											styles.sortOptionTextSelected,
-									]}
-								>
-									{t('filters.priceLowToHigh')}
-								</Text>
-							</TouchableOpacity>
-
-							<TouchableOpacity
-								style={[
-									styles.sortOption,
-									filters.orderBy === 'price' &&
-										filters.orderDirection === 'desc' &&
-										styles.sortOptionSelected,
-								]}
-								onPress={() => applySortFilter('price', 'desc')}
-							>
-								<Text
-									style={[
-										styles.sortOptionText,
-										filters.orderBy === 'price' &&
-											filters.orderDirection === 'desc' &&
-											styles.sortOptionTextSelected,
-									]}
-								>
-									{t('filters.priceHighToLow')}
-								</Text>
-							</TouchableOpacity>
-
-							<TouchableOpacity
-								style={[
-									styles.sortOption,
-									filters.orderBy === 'distance' && styles.sortOptionSelected,
-								]}
-								onPress={() => applySortFilter('distance', 'asc')}
-							>
-								<Text
-									style={[
-										styles.sortOptionText,
-										filters.orderBy === 'distance' &&
-											styles.sortOptionTextSelected,
-									]}
-								>
-									{t('filters.closest')}
-								</Text>
-							</TouchableOpacity>
-
-							<TouchableOpacity
-								style={[
-									styles.sortOption,
-									filters.orderBy === 'recommended' &&
-										styles.sortOptionSelected,
-								]}
-								onPress={() => applySortFilter('recommended', 'desc')}
-							>
-								<Text
-									style={[
-										styles.sortOptionText,
-										filters.orderBy === 'recommended' &&
-											styles.sortOptionTextSelected,
-									]}
-								>
-									{t('filters.recommended')}
-								</Text>
-							</TouchableOpacity>
-						</View>
-
-						<View style={styles.modalButtons}>
-							<TouchableOpacity
-								style={styles.cancelButton}
-								onPress={closeModal}
-							>
-								<Text style={styles.cancelButtonText}>
-									{t('general.cancel')}
-								</Text>
-							</TouchableOpacity>
-						</View>
-					</View>
-				</View>
-			</Modal>
 		</View>
 	);
 }
@@ -902,17 +736,19 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 10,
 		gap: 8,
 	},
-	pill: {
-		backgroundColor: colors.primary,
-		opacity: 0.5,
+	clearAllButton: {
+		backgroundColor: colors.quaternary,
 		borderRadius: 12,
-		paddingHorizontal: 16,
+		paddingHorizontal: 12,
 		paddingVertical: 8,
+		flexDirection: 'row',
 		alignItems: 'center',
-		justifyContent: 'center',
+		gap: 4,
+		borderWidth: 1,
+		borderColor: colors.primary,
 	},
-	pillText: {
-		color: colors.quaternary,
+	clearAllText: {
+		color: colors.primary,
 		fontSize: 12,
 		fontFamily: 'Manrope',
 		fontWeight: '500',
@@ -939,23 +775,6 @@ const styles = StyleSheet.create({
 		backgroundColor: 'rgba(255,255,255,0.3)',
 		alignItems: 'center',
 		justifyContent: 'center',
-	},
-	clearAllButton: {
-		backgroundColor: colors.quaternary,
-		borderRadius: 12,
-		paddingHorizontal: 12,
-		paddingVertical: 8,
-		flexDirection: 'row',
-		alignItems: 'center',
-		gap: 4,
-		borderWidth: 1,
-		borderColor: colors.primary,
-	},
-	clearAllText: {
-		color: colors.primary,
-		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
 	},
 	modalOverlay: {
 		flex: 1,
@@ -1167,31 +986,6 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '500',
 		color: colors.primary,
-	},
-	sortOptions: {
-		gap: 12,
-		marginBottom: 20,
-	},
-	sortOption: {
-		padding: 16,
-		backgroundColor: colors.secondary,
-		borderRadius: 8,
-		borderWidth: 1,
-		borderColor: colors.primaryLight,
-	},
-	sortOptionSelected: {
-		backgroundColor: colors.primary,
-		borderColor: colors.primary,
-	},
-	sortOptionText: {
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
-		color: colors.primary,
-		textAlign: 'center',
-	},
-	sortOptionTextSelected: {
-		color: colors.quaternary,
 	},
 	modalButtons: {
 		flexDirection: 'row',
