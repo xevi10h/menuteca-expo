@@ -5,7 +5,23 @@
 	"filters": {
 		"price": "Preu",
 		"rating": "Valoració",
-		"sortBy": "Ordenar per"
+		"sortBy": "Ordena per",
+		"categories": "Categories",
+		"schedule": "Horari",
+		"distance": "Distància",
+		"clearAll": "Neteja-ho tot",
+		"apply": "Aplica",
+		"priceRange": "Rang de preu",
+		"from": "Des de",
+		"to": "Fins a",
+		"minimumRating": "Valoració mínima",
+		"orMore": "o més",
+		"categoriesSubtitle": "Selecciona una o més categories",
+		"maxDistance": "Distància màxima",
+		"priceLowToHigh": "Preu: de menys a més",
+		"priceHighToLow": "Preu: de més a menys",
+		"closest": "Més propers",
+		"recommended": "Recomanats"
 	},
 	"horizontalScroll": {
 		"bestRating": "Amb millor valoració",
@@ -158,7 +174,7 @@
 		"addSecondCourse": "afegir un altre segon",
 		"addDessert": "afegir un altre postre",
 		"addManualMenu": "Afegir manualment",
-		"addPhotoMenu": "Afegir a partir d'una foto",
+		"addPhotoMenu": "Afegir a partir d'una foto (IA)",
 		"uploadMenuPhoto": "Pujar foto del menú",
 		"processingPhoto": "Processant la imatge...",
 		"photoMenuSuccess": "Perfecte! Hem convertit la vostra imatge en menú. Reviseu-lo i modifiqueu-lo si ho considereu oportú.",

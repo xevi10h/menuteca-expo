@@ -1,6 +1,7 @@
-import { allRestaurants } from '@/api/responses';
+import { allRestaurants, getCuisineById } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useUserStore } from '@/zustand/UserStore';
 import { router } from 'expo-router';
 import {
 	Dimensions,
@@ -24,12 +25,11 @@ export default function ScrollHorizontalResturant({
 	sortBy,
 }: ScrollHorizontalResturantProps) {
 	const { t } = useTranslation();
+	const language = useUserStore((state) => state.user.language);
 
 	const handleRestaurantPress = (restaurantId: string) => {
 		router.push(`/restaurant/${restaurantId}`);
 	};
-
-	const cuisineId = allRestaurants[0]?.cuisineId || '';
 
 	return (
 		<View style={styles.container}>
@@ -136,7 +136,13 @@ export default function ScrollHorizontalResturant({
 									fontWeight: '500',
 									color: colors.primary,
 								}}
-							></Text>
+							>
+								{`${
+									restaurant.cuisineId
+										? getCuisineById(restaurant.cuisineId)?.name[language]
+										: ''
+								}`}
+							</Text>
 							<Text
 								style={{
 									fontSize: 10,

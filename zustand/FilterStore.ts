@@ -1,3 +1,4 @@
+import { RestaurantTag } from '@/shared/enums';
 import { create } from 'zustand';
 
 export interface IFilter {
@@ -13,6 +14,12 @@ export interface IFilter {
 		min: number;
 		max: number;
 	};
+	tags: RestaurantTag[] | null;
+	timeRange: {
+		start: string;
+		end: string;
+	} | null;
+	distance: number | null; // Maximum distance in km
 }
 
 export const defaultFilter: IFilter = {
@@ -28,6 +35,9 @@ export const defaultFilter: IFilter = {
 		min: 0,
 		max: 5,
 	},
+	tags: null,
+	timeRange: null,
+	distance: null,
 };
 
 interface FilterState {
@@ -38,6 +48,10 @@ interface FilterState {
 	setOrderDirection: (orderDirection: 'asc' | 'desc') => void;
 	setPriceRange: (priceRange: { min: number; max: number }) => void;
 	setRatingRange: (ratingRange: { min: number; max: number }) => void;
+	setTags: (tags: RestaurantTag[] | null) => void;
+	setTimeRange: (timeRange: { start: string; end: string } | null) => void;
+	setDistance: (distance: number | null) => void;
+	resetAllFilters: () => void;
 }
 
 export const useFilterStore = create<FilterState>((set) => ({
@@ -59,5 +73,17 @@ export const useFilterStore = create<FilterState>((set) => ({
 	},
 	setRatingRange: (ratingRange: { min: number; max: number }) => {
 		set((state) => ({ main: { ...state.main, ratingRange } }));
+	},
+	setTags: (tags: RestaurantTag[] | null) => {
+		set((state) => ({ main: { ...state.main, tags } }));
+	},
+	setTimeRange: (timeRange: { start: string; end: string } | null) => {
+		set((state) => ({ main: { ...state.main, timeRange } }));
+	},
+	setDistance: (distance: number | null) => {
+		set((state) => ({ main: { ...state.main, distance } }));
+	},
+	resetAllFilters: () => {
+		set({ main: defaultFilter });
 	},
 }));

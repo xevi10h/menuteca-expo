@@ -5,7 +5,23 @@
 	"filters": {
 		"price": "Price",
 		"rating": "Rating",
-		"sortBy": "Sort by"
+		"sortBy": "Sort by",
+		"categories": "Categories",
+		"schedule": "Schedule",
+		"distance": "Distance",
+		"clearAll": "Clear all",
+		"apply": "Apply",
+		"priceRange": "Price range",
+		"from": "From",
+		"to": "To",
+		"minimumRating": "Minimum rating",
+		"orMore": "or more",
+		"categoriesSubtitle": "Select one or more categories",
+		"maxDistance": "Max distance",
+		"priceLowToHigh": "Price: low to high",
+		"priceHighToLow": "Price: high to low",
+		"closest": "Closest",
+		"recommended": "Recommended"
 	},
 	"horizontalScroll": {
 		"bestRating": "Best rated",
@@ -158,7 +174,7 @@
 		"addSecondCourse": "add another second course",
 		"addDessert": "add another dessert",
 		"addManualMenu": "Add manually",
-		"addPhotoMenu": "Add from a photo",
+		"addPhotoMenu": "Add from a photo (AI)",
 		"uploadMenuPhoto": "Upload menu photo",
 		"processingPhoto": "Processing image...",
 		"photoMenuSuccess": "Perfect! We have converted your image into a menu. Review it and modify it if you consider it appropriate.",

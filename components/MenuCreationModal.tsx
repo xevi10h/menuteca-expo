@@ -584,7 +584,7 @@ export default function MenuCreationModal({
 							) : (
 								<>
 									<Ionicons
-										name="camera-outline"
+										name="sparkles-outline"
 										size={16}
 										color={colors.quaternary}
 									/>

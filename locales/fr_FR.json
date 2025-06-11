@@ -5,7 +5,23 @@
 	"filters": {
 		"price": "Prix",
 		"rating": "Évaluation",
-		"sortBy": "Trier par"
+		"sortBy": "Trier par",
+		"categories": "Catégories",
+		"schedule": "Horaire",
+		"distance": "Distance",
+		"clearAll": "Tout effacer",
+		"apply": "Appliquer",
+		"priceRange": "Gamme de prix",
+		"from": "De",
+		"to": "À",
+		"minimumRating": "Évaluation minimale",
+		"orMore": "ou plus",
+		"categoriesSubtitle": "Sélectionnez une ou plusieurs catégories",
+		"maxDistance": "Distance maximale",
+		"priceLowToHigh": "Prix: du moins cher au plus cher",
+		"priceHighToLow": "Prix: du plus cher au moins cher",
+		"closest": "Les plus proches",
+		"recommended": "Recommandés"
 	},
 	"horizontalScroll": {
 		"bestRating": "Les mieux notés",
@@ -158,7 +174,7 @@
 		"addSecondCourse": "ajouter une autre plat principal",
 		"addDessert": "ajouter une autre dessert",
 		"addManualMenu": "Ajouter manuellement",
-		"addPhotoMenu": "Ajouter à partir d'une photo",
+		"addPhotoMenu": "Ajouter à partir d'une photo (IA)",
 		"uploadMenuPhoto": "Télécharger la photo du menu",
 		"processingPhoto": "Traitement de l'image...",
 		"photoMenuSuccess": "Parfait! Nous avons converti votre image en menu. Révisez-le et modifiez-le si vous le jugez approprié.",

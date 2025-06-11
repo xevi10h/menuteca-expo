@@ -5,7 +5,23 @@
 	"filters": {
 		"price": "Precio",
 		"rating": "Valoración",
-		"sortBy": "Ordenar por"
+		"sortBy": "Ordenar por",
+		"categories": "Categorías",
+		"schedule": "Horario",
+		"distance": "Distancia",
+		"clearAll": "Limpiar todo",
+		"apply": "Aplicar",
+		"priceRange": "Rango de precio",
+		"from": "Desde",
+		"to": "Hasta",
+		"minimumRating": "Valoración mínima",
+		"orMore": "o más",
+		"categoriesSubtitle": "Selecciona una o más categorías",
+		"maxDistance": "Distancia máxima",
+		"priceLowToHigh": "Precio: menor a mayor",
+		"priceHighToLow": "Precio: mayor a menor",
+		"closest": "Más cercanos",
+		"recommended": "Recomendados"
 	},
 	"horizontalScroll": {
 		"bestRating": "Mejor valorados",
@@ -158,7 +174,7 @@
 		"addSecondCourse": "añadir otro segundo",
 		"addDessert": "añadir otro postre",
 		"addManualMenu": "Añadir manualmente",
-		"addPhotoMenu": "Añadir a partir de una foto",
+		"addPhotoMenu": "Añadir a partir de una foto (IA)",
 		"uploadMenuPhoto": "Subir foto del menú",
 		"processingPhoto": "Procesando la imagen...",
 		"photoMenuSuccess": "¡Perfecto! Hemos convertido tu imagen en menú. Revísalo y modifícalo si lo consideras oportuno.",
