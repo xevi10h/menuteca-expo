@@ -23,16 +23,7 @@ export default function AddressSection({
 		address?.formattedAddress || t('registerRestaurant.noAddressSelected');
 
 	return (
-		<View style={styles.addressSection}>
-			<View style={styles.sectionHeader}>
-				<Text style={styles.sectionTitle}>
-					{t('registerRestaurant.address')}
-				</Text>
-				<TouchableOpacity style={styles.editButton} onPress={onEditPress}>
-					<Ionicons name="pencil-outline" size={16} color={colors.primary} />
-				</TouchableOpacity>
-			</View>
-
+		<View>
 			{address &&
 			address.coordinates.latitude &&
 			address.coordinates.longitude ? (
@@ -80,9 +71,6 @@ export default function AddressSection({
 }
 
 const styles = StyleSheet.create({
-	addressSection: {
-		paddingVertical: 20,
-	},
 	sectionHeader: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',

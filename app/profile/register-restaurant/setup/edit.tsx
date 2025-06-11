@@ -1,5 +1,3 @@
-// app/profile/register-restaurant/setup/edit.tsx - Updated
-
 import { colors } from '@/assets/styles/colors';
 import MenuCreationModal from '@/components/MenuCreationModal';
 import AddressEditModal from '@/components/restaurantCreation/AddressEditModal';
@@ -163,12 +161,28 @@ export default function EditTab() {
 					onImageSelected={setRegisterRestaurantProfileImage}
 				/>
 
-				{/* Address Section - UPDATED */}
-				<AddressSection
-					address={registerRestaurant.address}
-					restaurantName={registerRestaurant.name}
-					onEditPress={() => setShowAddressModal(true)}
-				/>
+				<View style={styles.sectionContainer}>
+					<View style={styles.sectionHeaderWithEdit}>
+						<RequiredFieldLabel required={true}>
+							{t('registerRestaurant.address')}
+						</RequiredFieldLabel>
+						<TouchableOpacity
+							style={styles.editButton}
+							onPress={() => setShowAddressModal(true)}
+						>
+							<Ionicons
+								name="pencil-outline"
+								size={16}
+								color={colors.primary}
+							/>
+						</TouchableOpacity>
+					</View>
+					<AddressSection
+						address={registerRestaurant.address}
+						restaurantName={registerRestaurant.name}
+						onEditPress={() => setShowAddressModal(true)}
+					/>
+				</View>
 
 				{/* Menus Section */}
 				<View style={styles.sectionContainer}>
@@ -328,7 +342,6 @@ export default function EditTab() {
 				</View>
 			</Modal>
 
-			{/* Address Edit Modal - UPDATED */}
 			<AddressEditModal
 				visible={showAddressModal}
 				onClose={() => setShowAddressModal(false)}

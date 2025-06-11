@@ -1,5 +1,3 @@
-// components/restaurantDetail/Menu.tsx - Actualizado para mostrar bebidas
-
 import SodaCanIcon from '@/assets/icons/SodaCanIcon';
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -93,7 +91,6 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 		return '';
 	};
 
-	// NUEVA FUNCIÓN: Formatear bebidas incluidas
 	const formatDrinks = (drinks?: DrinkInclusion): string => {
 		if (!drinks || !hasDrinks(drinks)) return '';
 
@@ -116,13 +113,11 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 		return drinkLabels.join(', ');
 	};
 
-	// ACTUALIZADA: Obtener icono para las bebidas - ahora retorna tipo específico para softDrinks
 	const getDrinksIconType = (drinks?: DrinkInclusion): 'ionicon' | 'custom' => {
 		if (!drinks || !hasDrinks(drinks)) return 'ionicon';
 
 		const selectedDrinks = getSelectedDrinks(drinks);
 
-		// Si solo tiene softDrinks, usar ícono personalizado
 		if (selectedDrinks.length === 1 && selectedDrinks[0] === 'softDrinks') {
 			return 'custom';
 		}
@@ -130,8 +125,7 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 		return 'ionicon';
 	};
 
-	// ACTUALIZADA: Obtener nombre del icono de Ionicons
-	const getDrinksIoniconName = (drinks?: DrinkInclusion): string => {
+	const getDrinksIoniconName = (drinks?: DrinkInclusion) => {
 		if (!drinks || !hasDrinks(drinks)) return 'wine-outline';
 
 		const selectedDrinks = getSelectedDrinks(drinks);
@@ -159,16 +153,11 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 		return 'wine-outline';
 	};
 
-	// NUEVA: Función para renderizar el ícono de bebidas
 	const renderDrinksIcon = (drinks?: DrinkInclusion) => {
 		const iconType = getDrinksIconType(drinks);
 
 		if (iconType === 'custom') {
-			return (
-				<View style={styles.iconContainer}>
-					<SodaCanIcon size={12} color={colors.quaternary} />
-				</View>
-			);
+			return <SodaCanIcon size={12} color={colors.quaternary} />;
 		}
 
 		return (
@@ -197,6 +186,17 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 			dishes: dishes,
 		}));
 	};
+
+	const showSchedule =
+		currentMenu.days?.length > 0 ||
+		currentMenu.startTime !== '00:00' ||
+		currentMenu.endTime !== '00:00';
+
+	const showOptions =
+		currentMenu.includesBread ||
+		currentMenu.includesCoffeeAndDessert !== 'none' ||
+		currentMenu.hasMinimumPeople ||
+		hasDrinks(currentMenu.drinks);
 
 	const renderMenuItem = ({ item }: { item: Dish }) => (
 		<View style={styles.menuItem}>
@@ -352,90 +352,100 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 			)}
 
 			{/* Menu Details Section */}
-			<View style={styles.menuDetailsSection}>
-				{/* Schedule and Days */}
-				<View style={styles.scheduleContainer}>
-					{formatDays(currentMenu.days) && (
-						<View style={styles.scheduleItem}>
-							<Ionicons
-								name="calendar-outline"
-								size={16}
-								color={colors.primary}
-							/>
-							<Text style={styles.scheduleText}>
-								{formatDays(currentMenu.days)}
-							</Text>
-						</View>
-					)}
-					{formatSchedule(currentMenu.startTime, currentMenu.endTime) && (
-						<View style={[styles.scheduleItem]}>
-							<Ionicons name="time-outline" size={16} color={colors.primary} />
-							<Text style={styles.scheduleText}>
-								{formatSchedule(currentMenu.startTime, currentMenu.endTime)}
-							</Text>
-						</View>
-					)}
-				</View>
-
-				{/* Menu Includes Section */}
-				<View style={styles.includesContainer}>
-					<Text style={styles.includesTitle}>
-						{t('menuCreation.menuOptions')}
-					</Text>
-					<View style={styles.includesGrid}>
-						{currentMenu.includesBread && (
-							<View style={styles.includeTag}>
-								<Ionicons
-									name="restaurant-outline"
-									size={12}
-									color={colors.quaternary}
-								/>
-								<Text style={styles.includeTagText}>
-									{t('menuCreation.includesBread')}
-								</Text>
-							</View>
-						)}
-
-						{/* ACTUALIZADO: Mostrar bebidas incluidas con ícono personalizado */}
-						{currentMenu.drinks && hasDrinks(currentMenu.drinks) && (
-							<View style={styles.includeTag}>
-								{renderDrinksIcon(currentMenu.drinks)}
-								<Text style={styles.includeTagText}>
-									{formatDrinks(currentMenu.drinks)}
-								</Text>
-							</View>
-						)}
-
-						{/* MANTIENE: Café sigue usando 'cafe-outline' */}
-						{currentMenu.includesCoffeeAndDessert &&
-							currentMenu.includesCoffeeAndDessert !== 'none' && (
-								<View style={styles.includeTag}>
+			{(showSchedule || showOptions) && (
+				<View style={styles.menuDetailsSection}>
+					{/* Schedule and Days */}
+					{showSchedule && (
+						<View style={styles.scheduleContainer}>
+							{formatDays(currentMenu.days) && (
+								<View style={styles.scheduleItem}>
 									<Ionicons
-										name="cafe-outline"
-										size={12}
-										color={colors.quaternary}
+										name="calendar-outline"
+										size={16}
+										color={colors.primary}
 									/>
-									<Text style={styles.includeTagText}>
-										{formatCoffeeDesert(currentMenu.includesCoffeeAndDessert)}
+									<Text style={styles.scheduleText}>
+										{formatDays(currentMenu.days)}
 									</Text>
 								</View>
 							)}
-						{currentMenu.hasMinimumPeople && currentMenu.minimumPeople && (
-							<View style={styles.includeTag}>
-								<Ionicons
-									name="people-outline"
-									size={12}
-									color={colors.quaternary}
-								/>
-								<Text style={styles.includeTagText}>
-									{t('menuCreation.minimumPeopleLabel')}{' '}
-									{currentMenu.minimumPeople}
-								</Text>
+							{formatSchedule(currentMenu.startTime, currentMenu.endTime) && (
+								<View style={[styles.scheduleItem]}>
+									<Ionicons
+										name="time-outline"
+										size={16}
+										color={colors.primary}
+									/>
+									<Text style={styles.scheduleText}>
+										{formatSchedule(currentMenu.startTime, currentMenu.endTime)}
+									</Text>
+								</View>
+							)}
+						</View>
+					)}
+
+					{/* Menu Includes Section */}
+					{showOptions && (
+						<View>
+							<Text style={styles.includesTitle}>
+								{t('menuCreation.menuOptions')}
+							</Text>
+							<View style={styles.includesGrid}>
+								{currentMenu.includesBread && (
+									<View style={styles.includeTag}>
+										<Ionicons
+											name="restaurant-outline"
+											size={12}
+											color={colors.quaternary}
+										/>
+										<Text style={styles.includeTagText}>
+											{t('menuCreation.includesBread')}
+										</Text>
+									</View>
+								)}
+
+								{currentMenu.drinks && hasDrinks(currentMenu.drinks) && (
+									<View style={styles.includeTag}>
+										{renderDrinksIcon(currentMenu.drinks)}
+										<Text style={styles.includeTagText}>
+											{formatDrinks(currentMenu.drinks)}
+										</Text>
+									</View>
+								)}
+
+								{currentMenu.includesCoffeeAndDessert &&
+									currentMenu.includesCoffeeAndDessert !== 'none' && (
+										<View style={styles.includeTag}>
+											<Ionicons
+												name="cafe-outline"
+												size={12}
+												color={colors.quaternary}
+											/>
+											<Text style={styles.includeTagText}>
+												{formatCoffeeDesert(
+													currentMenu.includesCoffeeAndDessert,
+												)}
+											</Text>
+										</View>
+									)}
+								{currentMenu.hasMinimumPeople && currentMenu.minimumPeople && (
+									<View style={styles.includeTag}>
+										<Ionicons
+											name="people-outline"
+											size={12}
+											color={colors.quaternary}
+										/>
+										<Text style={styles.includeTagText}>
+											{t('menuCreation.minimumPeopleLabel')}{' '}
+											{currentMenu.minimumPeople}
+										</Text>
+									</View>
+								)}
 							</View>
-						)}
-					</View>
+						</View>
+					)}
 				</View>
-			</View>
+			)}
 
 			{/* Menu Categories */}
 			<FlatList
@@ -517,7 +527,6 @@ const styles = StyleSheet.create({
 		backgroundColor: colors.primary,
 		width: 16,
 	},
-	// New styles for menu details
 	menuDetailsSection: {
 		backgroundColor: colors.quaternary,
 		borderRadius: 15,
@@ -531,6 +540,7 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.05,
 		shadowRadius: 3.84,
 		elevation: 2,
+		gap: 10,
 	},
 	scheduleContainer: {
 		flexDirection: 'row',
@@ -550,9 +560,6 @@ const styles = StyleSheet.create({
 		fontWeight: '500',
 		color: colors.primary,
 		flex: 1,
-	},
-	includesContainer: {
-		marginTop: 10,
 	},
 	includesTitle: {
 		fontSize: 14,
@@ -580,10 +587,6 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '500',
 		color: colors.quaternary,
-	},
-	iconContainer: {
-		justifyContent: 'center',
-		alignItems: 'center',
 	},
 	menuContent: {
 		paddingBottom: 20,

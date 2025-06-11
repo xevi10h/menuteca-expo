@@ -1,5 +1,3 @@
-// locales/es_ES.json - Traducciones en español actualizadas
-
 {
 	"discover": {
 		"searchMenus": "Busca menús"
@@ -114,16 +112,19 @@
 			"needPhotos": "• Debes añadir al menos una foto",
 			"needMenus": "• Debes crear al menos un menú",
 			"needCuisine": "• Debes seleccionar un tipo de cocina",
+			"needAddress": "• Debes añadir una dirección válida",
 			"tooManyTags": "• Máximo 5 categorías permitidas",
 			"completeRequired": "Completa los campos obligatorios para continuar",
 			"requiredFields": "Campos obligatorios pendientes:",
 			"photos": "Fotos del restaurante",
 			"menus": "Menús",
 			"cuisine": "Tipo de cocina",
+			"address": "Dirección del restaurante",
 			"maxTags": "Máximo 5 categorías",
 			"photosRequired": "Debes añadir al menos una foto del restaurante",
 			"menusRequired": "Debes crear al menos un menú",
 			"cuisineRequired": "Debes seleccionar un tipo de cocina",
+			"addressRequired": "Debes añadir una dirección válida para el restaurante",
 			"tooManyTagsTitle": "Demasiadas categorías",
 			"tooManyTagsMessage": "Solo puedes seleccionar un máximo de {{max}} categorías",
 			"tooManyTagsError": "Has seleccionado demasiadas categorías (máximo 5)"

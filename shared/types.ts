@@ -2,7 +2,6 @@ import { DishCategory, DrinkType, RestaurantTag } from './enums';
 
 export type Language = 'en_US' | 'es_ES' | 'ca_ES' | 'fr_FR';
 
-// New Address interface
 export interface Address {
 	street: string;
 	number: string;
@@ -27,10 +26,9 @@ export type Restaurant = {
 	profileImage?: string;
 	images: string[];
 	distance: number;
-	address: Address; // Updated from string to Address interface
+	address: Address;
 	tags?: RestaurantTag[];
 	menus: MenuData[];
-	// Removed coordinates as they're now part of address
 };
 
 export type Cuisine = {
@@ -84,7 +82,6 @@ export type MenuItem = {
 	isSpicy?: boolean;
 };
 
-// CAMBIO PRINCIPAL: Nueva interfaz para gestionar bebidas
 export interface DrinkInclusion {
 	water: boolean;
 	wine: boolean;

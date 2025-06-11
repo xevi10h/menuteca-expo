@@ -67,6 +67,10 @@ function CustomTabBar({
 		if (validation.errors.hasCuisine) {
 			errors.push(t('registerRestaurant.validation.needCuisine'));
 		}
+		// NUEVA VALIDACIÓN DE DIRECCIÓN
+		if (validation.errors.hasAddress) {
+			errors.push(t('registerRestaurant.validation.needAddress'));
+		}
 		if (validation.errors.tooManyTags) {
 			errors.push(t('registerRestaurant.validation.tooManyTags'));
 		}
@@ -180,6 +184,10 @@ export default function SetupLayout(): React.JSX.Element {
 			}
 			if (validation.errors.hasCuisine) {
 				errors.push(t('registerRestaurant.validation.needCuisine'));
+			}
+			// NUEVA VALIDACIÓN DE DIRECCIÓN EN SAVE
+			if (validation.errors.hasAddress) {
+				errors.push(t('registerRestaurant.validation.needAddress'));
 			}
 			if (validation.errors.tooManyTags) {
 				errors.push(t('registerRestaurant.validation.tooManyTags'));

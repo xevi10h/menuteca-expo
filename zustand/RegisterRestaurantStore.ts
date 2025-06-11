@@ -29,8 +29,8 @@ interface RegisterRestaurantValidation {
 		hasPhotos: boolean;
 		hasMenus: boolean;
 		hasCuisine: boolean;
+		hasAddress: boolean; // AHORA OBLIGATORIO
 		tooManyTags: boolean;
-		hasAddress: boolean;
 	};
 }
 
@@ -54,29 +54,48 @@ interface RegisterRestaurantState {
 const validateRestaurant = (
 	restaurant: Restaurant,
 ): RegisterRestaurantValidation => {
-	const hasPhotos = restaurant.images && restaurant.images.length > 0;
-	const hasMenus = restaurant.menus && restaurant.menus.length > 0;
-	const hasCuisine =
+	// Convertir explícitamente a boolean para evitar errores de tipo
+	const hasPhotos = Boolean(restaurant.images && restaurant.images.length > 0);
+	const hasMenus = Boolean(restaurant.menus && restaurant.menus.length > 0);
+	const hasCuisine = Boolean(
 		restaurant.cuisineId !== '' &&
-		restaurant.cuisineId !== null &&
-		restaurant.cuisineId !== undefined;
-	const tooManyTags = restaurant.tags && restaurant.tags.length > 5; // Cambiado de 3 a 5
-	const hasAddress =
+			restaurant.cuisineId !== null &&
+			restaurant.cuisineId !== undefined,
+	);
+	const tooManyTags = Boolean(restaurant.tags && restaurant.tags.length > 5);
+
+	// VALIDACIÓN DE DIRECCIÓN MEJORADA - Ahora más estricta
+	const hasValidAddress = Boolean(
 		restaurant.address &&
-		(restaurant.address.street !== '' ||
-			restaurant.address.city !== '' ||
-			restaurant.address.formattedAddress !== '');
+			// Debe tener al menos una dirección formateada O street + city
+			((restaurant.address.formattedAddress &&
+				restaurant.address.formattedAddress.trim() !== '') ||
+				(restaurant.address.street &&
+					restaurant.address.street.trim() !== '' &&
+					restaurant.address.city &&
+					restaurant.address.city.trim() !== '')) &&
+			// Debe tener coordenadas válidas
+			restaurant.address.coordinates &&
+			restaurant.address.coordinates.latitude !== 0 &&
+			restaurant.address.coordinates.longitude !== 0,
+	);
 
 	const errors = {
 		hasPhotos: !hasPhotos,
 		hasMenus: !hasMenus,
 		hasCuisine: !hasCuisine,
-		tooManyTags: tooManyTags || false,
-		hasAddress: !hasAddress,
+		hasAddress: !hasValidAddress, // AHORA OBLIGATORIO
+		tooManyTags: tooManyTags,
 	};
 
-	const isValid =
-		hasPhotos && hasMenus && hasCuisine && !tooManyTags && hasAddress;
+	// DIRECCIÓN AHORA ES REQUERIDA PARA VALIDACIÓN COMPLETA
+	const isValid = Boolean(
+		hasPhotos &&
+			hasMenus &&
+			hasCuisine &&
+			hasValidAddress && // AÑADIDO A LA VALIDACIÓN
+			!tooManyTags,
+	);
 
 	return {
 		isValid,
