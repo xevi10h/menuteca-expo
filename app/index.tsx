@@ -152,6 +152,7 @@ export default function Index() {
 				<ScrollHorizontalResturant title="closest" sortBy="distance" />
 				<ScrollHorizontalResturant title="recommended" sortBy="recommended" />
 				<ScrollHorizontalResturant title="alreadyTried" sortBy="alreadyTried" />
+				<View style={{ height: 100 }} />
 			</ScrollView>
 
 			<View

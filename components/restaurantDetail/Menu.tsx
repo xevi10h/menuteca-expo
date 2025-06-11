@@ -1,7 +1,16 @@
+// components/restaurantDetail/Menu.tsx - Actualizado para mostrar bebidas
+
+import SodaCanIcon from '@/assets/icons/SodaCanIcon';
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { DishCategory } from '@/shared/enums';
-import { Dish, MenuData } from '@/shared/types';
+import {
+	Dish,
+	DrinkInclusion,
+	MenuData,
+	getSelectedDrinks,
+	hasDrinks,
+} from '@/shared/types';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
@@ -82,6 +91,93 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 		if (option === 'dessert') return t('menuCreation.includesDessert');
 		if (option === 'both') return t('menuCreation.includesCoffeeAndDessert');
 		return '';
+	};
+
+	// NUEVA FUNCIÓN: Formatear bebidas incluidas
+	const formatDrinks = (drinks?: DrinkInclusion): string => {
+		if (!drinks || !hasDrinks(drinks)) return '';
+
+		const selectedDrinks = getSelectedDrinks(drinks);
+		const drinkLabels = selectedDrinks.map((drink) => {
+			switch (drink) {
+				case 'water':
+					return t('menuCreation.drinks.water');
+				case 'wine':
+					return t('menuCreation.drinks.wine');
+				case 'softDrinks':
+					return t('menuCreation.drinks.softDrinks');
+				case 'beer':
+					return t('menuCreation.drinks.beer');
+				default:
+					return '';
+			}
+		});
+
+		return drinkLabels.join(', ');
+	};
+
+	// ACTUALIZADA: Obtener icono para las bebidas - ahora retorna tipo específico para softDrinks
+	const getDrinksIconType = (drinks?: DrinkInclusion): 'ionicon' | 'custom' => {
+		if (!drinks || !hasDrinks(drinks)) return 'ionicon';
+
+		const selectedDrinks = getSelectedDrinks(drinks);
+
+		// Si solo tiene softDrinks, usar ícono personalizado
+		if (selectedDrinks.length === 1 && selectedDrinks[0] === 'softDrinks') {
+			return 'custom';
+		}
+
+		return 'ionicon';
+	};
+
+	// ACTUALIZADA: Obtener nombre del icono de Ionicons
+	const getDrinksIoniconName = (drinks?: DrinkInclusion): string => {
+		if (!drinks || !hasDrinks(drinks)) return 'wine-outline';
+
+		const selectedDrinks = getSelectedDrinks(drinks);
+
+		// Si tiene todas las bebidas, mostrar icono genérico
+		if (selectedDrinks.length >= 3) {
+			return 'wine-outline';
+		}
+
+		// Si solo tiene una bebida, mostrar su icono específico
+		if (selectedDrinks.length === 1) {
+			switch (selectedDrinks[0]) {
+				case 'water':
+					return 'water-outline';
+				case 'wine':
+					return 'wine-outline';
+				case 'beer':
+					return 'beer-outline';
+				default:
+					return 'wine-outline';
+			}
+		}
+
+		// Para múltiples bebidas, usar icono genérico
+		return 'wine-outline';
+	};
+
+	// NUEVA: Función para renderizar el ícono de bebidas
+	const renderDrinksIcon = (drinks?: DrinkInclusion) => {
+		const iconType = getDrinksIconType(drinks);
+
+		if (iconType === 'custom') {
+			return (
+				<View style={styles.iconContainer}>
+					<SodaCanIcon size={12} color={colors.quaternary} />
+				</View>
+			);
+		}
+
+		return (
+			<Ionicons
+				name={getDrinksIoniconName(drinks)}
+				size={12}
+				color={colors.quaternary}
+			/>
+		);
 	};
 
 	// Función para agrupar platos por categoría
@@ -299,18 +395,18 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 								</Text>
 							</View>
 						)}
-						{currentMenu.includesDrink && (
+
+						{/* ACTUALIZADO: Mostrar bebidas incluidas con ícono personalizado */}
+						{currentMenu.drinks && hasDrinks(currentMenu.drinks) && (
 							<View style={styles.includeTag}>
-								<Ionicons
-									name="wine-outline"
-									size={12}
-									color={colors.quaternary}
-								/>
+								{renderDrinksIcon(currentMenu.drinks)}
 								<Text style={styles.includeTagText}>
-									{t('menuCreation.includesDrink')}
+									{formatDrinks(currentMenu.drinks)}
 								</Text>
 							</View>
 						)}
+
+						{/* MANTIENE: Café sigue usando 'cafe-outline' */}
 						{currentMenu.includesCoffeeAndDessert &&
 							currentMenu.includesCoffeeAndDessert !== 'none' && (
 								<View style={styles.includeTag}>
@@ -484,6 +580,10 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '500',
 		color: colors.quaternary,
+	},
+	iconContainer: {
+		justifyContent: 'center',
+		alignItems: 'center',
 	},
 	menuContent: {
 		paddingBottom: 20,

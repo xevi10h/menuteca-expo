@@ -1,3 +1,5 @@
+// locales/es_ES.json - Traducciones en español actualizadas
+
 {
 	"discover": {
 		"searchMenus": "Busca menús"
@@ -198,7 +200,6 @@
 		"toShare": "Para compartir",
 		"menuOptions": "Opciones del menú",
 		"includesBread": "Incluye pan",
-		"includesDrink": "Incluye bebida",
 		"includesCoffee": "Incluye café",
 		"includesDessert": "Incluye postre",
 		"includesCoffeeAndDessert": "Incluye postre y café",
@@ -206,6 +207,16 @@
 		"hasMinimumPeople": "Mínimo de personas",
 		"minimumPeopleLabel": "Mínimo de personas:",
 		"people": "personas",
+		"includedDrinks": "Bebidas incluidas",
+		"drinks": {
+			"none": "Ninguna",
+			"all": "Todas",
+			"water": "Agua",
+			"wine": "Vino",
+			"softDrinks": "Refrescos",
+			"beer": "Cerveza",
+			"helperText": "Selecciona qué bebidas están incluidas en el menú"
+		},
 		"options": {
 			"none": "Ninguno",
 			"coffee": "Solo café",

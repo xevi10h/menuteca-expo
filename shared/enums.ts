@@ -42,3 +42,10 @@ export enum RestaurantTag {
 	ROMANTIC = 'romantic',
 	BUSINESS_FRIENDLY = 'businessFriendly',
 }
+
+export enum DrinkType {
+	WATER = 'water',
+	WINE = 'wine',
+	SOFT_DRINKS = 'softDrinks',
+	BEER = 'beer',
+}

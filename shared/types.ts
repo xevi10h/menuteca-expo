@@ -1,4 +1,4 @@
-import { DishCategory, RestaurantTag } from './enums';
+import { DishCategory, DrinkType, RestaurantTag } from './enums';
 
 export type Language = 'en_US' | 'es_ES' | 'ca_ES' | 'fr_FR';
 
@@ -84,6 +84,14 @@ export type MenuItem = {
 	isSpicy?: boolean;
 };
 
+// CAMBIO PRINCIPAL: Nueva interfaz para gestionar bebidas
+export interface DrinkInclusion {
+	water: boolean;
+	wine: boolean;
+	softDrinks: boolean;
+	beer: boolean;
+}
+
 export type MenuData = {
 	id: string;
 	name: string;
@@ -96,7 +104,7 @@ export type MenuData = {
 	secondCoursesToShare?: boolean;
 	dessertsToShare?: boolean;
 	includesBread?: boolean;
-	includesDrink?: boolean;
+	drinks?: DrinkInclusion;
 	includesCoffeeAndDessert?: 'none' | 'coffee' | 'dessert' | 'both';
 	minimumPeople?: number;
 	hasMinimumPeople?: boolean;
@@ -243,4 +251,53 @@ export const parseStringToAddress = (
 		coordinates: coordinates || { latitude: 0, longitude: 0 },
 		formattedAddress: addressString,
 	};
+};
+
+// NUEVAS UTILIDADES PARA BEBIDAS
+
+// Crear configuración vacía de bebidas
+export const createEmptyDrinks = (): DrinkInclusion => ({
+	water: false,
+	wine: false,
+	softDrinks: false,
+	beer: false,
+});
+
+// Verificar si incluye alguna bebida
+export const hasDrinks = (drinks?: DrinkInclusion): boolean => {
+	if (!drinks) return false;
+	return drinks.water || drinks.wine || drinks.softDrinks || drinks.beer;
+};
+
+// Obtener bebidas seleccionadas como array
+export const getSelectedDrinks = (drinks?: DrinkInclusion): DrinkType[] => {
+	if (!drinks) return [];
+	const selected: DrinkType[] = [];
+
+	if (drinks.water) selected.push(DrinkType.WATER);
+	if (drinks.wine) selected.push(DrinkType.WINE);
+	if (drinks.softDrinks) selected.push(DrinkType.SOFT_DRINKS);
+	if (drinks.beer) selected.push(DrinkType.BEER);
+
+	return selected;
+};
+
+// Crear DrinkInclusion desde array de DrinkType
+export const createDrinksFromArray = (
+	drinkTypes: DrinkType[],
+): DrinkInclusion => {
+	return {
+		water: drinkTypes.includes(DrinkType.WATER),
+		wine: drinkTypes.includes(DrinkType.WINE),
+		softDrinks: drinkTypes.includes(DrinkType.SOFT_DRINKS),
+		beer: drinkTypes.includes(DrinkType.BEER),
+	};
+};
+
+// Formatear bebidas para mostrar
+export const formatDrinksDisplay = (drinks?: DrinkInclusion): string => {
+	if (!drinks || !hasDrinks(drinks)) return '';
+
+	const selectedDrinks = getSelectedDrinks(drinks);
+	return selectedDrinks.join(', ');
 };

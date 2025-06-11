@@ -1,7 +1,12 @@
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { DishCategory } from '@/shared/enums';
-import { Dish, MenuData } from '@/shared/types';
+import {
+	Dish,
+	DrinkInclusion,
+	MenuData,
+	createEmptyDrinks,
+} from '@/shared/types';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useState } from 'react';
 import {
@@ -13,6 +18,7 @@ import {
 	View,
 } from 'react-native';
 import DishDescriptionModal from './DishDescriptionModal';
+import DrinksSelector from './DrinksSelector';
 import SupplementModal from './SupplementModal';
 
 interface ManualMenuSectionProps {
@@ -77,7 +83,7 @@ export default function ManualMenuSection({
 		];
 	});
 
-	// New state for menu options con valores iniciales desde props
+	// Estados para opciones del menú con valores iniciales desde props
 	const [firstCoursesToShare, setFirstCoursesToShare] = useState(
 		initialMenuOptions?.firstCoursesToShare ||
 			editingMenu?.firstCoursesToShare ||
@@ -96,9 +102,11 @@ export default function ManualMenuSection({
 	const [includesBread, setIncludesBread] = useState(
 		initialMenuOptions?.includesBread || editingMenu?.includesBread || false,
 	);
-	const [includesDrink, setIncludesDrink] = useState(
-		initialMenuOptions?.includesDrink || editingMenu?.includesDrink || false,
+
+	const [drinks, setDrinks] = useState<DrinkInclusion>(
+		initialMenuOptions?.drinks || editingMenu?.drinks || createEmptyDrinks(),
 	);
+
 	const [includesCoffeeAndDessert, setIncludesCoffeeAndDessert] = useState<
 		'none' | 'coffee' | 'dessert' | 'both'
 	>(
@@ -139,7 +147,7 @@ export default function ManualMenuSection({
 				prevInitialDishesRef.current = [...initialDishes];
 			}
 		}
-	}, [initialDishes?.length]); // Solo depende de la longitud
+	}, [initialDishes?.length]);
 
 	// Efecto para actualizar opciones del menú cuando se reciben initialMenuOptions
 	React.useEffect(() => {
@@ -161,8 +169,8 @@ export default function ManualMenuSection({
 				if (initialMenuOptions.includesBread !== undefined) {
 					setIncludesBread(initialMenuOptions.includesBread);
 				}
-				if (initialMenuOptions.includesDrink !== undefined) {
-					setIncludesDrink(initialMenuOptions.includesDrink);
+				if (initialMenuOptions.drinks !== undefined) {
+					setDrinks(initialMenuOptions.drinks);
 				}
 				if (initialMenuOptions.includesCoffeeAndDessert !== undefined) {
 					setIncludesCoffeeAndDessert(
@@ -178,7 +186,7 @@ export default function ManualMenuSection({
 				prevInitialMenuOptionsRef.current = { ...initialMenuOptions };
 			}
 		}
-	}, [Object.keys(initialMenuOptions || {}).length]); // Solo depende del número de keys
+	}, [Object.keys(initialMenuOptions || {}).length]);
 
 	const addDish = useCallback((category: DishCategory) => {
 		const newDish: Dish = {
@@ -254,7 +262,7 @@ export default function ManualMenuSection({
 			secondCoursesToShare,
 			dessertsToShare,
 			includesBread,
-			includesDrink,
+			drinks,
 			includesCoffeeAndDessert,
 			hasMinimumPeople,
 			minimumPeople: hasMinimumPeople
@@ -269,7 +277,7 @@ export default function ManualMenuSection({
 		secondCoursesToShare,
 		dessertsToShare,
 		includesBread,
-		includesDrink,
+		drinks,
 		includesCoffeeAndDessert,
 		hasMinimumPeople,
 		minimumPeople,
@@ -495,18 +503,7 @@ export default function ManualMenuSection({
 					/>
 				</View>
 
-				{/* Drink Option */}
-				<View style={styles.optionRow}>
-					<Text style={styles.optionLabel}>
-						{t('menuCreation.includesDrink')}
-					</Text>
-					<Switch
-						value={includesDrink}
-						onValueChange={setIncludesDrink}
-						trackColor={{ false: colors.primaryLight, true: colors.primary }}
-						thumbColor={colors.quaternary}
-					/>
-				</View>
+				<DrinksSelector drinks={drinks} onDrinksChange={setDrinks} />
 
 				{/* Coffee and Dessert Selector */}
 				{renderCoffeeDesertSelector()}

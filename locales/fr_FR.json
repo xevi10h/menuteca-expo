@@ -206,6 +206,16 @@
 		"hasMinimumPeople": "Minimum de personnes",
 		"minimumPeopleLabel": "Minimum de personnes:",
 		"people": "personnes",
+		"includedDrinks": "Boissons comprises",
+		"drinks": {
+			"none": "Aucune",
+			"all": "Toutes",
+			"water": "Eau",
+			"wine": "Vin",
+			"softDrinks": "Boissons non alcoolisées",
+			"beer": "Bière",
+			"helperText": "Sélectionnez les boissons incluses dans le menu"
+		},
 		"options": {
 			"none": "Aucun",
 			"coffee": "Café seulement",

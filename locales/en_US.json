@@ -206,6 +206,16 @@
 		"hasMinimumPeople": "Minimum people",
 		"minimumPeopleLabel": "Minimum people:",
 		"people": "people",
+		"includedDrinks": "Included drinks",
+		"drinks": {
+			"none": "None",
+			"all": "All",
+			"water": "Water",
+			"wine": "Wine",
+			"softDrinks": "Soft drinks",
+			"beer": "Beer",
+			"helperText": "Select which drinks are included in the menu"
+		},
 		"options": {
 			"none": "None",
 			"coffee": "Coffee only",

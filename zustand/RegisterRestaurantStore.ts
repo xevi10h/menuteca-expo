@@ -4,6 +4,7 @@ import {
 	MenuData,
 	Restaurant,
 	createEmptyAddress,
+	createEmptyDrinks,
 } from '@/shared/types';
 import { create } from 'zustand';
 
@@ -170,9 +171,14 @@ export const useRegisterRestaurantStore = create<RegisterRestaurantState>(
 
 		addRegisterRestaurantMenu: (menu: MenuData) => {
 			set((state) => {
+				const menuWithDrinks = {
+					...menu,
+					drinks: menu.drinks || createEmptyDrinks(),
+				};
+
 				const newRestaurant = {
 					...state.registerRestaurant,
-					menus: [...(state.registerRestaurant.menus || []), menu],
+					menus: [...(state.registerRestaurant.menus || []), menuWithDrinks],
 				};
 				return {
 					registerRestaurant: newRestaurant,
@@ -183,11 +189,16 @@ export const useRegisterRestaurantStore = create<RegisterRestaurantState>(
 
 		updateRegisterRestaurantMenu: (index: number, menu: MenuData) => {
 			set((state) => {
+				const menuWithDrinks = {
+					...menu,
+					drinks: menu.drinks || createEmptyDrinks(),
+				};
+
 				const newRestaurant = {
 					...state.registerRestaurant,
 					menus:
 						state.registerRestaurant.menus?.map((m, i) =>
-							i === index ? menu : m,
+							i === index ? menuWithDrinks : m,
 						) || [],
 				};
 				return {
