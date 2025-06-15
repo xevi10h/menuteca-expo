@@ -347,5 +347,11 @@
 			"4": "Bo",
 			"5": "Excel·lent"
 		}
+	},
+	"photoGallery": {
+		"doubleTapToZoom": "Doble toc per zoom",
+		"swipeToNavigate": "Llisca per navegar",
+		"pinchToZoom": "Pessiga per zoom",
+		"dragToMove": "Arrossega per moure"
 	}
 }

@@ -347,5 +347,11 @@
 			"4": "Good",
 			"5": "Excellent"
 		}
+	},
+	"photoGallery": {
+		"doubleTapToZoom": "Double tap to zoom",
+		"swipeToNavigate": "Swipe to navigate",
+		"pinchToZoom": "Pinch to zoom",
+		"dragToMove": "Drag to move"
 	}
 }

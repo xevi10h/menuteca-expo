@@ -21,97 +21,82 @@ export default function StarRating({
 	// Asegurar que el rating esté entre 0 y maxStars
 	const normalizedRating = Math.max(0, Math.min(maxStars, rating));
 
-	// Función para renderizar una estrella individual con precisión de 10%
+	// Función para renderizar una estrella individual
 	const renderStar = (index: number) => {
-		const starValue = index + 1;
-		const fillPercentage = Math.max(0, Math.min(1, normalizedRating - index));
+		const starPosition = index; // 0, 1, 2, 3, 4
+		const fillAmount = normalizedRating - starPosition; // Cuánto de esta estrella debe rellenarse
 
-		// Si está completamente vacía
-		if (fillPercentage === 0) {
-			return (
-				<Ionicons
-					key={index}
-					name="star-outline"
-					size={size}
-					color={emptyColor}
-					style={{ marginHorizontal: 1 }}
-				/>
-			);
-		}
+		// SIEMPRE renderizar la estrella con contorno como base
+		const baseStar = (
+			<Ionicons
+				name="star-outline"
+				size={size}
+				color={emptyColor}
+				style={styles.starBase}
+			/>
+		);
 
-		// Si está completamente llena
-		if (fillPercentage >= 1) {
+		// Si no hay relleno para esta estrella, solo mostrar el contorno
+		if (fillAmount <= 0) {
 			return (
-				<Ionicons
-					key={index}
-					name="star"
-					size={size}
-					color={color}
-					style={{ marginHorizontal: 1 }}
-				/>
-			);
-		}
-
-		// Estrella parcialmente llena - con precisión del 10%
-		const percentage = Math.round(fillPercentage * 10) * 10; // Redondear a múltiplos de 10%
-
-		// Determinar qué tipo de estrella mostrar basado en el porcentaje
-		if (percentage >= 90) {
-			// 90-100% -> estrella completa
-			return (
-				<Ionicons
-					key={index}
-					name="star"
-					size={size}
-					color={color}
-					style={{ marginHorizontal: 1 }}
-				/>
-			);
-		} else if (percentage >= 10) {
-			// 10-80% -> usar estrella con relleno parcial
-			return (
-				<View
-					key={index}
-					style={[styles.starContainer, { marginHorizontal: 1 }]}
-				>
-					{/* Estrella base vacía */}
-					<Ionicons
-						name="star-outline"
-						size={size}
-						color={emptyColor}
-						style={styles.starBase}
-					/>
-					{/* Estrella parcialmente llena usando clip */}
-					<View
-						style={[
-							styles.starFill,
-							{
-								width: `${percentage}%`,
-								height: size,
-							},
-						]}
-					>
-						<Ionicons
-							name="star"
-							size={size}
-							color={color}
-							style={styles.starFilled}
-						/>
-					</View>
+				<View key={index} style={styles.starContainer}>
+					{baseStar}
 				</View>
 			);
-		} else {
-			// 0-10% -> estrella vacía
+		}
+
+		// Calcular el porcentaje de relleno (entre 0 y 1)
+		const fillPercentage = Math.min(1, fillAmount);
+
+		// Redondear a múltiplos de 10% para mejor visualización
+		const roundedPercentage = Math.round(fillPercentage * 10) * 10;
+
+		// Si el porcentaje es muy bajo (menos del 10%), solo mostrar contorno
+		if (roundedPercentage <= 5) {
 			return (
-				<Ionicons
-					key={index}
-					name="star-outline"
-					size={size}
-					color={emptyColor}
-					style={{ marginHorizontal: 1 }}
-				/>
+				<View key={index} style={styles.starContainer}>
+					{baseStar}
+				</View>
 			);
 		}
+
+		// Si está casi llena (95% o más), mostrar estrella completa sobre el contorno
+		if (roundedPercentage >= 95) {
+			return (
+				<View key={index} style={styles.starContainer}>
+					{baseStar}
+					<Ionicons
+						name="star"
+						size={size}
+						color={color}
+						style={styles.starFilled}
+					/>
+				</View>
+			);
+		}
+
+		// Para porcentajes intermedios, mostrar relleno parcial
+		return (
+			<View key={index} style={styles.starContainer}>
+				{baseStar}
+				<View
+					style={[
+						styles.starFill,
+						{
+							width: (size * roundedPercentage) / 100,
+							height: size,
+						},
+					]}
+				>
+					<Ionicons
+						name="star"
+						size={size}
+						color={color}
+						style={styles.starFilled}
+					/>
+				</View>
+			</View>
+		);
 	};
 
 	return (
@@ -166,26 +151,31 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		gap: 6,
 	},
+	starContainer: {
+		position: 'relative',
+		justifyContent: 'center',
+		alignItems: 'center',
+		marginHorizontal: 1,
+	},
+	starBase: {
+		// Estrella base siempre visible
+	},
 	ratingNumber: {
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.primary,
 	},
-	starContainer: {
-		position: 'relative',
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	starBase: {
-		position: 'absolute',
-	},
 	starFill: {
+		position: 'absolute',
 		overflow: 'hidden',
 		justifyContent: 'center',
 		alignItems: 'flex-start',
+		top: 0,
+		left: 0,
 	},
 	starFilled: {
 		position: 'absolute',
 		left: 0,
+		top: 0,
 	},
 });

@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { useTranslation } from '@/hooks/useTranslation';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
@@ -37,6 +38,7 @@ export default function PhotoGalleryModal({
 	initialIndex,
 	onClose,
 }: PhotoGalleryModalProps) {
+	const { t } = useTranslation();
 	const insets = useSafeAreaInsets();
 	const [currentIndex, setCurrentIndex] = useState(initialIndex);
 	const [isControlsVisible, setIsControlsVisible] = useState(true);
@@ -62,7 +64,7 @@ export default function PhotoGalleryModal({
 		}
 	}, [visible, initialIndex]);
 
-	// Pinch gesture for zoom using new API
+	// Pinch gesture for zoom
 	const pinchGesture = Gesture.Pinch()
 		.onUpdate((event) => {
 			scale.value = Math.max(1, Math.min(4, event.scale));
@@ -114,13 +116,14 @@ export default function PhotoGalleryModal({
 			}
 		});
 
-	// Tap gesture for toggling controls and double tap for zoom
+	// Tap gesture for toggling controls
 	const tapGesture = Gesture.Tap()
 		.numberOfTaps(1)
 		.onEnd(() => {
 			runOnJS(toggleControls)();
 		});
 
+	// Double tap gesture for zoom
 	const doubleTapGesture = Gesture.Tap()
 		.numberOfTaps(2)
 		.onEnd(() => {
@@ -130,13 +133,13 @@ export default function PhotoGalleryModal({
 				translateX.value = withSpring(0, { damping: 20, stiffness: 300 });
 				translateY.value = withSpring(0, { damping: 20, stiffness: 300 });
 			} else {
-				// Zoom to 2x
+				// Zoom to 2.5x
 				scale.value = withSpring(2.5, { damping: 20, stiffness: 300 });
 			}
 		});
 
-	// Combine gestures
-	const composedGestures = Gesture.Simultaneous(
+	// Combine gestures with race for tap/double tap
+	const imageGestures = Gesture.Simultaneous(
 		Gesture.Race(doubleTapGesture, tapGesture),
 		Gesture.Simultaneous(pinchGesture, panGesture),
 	);
@@ -158,7 +161,14 @@ export default function PhotoGalleryModal({
 		translateY.value = withSpring(0, { damping: 20, stiffness: 300 });
 	};
 
-	// Animated styles for individual image zoom and pan
+	// Handle carousel snap to item
+	const handleSnapToItem = (index: number) => {
+		setCurrentIndex(index);
+		// Reset zoom when changing images
+		resetZoom();
+	};
+
+	// Animated styles for zoom and pan
 	const imageAnimatedStyle = useAnimatedStyle(() => ({
 		transform: [
 			{ scale: scale.value },
@@ -171,14 +181,29 @@ export default function PhotoGalleryModal({
 		opacity: opacity.value,
 	}));
 
-	const renderCarouselItem = ({ index }: { index: number }) => (
+	const renderCarouselItem = ({
+		item,
+		index,
+	}: {
+		item: string;
+		index: number;
+	}) => (
 		<View style={styles.carouselItem}>
-			<GestureDetector gesture={composedGestures}>
+			<GestureDetector gesture={imageGestures}>
 				<Animated.View style={[styles.imageContainer, imageAnimatedStyle]}>
 					<Image
-						source={{ uri: photos[index] }}
+						source={{ uri: item }}
 						style={styles.photo}
 						resizeMode="contain"
+						onLoadStart={() => {
+							// Optionally handle loading state
+						}}
+						onLoadEnd={() => {
+							// Image loaded successfully
+						}}
+						onError={(error) => {
+							console.warn('Error loading image:', error);
+						}}
 					/>
 				</Animated.View>
 			</GestureDetector>
@@ -212,11 +237,7 @@ export default function PhotoGalleryModal({
 						height={screenHeight}
 						defaultIndex={initialIndex}
 						enabled={scale.value <= 1.1} // Disable carousel swipe when zoomed
-						onSnapToItem={(index) => {
-							setCurrentIndex(index);
-							// Reset zoom when changing images
-							resetZoom();
-						}}
+						onSnapToItem={handleSnapToItem}
 						onProgressChange={progressValue}
 						scrollAnimationDuration={400}
 						mode="parallax"
@@ -288,11 +309,13 @@ export default function PhotoGalleryModal({
 							<View style={styles.instructionsContainer}>
 								{scale.value <= 1.1 ? (
 									<Text style={styles.instructionsText}>
-										Doble toque para zoom • Desliza para navegar
+										{t('photoGallery.doubleTapToZoom')} •{' '}
+										{t('photoGallery.swipeToNavigate')}
 									</Text>
 								) : (
 									<Text style={styles.instructionsText}>
-										Pellizca para zoom • Arrastra para mover
+										{t('photoGallery.pinchToZoom')} •{' '}
+										{t('photoGallery.dragToMove')}
 									</Text>
 								)}
 							</View>

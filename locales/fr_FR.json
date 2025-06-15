@@ -347,5 +347,11 @@
 			"4": "Bon",
 			"5": "Excellent"
 		}
+	},
+	"photoGallery": {
+		"doubleTapToZoom": "Double tap pour zoomer",
+		"swipeToNavigate": "Balayez pour naviguer",
+		"pinchToZoom": "Pincez pour zoomer",
+		"dragToMove": "Faites glisser pour déplacer"
 	}
 }
