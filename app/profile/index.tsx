@@ -1,8 +1,8 @@
 import { colors } from '@/assets/styles/colors';
-import { useTranslation } from '@/hooks/useTranslation';
 import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
 	Alert,
@@ -15,153 +15,180 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-// Mock data - reemplazar con datos reales
-const mockUserReviews = [
-	{
-		id: '1',
-		restaurantName: 'La Taverna',
-		restaurantImage:
-			'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=100',
-		rating: 4.5,
-		comment: 'Excelente comida y servicio. El ambiente es muy acogedor.',
-		date: '2024-06-10',
-		photos: [
-			'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=100',
-		],
-	},
-	{
-		id: '2',
-		restaurantName: 'El Rincón',
-		restaurantImage:
-			'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=100',
-		rating: 5,
-		comment: 'Increíble experiencia gastronómica. Volveré pronto.',
-		date: '2024-06-08',
-		photos: [],
-	},
-	{
-		id: '3',
-		restaurantName: 'Casa Pedro',
-		restaurantImage:
-			'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=100',
-		rating: 4,
-		comment: 'Buena relación calidad-precio. Los platos están muy ricos.',
-		date: '2024-06-05',
-		photos: [
-			'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=100',
-		],
-	},
-];
-
-const mockUserRestaurants = [
-	{
-		id: '1',
-		name: 'Mi Restaurante',
-		image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=100',
-		address: 'Calle Principal 123',
-		status: 'activo',
-	},
-];
-
-const languageOptions = [
-	{ code: 'es_ES', label: 'Español', flag: '🇪🇸' },
-	{ code: 'ca_ES', label: 'Català', flag: '🏴󠁥󠁳󠁣󠁴󠁿' },
-	{ code: 'en_US', label: 'English', flag: '🇺🇸' },
-	{ code: 'fr_FR', label: 'Français', flag: '🇫🇷' },
-];
+interface Restaurant {
+	id: string;
+	name: string;
+	address: string;
+	profileImage?: string;
+}
 
 export default function ProfileScreen() {
-	const { t } = useTranslation();
-	const router = useRouter();
+	const user = useUserStore((state) => state.user);
+	const updatePhoto = useUserStore((state) => state.updatePhoto);
+	const setDefaultUser = useUserStore((state) => state.setDefaultUser);
 	const insets = useSafeAreaInsets();
-	const { user, setLanguage } = useUserStore();
 
-	const [showLanguageModal, setShowLanguageModal] = useState(false);
+	// Datos mock de restaurantes del usuario (máximo 10)
+	const [userRestaurants] = useState<Restaurant[]>([
+		{
+			id: '1',
+			name: 'La Taberna del Abuelo',
+			address: 'Calle Mayor 123, Madrid',
+			profileImage: undefined,
+		},
+		{
+			id: '2',
+			name: 'Bistro Mediterráneo',
+			address: 'Avenida de la Paz 45, Barcelona',
+			profileImage: undefined,
+		},
+	]);
 
-	// Mostrar solo las primeras 2 reseñas
-	const displayedReviews = mockUserReviews.slice(0, 2);
-	const hasMoreReviews = mockUserReviews.length > 2;
+	const [userReviews] = useState([
+		{
+			id: '1',
+			restaurantName: 'El Rincón Catalán',
+			rating: 5,
+			comment: 'Excelente comida tradicional, el ambiente es muy acogedor.',
+			date: '2024-01-15',
+		},
+		{
+			id: '2',
+			restaurantName: 'Marisquería Sol',
+			rating: 4,
+			comment: 'Pescado fresco y buen servicio. Recomendado.',
+			date: '2024-01-10',
+		},
+	]);
 
-	const handleLanguageSelect = (languageCode: string) => {
-		setLanguage(languageCode as any);
-		setShowLanguageModal(false);
+	const handleBack = () => {
+		router.back();
 	};
 
-	const showLanguageSelector = () => {
-		const options = languageOptions.map((lang) => lang.label);
-
-		Alert.alert(t('profile.selectLanguage'), '', [
-			...languageOptions.map((lang) => ({
-				text: `${lang.flag} ${lang.label}`,
-				onPress: () => handleLanguageSelect(lang.code),
-			})),
-			{
-				text: t('general.cancel'),
-				style: 'cancel',
-			},
-		]);
+	const handleLogout = () => {
+		Alert.alert(
+			'Cerrar sesión',
+			'¿Estás seguro de que quieres cerrar sesión?',
+			[
+				{ text: 'Cancelar', style: 'cancel' },
+				{
+					text: 'Cerrar sesión',
+					style: 'destructive',
+					onPress: () => {
+						setDefaultUser();
+						router.replace('/');
+					},
+				},
+			],
+		);
 	};
 
-	const currentLanguage = languageOptions.find(
-		(lang) => lang.code === user.language,
-	);
+	const handleChangePhoto = async () => {
+		const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+		if (status !== 'granted') {
+			Alert.alert(
+				'Permisos requeridos',
+				'Necesitamos acceso a tu galería para cambiar la foto de perfil',
+			);
+			return;
+		}
+
+		const result = await ImagePicker.launchImageLibraryAsync({
+			mediaTypes: ImagePicker.MediaTypeOptions.Images,
+			allowsEditing: true,
+			aspect: [1, 1],
+			quality: 0.8,
+		});
+
+		if (!result.canceled && result.assets[0]) {
+			updatePhoto(result.assets[0].uri);
+		}
+	};
+
+	const handleAddRestaurant = () => {
+		if (userRestaurants.length >= 10) {
+			Alert.alert(
+				'Límite alcanzado',
+				'Has alcanzado el límite máximo de 10 restaurantes por usuario',
+			);
+			return;
+		}
+		router.push('/profile/register-restaurant');
+	};
+
+	const handleEditRestaurant = (restaurantId: string) => {
+		router.push('/profile/register-restaurant/setup/edit');
+	};
+
+	const handleChangePassword = () => {
+		Alert.alert(
+			'Cambiar contraseña',
+			'Esta funcionalidad estará disponible próximamente',
+		);
+	};
+
+	const renderProfilePhoto = () => {
+		if (user.photo) {
+			return <Image source={{ uri: user.photo }} style={styles.profileImage} />;
+		} else {
+			const initial = user.username
+				? user.username.charAt(0).toUpperCase()
+				: 'U';
+			return (
+				<View style={styles.profileImagePlaceholder}>
+					<Text style={styles.profileImageText}>{initial}</Text>
+				</View>
+			);
+		}
+	};
 
 	return (
 		<View style={[styles.container, { paddingTop: insets.top }]}>
 			{/* Header */}
 			<View style={styles.header}>
-				<TouchableOpacity
-					onPress={() => router.back()}
-					style={styles.backButton}
-				>
-					<Ionicons name="chevron-back" size={24} color={colors.primary} />
+				<TouchableOpacity onPress={handleBack} style={styles.backButton}>
+					<Ionicons name="arrow-back" size={24} color={colors.primary} />
 				</TouchableOpacity>
-				<View style={styles.titleContainer}>
-					<Text style={styles.headerTitle}>{t('profile.title')}</Text>
-				</View>
-				<TouchableOpacity
-					style={styles.settingsButton}
-					onPress={() => {
-						/* Abrir configuración */
-					}}
-				>
-					<Ionicons name="settings-outline" size={24} color={colors.primary} />
+				<Text style={styles.headerTitle}>Mi Perfil</Text>
+				<TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+					<Ionicons name="log-out-outline" size={24} color={colors.primary} />
 				</TouchableOpacity>
 			</View>
 
 			<ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-				{/* User Info */}
-				<View style={styles.userSection}>
-					<View style={styles.userInfo}>
-						<Image
-							source={{
-								uri: user.photo || 'https://via.placeholder.com/80',
-							}}
-							style={styles.userAvatar}
-						/>
-						<View style={styles.userDetails}>
-							<Text style={styles.userName}>{user.name || user.username}</Text>
-							<Text style={styles.userEmail}>{user.email}</Text>
+				{/* Profile Info Section */}
+				<View style={styles.profileSection}>
+					<TouchableOpacity
+						onPress={handleChangePhoto}
+						style={styles.profileImageContainer}
+					>
+						{renderProfilePhoto()}
+						<View style={styles.editPhotoIcon}>
+							<Ionicons name="camera" size={16} color={colors.quaternary} />
 						</View>
-					</View>
-					<TouchableOpacity style={styles.editProfileButton}>
-						<Ionicons name="pencil-outline" size={16} color={colors.primary} />
-						<Text style={styles.editProfileText}>
-							{t('profile.editProfile')}
-						</Text>
 					</TouchableOpacity>
+
+					<View style={styles.profileInfo}>
+						<Text style={styles.userName}>{user.name || user.username}</Text>
+						<Text style={styles.userEmail}>{user.email}</Text>
+						<Text style={styles.userSince}>
+							Miembro desde{' '}
+							{new Date(user.createdAt).toLocaleDateString('es-ES')}
+						</Text>
+					</View>
 				</View>
 
-				{/* Language Selection */}
+				{/* Profile Actions */}
 				<View style={styles.section}>
-					<Text style={styles.sectionTitle}>{t('profile.language')}</Text>
+					<Text style={styles.sectionTitle}>Configuración</Text>
+
 					<TouchableOpacity
-						style={styles.languageSelector}
-						onPress={showLanguageSelector}
+						style={styles.actionItem}
+						onPress={handleChangePassword}
 					>
-						<View style={styles.languageInfo}>
-							<Text style={styles.languageFlag}>{currentLanguage?.flag}</Text>
-							<Text style={styles.languageText}>{currentLanguage?.label}</Text>
+						<View style={styles.actionLeft}>
+							<Ionicons name="key-outline" size={20} color={colors.primary} />
+							<Text style={styles.actionText}>Cambiar contraseña</Text>
 						</View>
 						<Ionicons
 							name="chevron-forward"
@@ -171,156 +198,88 @@ export default function ProfileScreen() {
 					</TouchableOpacity>
 				</View>
 
-				{/* My Reviews */}
+				{/* Reviews Section */}
 				<View style={styles.section}>
-					<View style={styles.sectionHeader}>
-						<Text style={styles.sectionTitle}>{t('profile.myReviews')}</Text>
-						{hasMoreReviews && (
-							<TouchableOpacity
-								onPress={() => router.push('/profile/reviews')}
-								style={styles.seeAllButton}
-							>
-								<Text style={styles.seeAllText}>
-									{t('profile.viewAllReviews', {
-										count: mockUserReviews.length,
-									})}
+					<Text style={styles.sectionTitle}>
+						Mis Reseñas ({userReviews.length})
+					</Text>
+
+					{userReviews.map((review) => (
+						<View key={review.id} style={styles.reviewItem}>
+							<View style={styles.reviewHeader}>
+								<Text style={styles.reviewRestaurant}>
+									{review.restaurantName}
 								</Text>
-								<Ionicons
-									name="chevron-forward"
-									size={16}
-									color={colors.primary}
-								/>
-							</TouchableOpacity>
-						)}
-					</View>
-
-					{displayedReviews.length > 0 ? (
-						<View style={styles.reviewsList}>
-							{displayedReviews.map((review) => (
-								<View key={review.id} style={styles.reviewItem}>
-									<Image
-										source={{ uri: review.restaurantImage }}
-										style={styles.reviewRestaurantImage}
-									/>
-									<View style={styles.reviewContent}>
-										<View style={styles.reviewHeader}>
-											<Text style={styles.reviewRestaurantName}>
-												{review.restaurantName}
-											</Text>
-											<View style={styles.reviewRating}>
-												<Ionicons name="star" size={14} color="#FFD700" />
-												<Text style={styles.reviewRatingText}>
-													{review.rating}
-												</Text>
-											</View>
-										</View>
-										<Text style={styles.reviewComment} numberOfLines={2}>
-											{review.comment}
-										</Text>
-										<Text style={styles.reviewDate}>{review.date}</Text>
-									</View>
+								<View style={styles.reviewRating}>
+									{[...Array(5)].map((_, index) => (
+										<Ionicons
+											key={index}
+											name={index < review.rating ? 'star' : 'star-outline'}
+											size={12}
+											color={colors.primary}
+										/>
+									))}
 								</View>
-							))}
-
-							{hasMoreReviews && (
-								<TouchableOpacity
-									style={styles.viewAllReviewsButton}
-									onPress={() => router.push('/profile/reviews')}
-								>
-									<Text style={styles.viewAllReviewsText}>
-										{t('profile.viewAllReviews', {
-											count: mockUserReviews.length,
-										})}
-									</Text>
-									<Ionicons
-										name="chevron-forward"
-										size={16}
-										color={colors.primary}
-									/>
-								</TouchableOpacity>
-							)}
-						</View>
-					) : (
-						<View style={styles.emptyState}>
-							<Ionicons
-								name="chatbubble-outline"
-								size={48}
-								color={colors.primaryLight}
-							/>
-							<Text style={styles.emptyStateText}>
-								{t('profile.noReviewsYet')}
-							</Text>
-							<Text style={styles.emptyStateSubtext}>
-								{t('profile.startReviewing')}
+							</View>
+							<Text style={styles.reviewComment}>{review.comment}</Text>
+							<Text style={styles.reviewDate}>
+								{new Date(review.date).toLocaleDateString('es-ES')}
 							</Text>
 						</View>
-					)}
+					))}
 				</View>
 
-				{/* My Restaurants */}
+				{/* Restaurants Section */}
 				<View style={styles.section}>
 					<View style={styles.sectionHeader}>
 						<Text style={styles.sectionTitle}>
-							{t('profile.myRestaurants')}
+							Mis Restaurantes ({userRestaurants.length}/10)
 						</Text>
 						<TouchableOpacity
-							onPress={() => router.push('/profile/register-restaurant')}
+							onPress={handleAddRestaurant}
 							style={styles.addButton}
 						>
-							<Ionicons name="add" size={20} color={colors.primary} />
-							<Text style={styles.addButtonText}>
-								{t('profile.addRestaurant')}
-							</Text>
+							<Ionicons name="add" size={20} color={colors.quaternary} />
 						</TouchableOpacity>
 					</View>
 
-					{mockUserRestaurants.length > 0 ? (
-						<View style={styles.restaurantsList}>
-							{mockUserRestaurants.map((restaurant) => (
-								<TouchableOpacity
-									key={restaurant.id}
-									style={styles.restaurantItem}
-									onPress={() => router.push(`/restaurant/${restaurant.id}`)}
-								>
+					{userRestaurants.map((restaurant) => (
+						<TouchableOpacity
+							key={restaurant.id}
+							style={styles.restaurantItem}
+							onPress={() => handleEditRestaurant(restaurant.id)}
+						>
+							<View style={styles.restaurantImageContainer}>
+								{restaurant.profileImage ? (
 									<Image
-										source={{ uri: restaurant.image }}
+										source={{ uri: restaurant.profileImage }}
 										style={styles.restaurantImage}
 									/>
-									<View style={styles.restaurantContent}>
-										<Text style={styles.restaurantName}>{restaurant.name}</Text>
-										<Text style={styles.restaurantAddress}>
-											{restaurant.address}
+								) : (
+									<View style={styles.restaurantImagePlaceholder}>
+										<Text style={styles.restaurantImageText}>
+											{restaurant.name.charAt(0).toUpperCase()}
 										</Text>
-										<View style={styles.restaurantStatus}>
-											<View
-												style={[
-													styles.statusIndicator,
-													{
-														backgroundColor:
-															restaurant.status === 'activo'
-																? '#4CAF50'
-																: '#FF9800',
-													},
-												]}
-											/>
-											<Text style={styles.statusText}>
-												{restaurant.status === 'activo'
-													? t('profile.active')
-													: t('profile.pending')}
-											</Text>
-										</View>
 									</View>
-									<TouchableOpacity style={styles.manageButton}>
-										<Ionicons
-											name="settings-outline"
-											size={20}
-											color={colors.primary}
-										/>
-									</TouchableOpacity>
-								</TouchableOpacity>
-							))}
-						</View>
-					) : (
+								)}
+							</View>
+
+							<View style={styles.restaurantInfo}>
+								<Text style={styles.restaurantName}>{restaurant.name}</Text>
+								<Text style={styles.restaurantAddress}>
+									{restaurant.address}
+								</Text>
+							</View>
+
+							<Ionicons
+								name="chevron-forward"
+								size={20}
+								color={colors.primaryLight}
+							/>
+						</TouchableOpacity>
+					))}
+
+					{userRestaurants.length === 0 && (
 						<View style={styles.emptyState}>
 							<Ionicons
 								name="restaurant-outline"
@@ -328,23 +287,14 @@ export default function ProfileScreen() {
 								color={colors.primaryLight}
 							/>
 							<Text style={styles.emptyStateText}>
-								{t('profile.noRestaurantsYet')}
+								No tienes restaurantes registrados
 							</Text>
-							<TouchableOpacity
-								style={styles.addFirstRestaurantButton}
-								onPress={() => router.push('/profile/register-restaurant')}
-							>
-								<Ionicons name="add" size={16} color={colors.quaternary} />
-								<Text style={styles.addFirstRestaurantText}>
-									{t('profile.addFirstRestaurant')}
-								</Text>
-							</TouchableOpacity>
+							<Text style={styles.emptyStateSubtext}>
+								Añade tu primer restaurante para comenzar
+							</Text>
 						</View>
 					)}
 				</View>
-
-				{/* Bottom spacing */}
-				<View style={{ height: 100 }} />
 			</ScrollView>
 		</View>
 	);
@@ -357,89 +307,103 @@ const styles = StyleSheet.create({
 	},
 	header: {
 		flexDirection: 'row',
-		position: 'relative',
 		alignItems: 'center',
+		justifyContent: 'space-between',
 		paddingHorizontal: 20,
-		paddingVertical: 16,
+		paddingVertical: 15,
 		borderBottomWidth: 1,
 		borderBottomColor: colors.primaryLight,
 	},
-	titleContainer: {
-		position: 'absolute',
-		left: 0,
-		right: 0,
+	backButton: {
+		width: 40,
+		height: 40,
+		justifyContent: 'center',
 		alignItems: 'center',
-		pointerEvents: 'none',
 	},
 	headerTitle: {
-		fontSize: 24,
+		fontSize: 18,
 		fontFamily: 'Manrope',
-		fontWeight: '700',
+		fontWeight: '600',
 		color: colors.primary,
 	},
-	backButton: {
-		justifyContent: 'flex-start',
-		flex: 1,
-	},
-	settingsButton: {
-		justifyContent: 'flex-end',
-		flex: 1,
+	logoutButton: {
+		width: 40,
+		height: 40,
+		justifyContent: 'center',
+		alignItems: 'center',
 	},
 	content: {
 		flex: 1,
 	},
-	userSection: {
-		padding: 20,
+	profileSection: {
+		alignItems: 'center',
+		paddingVertical: 30,
+		paddingHorizontal: 20,
 		borderBottomWidth: 1,
 		borderBottomColor: colors.primaryLight,
 	},
-	userInfo: {
-		flexDirection: 'row',
-		alignItems: 'center',
+	profileImageContainer: {
+		position: 'relative',
 		marginBottom: 16,
 	},
-	userAvatar: {
+	profileImage: {
 		width: 80,
 		height: 80,
 		borderRadius: 40,
-		marginRight: 16,
 	},
-	userDetails: {
-		flex: 1,
+	profileImagePlaceholder: {
+		width: 80,
+		height: 80,
+		borderRadius: 40,
+		backgroundColor: colors.primary,
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	profileImageText: {
+		fontSize: 32,
+		fontFamily: 'Manrope',
+		fontWeight: '700',
+		color: colors.quaternary,
+	},
+	editPhotoIcon: {
+		position: 'absolute',
+		bottom: 0,
+		right: 0,
+		width: 24,
+		height: 24,
+		borderRadius: 12,
+		backgroundColor: colors.primary,
+		justifyContent: 'center',
+		alignItems: 'center',
+		borderWidth: 2,
+		borderColor: colors.secondary,
+	},
+	profileInfo: {
+		alignItems: 'center',
 	},
 	userName: {
-		fontSize: 20,
+		fontSize: 24,
 		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontWeight: '700',
 		color: colors.primary,
 		marginBottom: 4,
 	},
 	userEmail: {
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primaryLight,
+		marginBottom: 4,
+	},
+	userSince: {
 		fontSize: 14,
 		fontFamily: 'Manrope',
 		fontWeight: '400',
 		color: colors.primaryLight,
 	},
-	editProfileButton: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
-		backgroundColor: colors.quaternary,
-		borderRadius: 8,
-		paddingVertical: 12,
-		paddingHorizontal: 16,
-		borderWidth: 1,
-		borderColor: colors.primaryLight,
-	},
-	editProfileText: {
-		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
-		color: colors.primary,
-		marginLeft: 8,
-	},
 	section: {
-		padding: 20,
+		paddingHorizontal: 20,
+		paddingVertical: 20,
 		borderBottomWidth: 1,
 		borderBottomColor: colors.primaryLight,
 	},
@@ -454,85 +418,49 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.primary,
-	},
-	seeAllButton: {
-		flexDirection: 'row',
-		alignItems: 'center',
-	},
-	seeAllText: {
-		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
-		color: colors.primary,
-		marginRight: 4,
+		marginBottom: 16,
 	},
 	addButton: {
-		flexDirection: 'row',
-		alignItems: 'center',
+		width: 32,
+		height: 32,
+		borderRadius: 16,
 		backgroundColor: colors.primary,
-		borderRadius: 20,
-		paddingVertical: 8,
-		paddingHorizontal: 12,
+		justifyContent: 'center',
+		alignItems: 'center',
 	},
-	addButtonText: {
-		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
-		color: colors.quaternary,
-		marginLeft: 4,
-	},
-	languageSelector: {
+	actionItem: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
-		backgroundColor: colors.quaternary,
-		borderRadius: 12,
-		padding: 16,
-		borderWidth: 1,
-		borderColor: colors.primaryLight,
+		paddingVertical: 12,
 	},
-	languageInfo: {
+	actionLeft: {
 		flexDirection: 'row',
 		alignItems: 'center',
+		gap: 12,
 	},
-	languageFlag: {
-		fontSize: 20,
-		marginRight: 12,
-	},
-	languageText: {
+	actionText: {
 		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '500',
 		color: colors.primary,
 	},
-	reviewsList: {
-		gap: 12,
-	},
 	reviewItem: {
-		flexDirection: 'row',
 		backgroundColor: colors.quaternary,
 		borderRadius: 12,
-		padding: 12,
-		borderWidth: 1,
-		borderColor: colors.primaryLight,
-	},
-	reviewRestaurantImage: {
-		width: 60,
-		height: 60,
-		borderRadius: 8,
-		marginRight: 12,
-	},
-	reviewContent: {
-		flex: 1,
+		padding: 16,
+		marginBottom: 12,
+		borderLeftWidth: 4,
+		borderLeftColor: colors.primary,
 	},
 	reviewHeader: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
-		marginBottom: 4,
+		marginBottom: 8,
 	},
-	reviewRestaurantName: {
-		fontSize: 14,
+	reviewRestaurant: {
+		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.primary,
@@ -540,66 +468,52 @@ const styles = StyleSheet.create({
 	},
 	reviewRating: {
 		flexDirection: 'row',
-		alignItems: 'center',
-	},
-	reviewRatingText: {
-		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
-		color: colors.primary,
-		marginLeft: 2,
+		gap: 2,
 	},
 	reviewComment: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primary,
+		lineHeight: 20,
+		marginBottom: 8,
+	},
+	reviewDate: {
 		fontSize: 12,
 		fontFamily: 'Manrope',
 		fontWeight: '400',
 		color: colors.primaryLight,
-		marginBottom: 4,
-		lineHeight: 16,
-	},
-	reviewDate: {
-		fontSize: 10,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
-		color: colors.primaryLight,
-	},
-	viewAllReviewsButton: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
-		backgroundColor: colors.quaternary,
-		borderRadius: 8,
-		paddingVertical: 12,
-		borderWidth: 1,
-		borderColor: colors.primary,
-		marginTop: 8,
-	},
-	viewAllReviewsText: {
-		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
-		color: colors.primary,
-		marginRight: 4,
-	},
-	restaurantsList: {
-		gap: 12,
 	},
 	restaurantItem: {
 		flexDirection: 'row',
-		backgroundColor: colors.quaternary,
-		borderRadius: 12,
-		padding: 12,
-		borderWidth: 1,
-		borderColor: colors.primaryLight,
 		alignItems: 'center',
+		paddingVertical: 12,
+		borderBottomWidth: 1,
+		borderBottomColor: colors.primaryLight,
 	},
-	restaurantImage: {
-		width: 60,
-		height: 60,
-		borderRadius: 8,
+	restaurantImageContainer: {
 		marginRight: 12,
 	},
-	restaurantContent: {
+	restaurantImage: {
+		width: 48,
+		height: 48,
+		borderRadius: 24,
+	},
+	restaurantImagePlaceholder: {
+		width: 48,
+		height: 48,
+		borderRadius: 24,
+		backgroundColor: colors.primary,
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	restaurantImageText: {
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '700',
+		color: colors.quaternary,
+	},
+	restaurantInfo: {
 		flex: 1,
 	},
 	restaurantName: {
@@ -607,45 +521,25 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.primary,
-		marginBottom: 4,
+		marginBottom: 2,
 	},
 	restaurantAddress: {
-		fontSize: 12,
+		fontSize: 14,
 		fontFamily: 'Manrope',
 		fontWeight: '400',
 		color: colors.primaryLight,
-		marginBottom: 8,
-	},
-	restaurantStatus: {
-		flexDirection: 'row',
-		alignItems: 'center',
-	},
-	statusIndicator: {
-		width: 8,
-		height: 8,
-		borderRadius: 4,
-		marginRight: 6,
-	},
-	statusText: {
-		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
-		color: colors.primary,
-	},
-	manageButton: {
-		padding: 8,
 	},
 	emptyState: {
 		alignItems: 'center',
-		paddingVertical: 32,
+		paddingVertical: 40,
 	},
 	emptyStateText: {
 		fontSize: 16,
 		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontWeight: '600',
 		color: colors.primary,
-		marginTop: 12,
-		marginBottom: 4,
+		marginTop: 16,
+		marginBottom: 8,
 	},
 	emptyStateSubtext: {
 		fontSize: 14,
@@ -653,21 +547,5 @@ const styles = StyleSheet.create({
 		fontWeight: '400',
 		color: colors.primaryLight,
 		textAlign: 'center',
-	},
-	addFirstRestaurantButton: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		backgroundColor: colors.primary,
-		borderRadius: 20,
-		paddingVertical: 12,
-		paddingHorizontal: 16,
-		marginTop: 16,
-	},
-	addFirstRestaurantText: {
-		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
-		color: colors.quaternary,
-		marginLeft: 8,
 	},
 });
