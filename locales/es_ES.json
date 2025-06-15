@@ -72,7 +72,11 @@
 			"title": "Error de conexión",
 			"description": "No hemos podido cargar la información del restaurante. Verifica tu conexión a internet e inténtalo de nuevo.",
 			"retry": "Intentar de nuevo"
-		}
+		},
+		"viewAll": "Ver todas",
+		"basedOnReviews": "Basado en {{count}} opiniones",
+		"writeReview": "Toca para escribir una opinión",
+		"beFirstToReview": "Sé el primero en opinar"
 	},
 	"notFound": {
 		"restaurant": {
@@ -304,5 +308,43 @@
 		"familyFriendly": "Para familias",
 		"romantic": "Romántico",
 		"businessFriendly": "Para negocios"
+	},
+	"reviews": {
+		"title": "Opiniones",
+		"writeReview": "Escribir opinión",
+		"publish": "Publicar",
+		"yourRating": "Tu valoración",
+		"yourComment": "Tu comentario",
+		"writeComment": "Escribe un comentario",
+		"addPhotos": "Añadir fotos",
+		"photosOptional": "Opcional",
+		"addMorePhotos": "Añadir más fotos",
+		"commentPlaceholder": "Comparte tu experiencia sobre este restaurante...",
+		"ratingRequired": "Por favor, selecciona una valoración",
+		"commentRequired": "Por favor, escribe un comentario",
+		"permissionsRequired": "Permisos requeridos",
+		"photoPermissionMessage": "Necesitamos acceso a tu galería para añadir fotos",
+		"error": "Error",
+		"newest": "Más recientes",
+		"oldest": "Más antiguos",
+		"highest": "Mejor valorados",
+		"lowest": "Peor valorados",
+		"allReviews": "Todas las opiniones",
+		"totalReviews": "{{count}} opiniones",
+		"noReviews": "Sin opiniones aún",
+		"beFirst": "Sé el primero en escribir una opinión",
+		"today": "Hoy",
+		"yesterday": "Ayer",
+		"daysAgo": "Hace {{count}} días",
+		"weeksAgo": "Hace {{count}} semanas",
+		"monthsAgo": "Hace {{count}} meses",
+		"restaurantResponse": "Respuesta del restaurante",
+		"ratingLabels": {
+			"1": "Muy malo",
+			"2": "Malo",
+			"3": "Regular",
+			"4": "Bueno",
+			"5": "Excelente"
+		}
 	}
 }

@@ -72,7 +72,11 @@
 			"title": "Connection error",
 			"description": "We couldn't load the restaurant information. Please check your internet connection and try again.",
 			"retry": "Try again"
-		}
+		},
+		"viewAll": "View all",
+		"basedOnReviews": "Based on {{count}} reviews",
+		"writeReview": "Tap to write a review",
+		"beFirstToReview": "Be the first to review"
 	},
 	"notFound": {
 		"restaurant": {
@@ -305,5 +309,43 @@
 		"familyFriendly": "Family-friendly",
 		"romantic": "Romantic",
 		"businessFriendly": "Business-friendly"
+	},
+	"reviews": {
+		"title": "Reviews",
+		"writeReview": "Write review",
+		"publish": "Publish",
+		"yourRating": "Your rating",
+		"yourComment": "Your comment",
+		"writeComment": "Write a comment",
+		"addPhotos": "Add photos",
+		"photosOptional": "Optional",
+		"addMorePhotos": "Add more photos",
+		"commentPlaceholder": "Share your experience about this restaurant...",
+		"ratingRequired": "Please select a rating",
+		"commentRequired": "Please write a comment",
+		"permissionsRequired": "Permissions required",
+		"photoPermissionMessage": "We need access to your gallery to add photos",
+		"error": "Error",
+		"newest": "Newest",
+		"oldest": "Oldest",
+		"highest": "Highest rated",
+		"lowest": "Lowest rated",
+		"allReviews": "All reviews",
+		"totalReviews": "{{count}} reviews",
+		"noReviews": "No reviews yet",
+		"beFirst": "Be the first to write a review",
+		"today": "Today",
+		"yesterday": "Yesterday",
+		"daysAgo": "{{count}} days ago",
+		"weeksAgo": "{{count}} weeks ago",
+		"monthsAgo": "{{count}} months ago",
+		"restaurantResponse": "Restaurant response",
+		"ratingLabels": {
+			"1": "Very bad",
+			"2": "Bad",
+			"3": "Average",
+			"4": "Good",
+			"5": "Excellent"
+		}
 	}
 }

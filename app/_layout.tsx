@@ -1,3 +1,4 @@
+// app/_layout.tsx (actualización)
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import {
 	DarkTheme,
@@ -61,14 +62,6 @@ export default function RootLayout() {
 				>
 					<Stack screenOptions={{ headerShown: false }}>
 						<Stack.Screen name="index" />
-						<Stack.Screen
-							name="restaurant/[id]"
-							options={{
-								presentation: 'card',
-								gestureEnabled: true,
-								animation: 'slide_from_right',
-							}}
-						/>
 					</Stack>
 				</ThemeProvider>
 			</ActionSheetProvider>

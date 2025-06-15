@@ -1,8 +1,11 @@
+// components/restaurantDetail/Information.tsx
 import { colors } from '@/assets/styles/colors';
+import AddReviewModal from '@/components/AddReviewModal';
 import { useTranslation } from '@/hooks/useTranslation';
-import { Restaurant } from '@/shared/types';
+import { Restaurant, Review } from '@/shared/types';
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
 import {
 	Dimensions,
 	Image,
@@ -29,7 +32,9 @@ const Information: React.FC<InformationProps> = ({
 	onMapPress,
 }) => {
 	const { t } = useTranslation();
+	const router = useRouter();
 	const progressValue = useSharedValue<number>(0);
+	const [showAddReviewModal, setShowAddReviewModal] = useState(false);
 
 	const handleCallRestaurant = (phone: string) => {
 		if (phone) {
@@ -41,6 +46,18 @@ const Information: React.FC<InformationProps> = ({
 		if (reservationLink) {
 			Linking.openURL(reservationLink);
 		}
+	};
+
+	const handleViewReviews = () => {
+		router.push(`/restaurant/${restaurant.id}/reviews`);
+	};
+
+	const handleAddReview = (newReview: Omit<Review, 'id' | 'date'>) => {
+		// En una app real, aquí enviarías la review a tu backend
+		console.log('New review added:', newReview);
+		setShowAddReviewModal(false);
+		// Opcionalmente podrías navegar a la pantalla de reviews después de enviar
+		// router.push(`/restaurant/${restaurant.id}/reviews`);
 	};
 
 	return (
@@ -88,7 +105,7 @@ const Information: React.FC<InformationProps> = ({
 				</View>
 			)}
 
-			{/* Address containe */}
+			{/* Address container */}
 			{restaurant.address && (
 				<>
 					<TouchableOpacity
@@ -179,17 +196,44 @@ const Information: React.FC<InformationProps> = ({
 			{/* Reviews Section */}
 			<View>
 				<Text style={styles.sectionTitle}>{t('restaurant.reviews')}</Text>
-				<View style={styles.ratingContainer}>
-					{restaurant.rating ? (
-						<>
-							<Text style={styles.ratingText}>{restaurant.rating} / 5</Text>
-							<Ionicons name="star" size={20} color={colors.primary} />
-						</>
-					) : (
-						<Text style={styles.ratingText}>{t('restaurant.noRating')}</Text>
-					)}
-				</View>
+				<TouchableOpacity
+					style={styles.ratingContainer}
+					onPress={handleViewReviews}
+				>
+					<View style={styles.ratingInfo}>
+						{restaurant.rating ? (
+							<>
+								<Text style={styles.ratingText}>{restaurant.rating} / 5</Text>
+								<Ionicons name="star" size={20} color={colors.primary} />
+							</>
+						) : (
+							<Text style={styles.ratingText}>{t('restaurant.noRating')}</Text>
+						)}
+					</View>
+					<View style={styles.viewReviewsButton}>
+						<Text style={styles.viewReviewsText}>Ver todas las opiniones</Text>
+						<Ionicons name="chevron-forward" size={16} color={colors.primary} />
+					</View>
+				</TouchableOpacity>
+
+				{/* Write Review Button */}
+				<TouchableOpacity
+					style={styles.writeReviewButton}
+					onPress={() => setShowAddReviewModal(true)}
+				>
+					<Ionicons name="create-outline" size={16} color={colors.quaternary} />
+					<Text style={styles.writeReviewButtonText}>Escribir opinión</Text>
+				</TouchableOpacity>
 			</View>
+
+			{/* Add Review Modal */}
+			<AddReviewModal
+				visible={showAddReviewModal}
+				onClose={() => setShowAddReviewModal(false)}
+				onSubmit={handleAddReview}
+				restaurantId={restaurant.id}
+				restaurantName={restaurant.name}
+			/>
 		</>
 	);
 };
@@ -320,11 +364,15 @@ const styles = StyleSheet.create({
 	ratingContainer: {
 		flexDirection: 'row',
 		alignItems: 'center',
+		justifyContent: 'space-between',
 		padding: 15,
 		borderWidth: 1,
 		borderColor: colors.primary,
-		justifyContent: 'center',
 		borderRadius: 10,
+	},
+	ratingInfo: {
+		flexDirection: 'row',
+		alignItems: 'center',
 	},
 	ratingText: {
 		fontSize: 20,
@@ -332,6 +380,42 @@ const styles = StyleSheet.create({
 		fontWeight: '600',
 		color: colors.primary,
 		marginRight: 8,
+	},
+	viewReviewsButton: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: 4,
+	},
+	viewReviewsText: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		color: colors.primary,
+	},
+	writeReviewButton: {
+		backgroundColor: colors.primary,
+		borderRadius: 25,
+		paddingVertical: 12,
+		paddingHorizontal: 20,
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		gap: 8,
+		marginTop: 15,
+		shadowColor: '#000',
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.1,
+		shadowRadius: 4,
+		elevation: 3,
+	},
+	writeReviewButtonText: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.quaternary,
 	},
 });
 

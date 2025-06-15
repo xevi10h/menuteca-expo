@@ -72,7 +72,11 @@
 			"title": "Erreur de connexion",
 			"description": "Nous n'avons pas pu charger les informations du restaurant. Vérifiez votre connexion internet et réessayez.",
 			"retry": "Réessayer"
-		}
+		},
+		"viewAll": "Voir tout",
+		"basedOnReviews": "Basé sur {{count}} avis",
+		"writeReview": "Appuyez pour laisser un avis",
+		"beFirstToReview": "Soyez le premier à donner votre avis"
 	},
 	"notFound": {
 		"restaurant": {
@@ -305,5 +309,43 @@
 		"familyFriendly": "Idéal pour les familles",
 		"romantic": "Romantique",
 		"businessFriendly": "Idéal pour les affaires"
+	},
+	"reviews": {
+		"title": "Avis",
+		"writeReview": "Écrire un avis",
+		"publish": "Publier",
+		"yourRating": "Votre évaluation",
+		"yourComment": "Votre commentaire",
+		"writeComment": "Écrire un commentaire",
+		"addPhotos": "Ajouter des photos",
+		"photosOptional": "Facultatif",
+		"addMorePhotos": "Ajouter plus de photos",
+		"commentPlaceholder": "Partagez votre expérience sur ce restaurant...",
+		"ratingRequired": "Veuillez sélectionner une évaluation",
+		"commentRequired": "Veuillez écrire un commentaire",
+		"permissionsRequired": "Autorisations requises",
+		"photoPermissionMessage": "Nous avons besoin d'accès à votre galerie pour ajouter des photos",
+		"error": "Erreur",
+		"newest": "Les plus récents",
+		"oldest": "Les plus anciens",
+		"highest": "Les mieux notés",
+		"lowest": "Les moins bien notés",
+		"allReviews": "Tous les avis",
+		"totalReviews": "{{count}} avis",
+		"noReviews": "Pas encore d'avis",
+		"beFirst": "Soyez le premier à laisser un avis",
+		"today": "Aujourd'hui",
+		"yesterday": "Hier",
+		"daysAgo": "Il y a {{count}} jours",
+		"weeksAgo": "Il y a {{count}} semaines",
+		"monthsAgo": "Il y a {{count}} mois",
+		"restaurantResponse": "Réponse du restaurant",
+		"ratingLabels": {
+			"1": "Très mauvais",
+			"2": "Mauvais",
+			"3": "Moyen",
+			"4": "Bon",
+			"5": "Excellent"
+		}
 	}
 }

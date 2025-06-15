@@ -16,6 +16,21 @@ export interface Address {
 	formattedAddress?: string; // Human readable full address
 }
 
+export type Review = {
+	id: string;
+	userId: string;
+	userName: string;
+	userAvatar: string;
+	rating: number; // 1-5
+	comment: string;
+	date: string; // ISO date string
+	photos: string[]; // Array of image URLs
+	restaurantResponse?: {
+		message: string;
+		date: string; // ISO date string
+	};
+};
+
 export type Restaurant = {
 	id: string;
 	name: string;

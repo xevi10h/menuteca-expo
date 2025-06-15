@@ -1,7 +1,8 @@
 import { getMenusByRestaurantId } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
+import AddReviewModal from '@/components/AddReviewModal';
 import { useTranslation } from '@/hooks/useTranslation';
-import { Restaurant } from '@/shared/types';
+import { Restaurant, Review } from '@/shared/types';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -63,6 +64,7 @@ export default function ExpandableMapRestaurantModal({
 		'information',
 	);
 	const [isTransitioning, setIsTransitioning] = useState(false);
+	const [showAddReviewModal, setShowAddReviewModal] = useState(false);
 
 	// Estado para almacenar las medidas de los tabs
 	const [tabMeasurements, setTabMeasurements] = useState<TabMeasurements>({
@@ -107,6 +109,12 @@ export default function ExpandableMapRestaurantModal({
 			damping: 20,
 			stiffness: 90,
 		});
+	};
+
+	const handleAddReview = (newReview: Omit<Review, 'id' | 'date'>) => {
+		// En una app real, aquí enviarías la review a tu backend
+		console.log('New review added from map modal:', newReview);
+		setShowAddReviewModal(false);
 	};
 
 	// Pan gesture for expanding/collapsing
@@ -339,19 +347,18 @@ export default function ExpandableMapRestaurantModal({
 							/>
 						</TouchableOpacity>
 
-						{/* Share Button */}
+						{/* Write Review Button */}
 						<TouchableOpacity
-							style={[styles.shareButton, { top: insets.top - 20 }]}
-							onPress={() => {
-								/* Handle share */
-							}}
+							style={[styles.writeReviewHeaderButton, { top: insets.top - 20 }]}
+							onPress={() => setShowAddReviewModal(true)}
 						>
 							<Ionicons
-								name="share-outline"
-								size={24}
+								name="create-outline"
+								size={20}
 								color={colors.quaternary}
 							/>
 						</TouchableOpacity>
+
 						<View
 							style={{
 								position: 'absolute',
@@ -386,6 +393,21 @@ export default function ExpandableMapRestaurantModal({
 								restaurant={restaurant}
 								color={colors.primary}
 							/>
+						</TouchableOpacity>
+
+						{/* Write Review Button in collapsed state */}
+						<TouchableOpacity
+							style={styles.writeReviewCollapsedButton}
+							onPress={() => setShowAddReviewModal(true)}
+						>
+							<Ionicons
+								name="create-outline"
+								size={16}
+								color={colors.quaternary}
+							/>
+							<Text style={styles.writeReviewCollapsedText}>
+								{t('restaurant.writeReview')}
+							</Text>
 						</TouchableOpacity>
 					</Animated.View>
 
@@ -471,6 +493,15 @@ export default function ExpandableMapRestaurantModal({
 					</Animated.View>
 				</Animated.View>
 			</GestureDetector>
+
+			{/* Add Review Modal */}
+			<AddReviewModal
+				visible={showAddReviewModal}
+				onClose={() => setShowAddReviewModal(false)}
+				onSubmit={handleAddReview}
+				restaurantId={restaurant.id}
+				restaurantName={restaurant.name}
+			/>
 		</View>
 	);
 }
@@ -514,12 +545,13 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
-	shareButton: {
+	writeReviewHeaderButton: {
 		position: 'absolute',
 		right: 20,
 		width: 40,
 		height: 40,
 		borderRadius: 20,
+		backgroundColor: 'rgba(0, 0, 0, 0.3)',
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
@@ -534,9 +566,29 @@ const styles = StyleSheet.create({
 	},
 	collapsedContent: {
 		flex: 1,
+		paddingHorizontal: 20,
+		paddingBottom: 15,
 	},
 	content: {
 		flex: 1,
+	},
+	writeReviewCollapsedButton: {
+		backgroundColor: colors.primary,
+		borderRadius: 20,
+		paddingVertical: 8,
+		paddingHorizontal: 15,
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		gap: 6,
+		marginTop: 10,
+		alignSelf: 'center',
+	},
+	writeReviewCollapsedText: {
+		fontSize: 12,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.quaternary,
 	},
 	expandedContent: {
 		flex: 1,

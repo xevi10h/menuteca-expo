@@ -3,6 +3,8 @@ import { colors } from '@/assets/styles/colors';
 import LoadingScreen from '@/components/LoadingScreen';
 import NotFoundRestaurant from '@/components/NotFoundRestaurant';
 import RestaurantBasicInformation from '@/components/RestaurantBasicInformation';
+import Information from '@/components/restaurantDetail/Information';
+import Menu from '@/components/restaurantDetail/Menu';
 import { useTranslation } from '@/hooks/useTranslation';
 import { MenuData, Restaurant } from '@/shared/types';
 import { useActionSheet } from '@expo/react-native-action-sheet';
@@ -26,8 +28,6 @@ import Animated, {
 	withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Information from '../../components/restaurantDetail/Information';
-import Menu from '../../components/restaurantDetail/Menu';
 
 const { width: screenWidth } = Dimensions.get('window');
 
