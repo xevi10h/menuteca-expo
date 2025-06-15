@@ -110,7 +110,15 @@ export default function ProfileScreen() {
 		<View style={[styles.container, { paddingTop: insets.top }]}>
 			{/* Header */}
 			<View style={styles.header}>
-				<Text style={styles.headerTitle}>{t('profile.title')}</Text>
+				<TouchableOpacity
+					onPress={() => router.back()}
+					style={styles.backButton}
+				>
+					<Ionicons name="chevron-back" size={24} color={colors.primary} />
+				</TouchableOpacity>
+				<View style={styles.titleContainer}>
+					<Text style={styles.headerTitle}>{t('profile.title')}</Text>
+				</View>
 				<TouchableOpacity
 					style={styles.settingsButton}
 					onPress={() => {
@@ -349,12 +357,19 @@ const styles = StyleSheet.create({
 	},
 	header: {
 		flexDirection: 'row',
-		justifyContent: 'space-between',
+		position: 'relative',
 		alignItems: 'center',
 		paddingHorizontal: 20,
 		paddingVertical: 16,
 		borderBottomWidth: 1,
-		borderBottomColor: colors.borderLight,
+		borderBottomColor: colors.primaryLight,
+	},
+	titleContainer: {
+		position: 'absolute',
+		left: 0,
+		right: 0,
+		alignItems: 'center',
+		pointerEvents: 'none',
 	},
 	headerTitle: {
 		fontSize: 24,
@@ -362,8 +377,13 @@ const styles = StyleSheet.create({
 		fontWeight: '700',
 		color: colors.primary,
 	},
+	backButton: {
+		justifyContent: 'flex-start',
+		flex: 1,
+	},
 	settingsButton: {
-		padding: 8,
+		justifyContent: 'flex-end',
+		flex: 1,
 	},
 	content: {
 		flex: 1,
@@ -371,7 +391,7 @@ const styles = StyleSheet.create({
 	userSection: {
 		padding: 20,
 		borderBottomWidth: 1,
-		borderBottomColor: colors.borderLight,
+		borderBottomColor: colors.primaryLight,
 	},
 	userInfo: {
 		flexDirection: 'row',
@@ -409,7 +429,7 @@ const styles = StyleSheet.create({
 		paddingVertical: 12,
 		paddingHorizontal: 16,
 		borderWidth: 1,
-		borderColor: colors.primary,
+		borderColor: colors.primaryLight,
 	},
 	editProfileText: {
 		fontSize: 14,
@@ -421,7 +441,7 @@ const styles = StyleSheet.create({
 	section: {
 		padding: 20,
 		borderBottomWidth: 1,
-		borderBottomColor: colors.borderLight,
+		borderBottomColor: colors.primaryLight,
 	},
 	sectionHeader: {
 		flexDirection: 'row',
@@ -469,7 +489,7 @@ const styles = StyleSheet.create({
 		borderRadius: 12,
 		padding: 16,
 		borderWidth: 1,
-		borderColor: colors.borderLight,
+		borderColor: colors.primaryLight,
 	},
 	languageInfo: {
 		flexDirection: 'row',
@@ -494,7 +514,7 @@ const styles = StyleSheet.create({
 		borderRadius: 12,
 		padding: 12,
 		borderWidth: 1,
-		borderColor: colors.borderLight,
+		borderColor: colors.primaryLight,
 	},
 	reviewRestaurantImage: {
 		width: 60,
@@ -570,7 +590,7 @@ const styles = StyleSheet.create({
 		borderRadius: 12,
 		padding: 12,
 		borderWidth: 1,
-		borderColor: colors.borderLight,
+		borderColor: colors.primaryLight,
 		alignItems: 'center',
 	},
 	restaurantImage: {
