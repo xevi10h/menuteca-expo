@@ -370,13 +370,13 @@ const styles = StyleSheet.create({
 		width: 8,
 		height: 8,
 		borderRadius: 4,
-		backgroundColor: colors.primary,
+		backgroundColor: colors.secondary,
 	},
 	paginationActiveDot: {
 		width: 8,
 		height: 8,
 		borderRadius: 4,
-		backgroundColor: colors.quaternary,
+		backgroundColor: colors.primary,
 	},
 	sectionTitle: {
 		fontSize: 18,

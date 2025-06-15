@@ -518,6 +518,8 @@ const styles = StyleSheet.create({
 	},
 	photosContent: {
 		paddingRight: 16,
+		paddingTop: -10,
+		marginTop: 10,
 	},
 	photoWrapper: {
 		marginRight: 12,
