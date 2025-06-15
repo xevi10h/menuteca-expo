@@ -1,6 +1,6 @@
-// components/restaurantDetail/Information.tsx
 import { colors } from '@/assets/styles/colors';
 import AddReviewModal from '@/components/AddReviewModal';
+import PhotoGalleryModal from '@/components/PhotoGalleryModal';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Restaurant, Review } from '@/shared/types';
 import { Ionicons } from '@expo/vector-icons';
@@ -27,6 +27,9 @@ interface InformationProps {
 	onMapPress: () => void;
 }
 
+// Mock data para simular el número de reviews - en tu app real esto vendría del backend
+const MOCK_REVIEWS_COUNT = 23;
+
 const Information: React.FC<InformationProps> = ({
 	restaurant,
 	onMapPress,
@@ -35,6 +38,8 @@ const Information: React.FC<InformationProps> = ({
 	const router = useRouter();
 	const progressValue = useSharedValue<number>(0);
 	const [showAddReviewModal, setShowAddReviewModal] = useState(false);
+	const [showPhotoGallery, setShowPhotoGallery] = useState(false);
+	const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
 
 	const handleCallRestaurant = (phone: string) => {
 		if (phone) {
@@ -58,6 +63,11 @@ const Information: React.FC<InformationProps> = ({
 		setShowAddReviewModal(false);
 		// Opcionalmente podrías navegar a la pantalla de reviews después de enviar
 		// router.push(`/restaurant/${restaurant.id}/reviews`);
+	};
+
+	const handlePhotoPress = (index: number) => {
+		setSelectedPhotoIndex(index);
+		setShowPhotoGallery(true);
 	};
 
 	return (
@@ -171,7 +181,11 @@ const Information: React.FC<InformationProps> = ({
 					data={restaurant.images}
 					onProgressChange={progressValue}
 					renderItem={({ index }) => (
-						<View style={styles.imagesContainer}>
+						<TouchableOpacity
+							style={styles.imagesContainer}
+							onPress={() => handlePhotoPress(index)}
+							activeOpacity={0.9}
+						>
 							<Image
 								source={{
 									uri: restaurant?.images[index],
@@ -179,7 +193,7 @@ const Information: React.FC<InformationProps> = ({
 								resizeMode="cover"
 								style={styles.image}
 							/>
-						</View>
+						</TouchableOpacity>
 					)}
 				/>
 
@@ -212,6 +226,8 @@ const Information: React.FC<InformationProps> = ({
 					</View>
 					<View style={styles.viewReviewsButton}>
 						<Text style={styles.viewReviewsText}>Ver todas las opiniones</Text>
+						{/* Mostrar número de opiniones */}
+						<Text style={styles.reviewsCount}>({MOCK_REVIEWS_COUNT})</Text>
 						<Ionicons name="chevron-forward" size={16} color={colors.primary} />
 					</View>
 				</TouchableOpacity>
@@ -233,6 +249,14 @@ const Information: React.FC<InformationProps> = ({
 				onSubmit={handleAddReview}
 				restaurantId={restaurant.id}
 				restaurantName={restaurant.name}
+			/>
+
+			{/* Photo Gallery Modal */}
+			<PhotoGalleryModal
+				visible={showPhotoGallery}
+				photos={restaurant.images}
+				initialIndex={selectedPhotoIndex}
+				onClose={() => setShowPhotoGallery(false)}
 			/>
 		</>
 	);
@@ -391,6 +415,12 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '500',
 		color: colors.primary,
+	},
+	reviewsCount: {
+		fontSize: 12,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primaryLight,
 	},
 	writeReviewButton: {
 		backgroundColor: colors.primary,

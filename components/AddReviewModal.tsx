@@ -146,12 +146,7 @@ export default function AddReviewModal({
 			return;
 		}
 
-		if (comment.trim() === '') {
-			Alert.alert(t('reviews.error'), t('reviews.commentRequired'), [
-				{ text: t('general.ok'), style: 'default' },
-			]);
-			return;
-		}
+		// Los comentarios ahora son opcionales - no validamos que estén llenos
 
 		setIsSubmitting(true);
 
@@ -163,7 +158,7 @@ export default function AddReviewModal({
 				userName: 'Tu Usuario',
 				userAvatar: 'https://randomuser.me/api/portraits/men/10.jpg',
 				rating,
-				comment: comment.trim(),
+				comment: comment.trim() || '', // Permitir comentarios vacíos
 				photos,
 			};
 
@@ -183,7 +178,8 @@ export default function AddReviewModal({
 		}
 	};
 
-	const isFormValid = rating > 0 && comment.trim().length > 0;
+	// Solo validamos que tenga rating - comentario es opcional
+	const isFormValid = rating > 0;
 
 	return (
 		<Modal
@@ -226,9 +222,12 @@ export default function AddReviewModal({
 						</View>
 					</View>
 
-					{/* Comment Section */}
+					{/* Comment Section - Ahora opcional */}
 					<View style={styles.section}>
-						<Text style={styles.sectionTitle}>{t('reviews.yourComment')}</Text>
+						<Text style={styles.sectionTitle}>
+							{t('reviews.yourComment')}
+							<Text style={styles.optionalText}> (opcional)</Text>
+						</Text>
 						<View style={styles.commentCard}>
 							<TextInput
 								style={styles.commentInput}
@@ -426,6 +425,13 @@ const styles = StyleSheet.create({
 		fontWeight: '600',
 		color: colors.primary,
 		marginBottom: 12,
+	},
+	optionalText: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primaryLight,
+		fontStyle: 'italic',
 	},
 	ratingCard: {
 		backgroundColor: colors.quaternary,
