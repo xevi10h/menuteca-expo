@@ -52,8 +52,16 @@ export default function SortButton() {
 
 			{/* Sort Modal */}
 			<Modal visible={showSortModal} transparent animationType="slide">
-				<View style={styles.modalOverlay}>
-					<View style={[styles.modalContent, { paddingBottom: bottom + 20 }]}>
+				<TouchableOpacity
+					style={styles.modalOverlay}
+					activeOpacity={1}
+					onPress={() => setShowSortModal(false)}
+				>
+					<TouchableOpacity
+						style={[styles.modalContent, { paddingBottom: bottom + 20 }]}
+						activeOpacity={1}
+						onPress={(e) => e.stopPropagation()}
+					>
 						<Text style={styles.modalTitle}>{t('filters.sortBy')}</Text>
 
 						<View style={styles.sortOptions}>
@@ -143,8 +151,8 @@ export default function SortButton() {
 						>
 							<Text style={styles.cancelButtonText}>{t('general.cancel')}</Text>
 						</TouchableOpacity>
-					</View>
-				</View>
+					</TouchableOpacity>
+				</TouchableOpacity>
 			</Modal>
 		</>
 	);
