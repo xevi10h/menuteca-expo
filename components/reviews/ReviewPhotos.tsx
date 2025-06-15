@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import PhotoGalleryModal from '@/components/PhotoGalleryModal';
 import React, { useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -7,9 +8,15 @@ interface ReviewPhotosProps {
 }
 
 export default function ReviewPhotos({ photos }: ReviewPhotosProps) {
-	const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+	const [showGallery, setShowGallery] = useState(false);
+	const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
 
 	if (photos.length === 0) return null;
+
+	const handlePhotoPress = (index: number) => {
+		setSelectedPhotoIndex(index);
+		setShowGallery(true);
+	};
 
 	const renderPhoto = (photo: string, index: number) => {
 		const isLastItem = index === 2 && photos.length > 3;
@@ -19,7 +26,8 @@ export default function ReviewPhotos({ photos }: ReviewPhotosProps) {
 			<TouchableOpacity
 				key={index}
 				style={styles.reviewPhoto}
-				onPress={() => setSelectedPhoto(photo)}
+				onPress={() => handlePhotoPress(index)}
+				activeOpacity={0.8}
 			>
 				<Image source={{ uri: photo }} style={styles.reviewPhotoImage} />
 				{isLastItem && remainingCount > 0 && (
@@ -32,9 +40,19 @@ export default function ReviewPhotos({ photos }: ReviewPhotosProps) {
 	};
 
 	return (
-		<View style={styles.reviewPhotosContainer}>
-			{photos.slice(0, 3).map(renderPhoto)}
-		</View>
+		<>
+			<View style={styles.reviewPhotosContainer}>
+				{photos.slice(0, 3).map(renderPhoto)}
+			</View>
+
+			{/* Photo Gallery Modal */}
+			<PhotoGalleryModal
+				visible={showGallery}
+				photos={photos}
+				initialIndex={selectedPhotoIndex}
+				onClose={() => setShowGallery(false)}
+			/>
+		</>
 	);
 }
 

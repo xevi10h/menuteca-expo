@@ -52,12 +52,12 @@ export default function StarRating({
 			);
 		}
 
-		// Estrella parcialmente llena - dividida en 10 segmentos
+		// Estrella parcialmente llena - con precisión del 10%
 		const percentage = Math.round(fillPercentage * 10) * 10; // Redondear a múltiplos de 10%
 
 		// Determinar qué tipo de estrella mostrar basado en el porcentaje
-		if (percentage >= 80) {
-			// 80-90% -> estrella completa
+		if (percentage >= 90) {
+			// 90-100% -> estrella completa
 			return (
 				<Ionicons
 					key={index}
@@ -67,23 +67,41 @@ export default function StarRating({
 					style={{ marginHorizontal: 1 }}
 				/>
 			);
-		} else if (percentage >= 30) {
-			// 30-70% -> media estrella
+		} else if (percentage >= 10) {
+			// 10-80% -> usar estrella con relleno parcial
 			return (
-				<View key={index} style={{ position: 'relative', marginHorizontal: 1 }}>
+				<View
+					key={index}
+					style={[styles.starContainer, { marginHorizontal: 1 }]}
+				>
 					{/* Estrella base vacía */}
 					<Ionicons
 						name="star-outline"
 						size={size}
 						color={emptyColor}
-						style={{ position: 'absolute' }}
+						style={styles.starBase}
 					/>
-					{/* Estrella parcialmente llena usando star-half */}
-					<Ionicons name="star-half" size={size} color={color} />
+					{/* Estrella parcialmente llena usando clip */}
+					<View
+						style={[
+							styles.starFill,
+							{
+								width: `${percentage}%`,
+								height: size,
+							},
+						]}
+					>
+						<Ionicons
+							name="star"
+							size={size}
+							color={color}
+							style={styles.starFilled}
+						/>
+					</View>
 				</View>
 			);
 		} else {
-			// 10-20% -> estrella mayormente vacía
+			// 0-10% -> estrella vacía
 			return (
 				<Ionicons
 					key={index}
@@ -152,5 +170,22 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.primary,
+	},
+	starContainer: {
+		position: 'relative',
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	starBase: {
+		position: 'absolute',
+	},
+	starFill: {
+		overflow: 'hidden',
+		justifyContent: 'center',
+		alignItems: 'flex-start',
+	},
+	starFilled: {
+		position: 'absolute',
+		left: 0,
 	},
 });

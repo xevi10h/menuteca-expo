@@ -11,15 +11,15 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native';
-import { PanGestureHandler } from 'react-native-gesture-handler';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
 	runOnJS,
-	useAnimatedGestureHandler,
 	useAnimatedStyle,
 	useSharedValue,
 	withSpring,
 	withTiming,
 } from 'react-native-reanimated';
+import Carousel, { Pagination } from 'react-native-reanimated-carousel';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -41,80 +41,149 @@ export default function PhotoGalleryModal({
 	const [currentIndex, setCurrentIndex] = useState(initialIndex);
 	const [isControlsVisible, setIsControlsVisible] = useState(true);
 
-	// Animated values
-	const translateX = useSharedValue(-initialIndex * screenWidth);
+	// Animated values for zoom and pan
 	const scale = useSharedValue(1);
+	const translateX = useSharedValue(0);
+	const translateY = useSharedValue(0);
 	const opacity = useSharedValue(1);
+
+	// Carousel progress
+	const progressValue = useSharedValue(0);
 
 	// Reset values when modal opens
 	React.useEffect(() => {
 		if (visible) {
 			setCurrentIndex(initialIndex);
-			translateX.value = -initialIndex * screenWidth;
 			scale.value = 1;
+			translateX.value = 0;
+			translateY.value = 0;
 			opacity.value = 1;
+			progressValue.value = initialIndex;
 		}
 	}, [visible, initialIndex]);
 
-	// Pan gesture handler for swiping between images
-	const panGestureHandler = useAnimatedGestureHandler({
-		onStart: () => {
-			// Store the starting position
-		},
-		onActive: (event) => {
-			translateX.value = -currentIndex * screenWidth + event.translationX;
-		},
-		onEnd: (event) => {
-			const shouldMoveToNext =
-				event.translationX < -50 && currentIndex < photos.length - 1;
-			const shouldMoveToPrev = event.translationX > 50 && currentIndex > 0;
-
-			if (shouldMoveToNext) {
-				const newIndex = Math.min(currentIndex + 1, photos.length - 1);
-				translateX.value = withSpring(-newIndex * screenWidth);
-				runOnJS(setCurrentIndex)(newIndex);
-			} else if (shouldMoveToPrev) {
-				const newIndex = Math.max(currentIndex - 1, 0);
-				translateX.value = withSpring(-newIndex * screenWidth);
-				runOnJS(setCurrentIndex)(newIndex);
-			} else {
-				// Snap back to current position
-				translateX.value = withSpring(-currentIndex * screenWidth);
+	// Pinch gesture for zoom using new API
+	const pinchGesture = Gesture.Pinch()
+		.onUpdate((event) => {
+			scale.value = Math.max(1, Math.min(4, event.scale));
+		})
+		.onEnd(() => {
+			if (scale.value < 1.2) {
+				scale.value = withSpring(1, { damping: 20, stiffness: 300 });
+				translateX.value = withSpring(0, { damping: 20, stiffness: 300 });
+				translateY.value = withSpring(0, { damping: 20, stiffness: 300 });
+			} else if (scale.value > 3.5) {
+				scale.value = withSpring(3.5, { damping: 20, stiffness: 300 });
 			}
-		},
-	});
+		});
 
-	const animatedStyle = useAnimatedStyle(() => ({
-		transform: [{ translateX: translateX.value }, { scale: scale.value }],
-		opacity: opacity.value,
-	}));
+	// Pan gesture for moving zoomed image
+	const panGesture = Gesture.Pan()
+		.onUpdate((event) => {
+			if (scale.value > 1.1) {
+				// Calculate boundaries to prevent panning too far
+				const maxTranslateX = (screenWidth * (scale.value - 1)) / 2;
+				const maxTranslateY = (screenHeight * (scale.value - 1)) / 2;
+
+				translateX.value = Math.max(
+					-maxTranslateX,
+					Math.min(maxTranslateX, event.translationX),
+				);
+				translateY.value = Math.max(
+					-maxTranslateY,
+					Math.min(maxTranslateY, event.translationY),
+				);
+			}
+		})
+		.onEnd(() => {
+			// Smooth return to bounds if needed
+			const maxTranslateX = (screenWidth * (scale.value - 1)) / 2;
+			const maxTranslateY = (screenHeight * (scale.value - 1)) / 2;
+
+			if (Math.abs(translateX.value) > maxTranslateX) {
+				translateX.value = withSpring(
+					Math.sign(translateX.value) * maxTranslateX,
+					{ damping: 20, stiffness: 300 },
+				);
+			}
+			if (Math.abs(translateY.value) > maxTranslateY) {
+				translateY.value = withSpring(
+					Math.sign(translateY.value) * maxTranslateY,
+					{ damping: 20, stiffness: 300 },
+				);
+			}
+		});
+
+	// Tap gesture for toggling controls and double tap for zoom
+	const tapGesture = Gesture.Tap()
+		.numberOfTaps(1)
+		.onEnd(() => {
+			runOnJS(toggleControls)();
+		});
+
+	const doubleTapGesture = Gesture.Tap()
+		.numberOfTaps(2)
+		.onEnd(() => {
+			if (scale.value > 1.1) {
+				// Reset zoom
+				scale.value = withSpring(1, { damping: 20, stiffness: 300 });
+				translateX.value = withSpring(0, { damping: 20, stiffness: 300 });
+				translateY.value = withSpring(0, { damping: 20, stiffness: 300 });
+			} else {
+				// Zoom to 2x
+				scale.value = withSpring(2.5, { damping: 20, stiffness: 300 });
+			}
+		});
+
+	// Combine gestures
+	const composedGestures = Gesture.Simultaneous(
+		Gesture.Race(doubleTapGesture, tapGesture),
+		Gesture.Simultaneous(pinchGesture, panGesture),
+	);
 
 	const toggleControls = () => {
 		setIsControlsVisible(!isControlsVisible);
 	};
 
-	const handlePrevious = () => {
-		if (currentIndex > 0) {
-			const newIndex = currentIndex - 1;
-			setCurrentIndex(newIndex);
-			translateX.value = withSpring(-newIndex * screenWidth);
-		}
-	};
-
-	const handleNext = () => {
-		if (currentIndex < photos.length - 1) {
-			const newIndex = currentIndex + 1;
-			setCurrentIndex(newIndex);
-			translateX.value = withSpring(-newIndex * screenWidth);
-		}
-	};
-
 	const handleClose = () => {
-		scale.value = withTiming(0.8);
-		opacity.value = withTiming(0, undefined, () => {
+		scale.value = withTiming(0.8, { duration: 200 });
+		opacity.value = withTiming(0, { duration: 300 }, () => {
 			runOnJS(onClose)();
 		});
 	};
+
+	const resetZoom = () => {
+		scale.value = withSpring(1, { damping: 20, stiffness: 300 });
+		translateX.value = withSpring(0, { damping: 20, stiffness: 300 });
+		translateY.value = withSpring(0, { damping: 20, stiffness: 300 });
+	};
+
+	// Animated styles for individual image zoom and pan
+	const imageAnimatedStyle = useAnimatedStyle(() => ({
+		transform: [
+			{ scale: scale.value },
+			{ translateX: translateX.value },
+			{ translateY: translateY.value },
+		],
+	}));
+
+	const modalAnimatedStyle = useAnimatedStyle(() => ({
+		opacity: opacity.value,
+	}));
+
+	const renderCarouselItem = ({ index }: { index: number }) => (
+		<View style={styles.carouselItem}>
+			<GestureDetector gesture={composedGestures}>
+				<Animated.View style={[styles.imageContainer, imageAnimatedStyle]}>
+					<Image
+						source={{ uri: photos[index] }}
+						style={styles.photo}
+						resizeMode="contain"
+					/>
+				</Animated.View>
+			</GestureDetector>
+		</View>
+	);
 
 	if (!visible) return null;
 
@@ -125,8 +194,8 @@ export default function PhotoGalleryModal({
 			statusBarTranslucent
 			animationType="fade"
 		>
-			<StatusBar backgroundColor="rgba(0,0,0,0.9)" barStyle="light-content" />
-			<View style={styles.container}>
+			<StatusBar backgroundColor="rgba(0,0,0,0.95)" barStyle="light-content" />
+			<Animated.View style={[styles.container, modalAnimatedStyle]}>
 				{/* Background */}
 				<TouchableOpacity
 					style={styles.background}
@@ -134,26 +203,29 @@ export default function PhotoGalleryModal({
 					onPress={toggleControls}
 				/>
 
-				{/* Photos Container */}
-				<PanGestureHandler onGestureEvent={panGestureHandler}>
-					<Animated.View style={[styles.photosContainer, animatedStyle]}>
-						{photos.map((photo, index) => (
-							<View key={index} style={styles.photoWrapper}>
-								<TouchableOpacity
-									style={styles.photoTouchable}
-									onPress={toggleControls}
-									activeOpacity={1}
-								>
-									<Image
-										source={{ uri: photo }}
-										style={styles.photo}
-										resizeMode="contain"
-									/>
-								</TouchableOpacity>
-							</View>
-						))}
-					</Animated.View>
-				</PanGestureHandler>
+				{/* Carousel Container */}
+				<View style={styles.carouselContainer}>
+					<Carousel
+						data={photos}
+						renderItem={renderCarouselItem}
+						width={screenWidth}
+						height={screenHeight}
+						defaultIndex={initialIndex}
+						enabled={scale.value <= 1.1} // Disable carousel swipe when zoomed
+						onSnapToItem={(index) => {
+							setCurrentIndex(index);
+							// Reset zoom when changing images
+							resetZoom();
+						}}
+						onProgressChange={progressValue}
+						scrollAnimationDuration={400}
+						mode="parallax"
+						modeConfig={{
+							parallaxScrollingScale: 0.9,
+							parallaxScrollingOffset: 50,
+						}}
+					/>
+				</View>
 
 				{/* Controls Overlay */}
 				{isControlsVisible && (
@@ -162,75 +234,72 @@ export default function PhotoGalleryModal({
 						<View style={[styles.header, { paddingTop: insets.top + 10 }]}>
 							<TouchableOpacity
 								onPress={handleClose}
-								style={styles.closeButton}
+								style={styles.controlButton}
 							>
 								<Ionicons name="close" size={28} color={colors.quaternary} />
 							</TouchableOpacity>
+
 							<View style={styles.counter}>
 								<Text style={styles.counterText}>
 									{currentIndex + 1} / {photos.length}
 								</Text>
 							</View>
-							<View style={styles.placeholder} />
+
+							<TouchableOpacity
+								onPress={resetZoom}
+								style={[
+									styles.controlButton,
+									scale.value <= 1.1 && styles.controlButtonDisabled,
+								]}
+								disabled={scale.value <= 1.1}
+							>
+								<Ionicons
+									name="contract"
+									size={24}
+									color={
+										scale.value > 1.1
+											? colors.quaternary
+											: 'rgba(255,255,255,0.5)'
+									}
+								/>
+							</TouchableOpacity>
 						</View>
 
-						{/* Navigation Arrows */}
-						{photos.length > 1 && (
-							<>
-								{currentIndex > 0 && (
-									<TouchableOpacity
-										style={[styles.navButton, styles.prevButton]}
-										onPress={handlePrevious}
-									>
-										<Ionicons
-											name="chevron-back"
-											size={32}
-											color={colors.quaternary}
-										/>
-									</TouchableOpacity>
-								)}
+						{/* Bottom Controls */}
+						<View
+							style={[
+								styles.bottomControls,
+								{ paddingBottom: insets.bottom + 20 },
+							]}
+						>
+							{/* Pagination Dots */}
+							{photos.length > 1 && scale.value <= 1.1 && (
+								<Pagination.Basic
+									progress={progressValue}
+									data={photos}
+									dotStyle={styles.paginationDot}
+									activeDotStyle={styles.paginationActiveDot}
+									containerStyle={styles.paginationContainer}
+									horizontal
+								/>
+							)}
 
-								{currentIndex < photos.length - 1 && (
-									<TouchableOpacity
-										style={[styles.navButton, styles.nextButton]}
-										onPress={handleNext}
-									>
-										<Ionicons
-											name="chevron-forward"
-											size={32}
-											color={colors.quaternary}
-										/>
-									</TouchableOpacity>
+							{/* Instructions */}
+							<View style={styles.instructionsContainer}>
+								{scale.value <= 1.1 ? (
+									<Text style={styles.instructionsText}>
+										Doble toque para zoom • Desliza para navegar
+									</Text>
+								) : (
+									<Text style={styles.instructionsText}>
+										Pellizca para zoom • Arrastra para mover
+									</Text>
 								)}
-							</>
-						)}
-
-						{/* Dots Indicator */}
-						{photos.length > 1 && (
-							<View
-								style={[
-									styles.dotsContainer,
-									{ paddingBottom: insets.bottom + 20 },
-								]}
-							>
-								{photos.map((_, index) => (
-									<TouchableOpacity
-										key={index}
-										style={[
-											styles.dot,
-											index === currentIndex && styles.activeDot,
-										]}
-										onPress={() => {
-											setCurrentIndex(index);
-											translateX.value = withSpring(-index * screenWidth);
-										}}
-									/>
-								))}
 							</View>
-						)}
+						</View>
 					</>
 				)}
-			</View>
+			</Animated.View>
 		</Modal>
 	);
 }
@@ -243,18 +312,19 @@ const styles = StyleSheet.create({
 	background: {
 		...StyleSheet.absoluteFillObject,
 	},
-	photosContainer: {
+	carouselContainer: {
 		flex: 1,
-		flexDirection: 'row',
-		width: screenWidth * 10, // Adjust based on max photos you expect
-	},
-	photoWrapper: {
-		width: screenWidth,
-		height: screenHeight,
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
-	photoTouchable: {
+	carouselItem: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		width: screenWidth,
+		height: screenHeight,
+	},
+	imageContainer: {
 		width: '100%',
 		height: '100%',
 		justifyContent: 'center',
@@ -277,13 +347,16 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 20,
 		zIndex: 1000,
 	},
-	closeButton: {
+	controlButton: {
 		width: 44,
 		height: 44,
 		borderRadius: 22,
-		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+		backgroundColor: 'rgba(0, 0, 0, 0.7)',
 		justifyContent: 'center',
 		alignItems: 'center',
+	},
+	controlButtonDisabled: {
+		opacity: 0.5,
 	},
 	counter: {
 		backgroundColor: 'rgba(0, 0, 0, 0.7)',
@@ -297,49 +370,41 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 	},
-	placeholder: {
-		width: 44,
-		height: 44,
-	},
-	navButton: {
-		position: 'absolute',
-		top: '50%',
-		width: 60,
-		height: 60,
-		borderRadius: 30,
-		backgroundColor: 'rgba(0, 0, 0, 0.5)',
-		justifyContent: 'center',
-		alignItems: 'center',
-		transform: [{ translateY: -30 }],
-		zIndex: 1000,
-	},
-	prevButton: {
-		left: 20,
-	},
-	nextButton: {
-		right: 20,
-	},
-	dotsContainer: {
+	bottomControls: {
 		position: 'absolute',
 		bottom: 0,
 		left: 0,
 		right: 0,
-		flexDirection: 'row',
-		justifyContent: 'center',
 		alignItems: 'center',
-		gap: 8,
-		paddingHorizontal: 20,
+		zIndex: 1000,
 	},
-	dot: {
+	paginationContainer: {
+		marginBottom: 10,
+	},
+	paginationDot: {
 		width: 8,
 		height: 8,
 		borderRadius: 4,
 		backgroundColor: 'rgba(255, 255, 255, 0.5)',
 	},
-	activeDot: {
+	paginationActiveDot: {
 		backgroundColor: colors.quaternary,
-		width: 10,
-		height: 10,
-		borderRadius: 5,
+		width: 20,
+		height: 8,
+		borderRadius: 4,
+	},
+	instructionsContainer: {
+		backgroundColor: 'rgba(0, 0, 0, 0.7)',
+		paddingHorizontal: 16,
+		paddingVertical: 8,
+		borderRadius: 20,
+		marginHorizontal: 20,
+	},
+	instructionsText: {
+		color: 'rgba(255, 255, 255, 0.8)',
+		fontSize: 13,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		textAlign: 'center',
 	},
 });
