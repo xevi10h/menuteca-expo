@@ -2,7 +2,43 @@ import { DishCategory, DrinkType, RestaurantTag } from './enums';
 
 export type Language = 'en_US' | 'es_ES' | 'ca_ES' | 'fr_FR';
 
-export interface Address {
+export type User = {
+	id: string;
+	email: string;
+	username: string;
+	createdAt: string;
+	name: string;
+	photo: string;
+	googleId: string;
+	token: string;
+	hasPassword: boolean;
+	language: Language;
+};
+
+export type UserRestaurant = {
+	id: string;
+	name: string;
+	address: string;
+	profileImage?: string;
+	phone?: string;
+	cuisineType?: string;
+	userId: string;
+	createdAt: string;
+	updatedAt: string;
+};
+
+export type UserReview = {
+	id: string;
+	restaurantId: string;
+	restaurantName: string;
+	userId: string;
+	rating: number;
+	comment: string;
+	createdAt: string;
+	updatedAt: string;
+};
+
+export type Address = {
 	street: string;
 	number: string;
 	additionalInformation: string; // Pis/Porta, etc.
@@ -14,7 +50,7 @@ export interface Address {
 		longitude: number;
 	};
 	formattedAddress?: string; // Human readable full address
-}
+};
 
 export type Review = {
 	id: string;
@@ -67,24 +103,6 @@ export type Days =
 	| 'friday'
 	| 'saturday'
 	| 'sunday';
-
-export type User = {
-	id?: string;
-	email?: string;
-	username?: string;
-	createdAt: string;
-	name?: string;
-	photo?: string;
-	hashedPassword?: string;
-	googleId?: string;
-	token?: string;
-	language: Language;
-	hasPassword?: boolean;
-	deviceId?: string;
-	thirdPartyAccount?: 'google' | 'apple';
-	thirdPartyEmail?: string;
-	websiteUrl?: string;
-};
 
 export type MenuItem = {
 	id: string;
