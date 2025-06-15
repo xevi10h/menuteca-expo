@@ -353,5 +353,22 @@
 		"swipeToNavigate": "Llisca per navegar",
 		"pinchToZoom": "Pessiga per zoom",
 		"dragToMove": "Arrossega per moure"
+	},
+	"profile": {
+		"title": "Perfil",
+		"editProfile": "Editar perfil",
+		"language": "Idioma",
+		"selectLanguage": "Seleccionar idioma",
+		"myReviews": "Les meves ressenyes",
+		"myRestaurants": "Els meus restaurants",
+		"addRestaurant": "Afegir",
+		"addFirstRestaurant": "Afegir el meu primer restaurant",
+		"viewAllReviews": "Veure totes ({{count}})",
+		"noReviewsYet": "Encara no has escrit ressenyes",
+		"startReviewing": "Comença a compartir les teves experiències gastronòmiques",
+		"noRestaurantsYet": "Encara no tens restaurants",
+		"averageRating": "Puntuació mitjana",
+		"active": "Actiu",
+		"pending": "Pendent"
 	}
 }

@@ -352,5 +352,22 @@
 		"swipeToNavigate": "Desliza para navegar",
 		"pinchToZoom": "Pellizca para zoom",
 		"dragToMove": "Arrastra para mover"
+	},
+	"profile": {
+		"title": "Perfil",
+		"editProfile": "Editar perfil",
+		"language": "Idioma",
+		"selectLanguage": "Seleccionar idioma",
+		"myReviews": "Mis reseñas",
+		"myRestaurants": "Mis restaurantes",
+		"addRestaurant": "Añadir",
+		"addFirstRestaurant": "Añadir mi primer restaurante",
+		"viewAllReviews": "Ver todas ({{count}})",
+		"noReviewsYet": "Aún no has escrito reseñas",
+		"startReviewing": "Empieza a compartir tus experiencias gastronómicas",
+		"noRestaurantsYet": "Aún no tienes restaurantes",
+		"averageRating": "Puntuación media",
+		"active": "Activo",
+		"pending": "Pendiente"
 	}
 }
