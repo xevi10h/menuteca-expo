@@ -1,18 +1,24 @@
 import { colors } from '@/assets/styles/colors';
+import AddReviewModal from '@/components/AddReviewModal';
+import StarRating from '@/components/StarRating';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Review } from '@/shared/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
 	FlatList,
 	Image,
+	ScrollView,
 	StyleSheet,
 	Text,
 	TouchableOpacity,
 	View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+// Tipos para el ordenamiento
+type SortOption = 'newest' | 'oldest' | 'highest' | 'lowest';
 
 // Mock data for reviews - replace with actual API call
 const mockReviews: Review[] = [
@@ -40,7 +46,7 @@ const mockReviews: Review[] = [
 		userId: 'user2',
 		userName: 'Carlos Rodríguez',
 		userAvatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-		rating: 4,
+		rating: 4.5,
 		comment:
 			'Muy buen restaurante, la comida está muy rica aunque tuvimos que esperar un poco. El ambiente es acogedor.',
 		date: '2024-12-08',
@@ -53,7 +59,7 @@ const mockReviews: Review[] = [
 		userId: 'user3',
 		userName: 'Ana Martínez',
 		userAvatar: 'https://randomuser.me/api/portraits/women/3.jpg',
-		rating: 5,
+		rating: 4.8,
 		comment:
 			'Perfecta cena de aniversario. El personal fue muy atento y la decoración es preciosa. Los postres son espectaculares.',
 		date: '2024-12-05',
@@ -64,7 +70,7 @@ const mockReviews: Review[] = [
 		userId: 'user4',
 		userName: 'David López',
 		userAvatar: 'https://randomuser.me/api/portraits/men/4.jpg',
-		rating: 3,
+		rating: 2.5,
 		comment:
 			'La comida está bien pero esperaba más por el precio. El servicio podría mejorar un poco.',
 		date: '2024-12-03',
@@ -80,7 +86,7 @@ const mockReviews: Review[] = [
 		userId: 'user5',
 		userName: 'Laura Fernández',
 		userAvatar: 'https://randomuser.me/api/portraits/women/5.jpg',
-		rating: 5,
+		rating: 4.2,
 		comment:
 			'Una experiencia gastronómica increíble. Cada plato fue una sorpresa para el paladar. Altamente recomendado para una ocasión especial.',
 		date: '2024-11-28',
@@ -89,6 +95,17 @@ const mockReviews: Review[] = [
 			'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=300',
 			'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=300',
 		],
+	},
+	{
+		id: '6',
+		userId: 'user6',
+		userName: 'Roberto Silva',
+		userAvatar: 'https://randomuser.me/api/portraits/men/6.jpg',
+		rating: 1.5,
+		comment:
+			'Muy decepcionante. La comida llegó fría y el servicio fue muy lento. No recomiendo este lugar.',
+		date: '2024-11-25',
+		photos: [],
 	},
 ];
 
@@ -128,25 +145,37 @@ const ReviewPhotos: React.FC<ReviewPhotosProps> = ({ photos }) => {
 	);
 };
 
-interface StarRatingProps {
-	rating: number;
-	size?: number;
+interface SortButtonProps {
+	label: string;
+	isActive: boolean;
+	onPress: () => void;
+	icon?: keyof typeof Ionicons.glyphMap;
 }
 
-const StarRating: React.FC<StarRatingProps> = ({ rating, size = 16 }) => {
-	return (
-		<View style={styles.starsContainer}>
-			{[1, 2, 3, 4, 5].map((star) => (
-				<Ionicons
-					key={star}
-					name={star <= rating ? 'star' : 'star-outline'}
-					size={size}
-					color={star <= rating ? '#FFD700' : colors.primaryLight}
-				/>
-			))}
-		</View>
-	);
-};
+const SortButton: React.FC<SortButtonProps> = ({
+	label,
+	isActive,
+	onPress,
+	icon,
+}) => (
+	<TouchableOpacity
+		style={[styles.sortButton, isActive && styles.sortButtonActive]}
+		onPress={onPress}
+	>
+		{icon && (
+			<Ionicons
+				name={icon}
+				size={14}
+				color={isActive ? colors.quaternary : colors.primary}
+			/>
+		)}
+		<Text
+			style={[styles.sortButtonText, isActive && styles.sortButtonTextActive]}
+		>
+			{label}
+		</Text>
+	</TouchableOpacity>
+);
 
 interface ReviewItemProps {
 	review: Review;
@@ -178,7 +207,15 @@ const ReviewItem: React.FC<ReviewItemProps> = ({ review }) => {
 						<Text style={styles.reviewDate}>{formatDate(review.date)}</Text>
 					</View>
 				</View>
-				<StarRating rating={review.rating} />
+				<View style={styles.ratingContainer}>
+					<StarRating
+						rating={review.rating}
+						size={16}
+						color={colors.primary}
+						emptyColor={colors.primaryLight}
+					/>
+					<Text style={styles.ratingNumber}>{review.rating}</Text>
+				</View>
 			</View>
 
 			{/* Review Content */}
@@ -216,17 +253,49 @@ export default function ReviewsScreen() {
 
 	const [reviews, setReviews] = useState<Review[]>(mockReviews);
 	const [showAddReviewModal, setShowAddReviewModal] = useState(false);
+	const [currentSort, setCurrentSort] = useState<SortOption>('newest');
 
 	// Calculate average rating
-	const averageRating =
-		reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
+	const averageRating = useMemo(() => {
+		if (reviews.length === 0) return 0;
+		return (
+			reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
+		);
+	}, [reviews]);
 
 	// Calculate rating distribution
-	const ratingDistribution = [5, 4, 3, 2, 1].map((rating) => {
-		const count = reviews.filter((review) => review.rating === rating).length;
-		const percentage = (count / reviews.length) * 100;
-		return { rating, count, percentage };
-	});
+	const ratingDistribution = useMemo(() => {
+		return [5, 4, 3, 2, 1].map((rating) => {
+			const count = reviews.filter(
+				(review) => Math.floor(review.rating) === rating,
+			).length;
+			const percentage =
+				reviews.length > 0 ? (count / reviews.length) * 100 : 0;
+			return { rating, count, percentage };
+		});
+	}, [reviews]);
+
+	// Sort reviews based on current sort option
+	const sortedReviews = useMemo(() => {
+		const reviewsCopy = [...reviews];
+
+		switch (currentSort) {
+			case 'newest':
+				return reviewsCopy.sort(
+					(a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+				);
+			case 'oldest':
+				return reviewsCopy.sort(
+					(a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+				);
+			case 'highest':
+				return reviewsCopy.sort((a, b) => b.rating - a.rating);
+			case 'lowest':
+				return reviewsCopy.sort((a, b) => a.rating - b.rating);
+			default:
+				return reviewsCopy;
+		}
+	}, [reviews, currentSort]);
 
 	const handleBack = () => {
 		router.back();
@@ -247,6 +316,25 @@ export default function ReviewsScreen() {
 		<ReviewItem review={item} />
 	);
 
+	const getSortOptions = (): {
+		option: SortOption;
+		label: string;
+		icon?: keyof typeof Ionicons.glyphMap;
+	}[] => [
+		{ option: 'newest', label: t('reviews.newest'), icon: 'time-outline' },
+		{
+			option: 'highest',
+			label: t('reviews.highest'),
+			icon: 'trending-up-outline',
+		},
+		{
+			option: 'lowest',
+			label: t('reviews.lowest'),
+			icon: 'trending-down-outline',
+		},
+		{ option: 'oldest', label: t('reviews.oldest'), icon: 'hourglass-outline' },
+	];
+
 	return (
 		<View style={[styles.container, { paddingTop: insets.top }]}>
 			{/* Header */}
@@ -255,7 +343,12 @@ export default function ReviewsScreen() {
 					<Ionicons name="chevron-back" size={24} color={colors.primary} />
 				</TouchableOpacity>
 				<Text style={styles.headerTitle}>{t('reviews.title')}</Text>
-				<View style={styles.headerRight} />
+				<TouchableOpacity
+					onPress={() => setShowAddReviewModal(true)}
+					style={styles.addReviewButton}
+				>
+					<Ionicons name="add" size={24} color={colors.primary} />
+				</TouchableOpacity>
 			</View>
 
 			{/* Reviews Summary */}
@@ -265,10 +358,17 @@ export default function ReviewsScreen() {
 						<Text style={styles.averageRatingNumber}>
 							{averageRating.toFixed(1)}
 						</Text>
-						<StarRating rating={Math.round(averageRating)} size={20} />
-						<Text style={styles.totalReviews}>
-							{t('reviews.totalReviews', { count: mockReviews.length })}
-						</Text>
+						<View style={styles.starsAndCount}>
+							<StarRating
+								rating={averageRating}
+								size={20}
+								color={colors.primary}
+								emptyColor={colors.primaryLight}
+							/>
+							<Text style={styles.totalReviews}>
+								{t('reviews.totalReviews', { count: reviews.length })}
+							</Text>
+						</View>
 					</View>
 				</View>
 
@@ -287,16 +387,79 @@ export default function ReviewsScreen() {
 						</View>
 					))}
 				</View>
+
+				{/* Write Review Button */}
+				<TouchableOpacity
+					style={styles.writeReviewButton}
+					onPress={() => setShowAddReviewModal(true)}
+				>
+					<Ionicons name="create-outline" size={16} color={colors.quaternary} />
+					<Text style={styles.writeReviewText}>{t('reviews.writeReview')}</Text>
+				</TouchableOpacity>
+			</View>
+
+			{/* Sort Options */}
+			<View style={styles.sortContainer}>
+				<Text style={styles.sortLabel}>{t('filters.sortBy')}:</Text>
+				<ScrollView
+					horizontal
+					showsHorizontalScrollIndicator={false}
+					style={styles.sortButtons}
+				>
+					{getSortOptions().map(({ option, label, icon }) => (
+						<SortButton
+							key={option}
+							label={label}
+							isActive={currentSort === option}
+							onPress={() => setCurrentSort(option)}
+							icon={icon}
+						/>
+					))}
+				</ScrollView>
 			</View>
 
 			{/* Reviews List */}
-			<FlatList
-				data={mockReviews}
-				renderItem={renderReviewItem}
-				keyExtractor={(item) => item.id}
-				contentContainerStyle={styles.reviewsList}
-				showsVerticalScrollIndicator={false}
-				ItemSeparatorComponent={() => <View style={styles.separator} />}
+			{reviews.length > 0 ? (
+				<FlatList
+					data={sortedReviews}
+					renderItem={renderReviewItem}
+					keyExtractor={(item) => item.id}
+					contentContainerStyle={styles.reviewsList}
+					showsVerticalScrollIndicator={false}
+					ItemSeparatorComponent={() => <View style={styles.separator} />}
+				/>
+			) : (
+				<View style={styles.emptyState}>
+					<Ionicons
+						name="chatbubble-outline"
+						size={64}
+						color={colors.primaryLight}
+					/>
+					<Text style={styles.emptyStateTitle}>{t('reviews.noReviews')}</Text>
+					<Text style={styles.emptyStateSubtitle}>{t('reviews.beFirst')}</Text>
+					<TouchableOpacity
+						style={styles.firstReviewButton}
+						onPress={() => setShowAddReviewModal(true)}
+					>
+						<Ionicons
+							name="create-outline"
+							size={16}
+							color={colors.quaternary}
+						/>
+						<Text style={styles.firstReviewButtonText}>
+							{t('reviews.writeReview')}
+						</Text>
+					</TouchableOpacity>
+				</View>
+			)}
+
+			{/* Add Review Modal */}
+			<AddReviewModal
+				visible={showAddReviewModal}
+				onClose={() => setShowAddReviewModal(false)}
+				onSubmit={handleAddReview}
+				restaurantId={id || ''}
+				restaurantName="Restaurante Ejemplo"
 			/>
 		</View>
 	);
@@ -314,7 +477,15 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 20,
 		paddingVertical: 15,
 		borderBottomWidth: 1,
-		borderBottomColor: colors.primaryLight,
+		borderBottomColor: '#E5E5E5',
+		shadowColor: '#000',
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.1,
+		shadowRadius: 4,
+		elevation: 3,
 	},
 	backButton: {
 		width: 40,
@@ -328,29 +499,30 @@ const styles = StyleSheet.create({
 		fontWeight: '600',
 		color: colors.primary,
 	},
-	headerRight: {
-		width: 40,
-	},
 	addReviewButton: {
 		width: 40,
 		height: 40,
 		justifyContent: 'center',
 		alignItems: 'center',
+		borderRadius: 20,
+		borderWidth: 1,
+		borderColor: colors.primary,
+		backgroundColor: colors.quaternary,
 	},
 	summaryContainer: {
 		backgroundColor: colors.quaternary,
-		marginHorizontal: 20,
-		marginVertical: 15,
-		borderRadius: 15,
+		marginHorizontal: 16,
+		marginVertical: 16,
+		borderRadius: 20,
 		padding: 20,
 		shadowColor: '#000',
 		shadowOffset: {
 			width: 0,
-			height: 2,
+			height: 4,
 		},
-		shadowOpacity: 0.1,
-		shadowRadius: 4,
-		elevation: 3,
+		shadowOpacity: 0.15,
+		shadowRadius: 8,
+		elevation: 5,
 	},
 	summaryHeader: {
 		alignItems: 'center',
@@ -366,6 +538,9 @@ const styles = StyleSheet.create({
 		color: colors.primary,
 		marginBottom: 8,
 	},
+	starsAndCount: {
+		alignItems: 'center',
+	},
 	totalReviews: {
 		fontSize: 14,
 		fontFamily: 'Manrope',
@@ -375,6 +550,7 @@ const styles = StyleSheet.create({
 	},
 	ratingDistribution: {
 		gap: 8,
+		marginBottom: 20,
 	},
 	ratingRow: {
 		flexDirection: 'row',
@@ -408,22 +584,87 @@ const styles = StyleSheet.create({
 		width: 30,
 		textAlign: 'right',
 	},
+	writeReviewButton: {
+		backgroundColor: colors.primary,
+		borderRadius: 16,
+		paddingVertical: 12,
+		paddingHorizontal: 20,
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		gap: 8,
+		shadowColor: '#000',
+		shadowOffset: {
+			width: 0,
+			height: 4,
+		},
+		shadowOpacity: 0.3,
+		shadowRadius: 8,
+		elevation: 8,
+	},
+	writeReviewText: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.quaternary,
+	},
+	sortContainer: {
+		paddingHorizontal: 16,
+		marginBottom: 16,
+	},
+	sortLabel: {
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.primary,
+		marginBottom: 12,
+	},
+	sortButtons: {
+		flexDirection: 'row',
+		gap: 8,
+		flexWrap: 'wrap',
+	},
+	sortButton: {
+		backgroundColor: colors.quaternary,
+		borderRadius: 12,
+		paddingHorizontal: 12,
+		paddingVertical: 8,
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: 4,
+		borderWidth: 1,
+		borderColor: colors.primaryLight,
+		marginRight: 10,
+	},
+	sortButtonActive: {
+		backgroundColor: colors.primary,
+		borderColor: colors.primary,
+	},
+	sortButtonText: {
+		fontSize: 12,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		color: colors.primary,
+	},
+	sortButtonTextActive: {
+		color: colors.quaternary,
+	},
 	reviewsList: {
 		paddingBottom: 20,
 	},
 	reviewItem: {
 		backgroundColor: colors.quaternary,
-		marginHorizontal: 20,
-		borderRadius: 15,
+		marginHorizontal: 16,
+		borderRadius: 16,
 		padding: 20,
 		shadowColor: '#000',
 		shadowOffset: {
 			width: 0,
-			height: 1,
+			height: 2,
 		},
-		shadowOpacity: 0.05,
-		shadowRadius: 2,
-		elevation: 2,
+		shadowOpacity: 0.1,
+		shadowRadius: 8,
+		elevation: 3,
 	},
 	reviewHeader: {
 		flexDirection: 'row',
@@ -458,9 +699,16 @@ const styles = StyleSheet.create({
 		fontWeight: '400',
 		color: colors.primaryLight,
 	},
-	starsContainer: {
+	ratingContainer: {
 		flexDirection: 'row',
-		gap: 2,
+		alignItems: 'center',
+		gap: 6,
+	},
+	ratingNumber: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.primary,
 	},
 	reviewComment: {
 		fontSize: 15,
@@ -536,27 +784,50 @@ const styles = StyleSheet.create({
 	separator: {
 		height: 15,
 	},
-	writeReviewButton: {
+	emptyState: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingHorizontal: 40,
+	},
+	emptyStateTitle: {
+		fontSize: 20,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.primary,
+		textAlign: 'center',
+		marginTop: 16,
+		marginBottom: 8,
+	},
+	emptyStateSubtitle: {
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primaryLight,
+		textAlign: 'center',
+		lineHeight: 22,
+		marginBottom: 24,
+	},
+	firstReviewButton: {
 		backgroundColor: colors.primary,
-		borderRadius: 25,
-		paddingVertical: 12,
-		paddingHorizontal: 20,
+		borderRadius: 16,
+		paddingVertical: 14,
+		paddingHorizontal: 24,
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
 		gap: 8,
-		marginTop: 15,
 		shadowColor: '#000',
 		shadowOffset: {
 			width: 0,
-			height: 2,
+			height: 4,
 		},
-		shadowOpacity: 0.1,
-		shadowRadius: 4,
-		elevation: 3,
+		shadowOpacity: 0.3,
+		shadowRadius: 8,
+		elevation: 8,
 	},
-	writeReviewText: {
-		fontSize: 14,
+	firstReviewButtonText: {
+		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.quaternary,
