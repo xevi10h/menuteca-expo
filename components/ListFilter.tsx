@@ -1,4 +1,3 @@
-// components/ListFilter.tsx (Complete Updated Version)
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { RestaurantTag } from '@/shared/enums';
@@ -430,8 +429,16 @@ export default function ListFilter() {
 				transparent
 				animationType="slide"
 			>
-				<View style={styles.modalOverlay}>
-					<View style={[styles.modalContent, { paddingBottom: bottom + 20 }]}>
+				<TouchableOpacity
+					style={styles.modalOverlay}
+					activeOpacity={1}
+					onPress={closeModal}
+				>
+					<TouchableOpacity
+						style={[styles.modalContent, { paddingBottom: bottom + 20 }]}
+						activeOpacity={1}
+						onPress={(e) => e.stopPropagation()}
+					>
 						<Text style={styles.modalTitle}>{t('filters.priceRange')}</Text>
 
 						<View style={styles.priceInputContainer}>
@@ -478,8 +485,8 @@ export default function ListFilter() {
 								<Text style={styles.applyButtonText}>{t('filters.apply')}</Text>
 							</TouchableOpacity>
 						</View>
-					</View>
-				</View>
+					</TouchableOpacity>
+				</TouchableOpacity>
 			</Modal>
 
 			{/* Rating Filter Modal */}
@@ -488,8 +495,16 @@ export default function ListFilter() {
 				transparent
 				animationType="slide"
 			>
-				<View style={styles.modalOverlay}>
-					<View style={[styles.modalContent, { paddingBottom: bottom + 20 }]}>
+				<TouchableOpacity
+					style={styles.modalOverlay}
+					activeOpacity={1}
+					onPress={closeModal}
+				>
+					<TouchableOpacity
+						style={[styles.modalContent, { paddingBottom: bottom + 20 }]}
+						activeOpacity={1}
+						onPress={(e) => e.stopPropagation()}
+					>
 						<Text style={styles.modalTitle}>{t('filters.minimumRating')}</Text>
 
 						<View style={styles.ratingContainer}>
@@ -519,14 +534,22 @@ export default function ListFilter() {
 								<Text style={styles.applyButtonText}>{t('filters.apply')}</Text>
 							</TouchableOpacity>
 						</View>
-					</View>
-				</View>
+					</TouchableOpacity>
+				</TouchableOpacity>
 			</Modal>
 
 			{/* Tags Filter Modal */}
 			<Modal visible={activeModal === 'tags'} transparent animationType="slide">
-				<View style={styles.modalOverlay}>
-					<View style={[styles.modalContent, { paddingBottom: bottom + 20 }]}>
+				<TouchableOpacity
+					style={styles.modalOverlay}
+					activeOpacity={1}
+					onPress={closeModal}
+				>
+					<TouchableOpacity
+						style={[styles.modalContent, { paddingBottom: bottom + 20 }]}
+						activeOpacity={1}
+						onPress={(e) => e.stopPropagation()}
+					>
 						<Text style={styles.modalTitle}>{t('filters.categories')}</Text>
 						<Text style={styles.modalSubtitle}>
 							{t('filters.categoriesSubtitle')}
@@ -561,8 +584,8 @@ export default function ListFilter() {
 								<Text style={styles.applyButtonText}>{t('filters.apply')}</Text>
 							</TouchableOpacity>
 						</View>
-					</View>
-				</View>
+					</TouchableOpacity>
+				</TouchableOpacity>
 			</Modal>
 
 			{/* Schedule Filter Modal */}
@@ -571,8 +594,16 @@ export default function ListFilter() {
 				transparent
 				animationType="slide"
 			>
-				<View style={styles.modalOverlay}>
-					<View style={[styles.modalContent, { paddingBottom: bottom + 20 }]}>
+				<TouchableOpacity
+					style={styles.modalOverlay}
+					activeOpacity={1}
+					onPress={closeModal}
+				>
+					<TouchableOpacity
+						style={[styles.modalContent, { paddingBottom: bottom + 20 }]}
+						activeOpacity={1}
+						onPress={(e) => e.stopPropagation()}
+					>
 						<Text style={styles.modalTitle}>{t('filters.schedule')}</Text>
 
 						<View style={styles.timeInputContainer}>
@@ -677,8 +708,8 @@ export default function ListFilter() {
 								<Text style={styles.applyButtonText}>{t('filters.apply')}</Text>
 							</TouchableOpacity>
 						</View>
-					</View>
-				</View>
+					</TouchableOpacity>
+				</TouchableOpacity>
 			</Modal>
 
 			{/* Distance Filter Modal */}
@@ -687,8 +718,16 @@ export default function ListFilter() {
 				transparent
 				animationType="slide"
 			>
-				<View style={styles.modalOverlay}>
-					<View style={[styles.modalContent, { paddingBottom: bottom + 20 }]}>
+				<TouchableOpacity
+					style={styles.modalOverlay}
+					activeOpacity={1}
+					onPress={closeModal}
+				>
+					<TouchableOpacity
+						style={[styles.modalContent, { paddingBottom: bottom + 20 }]}
+						activeOpacity={1}
+						onPress={(e) => e.stopPropagation()}
+					>
 						<Text style={styles.modalTitle}>{t('filters.maxDistance')}</Text>
 
 						<View style={styles.distanceContainer}>
@@ -718,8 +757,8 @@ export default function ListFilter() {
 								<Text style={styles.applyButtonText}>{t('filters.apply')}</Text>
 							</TouchableOpacity>
 						</View>
-					</View>
-				</View>
+					</TouchableOpacity>
+				</TouchableOpacity>
 			</Modal>
 		</View>
 	);
