@@ -2,7 +2,6 @@ import { colors } from '@/assets/styles/colors';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import Svg, { Defs, LinearGradient, Path, Stop } from 'react-native-svg';
 
 interface StarRatingProps {
 	rating: number;
@@ -15,7 +14,7 @@ interface StarRatingProps {
 export default function StarRating({
 	rating,
 	size = 16,
-	color = '#FFD700',
+	color = colors.primary,
 	emptyColor = colors.primaryLight,
 	maxStars = 5,
 }: StarRatingProps) {
@@ -50,48 +49,65 @@ export default function StarRating({
 
 	const renderPreciseStar = (index: number) => {
 		const starValue = index + 1;
-		let fillPercentage = 0;
 
 		if (normalizedRating >= starValue) {
 			// Estrella completamente llena
-			fillPercentage = 1;
+			return (
+				<Ionicons
+					key={index}
+					name="star"
+					size={size}
+					color={color}
+					style={{ marginHorizontal: 1 }}
+				/>
+			);
 		} else if (normalizedRating > starValue - 1) {
 			// Estrella parcialmente llena
-			fillPercentage = normalizedRating - (starValue - 1);
-		}
+			const fillPercentage = normalizedRating - (starValue - 1);
 
-		// Redondear a la décima más cercana para mejor precisión visual
-		fillPercentage = Math.round(fillPercentage * 10) / 10;
-
-		const starPath = createStarPath(size);
-		const gradientId = `star-gradient-${index}-${fillPercentage}`;
-
-		return (
-			<View key={index} style={{ marginHorizontal: 1 }}>
-				<Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-					<Defs>
-						<LinearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
-							<Stop
-								offset={`${fillPercentage * 100}%`}
-								stopColor={color}
-								stopOpacity="1"
-							/>
-							<Stop
-								offset={`${fillPercentage * 100}%`}
-								stopColor={emptyColor}
-								stopOpacity="1"
-							/>
-						</LinearGradient>
-					</Defs>
-					<Path
-						d={starPath}
-						fill={`url(#${gradientId})`}
-						stroke={fillPercentage > 0 ? color : emptyColor}
-						strokeWidth="0.5"
+			if (fillPercentage >= 0.7) {
+				return (
+					<Ionicons
+						key={index}
+						name="star"
+						size={size}
+						color={color}
+						style={{ marginHorizontal: 1 }}
 					/>
-				</Svg>
-			</View>
-		);
+				);
+			} else if (fillPercentage >= 0.3) {
+				return (
+					<Ionicons
+						key={index}
+						name="star-half"
+						size={size}
+						color={color}
+						style={{ marginHorizontal: 1 }}
+					/>
+				);
+			} else {
+				return (
+					<Ionicons
+						key={index}
+						name="star-outline"
+						size={size}
+						color={emptyColor}
+						style={{ marginHorizontal: 1 }}
+					/>
+				);
+			}
+		} else {
+			// Estrella vacía
+			return (
+				<Ionicons
+					key={index}
+					name="star-outline"
+					size={size}
+					color={emptyColor}
+					style={{ marginHorizontal: 1 }}
+				/>
+			);
+		}
 	};
 
 	// Fallback usando Ionicons para casos donde SVG no esté disponible
@@ -175,8 +191,8 @@ export default function StarRating({
 		}
 	};
 
-	// Intentar usar SVG primero, fallback a Ionicons
-	const useSVG = true; // Puedes cambiar esto a false si prefieres usar Ionicons
+	// Usar Ionicons directamente para mejor compatibilidad
+	const useSVG = false;
 
 	return (
 		<View style={styles.container}>
@@ -196,7 +212,7 @@ interface StarRatingWithNumberProps extends StarRatingProps {
 export const StarRatingWithNumber: React.FC<StarRatingWithNumberProps> = ({
 	rating,
 	size = 16,
-	color = '#FFD700',
+	color = colors.primary,
 	emptyColor = colors.primaryLight,
 	maxStars = 5,
 	showNumber = true,
