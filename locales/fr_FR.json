@@ -369,7 +369,7 @@
 		"noRestaurantsYet": "Vous n'avez pas encore de restaurants",
 		"averageRating": "Note moyenne",
 		"active": "Actif",
-		"pending": "En attente"
+		"inactive": "Inactif"
 	},
 	"languages": {
 		"en_US": "Anglais",

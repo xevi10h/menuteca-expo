@@ -368,7 +368,7 @@
 		"noRestaurantsYet": "Aún no tienes restaurantes",
 		"averageRating": "Puntuación media",
 		"active": "Activo",
-		"pending": "Pendiente"
+		"inactive": "Inactivo"
 	},
 	"languages": {
 		"es_ES": "Español",

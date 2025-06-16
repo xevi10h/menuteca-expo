@@ -369,7 +369,7 @@
 		"noRestaurantsYet": "You don't have any restaurants yet",
 		"averageRating": "Average rating",
 		"active": "Active",
-		"pending": "Pending"
+		"inactive": "Inactive"
 	},
 	"languages": {
 		"es_ES": "Spanish",

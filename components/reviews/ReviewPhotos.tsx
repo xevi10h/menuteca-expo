@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
 	reviewPhotosContainer: {
 		flexDirection: 'row',
 		gap: 8,
-		marginBottom: 15,
+		marginTop: 15,
 	},
 	reviewPhoto: {
 		position: 'relative',

@@ -160,6 +160,9 @@ export default function AddReviewModal({
 				rating,
 				comment: comment.trim() || '', // Permitir comentarios vacíos
 				photos,
+				restaurantId,
+				restaurantName,
+				restaurantImage: 'https://example.com/restaurant.jpg',
 			};
 
 			onSubmit(newReview);

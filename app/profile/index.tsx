@@ -1,8 +1,9 @@
-import { mockUserReviews } from '@/api/responses';
+import { getUserRestaurants, mockUserReviews } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import ChangePasswordPopup from '@/components/profile/ChangePasswordPopup';
 import ChangeUsernamePopup from '@/components/profile/ChangeUsernamePopup';
 import LanguageSelectorPopup from '@/components/profile/LanguageSelectorPopup';
+import UserRestaurantPill from '@/components/profile/UserRestaurantPill';
 import UserReviewItem from '@/components/reviews/UserReviewItem';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useUserStore } from '@/zustand/UserStore';
@@ -21,13 +22,6 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-interface Restaurant {
-	id: string;
-	name: string;
-	address: string;
-	profileImage?: string;
-}
-
 export default function ProfileScreen() {
 	const user = useUserStore((state) => state.user);
 	const updatePhoto = useUserStore((state) => state.updatePhoto);
@@ -40,23 +34,8 @@ export default function ProfileScreen() {
 	const [showChangeUsernamePopup, setShowChangeUsernamePopup] = useState(false);
 	const [showLanguagePopup, setShowLanguagePopup] = useState(false);
 
-	// Datos mock de restaurantes del usuario (máximo 10)
-	const [userRestaurants] = useState<Restaurant[]>([
-		{
-			id: '1',
-			name: 'La Taberna del Abuelo',
-			address: 'Calle Mayor 123, Madrid',
-			profileImage: undefined,
-		},
-		{
-			id: '2',
-			name: 'Bistro Mediterráneo',
-			address: 'Avenida de la Paz 45, Barcelona',
-			profileImage: undefined,
-		},
-	]);
-
-	// Usar solo las primeras 2 reseñas del mock
+	// Get user restaurants and reviews
+	const userRestaurants = getUserRestaurants();
 	const userReviews = mockUserReviews.slice(0, 2);
 
 	const handleBack = () => {
@@ -112,10 +91,6 @@ export default function ProfileScreen() {
 			return;
 		}
 		router.push('/profile/register-restaurant');
-	};
-
-	const handleEditRestaurant = (restaurantId: string) => {
-		router.push('/profile/register-restaurant/setup/edit');
 	};
 
 	const handleViewAllReviews = () => {
@@ -249,6 +224,46 @@ export default function ProfileScreen() {
 					</TouchableOpacity>
 				</View>
 
+				{/* Restaurants Section */}
+				<View style={styles.section}>
+					<View style={styles.sectionHeader}>
+						<Text style={styles.sectionTitle}>
+							Mis Restaurantes ({userRestaurants.length}/10)
+						</Text>
+						<TouchableOpacity
+							onPress={handleAddRestaurant}
+							style={styles.addButton}
+						>
+							<Ionicons name="add" size={20} color={colors.quaternary} />
+						</TouchableOpacity>
+					</View>
+
+					{userRestaurants.length > 0 ? (
+						<View style={styles.restaurantsContainer}>
+							{userRestaurants.map((restaurant) => (
+								<UserRestaurantPill
+									key={restaurant.id}
+									restaurant={restaurant}
+								/>
+							))}
+						</View>
+					) : (
+						<View style={styles.emptyState}>
+							<Ionicons
+								name="restaurant-outline"
+								size={48}
+								color={colors.primaryLight}
+							/>
+							<Text style={styles.emptyStateText}>
+								No tienes restaurantes registrados
+							</Text>
+							<Text style={styles.emptyStateSubtext}>
+								Añade tu primer restaurante para comenzar
+							</Text>
+						</View>
+					)}
+				</View>
+
 				{/* Reviews Section */}
 				<View style={styles.section}>
 					<View style={styles.sectionHeader}>
@@ -296,73 +311,6 @@ export default function ProfileScreen() {
 							</Text>
 							<Text style={styles.emptyStateSubtext}>
 								{t('profile.startReviewing')}
-							</Text>
-						</View>
-					)}
-				</View>
-
-				{/* Restaurants Section */}
-				<View style={styles.section}>
-					<View style={styles.sectionHeader}>
-						<Text style={styles.sectionTitle}>
-							Mis Restaurantes ({userRestaurants.length}/10)
-						</Text>
-						<TouchableOpacity
-							onPress={handleAddRestaurant}
-							style={styles.addButton}
-						>
-							<Ionicons name="add" size={20} color={colors.quaternary} />
-						</TouchableOpacity>
-					</View>
-
-					{userRestaurants.map((restaurant) => (
-						<TouchableOpacity
-							key={restaurant.id}
-							style={styles.restaurantItem}
-							onPress={() => handleEditRestaurant(restaurant.id)}
-						>
-							<View style={styles.restaurantImageContainer}>
-								{restaurant.profileImage ? (
-									<Image
-										source={{ uri: restaurant.profileImage }}
-										style={styles.restaurantImage}
-									/>
-								) : (
-									<View style={styles.restaurantImagePlaceholder}>
-										<Text style={styles.restaurantImageText}>
-											{restaurant.name.charAt(0).toUpperCase()}
-										</Text>
-									</View>
-								)}
-							</View>
-
-							<View style={styles.restaurantInfo}>
-								<Text style={styles.restaurantName}>{restaurant.name}</Text>
-								<Text style={styles.restaurantAddress}>
-									{restaurant.address}
-								</Text>
-							</View>
-
-							<Ionicons
-								name="chevron-forward"
-								size={20}
-								color={colors.primaryLight}
-							/>
-						</TouchableOpacity>
-					))}
-
-					{userRestaurants.length === 0 && (
-						<View style={styles.emptyState}>
-							<Ionicons
-								name="restaurant-outline"
-								size={48}
-								color={colors.primaryLight}
-							/>
-							<Text style={styles.emptyStateText}>
-								No tienes restaurantes registrados
-							</Text>
-							<Text style={styles.emptyStateSubtext}>
-								Añade tu primer restaurante para comenzar
 							</Text>
 						</View>
 					)}
@@ -506,7 +454,6 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.primary,
-		marginBottom: 16,
 	},
 	viewAllButton: {
 		flexDirection: 'row',
@@ -556,53 +503,11 @@ const styles = StyleSheet.create({
 		fontWeight: '400',
 		color: colors.primaryLight,
 	},
+	restaurantsContainer: {
+		gap: 0,
+	},
 	reviewsContainer: {
 		gap: 12,
-	},
-	restaurantItem: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		paddingVertical: 12,
-		borderBottomWidth: 1,
-		borderBottomColor: colors.primaryLight,
-	},
-	restaurantImageContainer: {
-		marginRight: 12,
-	},
-	restaurantImage: {
-		width: 48,
-		height: 48,
-		borderRadius: 24,
-	},
-	restaurantImagePlaceholder: {
-		width: 48,
-		height: 48,
-		borderRadius: 24,
-		backgroundColor: colors.primary,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	restaurantImageText: {
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
-		color: colors.quaternary,
-	},
-	restaurantInfo: {
-		flex: 1,
-	},
-	restaurantName: {
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
-		color: colors.primary,
-		marginBottom: 2,
-	},
-	restaurantAddress: {
-		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
-		color: colors.primaryLight,
 	},
 	emptyState: {
 		alignItems: 'center',

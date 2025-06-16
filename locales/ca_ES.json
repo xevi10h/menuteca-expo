@@ -369,7 +369,7 @@
 		"noRestaurantsYet": "Encara no tens restaurants",
 		"averageRating": "Puntuació mitjana",
 		"active": "Actiu",
-		"pending": "Pendent"
+		"inactive": "Inactiu"
 	},
 	"languages": {
 		"es_ES": "Espanyol",

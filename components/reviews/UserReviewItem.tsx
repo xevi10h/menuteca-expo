@@ -49,23 +49,25 @@ export default function UserReviewItem({
 						style={styles.restaurantImage}
 					/>
 					<View style={styles.restaurantInfo}>
-						<Text style={styles.restaurantName}>{review.restaurantName}</Text>
+						<Text style={styles.restaurantName} numberOfLines={1}>
+							{review.restaurantName}
+						</Text>
 						<Text style={styles.reviewDate}>{formatDate(review.date)}</Text>
 					</View>
 					<View style={styles.ratingContainer}>
 						<StarRating
 							rating={review.rating}
-							size={16}
+							size={12}
 							color={colors.primary}
 							emptyColor={colors.primaryLight}
 						/>
 						<Text style={styles.ratingNumber}>{review.rating}</Text>
+						<Ionicons
+							name="chevron-forward"
+							size={16}
+							color={colors.primaryLight}
+						/>
 					</View>
-					<Ionicons
-						name="chevron-forward"
-						size={16}
-						color={colors.primaryLight}
-					/>
 				</TouchableOpacity>
 			)}
 
@@ -105,10 +107,10 @@ export default function UserReviewItem({
 				<View style={styles.restaurantResponse}>
 					<View style={styles.responseHeader}>
 						<Ionicons name="storefront" size={16} color={colors.primary} />
-						<Text style={styles.responseLabel}>
+						<Text style={styles.responseLabel} numberOfLines={1}>
 							{t('reviews.restaurantResponse')}
 						</Text>
-						<Text style={styles.responseDate}>
+						<Text style={styles.responseDate} numberOfLines={1}>
 							{formatDate(review.restaurantResponse.date)}
 						</Text>
 					</View>
@@ -138,22 +140,23 @@ const styles = StyleSheet.create({
 	restaurantHeader: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		marginBottom: 15,
-		paddingBottom: 15,
+		marginBottom: 10,
+		paddingBottom: 10,
 		borderBottomWidth: 1,
 		borderBottomColor: colors.secondary,
+		gap: 10,
 	},
 	restaurantImage: {
 		width: 50,
 		height: 50,
 		borderRadius: 8,
-		marginRight: 12,
 	},
 	restaurantInfo: {
 		flex: 1,
 	},
 	restaurantName: {
-		fontSize: 16,
+		fontSize: 14,
+
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.primary,
@@ -195,21 +198,20 @@ const styles = StyleSheet.create({
 	ratingContainer: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: 6,
+		gap: 4,
 	},
 	ratingNumber: {
-		fontSize: 14,
+		fontSize: 12,
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.primary,
 	},
 	reviewComment: {
-		fontSize: 15,
+		fontSize: 12,
 		fontFamily: 'Manrope',
 		fontWeight: '400',
 		color: colors.primary,
 		lineHeight: 22,
-		marginBottom: 15,
 	},
 	restaurantResponse: {
 		backgroundColor: colors.secondary,
@@ -217,6 +219,7 @@ const styles = StyleSheet.create({
 		padding: 15,
 		borderLeftWidth: 4,
 		borderLeftColor: colors.primary,
+		marginTop: 15,
 	},
 	responseHeader: {
 		flexDirection: 'row',
@@ -225,20 +228,20 @@ const styles = StyleSheet.create({
 		gap: 8,
 	},
 	responseLabel: {
-		fontSize: 14,
+		fontSize: 12,
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.primary,
 		flex: 1,
 	},
 	responseDate: {
-		fontSize: 11,
+		fontSize: 8,
 		fontFamily: 'Manrope',
 		fontWeight: '400',
 		color: colors.primaryLight,
 	},
 	responseMessage: {
-		fontSize: 14,
+		fontSize: 10,
 		fontFamily: 'Manrope',
 		fontWeight: '400',
 		color: colors.primary,

@@ -1945,7 +1945,7 @@ export const mockUserReviews: Review[] = [
 			'Excelente comida tradicional, el ambiente es muy acogedor y el personal muy atento. La paella estaba espectacular.',
 		date: '2024-06-15',
 		photos: [
-			'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=300',
+			'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300',
 			'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=300',
 		],
 		restaurantId: '1',
@@ -2116,3 +2116,380 @@ export const mockUserReviews: Review[] = [
 		},
 	},
 ];
+
+// Añadir al final de api/responses.ts
+
+// Mock data para restaurantes del usuario
+export const mockUserRestaurants: Restaurant[] = [
+	{
+		id: 'user-rest-1',
+		name: 'La Taberna del Abuelo',
+		minimumPrice: 12,
+		cuisineId: '1', // Mediterranean
+		rating: 4.3,
+		mainImage:
+			'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
+		profileImage:
+			'https://visitbegur.cat/wp-content/uploads/2021/06/mooma-1024x813.jpg',
+		images: [
+			'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
+			'https://images.pexels.com/photos/2092507/pexels-photo-2092507.jpeg',
+			'https://images.pexels.com/photos/1907228/pexels-photo-1907228.jpeg',
+		],
+		distance: 0,
+		address: {
+			street: 'Calle Mayor',
+			number: '123',
+			additionalInformation: 'Local 2',
+			postalCode: '28001',
+			city: 'Madrid',
+			country: 'España',
+			coordinates: {
+				latitude: 40.4168,
+				longitude: -3.7038,
+			},
+			formattedAddress: 'Calle Mayor, 123, Local 2, 28001 Madrid, España',
+		},
+		tags: [
+			RestaurantTag.FAMILY_FRIENDLY,
+			RestaurantTag.VEGETARIAN,
+			RestaurantTag.OUTDOOR_SEATING,
+			RestaurantTag.WIFI,
+		],
+		menus: [],
+		phone: '+34 911 234 567',
+		reservationLink: 'https://reservas.latabernaddelabuelo.com',
+	},
+	{
+		id: 'user-rest-2',
+		name: 'Bistro Mediterráneo',
+		minimumPrice: 18,
+		cuisineId: '1', // Mediterranean
+		rating: 4.6,
+		mainImage:
+			'https://images.pexels.com/photos/2092507/pexels-photo-2092507.jpeg',
+		profileImage:
+			'https://visitbegur.cat/wp-content/uploads/2021/06/mooma-1024x813.jpg',
+		images: [
+			'https://images.pexels.com/photos/2092507/pexels-photo-2092507.jpeg',
+			'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
+			'https://images.pexels.com/photos/1907228/pexels-photo-1907228.jpeg',
+		],
+		distance: 0,
+		address: {
+			street: 'Avenida de la Paz',
+			number: '45',
+			additionalInformation: '2º A',
+			postalCode: '08002',
+			city: 'Barcelona',
+			country: 'España',
+			coordinates: {
+				latitude: 41.3851,
+				longitude: 2.1734,
+			},
+			formattedAddress: 'Avenida de la Paz, 45, 2º A, 08002 Barcelona, España',
+		},
+		tags: [
+			RestaurantTag.ROMANTIC,
+			RestaurantTag.BUSINESS_FRIENDLY,
+			RestaurantTag.RESERVATIONS,
+			RestaurantTag.AIR_CONDITIONING,
+		],
+		menus: [],
+		phone: '+34 933 456 789',
+		reservationLink: 'https://bistromediterraneo.opentable.com',
+	},
+	{
+		id: 'user-rest-3',
+		name: 'Café Central',
+		minimumPrice: 8,
+		cuisineId: '5', // American
+		rating: 3.9,
+		mainImage:
+			'https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg',
+		profileImage:
+			'https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg',
+		images: [
+			'https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg',
+		],
+		distance: 0,
+		address: {
+			street: 'Plaza de la Constitución',
+			number: '8',
+			additionalInformation: '',
+			postalCode: '41001',
+			city: 'Sevilla',
+			country: 'España',
+			coordinates: {
+				latitude: 37.3886,
+				longitude: -5.9823,
+			},
+			formattedAddress: 'Plaza de la Constitución, 8, 41001 Sevilla, España',
+		},
+		tags: [
+			RestaurantTag.WIFI,
+			RestaurantTag.OUTDOOR_SEATING,
+			RestaurantTag.FAMILY_FRIENDLY,
+		],
+		menus: [],
+		phone: '+34 954 123 456',
+	},
+];
+
+// Estado de activación de restaurantes del usuario
+export const mockUserRestaurantStatus: Record<string, { isActive: boolean }> = {
+	'user-rest-1': { isActive: true },
+	'user-rest-2': { isActive: true },
+	'user-rest-3': { isActive: false },
+};
+
+// Función para obtener restaurantes del usuario
+export const getUserRestaurants = (): Restaurant[] => {
+	return mockUserRestaurants;
+};
+
+// Función para obtener un restaurante del usuario por ID
+export const getUserRestaurantById = (id: string): Restaurant | undefined => {
+	return mockUserRestaurants.find((restaurant) => restaurant.id === id);
+};
+
+// Función para obtener el estado de un restaurante del usuario
+export const getUserRestaurantStatus = (id: string): { isActive: boolean } => {
+	return mockUserRestaurantStatus[id] || { isActive: false };
+};
+
+// Función para actualizar el estado de un restaurante del usuario
+export const updateUserRestaurantStatus = (
+	id: string,
+	isActive: boolean,
+): void => {
+	mockUserRestaurantStatus[id] = { isActive };
+};
+
+// Menús para los restaurantes del usuario
+export const getUserRestaurantMenus = (id: string): MenuData[] => {
+	const menuMap: Record<string, MenuData[]> = {
+		'user-rest-1': [
+			{
+				id: 'user-menu-1',
+				name: 'Menú del día',
+				startTime: '13:00',
+				endTime: '16:00',
+				days: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+				price: 12.95,
+				firstCoursesToShare: false,
+				secondCoursesToShare: false,
+				dessertsToShare: false,
+				includesBread: true,
+				drinks: { water: true, wine: false, softDrinks: false, beer: false },
+				includesCoffeeAndDessert: 'dessert',
+				minimumPeople: 1,
+				hasMinimumPeople: false,
+				dishes: [
+					{
+						id: 'user-dish-1',
+						name: 'Gazpacho andaluz',
+						description: 'Gazpacho tradicional con verduras frescas',
+						extraPrice: 0,
+						category: DishCategory.APPETIZERS,
+						isVegetarian: true,
+						isLactoseFree: true,
+						isSpicy: false,
+						isGlutenFree: true,
+						isVegan: true,
+					},
+					{
+						id: 'user-dish-2',
+						name: 'Paella mixta',
+						description: 'Paella con pollo, mariscos y verduras',
+						extraPrice: 2,
+						category: DishCategory.MAIN_COURSES,
+						isVegetarian: false,
+						isLactoseFree: true,
+						isSpicy: false,
+						isGlutenFree: true,
+						isVegan: false,
+					},
+					{
+						id: 'user-dish-3',
+						name: 'Flan casero',
+						description: 'Flan tradicional con caramelo',
+						extraPrice: 0,
+						category: DishCategory.DESSERTS,
+						isVegetarian: true,
+						isLactoseFree: false,
+						isSpicy: false,
+						isGlutenFree: true,
+						isVegan: false,
+					},
+				],
+			},
+		],
+		'user-rest-2': [
+			{
+				id: 'user-menu-2',
+				name: 'Menú degustación',
+				startTime: '20:00',
+				endTime: '23:00',
+				days: ['thursday', 'friday', 'saturday'],
+				price: 35.0,
+				firstCoursesToShare: true,
+				secondCoursesToShare: false,
+				dessertsToShare: true,
+				includesBread: true,
+				drinks: { water: true, wine: true, softDrinks: false, beer: false },
+				includesCoffeeAndDessert: 'both',
+				minimumPeople: 2,
+				hasMinimumPeople: true,
+				dishes: [
+					{
+						id: 'user-dish-4',
+						name: 'Tabla de embutidos ibéricos',
+						description: 'Selección de jamón ibérico, chorizo y lomo',
+						extraPrice: 5,
+						category: DishCategory.APPETIZERS,
+						isVegetarian: false,
+						isLactoseFree: true,
+						isSpicy: false,
+						isGlutenFree: true,
+						isVegan: false,
+					},
+					{
+						id: 'user-dish-5',
+						name: 'Lubina a la sal',
+						description: 'Lubina fresca con costra de sal y hierbas',
+						extraPrice: 0,
+						category: DishCategory.MAIN_COURSES,
+						isVegetarian: false,
+						isLactoseFree: true,
+						isSpicy: false,
+						isGlutenFree: true,
+						isVegan: false,
+					},
+				],
+			},
+		],
+		'user-rest-3': [
+			{
+				id: 'user-menu-3',
+				name: 'Brunch weekend',
+				startTime: '10:00',
+				endTime: '14:00',
+				days: ['saturday', 'sunday'],
+				price: 8.5,
+				firstCoursesToShare: false,
+				secondCoursesToShare: false,
+				dessertsToShare: false,
+				includesBread: false,
+				drinks: { water: false, wine: false, softDrinks: true, beer: false },
+				includesCoffeeAndDessert: 'coffee',
+				minimumPeople: 1,
+				hasMinimumPeople: false,
+				dishes: [
+					{
+						id: 'user-dish-6',
+						name: 'Tostadas con aguacate',
+						description: 'Pan tostado con aguacate, tomate y huevo',
+						extraPrice: 0,
+						category: DishCategory.MAIN_COURSES,
+						isVegetarian: true,
+						isLactoseFree: true,
+						isSpicy: false,
+						isGlutenFree: false,
+						isVegan: false,
+					},
+				],
+			},
+		],
+	};
+
+	return menuMap[id] || [];
+};
+
+// Reseñas para los restaurantes del usuario
+export const getUserRestaurantReviews = (restaurantId: string): Review[] => {
+	const reviewsMap: Record<string, Review[]> = {
+		'user-rest-1': [
+			{
+				id: 'user-review-1',
+				userId: 'customer1',
+				userName: 'Ana García',
+				userAvatar: 'https://randomuser.me/api/portraits/women/1.jpg',
+				rating: 4.5,
+				comment:
+					'Excelente comida casera y muy buen precio. El servicio es muy amable.',
+				date: '2024-06-10',
+				photos: [
+					'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=300',
+				],
+				restaurantId: restaurantId,
+				restaurantName: 'La Taberna del Abuelo',
+				restaurantImage:
+					'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
+				restaurantResponse: {
+					message:
+						'¡Muchas gracias Ana! Nos alegra saber que disfrutaste de la experiencia.',
+					date: '2024-06-11',
+				},
+			},
+			{
+				id: 'user-review-2',
+				userId: 'customer2',
+				userName: 'Miguel Rodriguez',
+				userAvatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+				rating: 4.0,
+				comment: 'Buena paella y ambiente familiar. Repetiremos seguro.',
+				date: '2024-06-05',
+				photos: [],
+				restaurantId: restaurantId,
+				restaurantName: 'La Taberna del Abuelo',
+				restaurantImage:
+					'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
+			},
+		],
+		'user-rest-2': [
+			{
+				id: 'user-review-3',
+				userId: 'customer3',
+				userName: 'Carmen López',
+				userAvatar: 'https://randomuser.me/api/portraits/women/3.jpg',
+				rating: 5.0,
+				comment:
+					'Una experiencia gastronómica increíble. Cada plato es una obra de arte.',
+				date: '2024-06-08',
+				photos: [
+					'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=300',
+					'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=300',
+				],
+				restaurantId: restaurantId,
+				restaurantName: 'Bistro Mediterráneo',
+				restaurantImage:
+					'https://images.pexels.com/photos/2092507/pexels-photo-2092507.jpeg',
+				restaurantResponse: {
+					message:
+						'Carmen, muchísimas gracias por tu reseña. Es un placer tenerte como cliente.',
+					date: '2024-06-09',
+				},
+			},
+		],
+		'user-rest-3': [
+			{
+				id: 'user-review-4',
+				userId: 'customer4',
+				userName: 'José Martinez',
+				userAvatar: 'https://randomuser.me/api/portraits/men/4.jpg',
+				rating: 3.5,
+				comment:
+					'Buen café pero el servicio es un poco lento. El ambiente es agradable.',
+				date: '2024-06-01',
+				photos: [],
+				restaurantId: restaurantId,
+				restaurantName: 'Café Central',
+				restaurantImage:
+					'https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg',
+			},
+		],
+	};
+
+	return reviewsMap[restaurantId] || [];
+};
