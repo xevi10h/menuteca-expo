@@ -1,5 +1,5 @@
 import { DishCategory, RestaurantTag } from '@/shared/enums';
-import { Cuisine, MenuData, Restaurant } from '@/shared/types';
+import { Cuisine, MenuData, Restaurant, Review } from '@/shared/types';
 
 export const allRestaurants: Restaurant[] = [
 	{
@@ -1930,3 +1930,189 @@ export const getMenusByRestaurantId = (id: string): MenuData[] => {
 
 	return menuMap[id] || [];
 };
+
+// Añadir al final de api/responses.ts
+
+// Mock data para las reseñas del usuario actual
+export const mockUserReviews: Review[] = [
+	{
+		id: '1',
+		userId: 'current_user',
+		userName: 'Tu Usuario',
+		userAvatar: 'https://randomuser.me/api/portraits/men/10.jpg',
+		rating: 5,
+		comment:
+			'Excelente comida tradicional, el ambiente es muy acogedor y el personal muy atento. La paella estaba espectacular.',
+		date: '2024-06-15',
+		photos: [
+			'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=300',
+			'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=300',
+		],
+		restaurantId: '1',
+		restaurantName: 'Sant Francesc Restaurant',
+		restaurantImage:
+			'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
+	},
+	{
+		id: '2',
+		userId: 'current_user',
+		userName: 'Tu Usuario',
+		userAvatar: 'https://randomuser.me/api/portraits/men/10.jpg',
+		rating: 4,
+		comment:
+			'Pescado fresco y buen servicio. Recomendado para una cena especial.',
+		date: '2024-06-10',
+		photos: [],
+		restaurantId: '3',
+		restaurantName: 'El gran sol',
+		restaurantImage:
+			'https://images.pexels.com/photos/1907228/pexels-photo-1907228.jpeg',
+		restaurantResponse: {
+			message:
+				'Muchas gracias por tu comentario. Nos alegra que hayas disfrutado de la experiencia.',
+			date: '2024-06-11',
+		},
+	},
+	{
+		id: '3',
+		userId: 'current_user',
+		userName: 'Tu Usuario',
+		userAvatar: 'https://randomuser.me/api/portraits/men/10.jpg',
+		rating: 4.5,
+		comment:
+			'Increíble experiencia gastronómica japonesa. El sushi estaba fresco y la presentación impecable.',
+		date: '2024-06-05',
+		photos: [
+			'https://images.unsplash.com/photo-1563612116625-3012372fccce?w=300',
+		],
+		restaurantId: '4',
+		restaurantName: 'Sakura Tokyo',
+		restaurantImage:
+			'https://images.pexels.com/photos/2098085/pexels-photo-2098085.jpeg',
+	},
+	{
+		id: '4',
+		userId: 'current_user',
+		userName: 'Tu Usuario',
+		userAvatar: 'https://randomuser.me/api/portraits/men/10.jpg',
+		rating: 3.8,
+		comment:
+			'Buenas tapas tradicionales. Ambiente auténtico español aunque el servicio podría ser más rápido.',
+		date: '2024-05-28',
+		photos: [],
+		restaurantId: '2',
+		restaurantName: 'Tika Tacos',
+		restaurantImage:
+			'https://images.pexels.com/photos/2092507/pexels-photo-2092507.jpeg',
+	},
+	{
+		id: '5',
+		userId: 'current_user',
+		userName: 'Tu Usuario',
+		userAvatar: 'https://randomuser.me/api/portraits/men/10.jpg',
+		rating: 4.2,
+		comment:
+			'Perfecto para un desayuno o brunch. El café es excelente y los pasteles están deliciosos.',
+		date: '2024-05-20',
+		photos: [
+			'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=300',
+			'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=300',
+		],
+		restaurantId: '5',
+		restaurantName: 'La Nonna Italiana',
+		restaurantImage:
+			'https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg',
+	},
+	{
+		id: '6',
+		userId: 'current_user',
+		userName: 'Tu Usuario',
+		userAvatar: 'https://randomuser.me/api/portraits/men/10.jpg',
+		rating: 5,
+		comment:
+			'El mejor curry de la ciudad. Los sabores son auténticos y las especias perfectamente balanceadas.',
+		date: '2024-05-15',
+		photos: [],
+		restaurantId: '6',
+		restaurantName: 'Mumbai Spice',
+		restaurantImage:
+			'https://images.pexels.com/photos/2474661/pexels-photo-2474661.jpeg',
+		restaurantResponse: {
+			message:
+				'¡Gracias por tu reseña! Nos encanta saber que disfrutaste de nuestros platos auténticos.',
+			date: '2024-05-16',
+		},
+	},
+	{
+		id: '7',
+		userId: 'current_user',
+		userName: 'Tu Usuario',
+		userAvatar: 'https://randomuser.me/api/portraits/men/10.jpg',
+		rating: 3.5,
+		comment:
+			'Comida tailandesa decente. El pad thai estaba bien pero he probado mejores. El lugar está bien para una cena casual.',
+		date: '2024-05-10',
+		photos: ['https://images.unsplash.com/photo-1562565652-a0d8f0c59eb4?w=300'],
+		restaurantId: '7',
+		restaurantName: 'Bangkok Street',
+		restaurantImage:
+			'https://images.pexels.com/photos/12153467/pexels-photo-12153467.jpeg',
+	},
+	{
+		id: '8',
+		userId: 'current_user',
+		userName: 'Tu Usuario',
+		userAvatar: 'https://randomuser.me/api/portraits/men/10.jpg',
+		rating: 4.8,
+		comment:
+			'Experiencia de BBQ coreano increíble. La carne estaba tierna y bien marinada. Perfecto para ir en grupo.',
+		date: '2024-05-05',
+		photos: [
+			'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=300',
+			'https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=300',
+		],
+		restaurantId: '8',
+		restaurantName: 'Seoul Kitchen',
+		restaurantImage:
+			'https://images.pexels.com/photos/12973148/pexels-photo-12973148.jpeg',
+	},
+	{
+		id: '9',
+		userId: 'current_user',
+		userName: 'Tu Usuario',
+		userAvatar: 'https://randomuser.me/api/portraits/men/10.jpg',
+		rating: 3.2,
+		comment:
+			'Hamburguesas grandes pero un poco secas. Las patatas están bien. Servicio lento pero el ambiente es agradable.',
+		date: '2024-04-25',
+		photos: [],
+		restaurantId: '9',
+		restaurantName: 'Brooklyn Diner',
+		restaurantImage:
+			'https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg',
+	},
+	{
+		id: '10',
+		userId: 'current_user',
+		userName: 'Tu Usuario',
+		userAvatar: 'https://randomuser.me/api/portraits/men/10.jpg',
+		rating: 5,
+		comment:
+			'Una experiencia culinaria extraordinaria. Cada plato es una obra de arte. El servicio es impecable y la presentación sublime.',
+		date: '2024-04-20',
+		photos: [
+			'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=300',
+			'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=300',
+			'https://images.unsplash.com/photo-1551218808-94e220e084d2?w=300',
+		],
+		restaurantId: '10',
+		restaurantName: 'Le Petit Bistrot',
+		restaurantImage:
+			'https://images.unsplash.com/photo-1577106263724-2c8e03bfe9cf?fm=jpg&q=60&w=3000',
+		restaurantResponse: {
+			message:
+				'Merci beaucoup pour votre critique élogieuse! Nous sommes ravis que vous ayez apprécié notre cuisine.',
+			date: '2024-04-21',
+		},
+	},
+];

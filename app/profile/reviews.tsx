@@ -1,9 +1,13 @@
+import { mockUserReviews } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import SortButton from '@/components/reviews/SortButton';
+import UserReviewItem from '@/components/reviews/UserReviewItem';
 import { useTranslation } from '@/hooks/useTranslation';
+import { Review } from '@/shared/types';
+import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
 	FlatList,
 	Image,
@@ -15,131 +19,27 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-// Mock data - todas las reseñas del usuario
-const mockUserReviews = [
-	{
-		id: '1',
-		restaurantId: 'rest1',
-		restaurantName: 'La Taverna',
-		restaurantImage:
-			'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=100',
-		rating: 4.5,
-		comment:
-			'Excelente comida y servicio. El ambiente es muy acogedor y el personal muy atento.',
-		date: '2024-06-10',
-		photos: [
-			'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=300',
-			'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=300',
-		],
-	},
-	{
-		id: '2',
-		restaurantId: 'rest2',
-		restaurantName: 'El Rincón',
-		restaurantImage:
-			'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=100',
-		rating: 5,
-		comment:
-			'Increíble experiencia gastronómica. Cada plato fue una sorpresa para el paladar. Volveré pronto sin duda.',
-		date: '2024-06-08',
-		photos: [],
-	},
-	{
-		id: '3',
-		restaurantId: 'rest3',
-		restaurantName: 'Casa Pedro',
-		restaurantImage:
-			'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=100',
-		rating: 4,
-		comment:
-			'Buena relación calidad-precio. Los platos están muy ricos y las porciones son generosas.',
-		date: '2024-06-05',
-		photos: [
-			'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=300',
-		],
-	},
-	{
-		id: '4',
-		restaurantId: 'rest4',
-		restaurantName: 'Pizzería Mario',
-		restaurantImage:
-			'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=100',
-		rating: 3.5,
-		comment:
-			'Pizza decente pero he probado mejores. El lugar está bien para una cena casual.',
-		date: '2024-06-01',
-		photos: [],
-	},
-	{
-		id: '5',
-		restaurantId: 'rest5',
-		restaurantName: 'Sushi Zen',
-		restaurantImage:
-			'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=100',
-		rating: 4.8,
-		comment:
-			'El mejor sushi de la ciudad. Fresco, sabroso y presentación impecable. Personal muy profesional.',
-		date: '2024-05-28',
-		photos: [
-			'https://images.unsplash.com/photo-1563612116625-3012372fccce?w=300',
-			'https://images.unsplash.com/photo-1553621042-f6e147245754?w=300',
-			'https://images.unsplash.com/photo-1582270917217-0b4b1d3df4bc?w=300',
-		],
-	},
-	{
-		id: '6',
-		restaurantId: 'rest6',
-		restaurantName: 'Café Central',
-		restaurantImage:
-			'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=100',
-		rating: 4.2,
-		comment:
-			'Perfecto para un desayuno o brunch. El café es excelente y los pasteles están deliciosos.',
-		date: '2024-05-25',
-		photos: [
-			'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=300',
-		],
-	},
-	{
-		id: '7',
-		restaurantId: 'rest7',
-		restaurantName: 'Tapas García',
-		restaurantImage:
-			'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=100',
-		rating: 3.8,
-		comment:
-			'Buenas tapas tradicionales. Ambiente auténtico español. Las bravas están muy buenas.',
-		date: '2024-05-20',
-		photos: [],
-	},
-	{
-		id: '8',
-		restaurantId: 'rest8',
-		restaurantName: 'Burger House',
-		restaurantImage:
-			'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=100',
-		rating: 3.2,
-		comment:
-			'Hamburguesas grandes pero un poco secas. Las patatas están bien. Servicio lento.',
-		date: '2024-05-15',
-		photos: [
-			'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300',
-		],
-	},
-];
-
 type SortOption = 'newest' | 'oldest' | 'highest' | 'lowest';
 
 export default function UserReviewsScreen() {
 	const { t } = useTranslation();
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
+	const user = useUserStore((state) => state.user);
 
 	const [currentSort, setCurrentSort] = useState<SortOption>('newest');
-	const [reviews, setReviews] = useState(mockUserReviews);
+	const [reviews] = useState<Review[]>(mockUserReviews);
+
+	// Calculate average rating
+	const averageRating = useMemo(() => {
+		if (reviews.length === 0) return 0;
+		return (
+			reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
+		);
+	}, [reviews]);
 
 	// Ordenar reseñas
-	const sortedReviews = React.useMemo(() => {
+	const sortedReviews = useMemo(() => {
 		const reviewsCopy = [...reviews];
 
 		switch (currentSort) {
@@ -183,86 +83,43 @@ export default function UserReviewsScreen() {
 		router.back();
 	};
 
-	const handleRestaurantPress = (restaurantId: string) => {
-		router.push(`/restaurant/${restaurantId}`);
-	};
-
-	const formatDate = (dateString: string) => {
-		const date = new Date(dateString);
-		const today = new Date();
-		const diffTime = Math.abs(today.getTime() - date.getTime());
-		const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-		if (diffDays === 1) return t('reviews.today');
-		if (diffDays === 2) return t('reviews.yesterday');
-		if (diffDays <= 7) return t('reviews.daysAgo', { count: diffDays - 1 });
-		if (diffDays <= 30)
-			return t('reviews.weeksAgo', { count: Math.ceil((diffDays - 1) / 7) });
-		return t('reviews.monthsAgo', { count: Math.ceil((diffDays - 1) / 30) });
-	};
-
-	const renderReviewItem = ({
-		item,
-	}: {
-		item: (typeof mockUserReviews)[0];
-	}) => (
-		<TouchableOpacity
-			style={styles.reviewItem}
-			onPress={() => handleRestaurantPress(item.restaurantId)}
-		>
-			<View style={styles.reviewHeader}>
-				<Image
-					source={{ uri: item.restaurantImage }}
-					style={styles.restaurantImage}
-				/>
-				<View style={styles.restaurantInfo}>
-					<Text style={styles.restaurantName}>{item.restaurantName}</Text>
-					<View style={styles.ratingContainer}>
-						{Array.from({ length: 5 }).map((_, index) => (
-							<Ionicons
-								key={index}
-								name={
-									index < Math.floor(item.rating)
-										? 'star'
-										: index < item.rating
-										? 'star-half'
-										: 'star-outline'
-								}
-								size={16}
-								color="#FFD700"
-							/>
-						))}
-						<Text style={styles.ratingText}>{item.rating}</Text>
+	const renderUserInfo = () => {
+		const renderProfilePhoto = () => {
+			if (user.photo) {
+				return <Image source={{ uri: user.photo }} style={styles.userAvatar} />;
+			} else {
+				const initial = user.username
+					? user.username.charAt(0).toUpperCase()
+					: 'U';
+				return (
+					<View style={styles.userAvatarPlaceholder}>
+						<Text style={styles.userAvatarText}>{initial}</Text>
 					</View>
+				);
+			}
+		};
+
+		return (
+			<View style={styles.userInfoContainer}>
+				{renderProfilePhoto()}
+				<View style={styles.userDetails}>
+					<Text style={styles.userName}>{user.name || user.username}</Text>
+					<Text style={styles.userEmail}>{user.email}</Text>
 				</View>
-				<Text style={styles.reviewDate}>{formatDate(item.date)}</Text>
 			</View>
+		);
+	};
 
-			<Text style={styles.reviewComment}>{item.comment}</Text>
-
-			{item.photos.length > 0 && (
-				<View style={styles.photosContainer}>
-					{item.photos.slice(0, 3).map((photo, index) => (
-						<Image
-							key={index}
-							source={{ uri: photo }}
-							style={styles.reviewPhoto}
-						/>
-					))}
-					{item.photos.length > 3 && (
-						<View style={styles.morePhotosOverlay}>
-							<Text style={styles.morePhotosText}>
-								+{item.photos.length - 3}
-							</Text>
-						</View>
-					)}
-				</View>
-			)}
-		</TouchableOpacity>
+	const renderReviewItem = ({ item }: { item: Review }) => (
+		<UserReviewItem review={item} showRestaurantInfo={true} />
 	);
 
 	const renderHeader = () => (
 		<View style={styles.headerContent}>
+			{/* User Info */}
+			{renderUserInfo()}
+
+			{/* Stats */}
 			<View style={styles.statsContainer}>
 				<View style={styles.statItem}>
 					<Text style={styles.statNumber}>{reviews.length}</Text>
@@ -273,16 +130,12 @@ export default function UserReviewsScreen() {
 					</Text>
 				</View>
 				<View style={styles.statItem}>
-					<Text style={styles.statNumber}>
-						{(
-							reviews.reduce((sum, review) => sum + review.rating, 0) /
-							reviews.length
-						).toFixed(1)}
-					</Text>
+					<Text style={styles.statNumber}>{averageRating.toFixed(1)}</Text>
 					<Text style={styles.statLabel}>{t('profile.averageRating')}</Text>
 				</View>
 			</View>
 
+			{/* Sort Options */}
 			<View style={styles.sortContainer}>
 				<Text style={styles.sortLabel}>{t('filters.sortBy')}:</Text>
 				<ScrollView
@@ -322,10 +175,10 @@ export default function UserReviewsScreen() {
 		<View style={[styles.container, { paddingTop: insets.top }]}>
 			{/* Header */}
 			<View style={styles.header}>
+				<Text style={styles.headerTitle}>{t('profile.myReviews')}</Text>
 				<TouchableOpacity onPress={handleBack} style={styles.backButton}>
 					<Ionicons name="chevron-back" size={24} color={colors.primary} />
 				</TouchableOpacity>
-				<Text style={styles.headerTitle}>{t('profile.myReviews')}</Text>
 				<View style={styles.headerSpacer} />
 			</View>
 
@@ -341,7 +194,10 @@ export default function UserReviewsScreen() {
 					ItemSeparatorComponent={() => <View style={styles.separator} />}
 				/>
 			) : (
-				renderEmptyState()
+				<>
+					{renderHeader()}
+					{renderEmptyState()}
+				</>
 			)}
 		</View>
 	);
@@ -351,6 +207,7 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: colors.secondary,
+		paddingHorizontal: 20,
 	},
 	header: {
 		flexDirection: 'row',
@@ -359,24 +216,83 @@ const styles = StyleSheet.create({
 		paddingVertical: 16,
 		borderBottomWidth: 1,
 		borderBottomColor: colors.primaryLight,
+		marginHorizontal: -20,
 	},
 	backButton: {
-		padding: 8,
-		marginLeft: -8,
+		alignItems: 'flex-start',
+		width: 40,
 	},
 	headerTitle: {
-		flex: 1,
 		fontSize: 20,
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.primary,
 		textAlign: 'center',
+		position: 'absolute',
+		left: 0,
+		right: 0,
 	},
 	headerSpacer: {
 		width: 40,
 	},
 	headerContent: {
+		paddingBottom: 16,
 		borderBottomColor: colors.primaryLight,
+	},
+	userInfoContainer: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		paddingHorizontal: 20,
+		paddingVertical: 20,
+		backgroundColor: colors.quaternary,
+		marginHorizontal: 16,
+		marginVertical: 16,
+		borderRadius: 16,
+		shadowColor: '#000',
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.1,
+		shadowRadius: 8,
+		elevation: 3,
+	},
+	userAvatar: {
+		width: 60,
+		height: 60,
+		borderRadius: 30,
+		marginRight: 16,
+	},
+	userAvatarPlaceholder: {
+		width: 60,
+		height: 60,
+		borderRadius: 30,
+		backgroundColor: colors.primary,
+		justifyContent: 'center',
+		alignItems: 'center',
+		marginRight: 16,
+	},
+	userAvatarText: {
+		fontSize: 24,
+		fontFamily: 'Manrope',
+		fontWeight: '700',
+		color: colors.quaternary,
+	},
+	userDetails: {
+		flex: 1,
+	},
+	userName: {
+		fontSize: 18,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.primary,
+		marginBottom: 2,
+	},
+	userEmail: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primaryLight,
 	},
 	statsContainer: {
 		flexDirection: 'row',
@@ -414,113 +330,8 @@ const styles = StyleSheet.create({
 		flexWrap: 'wrap',
 		gap: 8,
 	},
-	sortButton: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		backgroundColor: colors.quaternary,
-		borderRadius: 20,
-		paddingVertical: 8,
-		paddingHorizontal: 12,
-		borderWidth: 1,
-		borderColor: colors.primaryLight,
-	},
-	sortButtonActive: {
-		backgroundColor: colors.primary,
-		borderColor: colors.primary,
-	},
-	sortButtonText: {
-		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
-		color: colors.primary,
-		marginLeft: 4,
-	},
-	sortButtonTextActive: {
-		color: colors.quaternary,
-	},
 	listContent: {
-		paddingHorizontal: 20,
-		paddingVertical: 16,
-	},
-	reviewItem: {
-		backgroundColor: colors.quaternary,
-		borderRadius: 12,
-		padding: 16,
-		borderWidth: 1,
-		borderColor: colors.primaryLight,
-	},
-	reviewHeader: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginBottom: 12,
-	},
-	restaurantImage: {
-		width: 50,
-		height: 50,
-		borderRadius: 8,
-		marginRight: 12,
-	},
-	restaurantInfo: {
-		flex: 1,
-	},
-	restaurantName: {
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
-		color: colors.primary,
-		marginBottom: 4,
-	},
-	ratingContainer: {
-		flexDirection: 'row',
-		alignItems: 'center',
-	},
-	ratingText: {
-		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
-		color: colors.primary,
-		marginLeft: 6,
-	},
-	reviewDate: {
-		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
-		color: colors.primaryLight,
-	},
-	reviewComment: {
-		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
-		color: colors.primary,
-		lineHeight: 20,
-		marginBottom: 12,
-	},
-	photosContainer: {
-		flexDirection: 'row',
-		gap: 8,
-		position: 'relative',
-	},
-	reviewPhoto: {
-		width: 60,
-		height: 60,
-		borderRadius: 8,
-	},
-	morePhotosOverlay: {
-		position: 'absolute',
-		right: 0,
-		top: 0,
-		width: 60,
-		height: 60,
-		borderRadius: 8,
-		backgroundColor: 'rgba(0, 0, 0, 0.6)',
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	morePhotosText: {
-		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
-		color: colors.quaternary,
+		paddingBottom: 20,
 	},
 	separator: {
 		height: 12,
@@ -529,7 +340,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: 40,
 	},
 	emptyStateTitle: {
 		fontSize: 18,

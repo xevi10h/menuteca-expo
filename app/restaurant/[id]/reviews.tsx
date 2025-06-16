@@ -45,6 +45,10 @@ const mockReviews: Review[] = [
 				'¡Muchas gracias por tu comentario María! Nos alegra mucho saber que disfrutaste de tu experiencia con nosotros.',
 			date: '2024-12-11',
 		},
+		restaurantId: 'restaurant1',
+		restaurantName: 'Restaurante Ejemplo',
+		restaurantImage:
+			'https://images.unsplash.com/photo-1542831371-5c8b3f6d7a2c?w=300',
 	},
 	{
 		id: '2',
@@ -58,6 +62,10 @@ const mockReviews: Review[] = [
 		photos: [
 			'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=300',
 		],
+		restaurantId: 'restaurant1',
+		restaurantName: 'Restaurante Ejemplo',
+		restaurantImage:
+			'https://images.unsplash.com/photo-1542831371-5c8b3f6d7a2c?w=300',
 	},
 	{
 		id: '3',
@@ -69,6 +77,10 @@ const mockReviews: Review[] = [
 			'Perfecta cena de aniversario. El personal fue muy atento y la decoración es preciosa. Los postres son espectaculares.',
 		date: '2024-12-05',
 		photos: [],
+		restaurantId: 'restaurant1',
+		restaurantName: 'Restaurante Ejemplo',
+		restaurantImage:
+			'https://images.unsplash.com/photo-1542831371-5c8b3f6d7a2c?w=300',
 	},
 	{
 		id: '4',
@@ -85,6 +97,10 @@ const mockReviews: Review[] = [
 				'Gracias por tu feedback David. Tomamos nota de tus comentarios para seguir mejorando nuestro servicio.',
 			date: '2024-12-04',
 		},
+		restaurantId: 'restaurant1',
+		restaurantName: 'Restaurante Ejemplo',
+		restaurantImage:
+			'https://images.unsplash.com/photo-1542831371-5c8b3f6d7a2c?w=300',
 	},
 	{
 		id: '5',
@@ -100,6 +116,10 @@ const mockReviews: Review[] = [
 			'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=300',
 			'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=300',
 		],
+		restaurantId: 'restaurant1',
+		restaurantName: 'Restaurante Ejemplo',
+		restaurantImage:
+			'https://images.unsplash.com/photo-1542831371-5c8b3f6d7a2c?w=300',
 	},
 	{
 		id: '6',
@@ -111,6 +131,10 @@ const mockReviews: Review[] = [
 			'Muy decepcionante. La comida llegó fría y el servicio fue muy lento. No recomiendo este lugar.',
 		date: '2024-11-25',
 		photos: [],
+		restaurantId: 'restaurant1',
+		restaurantName: 'Restaurante Ejemplo',
+		restaurantImage:
+			'https://images.unsplash.com/photo-1542831371-5c8b3f6d7a2c?w=300',
 	},
 ];
 

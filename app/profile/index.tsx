@@ -1,7 +1,9 @@
+import { mockUserReviews } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import ChangePasswordPopup from '@/components/profile/ChangePasswordPopup';
 import ChangeUsernamePopup from '@/components/profile/ChangeUsernamePopup';
 import LanguageSelectorPopup from '@/components/profile/LanguageSelectorPopup';
+import UserReviewItem from '@/components/reviews/UserReviewItem';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
@@ -54,22 +56,8 @@ export default function ProfileScreen() {
 		},
 	]);
 
-	const [userReviews] = useState([
-		{
-			id: '1',
-			restaurantName: 'El Rincón Catalán',
-			rating: 5,
-			comment: 'Excelente comida tradicional, el ambiente es muy acogedor.',
-			date: '2024-01-15',
-		},
-		{
-			id: '2',
-			restaurantName: 'Marisquería Sol',
-			rating: 4,
-			comment: 'Pescado fresco y buen servicio. Recomendado.',
-			date: '2024-01-10',
-		},
-	]);
+	// Usar solo las primeras 2 reseñas del mock
+	const userReviews = mockUserReviews.slice(0, 2);
 
 	const handleBack = () => {
 		router.back();
@@ -130,6 +118,10 @@ export default function ProfileScreen() {
 		router.push('/profile/register-restaurant/setup/edit');
 	};
 
+	const handleViewAllReviews = () => {
+		router.push('/profile/reviews');
+	};
+
 	const getCurrentLanguageLabel = () => {
 		const languageLabels = {
 			en_US: 'English',
@@ -160,7 +152,7 @@ export default function ProfileScreen() {
 			{/* Header */}
 			<View style={styles.header}>
 				<TouchableOpacity onPress={handleBack} style={styles.backButton}>
-					<Ionicons name="arrow-back" size={24} color={colors.primary} />
+					<Ionicons name="chevron-back" size={24} color={colors.primary} />
 				</TouchableOpacity>
 				<Text style={styles.headerTitle}>Mi Perfil</Text>
 				<TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
@@ -259,33 +251,54 @@ export default function ProfileScreen() {
 
 				{/* Reviews Section */}
 				<View style={styles.section}>
-					<Text style={styles.sectionTitle}>
-						Mis Reseñas ({userReviews.length})
-					</Text>
-
-					{userReviews.map((review) => (
-						<View key={review.id} style={styles.reviewItem}>
-							<View style={styles.reviewHeader}>
-								<Text style={styles.reviewRestaurant}>
-									{review.restaurantName}
+					<View style={styles.sectionHeader}>
+						<Text style={styles.sectionTitle}>
+							Mis Reseñas ({mockUserReviews.length})
+						</Text>
+						{mockUserReviews.length > 2 && (
+							<TouchableOpacity
+								onPress={handleViewAllReviews}
+								style={styles.viewAllButton}
+							>
+								<Text style={styles.viewAllText}>
+									{t('profile.viewAllReviews', {
+										count: mockUserReviews.length,
+									})}
 								</Text>
-								<View style={styles.reviewRating}>
-									{[...Array(5)].map((_, index) => (
-										<Ionicons
-											key={index}
-											name={index < review.rating ? 'star' : 'star-outline'}
-											size={12}
-											color={colors.primary}
-										/>
-									))}
-								</View>
-							</View>
-							<Text style={styles.reviewComment}>{review.comment}</Text>
-							<Text style={styles.reviewDate}>
-								{new Date(review.date).toLocaleDateString('es-ES')}
+								<Ionicons
+									name="chevron-forward"
+									size={16}
+									color={colors.primary}
+								/>
+							</TouchableOpacity>
+						)}
+					</View>
+
+					{userReviews.length > 0 ? (
+						<View style={styles.reviewsContainer}>
+							{userReviews.map((review) => (
+								<UserReviewItem
+									key={review.id}
+									review={review}
+									showRestaurantInfo={true}
+								/>
+							))}
+						</View>
+					) : (
+						<View style={styles.emptyState}>
+							<Ionicons
+								name="chatbubble-outline"
+								size={48}
+								color={colors.primaryLight}
+							/>
+							<Text style={styles.emptyStateText}>
+								{t('profile.noReviewsYet')}
+							</Text>
+							<Text style={styles.emptyStateSubtext}>
+								{t('profile.startReviewing')}
 							</Text>
 						</View>
-					))}
+					)}
 				</View>
 
 				{/* Restaurants Section */}
@@ -396,7 +409,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	headerTitle: {
-		fontSize: 18,
+		fontSize: 20,
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.primary,
@@ -495,6 +508,17 @@ const styles = StyleSheet.create({
 		color: colors.primary,
 		marginBottom: 16,
 	},
+	viewAllButton: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: 4,
+	},
+	viewAllText: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		color: colors.primary,
+	},
 	addButton: {
 		width: 32,
 		height: 32,
@@ -532,44 +556,8 @@ const styles = StyleSheet.create({
 		fontWeight: '400',
 		color: colors.primaryLight,
 	},
-	reviewItem: {
-		backgroundColor: colors.quaternary,
-		borderRadius: 12,
-		padding: 16,
-		marginBottom: 12,
-		borderLeftWidth: 4,
-		borderLeftColor: colors.primary,
-	},
-	reviewHeader: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		marginBottom: 8,
-	},
-	reviewRestaurant: {
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
-		color: colors.primary,
-		flex: 1,
-	},
-	reviewRating: {
-		flexDirection: 'row',
-		gap: 2,
-	},
-	reviewComment: {
-		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
-		color: colors.primary,
-		lineHeight: 20,
-		marginBottom: 8,
-	},
-	reviewDate: {
-		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
-		color: colors.primaryLight,
+	reviewsContainer: {
+		gap: 12,
 	},
 	restaurantItem: {
 		flexDirection: 'row',

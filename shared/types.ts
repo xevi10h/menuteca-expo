@@ -65,6 +65,9 @@ export type Review = {
 		message: string;
 		date: string; // ISO date string
 	};
+	restaurantId: string;
+	restaurantName: string;
+	restaurantImage: string;
 };
 
 export type Restaurant = {
