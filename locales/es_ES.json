@@ -369,5 +369,11 @@
 		"averageRating": "Puntuación media",
 		"active": "Activo",
 		"pending": "Pendiente"
+	},
+	"languages": {
+		"es_ES": "Español",
+		"ca_ES": "Catalan",
+		"en_US": "Inglés",
+		"fr_FR": "Francés"
 	}
 }

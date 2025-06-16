@@ -370,5 +370,11 @@
 		"averageRating": "Puntuació mitjana",
 		"active": "Actiu",
 		"pending": "Pendent"
+	},
+	"languages": {
+		"es_ES": "Espanyol",
+		"ca_ES": "Català",
+		"en_US": "Anglès",
+		"fr_FR": "Francès"
 	}
 }

@@ -370,5 +370,11 @@
 		"averageRating": "Average rating",
 		"active": "Active",
 		"pending": "Pending"
+	},
+	"languages": {
+		"es_ES": "Spanish",
+		"ca_ES": "Catalan",
+		"en_US": "English",
+		"fr_FR": "French"
 	}
 }

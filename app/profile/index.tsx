@@ -1,4 +1,8 @@
 import { colors } from '@/assets/styles/colors';
+import ChangePasswordPopup from '@/components/profile/ChangePasswordPopup';
+import ChangeUsernamePopup from '@/components/profile/ChangeUsernamePopup';
+import LanguageSelectorPopup from '@/components/profile/LanguageSelectorPopup';
+import { useTranslation } from '@/hooks/useTranslation';
 import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -26,7 +30,13 @@ export default function ProfileScreen() {
 	const user = useUserStore((state) => state.user);
 	const updatePhoto = useUserStore((state) => state.updatePhoto);
 	const setDefaultUser = useUserStore((state) => state.setDefaultUser);
+	const { t } = useTranslation();
 	const insets = useSafeAreaInsets();
+
+	// Popup states
+	const [showChangePasswordPopup, setShowChangePasswordPopup] = useState(false);
+	const [showChangeUsernamePopup, setShowChangeUsernamePopup] = useState(false);
+	const [showLanguagePopup, setShowLanguagePopup] = useState(false);
 
 	// Datos mock de restaurantes del usuario (máximo 10)
 	const [userRestaurants] = useState<Restaurant[]>([
@@ -120,11 +130,14 @@ export default function ProfileScreen() {
 		router.push('/profile/register-restaurant/setup/edit');
 	};
 
-	const handleChangePassword = () => {
-		Alert.alert(
-			'Cambiar contraseña',
-			'Esta funcionalidad estará disponible próximamente',
-		);
+	const getCurrentLanguageLabel = () => {
+		const languageLabels = {
+			en_US: 'English',
+			es_ES: 'Español',
+			ca_ES: 'Català',
+			fr_FR: 'Français',
+		};
+		return languageLabels[user.language] || 'Español';
 	};
 
 	const renderProfilePhoto = () => {
@@ -184,7 +197,7 @@ export default function ProfileScreen() {
 
 					<TouchableOpacity
 						style={styles.actionItem}
-						onPress={handleChangePassword}
+						onPress={() => setShowChangePasswordPopup(true)}
 					>
 						<View style={styles.actionLeft}>
 							<Ionicons name="key-outline" size={20} color={colors.primary} />
@@ -195,6 +208,52 @@ export default function ProfileScreen() {
 							size={20}
 							color={colors.primaryLight}
 						/>
+					</TouchableOpacity>
+
+					<TouchableOpacity
+						style={styles.actionItem}
+						onPress={() => setShowChangeUsernamePopup(true)}
+					>
+						<View style={styles.actionLeft}>
+							<Ionicons
+								name="person-outline"
+								size={20}
+								color={colors.primary}
+							/>
+							<Text style={styles.actionText}>Cambiar nombre de usuario</Text>
+						</View>
+						<View style={styles.actionRight}>
+							<Text style={styles.currentValueText}>@{user.username}</Text>
+							<Ionicons
+								name="chevron-forward"
+								size={20}
+								color={colors.primaryLight}
+							/>
+						</View>
+					</TouchableOpacity>
+
+					<TouchableOpacity
+						style={styles.actionItem}
+						onPress={() => setShowLanguagePopup(true)}
+					>
+						<View style={styles.actionLeft}>
+							<Ionicons
+								name="language-outline"
+								size={20}
+								color={colors.primary}
+							/>
+							<Text style={styles.actionText}>Cambiar idioma</Text>
+						</View>
+						<View style={styles.actionRight}>
+							<Text style={styles.currentValueText}>
+								{getCurrentLanguageLabel()}
+							</Text>
+							<Ionicons
+								name="chevron-forward"
+								size={20}
+								color={colors.primaryLight}
+							/>
+						</View>
 					</TouchableOpacity>
 				</View>
 
@@ -296,6 +355,22 @@ export default function ProfileScreen() {
 					)}
 				</View>
 			</ScrollView>
+
+			{/* Popups */}
+			<ChangePasswordPopup
+				visible={showChangePasswordPopup}
+				onClose={() => setShowChangePasswordPopup(false)}
+			/>
+
+			<ChangeUsernamePopup
+				visible={showChangeUsernamePopup}
+				onClose={() => setShowChangeUsernamePopup(false)}
+			/>
+
+			<LanguageSelectorPopup
+				visible={showLanguagePopup}
+				onClose={() => setShowLanguagePopup(false)}
+			/>
 		</View>
 	);
 }
@@ -438,12 +513,24 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		gap: 12,
+		flex: 1,
+	},
+	actionRight: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: 8,
 	},
 	actionText: {
 		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '500',
 		color: colors.primary,
+	},
+	currentValueText: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primaryLight,
 	},
 	reviewItem: {
 		backgroundColor: colors.quaternary,

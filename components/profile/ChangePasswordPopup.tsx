@@ -1,0 +1,353 @@
+import { colors } from '@/assets/styles/colors';
+import { Ionicons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import {
+	Alert,
+	Dimensions,
+	Modal,
+	ScrollView,
+	StyleSheet,
+	Text,
+	TextInput,
+	TouchableOpacity,
+	View,
+} from 'react-native';
+
+interface ChangePasswordPopupProps {
+	visible: boolean;
+	onClose: () => void;
+}
+
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+
+export default function ChangePasswordPopup({
+	visible,
+	onClose,
+}: ChangePasswordPopupProps) {
+	const [currentPassword, setCurrentPassword] = useState('');
+	const [newPassword, setNewPassword] = useState('');
+	const [confirmPassword, setConfirmPassword] = useState('');
+	const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+	const [showNewPassword, setShowNewPassword] = useState(false);
+	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+	const [isChangingPassword, setIsChangingPassword] = useState(false);
+
+	const resetForm = () => {
+		setCurrentPassword('');
+		setNewPassword('');
+		setConfirmPassword('');
+		setShowCurrentPassword(false);
+		setShowNewPassword(false);
+		setShowConfirmPassword(false);
+	};
+
+	const handleClose = () => {
+		resetForm();
+		onClose();
+	};
+
+	const handleChangePassword = async () => {
+		if (!currentPassword || !newPassword || !confirmPassword) {
+			Alert.alert('Error', 'Por favor, completa todos los campos');
+			return;
+		}
+
+		if (newPassword !== confirmPassword) {
+			Alert.alert('Error', 'Las contraseñas no coinciden');
+			return;
+		}
+
+		if (newPassword.length < 6) {
+			Alert.alert(
+				'Error',
+				'La nueva contraseña debe tener al menos 6 caracteres',
+			);
+			return;
+		}
+
+		setIsChangingPassword(true);
+
+		try {
+			// Simular llamada a API
+			await new Promise((resolve) => setTimeout(resolve, 1500));
+
+			Alert.alert('Éxito', 'Contraseña cambiada correctamente', [
+				{ text: 'OK', onPress: handleClose },
+			]);
+		} catch (error) {
+			Alert.alert(
+				'Error',
+				'No se pudo cambiar la contraseña. Inténtalo de nuevo.',
+			);
+		} finally {
+			setIsChangingPassword(false);
+		}
+	};
+
+	return (
+		<Modal
+			visible={visible}
+			transparent
+			animationType="fade"
+			onRequestClose={handleClose}
+		>
+			<View style={styles.overlay}>
+				<TouchableOpacity
+					style={styles.backdrop}
+					activeOpacity={1}
+					onPress={handleClose}
+				/>
+
+				<View style={styles.popup}>
+					{/* Header */}
+					<View style={styles.header}>
+						<Text style={styles.title}>Cambiar Contraseña</Text>
+						<TouchableOpacity onPress={handleClose} style={styles.closeButton}>
+							<Ionicons name="close" size={24} color={colors.primary} />
+						</TouchableOpacity>
+					</View>
+
+					{/* Content */}
+					<ScrollView
+						style={styles.content}
+						showsVerticalScrollIndicator={false}
+					>
+						<View style={styles.inputContainer}>
+							<Text style={styles.inputLabel}>Contraseña actual</Text>
+							<View style={styles.passwordInputContainer}>
+								<TextInput
+									style={styles.passwordInput}
+									value={currentPassword}
+									onChangeText={setCurrentPassword}
+									placeholder="Ingresa tu contraseña actual"
+									placeholderTextColor={colors.primaryLight}
+									secureTextEntry={!showCurrentPassword}
+									autoCapitalize="none"
+								/>
+								<TouchableOpacity
+									onPress={() => setShowCurrentPassword(!showCurrentPassword)}
+									style={styles.passwordToggle}
+								>
+									<Ionicons
+										name={showCurrentPassword ? 'eye-off' : 'eye'}
+										size={20}
+										color={colors.primaryLight}
+									/>
+								</TouchableOpacity>
+							</View>
+						</View>
+
+						<View style={styles.inputContainer}>
+							<Text style={styles.inputLabel}>Nueva contraseña</Text>
+							<View style={styles.passwordInputContainer}>
+								<TextInput
+									style={styles.passwordInput}
+									value={newPassword}
+									onChangeText={setNewPassword}
+									placeholder="Ingresa tu nueva contraseña"
+									placeholderTextColor={colors.primaryLight}
+									secureTextEntry={!showNewPassword}
+									autoCapitalize="none"
+								/>
+								<TouchableOpacity
+									onPress={() => setShowNewPassword(!showNewPassword)}
+									style={styles.passwordToggle}
+								>
+									<Ionicons
+										name={showNewPassword ? 'eye-off' : 'eye'}
+										size={20}
+										color={colors.primaryLight}
+									/>
+								</TouchableOpacity>
+							</View>
+							<Text style={styles.inputHelper}>Mínimo 6 caracteres</Text>
+						</View>
+
+						<View style={styles.inputContainer}>
+							<Text style={styles.inputLabel}>Confirmar nueva contraseña</Text>
+							<View style={styles.passwordInputContainer}>
+								<TextInput
+									style={styles.passwordInput}
+									value={confirmPassword}
+									onChangeText={setConfirmPassword}
+									placeholder="Confirma tu nueva contraseña"
+									placeholderTextColor={colors.primaryLight}
+									secureTextEntry={!showConfirmPassword}
+									autoCapitalize="none"
+								/>
+								<TouchableOpacity
+									onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+									style={styles.passwordToggle}
+								>
+									<Ionicons
+										name={showConfirmPassword ? 'eye-off' : 'eye'}
+										size={20}
+										color={colors.primaryLight}
+									/>
+								</TouchableOpacity>
+							</View>
+						</View>
+					</ScrollView>
+
+					{/* Footer */}
+					<View style={styles.footer}>
+						<TouchableOpacity style={styles.cancelButton} onPress={handleClose}>
+							<Text style={styles.cancelButtonText}>Cancelar</Text>
+						</TouchableOpacity>
+
+						<TouchableOpacity
+							style={[
+								styles.saveButton,
+								isChangingPassword && styles.saveButtonDisabled,
+							]}
+							onPress={handleChangePassword}
+							disabled={isChangingPassword}
+						>
+							<Text
+								style={[
+									styles.saveButtonText,
+									isChangingPassword && styles.saveButtonTextDisabled,
+								]}
+							>
+								{isChangingPassword ? 'Guardando...' : 'Guardar'}
+							</Text>
+						</TouchableOpacity>
+					</View>
+				</View>
+			</View>
+		</Modal>
+	);
+}
+
+const styles = StyleSheet.create({
+	overlay: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+	},
+	backdrop: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+	},
+	popup: {
+		backgroundColor: colors.quaternary,
+		borderRadius: 20,
+		width: screenWidth * 0.9,
+		maxWidth: 400,
+		maxHeight: screenHeight * 0.8,
+		shadowColor: '#000',
+		shadowOffset: {
+			width: 0,
+			height: 10,
+		},
+		shadowOpacity: 0.25,
+		shadowRadius: 20,
+		elevation: 10,
+	},
+	header: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		paddingHorizontal: 20,
+		paddingVertical: 16,
+		borderBottomWidth: 1,
+		borderBottomColor: colors.primaryLight,
+	},
+	title: {
+		fontSize: 18,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.primary,
+	},
+	closeButton: {
+		padding: 4,
+	},
+	content: {
+		paddingHorizontal: 20,
+		paddingVertical: 16,
+		maxHeight: screenHeight * 0.5,
+	},
+	inputContainer: {
+		marginBottom: 20,
+	},
+	inputLabel: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		color: colors.primary,
+		marginBottom: 8,
+	},
+	passwordInputContainer: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		backgroundColor: colors.secondary,
+		borderRadius: 12,
+		borderWidth: 1,
+		borderColor: colors.primaryLight,
+	},
+	passwordInput: {
+		flex: 1,
+		paddingHorizontal: 16,
+		paddingVertical: 15,
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		color: colors.primary,
+	},
+	passwordToggle: {
+		paddingHorizontal: 16,
+		paddingVertical: 15,
+	},
+	inputHelper: {
+		fontSize: 12,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primaryLight,
+		marginTop: 4,
+	},
+	footer: {
+		flexDirection: 'row',
+		gap: 12,
+		paddingHorizontal: 20,
+		paddingVertical: 16,
+		borderTopWidth: 1,
+		borderTopColor: colors.primaryLight,
+	},
+	cancelButton: {
+		flex: 1,
+		paddingVertical: 12,
+		backgroundColor: colors.secondary,
+		borderRadius: 12,
+		borderWidth: 1,
+		borderColor: colors.primary,
+		alignItems: 'center',
+	},
+	cancelButtonText: {
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		color: colors.primary,
+	},
+	saveButton: {
+		flex: 1,
+		paddingVertical: 12,
+		backgroundColor: colors.primary,
+		borderRadius: 12,
+		alignItems: 'center',
+	},
+	saveButtonDisabled: {
+		opacity: 0.6,
+	},
+	saveButtonText: {
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.quaternary,
+	},
+	saveButtonTextDisabled: {
+		color: colors.quaternary,
+	},
+});

@@ -370,5 +370,11 @@
 		"averageRating": "Note moyenne",
 		"active": "Actif",
 		"pending": "En attente"
+	},
+	"languages": {
+		"en_US": "Anglais",
+		"es_ES": "Espagnol",
+		"fr_FR": "Français",
+		"ca_ES": "Catalan"
 	}
 }
