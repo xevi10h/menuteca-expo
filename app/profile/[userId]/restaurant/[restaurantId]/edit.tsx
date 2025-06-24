@@ -39,7 +39,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 export default function UserRestaurantEdit() {
 	const { t } = useTranslation();
 	const router = useRouter();
-	const { userId, restaurantId } = useLocalSearchParams<{
+	const { restaurantId } = useLocalSearchParams<{
 		userId: string;
 		restaurantId: string;
 	}>();

@@ -160,8 +160,7 @@ export default function ExpandableMapRestaurantModal({
 
 	const handleTabLayout = (tab: 'information' | 'menu', event: any) => {
 		const { width } = event.nativeEvent.layout;
-		const tabIndicator =
-			tab === 'information' ? -(width / 2 + 2) : width / 2 + 38;
+		const tabIndicator = tab === 'information' ? -(width / 2) : width / 2 + 42;
 
 		setTabMeasurements((prev) => {
 			const newMeasurements = {
@@ -347,14 +346,16 @@ export default function ExpandableMapRestaurantModal({
 							/>
 						</TouchableOpacity>
 
-						{/* Write Review Button */}
+						{/* Share Button */}
 						<TouchableOpacity
-							style={[styles.writeReviewHeaderButton, { top: insets.top - 20 }]}
-							onPress={() => setShowAddReviewModal(true)}
+							style={[styles.shareButton, { top: insets.top - 20 }]}
+							onPress={() => {
+								/* Handle share */
+							}}
 						>
 							<Ionicons
-								name="create-outline"
-								size={20}
+								name="share-outline"
+								size={24}
 								color={colors.quaternary}
 							/>
 						</TouchableOpacity>
@@ -393,21 +394,6 @@ export default function ExpandableMapRestaurantModal({
 								restaurant={restaurant}
 								color={colors.primary}
 							/>
-						</TouchableOpacity>
-
-						{/* Write Review Button in collapsed state */}
-						<TouchableOpacity
-							style={styles.writeReviewCollapsedButton}
-							onPress={() => setShowAddReviewModal(true)}
-						>
-							<Ionicons
-								name="create-outline"
-								size={16}
-								color={colors.quaternary}
-							/>
-							<Text style={styles.writeReviewCollapsedText}>
-								{t('restaurant.writeReview')}
-							</Text>
 						</TouchableOpacity>
 					</Animated.View>
 
@@ -545,13 +531,12 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
-	writeReviewHeaderButton: {
+	shareButton: {
 		position: 'absolute',
 		right: 20,
 		width: 40,
 		height: 40,
 		borderRadius: 20,
-		backgroundColor: 'rgba(0, 0, 0, 0.3)',
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
@@ -566,7 +551,7 @@ const styles = StyleSheet.create({
 	},
 	collapsedContent: {
 		flex: 1,
-		paddingHorizontal: 20,
+
 		paddingBottom: 15,
 	},
 	content: {

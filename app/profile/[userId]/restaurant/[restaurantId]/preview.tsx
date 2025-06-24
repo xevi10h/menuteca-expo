@@ -9,7 +9,6 @@ import LoadingScreen from '@/components/LoadingScreen';
 import RestaurantBasicInformation from '@/components/RestaurantBasicInformation';
 import Information from '@/components/restaurantDetail/Information';
 import Menu from '@/components/restaurantDetail/Menu';
-import ReviewItem from '@/components/reviews/ReviewItem';
 import { useTranslation } from '@/hooks/useTranslation';
 import { MenuData, Restaurant, Review } from '@/shared/types';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,7 +18,6 @@ import {
 	Dimensions,
 	Image,
 	ImageBackground,
-	ScrollView,
 	StyleSheet,
 	Text,
 	TouchableOpacity,
@@ -138,42 +136,10 @@ export default function UserRestaurantPreview() {
 		return <Menu menus={menus} />;
 	}, [menus, t]);
 
-	const reviewsComponent = useMemo(() => {
-		if (reviews.length === 0) {
-			return (
-				<View style={styles.emptyContent}>
-					<Text style={styles.emptyText}>Sin reseñas aún</Text>
-					<Text style={styles.emptySubtext}>
-						Las reseñas de los clientes aparecerán aquí
-					</Text>
-				</View>
-			);
-		}
-		return (
-			<ScrollView showsVerticalScrollIndicator={false}>
-				{reviews.map((review, index) => (
-					<View
-						key={review.id}
-						style={{ marginBottom: index === reviews.length - 1 ? 0 : 15 }}
-					>
-						<ReviewItem review={review} />
-					</View>
-				))}
-			</ScrollView>
-		);
-	}, [reviews]);
-
-	const handleTabLayout = (
-		tab: 'information' | 'menu' | 'reviews',
-		event: any,
-	) => {
+	const handleTabLayout = (tab: 'information' | 'menu', event: any) => {
 		const { width } = event.nativeEvent.layout;
 		const tabIndicator =
-			tab === 'information'
-				? -(width / 2 + 15)
-				: tab === 'menu'
-				? 0
-				: width / 2 + 15;
+			tab === 'information' ? -(width / 2 + 2) : width / 2 + 38;
 
 		setTabMeasurements((prev) => {
 			const newMeasurements = {
@@ -193,7 +159,7 @@ export default function UserRestaurantPreview() {
 		});
 	};
 
-	const handleTabChange = (tab: 'information' | 'menu' | 'reviews') => {
+	const handleTabChange = (tab: 'information' | 'menu') => {
 		if (tab === activeTab || isTransitioning) return;
 
 		setIsTransitioning(true);
@@ -274,14 +240,6 @@ export default function UserRestaurantPreview() {
 					<Ionicons name="chevron-back" size={24} color={colors.quaternary} />
 				</TouchableOpacity>
 
-				{/* Edit Button */}
-				<TouchableOpacity
-					style={[styles.editButton, { top: insets.top + 10 }]}
-					onPress={handleEdit}
-				>
-					<Ionicons name="pencil-outline" size={24} color={colors.quaternary} />
-				</TouchableOpacity>
-
 				{/* Status Badge */}
 				<View style={[styles.statusBadge, { top: insets.top + 60 }]}>
 					<View
@@ -294,6 +252,14 @@ export default function UserRestaurantPreview() {
 						{status.isActive ? 'Activo' : 'Inactivo'}
 					</Text>
 				</View>
+
+				{/* Edit Button */}
+				<TouchableOpacity
+					style={[styles.editButton, { top: insets.top + 10 }]}
+					onPress={handleEdit}
+				>
+					<Ionicons name="pencil-outline" size={24} color={colors.quaternary} />
+				</TouchableOpacity>
 
 				<View
 					style={{
@@ -345,20 +311,6 @@ export default function UserRestaurantPreview() {
 							{t('restaurant.menu')}
 						</Text>
 					</TouchableOpacity>
-					<TouchableOpacity
-						onPress={() => handleTabChange('reviews')}
-						disabled={isTransitioning}
-						onLayout={(event) => handleTabLayout('reviews', event)}
-					>
-						<Text
-							style={[
-								styles.tabText,
-								activeTab === 'reviews' && styles.activeTabText,
-							]}
-						>
-							{t('restaurant.reviews')} ({reviews.length})
-						</Text>
-					</TouchableOpacity>
 
 					{/* Animated tab indicator */}
 					<Animated.View style={[styles.tabIndicator, tabIndicatorStyle]} />
@@ -367,7 +319,7 @@ export default function UserRestaurantPreview() {
 				{/* Animated Content Container */}
 				<View style={styles.animatedContentContainer}>
 					<Animated.View style={[styles.slidingContent, contentAnimatedStyle]}>
-						{/* Information Tab Content */}
+						{/* Information Tab Content with its own ScrollView */}
 						<View style={styles.tabContent}>
 							<Animated.ScrollView
 								style={styles.tabScrollView}
@@ -380,7 +332,7 @@ export default function UserRestaurantPreview() {
 							</Animated.ScrollView>
 						</View>
 
-						{/* Menu Tab Content */}
+						{/* Menu Tab Content with its own ScrollView */}
 						<View style={styles.tabContent}>
 							<Animated.ScrollView
 								style={styles.tabScrollView}
@@ -391,14 +343,6 @@ export default function UserRestaurantPreview() {
 								{menuComponent}
 								<View style={{ height: 100 }} />
 							</Animated.ScrollView>
-						</View>
-
-						{/* Reviews Tab Content */}
-						<View style={styles.tabContent}>
-							<View style={styles.tabScrollView}>
-								{reviewsComponent}
-								<View style={{ height: 100 }} />
-							</View>
 						</View>
 					</Animated.View>
 				</View>

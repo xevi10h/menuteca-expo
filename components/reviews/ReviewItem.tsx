@@ -148,6 +148,7 @@ const styles = StyleSheet.create({
 		padding: 15,
 		borderLeftWidth: 4,
 		borderLeftColor: colors.primary,
+		marginTop: 10,
 	},
 	responseHeader: {
 		flexDirection: 'row',
