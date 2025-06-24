@@ -1,7 +1,6 @@
 import {
 	getUserRestaurantById,
 	getUserRestaurantMenus,
-	getUserRestaurantReviews,
 	getUserRestaurantStatus,
 } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
@@ -10,7 +9,7 @@ import RestaurantBasicInformation from '@/components/RestaurantBasicInformation'
 import Information from '@/components/restaurantDetail/Information';
 import Menu from '@/components/restaurantDetail/Menu';
 import { useTranslation } from '@/hooks/useTranslation';
-import { MenuData, Restaurant, Review } from '@/shared/types';
+import { MenuData, Restaurant } from '@/shared/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -36,7 +35,6 @@ const { width: screenWidth } = Dimensions.get('window');
 interface TabMeasurements {
 	information: { x: number; width: number };
 	menu: { x: number; width: number };
-	reviews: { x: number; width: number };
 }
 
 export default function UserRestaurantPreview() {
@@ -50,23 +48,21 @@ export default function UserRestaurantPreview() {
 
 	const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
 	const [menus, setMenus] = useState<MenuData[]>([]);
-	const [reviews, setReviews] = useState<Review[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [status, setStatus] = useState<{ isActive: boolean }>({
 		isActive: false,
 	});
 
 	// Estado para las pestañas
-	const [activeTab, setActiveTab] = useState<
-		'information' | 'menu' | 'reviews'
-	>('information');
+	const [activeTab, setActiveTab] = useState<'information' | 'menu'>(
+		'information',
+	);
 	const [isTransitioning, setIsTransitioning] = useState(false);
 
 	// Estado para almacenar las medidas de los tabs
 	const [tabMeasurements, setTabMeasurements] = useState<TabMeasurements>({
 		information: { x: 0, width: 0 },
 		menu: { x: 0, width: 0 },
-		reviews: { x: 0, width: 0 },
 	});
 
 	// Animated values
@@ -84,12 +80,10 @@ export default function UserRestaurantPreview() {
 				if (restaurantId) {
 					const restaurantData = getUserRestaurantById(restaurantId);
 					const menusData = getUserRestaurantMenus(restaurantId);
-					const reviewsData = getUserRestaurantReviews(restaurantId);
 					const statusData = getUserRestaurantStatus(restaurantId);
 
 					setRestaurant(restaurantData || null);
 					setMenus(menusData);
-					setReviews(reviewsData);
 					setStatus(statusData);
 				}
 			} catch (error) {
@@ -138,8 +132,7 @@ export default function UserRestaurantPreview() {
 
 	const handleTabLayout = (tab: 'information' | 'menu', event: any) => {
 		const { width } = event.nativeEvent.layout;
-		const tabIndicator =
-			tab === 'information' ? -(width / 2 + 2) : width / 2 + 38;
+		const tabIndicator = tab === 'information' ? -(width / 2) : width / 2 + 42;
 
 		setTabMeasurements((prev) => {
 			const newMeasurements = {
@@ -164,12 +157,7 @@ export default function UserRestaurantPreview() {
 
 		setIsTransitioning(true);
 
-		const targetX =
-			tab === 'information'
-				? 0
-				: tab === 'menu'
-				? -screenWidth
-				: -screenWidth * 2;
+		const targetX = tab === 'information' ? 0 : -screenWidth;
 
 		const currentTabMeasurement = tabMeasurements[tab];
 		if (currentTabMeasurement.width > 0) {
@@ -226,7 +214,7 @@ export default function UserRestaurantPreview() {
 				{restaurant.mainImage && (
 					<Image
 						source={{ uri: restaurant.mainImage }}
-						style={[styles.headerImage, { height: 200 + insets.top }]}
+						style={[styles.headerImage, { height: 250 + insets.top }]}
 						resizeMode="cover"
 					/>
 				)}
@@ -240,17 +228,19 @@ export default function UserRestaurantPreview() {
 					<Ionicons name="chevron-back" size={24} color={colors.quaternary} />
 				</TouchableOpacity>
 
-				{/* Status Badge */}
-				<View style={[styles.statusBadge, { top: insets.top + 60 }]}>
-					<View
-						style={[
-							styles.statusDot,
-							{ backgroundColor: status.isActive ? '#10B981' : '#EF4444' },
-						]}
-					/>
-					<Text style={styles.statusText}>
-						{status.isActive ? 'Activo' : 'Inactivo'}
-					</Text>
+				{/* Status Badge - Centrado arriba */}
+				<View style={styles.statusBadgeContainer}>
+					<View style={[styles.statusBadge, { top: insets.top + 10 }]}>
+						<View
+							style={[
+								styles.statusDot,
+								{ backgroundColor: status.isActive ? '#10B981' : '#EF4444' },
+							]}
+						/>
+						<Text style={styles.statusText}>
+							{status.isActive ? 'Activo' : 'Inactivo'}
+						</Text>
+					</View>
 				</View>
 
 				{/* Edit Button */}
@@ -403,16 +393,23 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
+	statusBadgeContainer: {
+		position: 'absolute',
+		right: 0,
+		left: 0,
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
 	statusBadge: {
 		position: 'absolute',
-		right: 20,
-		backgroundColor: 'rgba(0, 0, 0, 0.7)',
-		borderRadius: 12,
+		backgroundColor: 'rgba(0, 0, 0, 0.3)',
+		borderRadius: 20,
 		paddingHorizontal: 12,
 		paddingVertical: 6,
 		flexDirection: 'row',
 		alignItems: 'center',
-		gap: 6,
+		gap: 10,
+		height: 40,
 	},
 	statusDot: {
 		width: 8,
@@ -420,7 +417,7 @@ const styles = StyleSheet.create({
 		borderRadius: 4,
 	},
 	statusText: {
-		fontSize: 12,
+		fontSize: 14,
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.quaternary,
@@ -440,11 +437,11 @@ const styles = StyleSheet.create({
 		marginVertical: 20,
 		paddingBottom: 10,
 		justifyContent: 'center',
-		gap: 30,
+		gap: 40,
 		paddingHorizontal: 20,
 	},
 	tabText: {
-		fontSize: 14,
+		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '500',
 		color: colors.primaryLight,
@@ -458,7 +455,7 @@ const styles = StyleSheet.create({
 	},
 	slidingContent: {
 		flexDirection: 'row',
-		width: screenWidth * 3,
+		width: screenWidth * 2,
 		height: '100%',
 	},
 	tabContent: {
