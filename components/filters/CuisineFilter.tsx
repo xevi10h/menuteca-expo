@@ -1,8 +1,6 @@
-// components/filters/CuisineFilter.tsx
 import { allCuisines } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import { useFilterStore } from '@/zustand/FilterStore';
-import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo } from 'react';
 import {
@@ -15,7 +13,6 @@ import {
 } from 'react-native';
 
 export default function CuisineFilter() {
-	const language = useUserStore((state) => state.user.language);
 	const { main: filters, setCuisines } = useFilterStore();
 	const selectedCuisines = filters.cuisines || [];
 
@@ -83,7 +80,7 @@ export default function CuisineFilter() {
 								)}
 							</View>
 							<Text style={[styles.text, isSelected && styles.textSelected]}>
-								{cuisine.name[language]}
+								{cuisine.name}
 							</Text>
 						</TouchableOpacity>
 					);

@@ -2,7 +2,6 @@ import { getCuisineById } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Restaurant } from '@/shared/types';
-import { useUserStore } from '@/zustand/UserStore';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -14,7 +13,6 @@ interface RestaurantCardProps {
 export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
 	const { t } = useTranslation();
 	const router = useRouter();
-	const language = useUserStore((state) => state.user.language);
 
 	const cuisine = getCuisineById(restaurant.cuisineId);
 
@@ -54,7 +52,7 @@ export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
 				<View style={styles.details}>
 					{cuisine && (
 						<Text style={styles.cuisine} numberOfLines={1}>
-							{cuisine.name[language]}
+							{cuisine.name}
 						</Text>
 					)}
 					<Text style={styles.distance}>{restaurant.distance} km</Text>

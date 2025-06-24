@@ -89,12 +89,7 @@ export type Restaurant = {
 
 export type Cuisine = {
 	id: string;
-	name: {
-		en_US: string;
-		es_ES: string;
-		ca_ES: string;
-		fr_FR: string;
-	};
+	name: string;
 	image: string;
 };
 

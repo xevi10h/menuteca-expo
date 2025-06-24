@@ -1,4 +1,3 @@
-// components/profile/UserRestaurantPill.tsx
 import { getCuisineById, getUserRestaurantStatus } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -18,7 +17,6 @@ export default function UserRestaurantPill({
 }: UserRestaurantPillProps) {
 	const { t } = useTranslation();
 	const router = useRouter();
-	const language = useUserStore((state) => state.user.language);
 	const userId = useUserStore((state) => state.user.id);
 
 	const cuisine = getCuisineById(restaurant.cuisineId);
@@ -82,7 +80,7 @@ export default function UserRestaurantPill({
 				<View style={styles.detailsRow}>
 					{cuisine && (
 						<Text style={styles.cuisineText} numberOfLines={1}>
-							{cuisine.name[language]}
+							{cuisine.name}
 						</Text>
 					)}
 					<Text style={styles.priceText}>

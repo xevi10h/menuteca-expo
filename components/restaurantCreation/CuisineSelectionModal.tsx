@@ -2,7 +2,6 @@ import { allCuisines } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
-import { useUserStore } from '@/zustand/UserStore';
 import React, { useEffect, useState } from 'react';
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import HeaderModal from './HeaderModal';
@@ -19,7 +18,6 @@ export default function CuisineSelectionModal({
 	onSave,
 }: CuisineSelectionModalProps) {
 	const { t } = useTranslation();
-	const language = useUserStore((state) => state.user.language);
 	const selectedCuisineId = useRegisterRestaurantStore(
 		(state) => state.registerRestaurant.cuisineId,
 	);
@@ -76,7 +74,7 @@ export default function CuisineSelectionModal({
 											styles.cuisineButtonTextSelected,
 									]}
 								>
-									{cuisine.name[language]}
+									{cuisine.name}
 								</Text>
 							</TouchableOpacity>
 						))}

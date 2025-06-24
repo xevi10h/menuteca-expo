@@ -31,18 +31,6 @@
 		"recommended": "Recomanats per tu",
 		"alreadyTried": "Els que ja has provat"
 	},
-	"cuisinesRestaurants": {
-		"mediterranean": "Mediterrani",
-		"japanese": "Japonès",
-		"italian": "Italià",
-		"mexican": "Mexicà",
-		"american": "Americà",
-		"chinese": "Xinès",
-		"indian": "Indi",
-		"thai": "Tailandès",
-		"korean": "Coreà",
-		"hauteCuisine": "Alta cuina"
-	},
 	"general": {
 		"from": "Des de",
 		"cancel": "Cancel·lar",

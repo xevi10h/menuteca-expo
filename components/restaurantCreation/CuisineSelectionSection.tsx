@@ -1,7 +1,6 @@
 import { getCuisineById } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -18,7 +17,6 @@ export default function CuisineSelectionSection({
 	showTitle = false,
 }: CuisineSelectionSectionProps) {
 	const { t } = useTranslation();
-	const language = useUserStore((state) => state.user.language);
 
 	const selectedCuisine = selectedCuisineId
 		? getCuisineById(selectedCuisineId)
@@ -44,7 +42,7 @@ export default function CuisineSelectionSection({
 				<View style={styles.selectedCuisineTag}>
 					<Text style={styles.selectedCuisineText}>
 						{selectedCuisine
-							? selectedCuisine.name[language]
+							? selectedCuisine.name
 							: t('registerRestaurant.noCuisinesSelected')}
 					</Text>
 				</View>

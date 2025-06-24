@@ -31,18 +31,6 @@
 		"recommended": "Recommended for you",
 		"alreadyTried": "The ones you have already tried"
 	},
-	"cuisinesRestaurants": {
-		"mediterranean": "Mediterranean",
-		"japanese": "Japanese",
-		"italian": "Italian",
-		"mexican": "Mexican",
-		"american": "American",
-		"chinese": "Chinese",
-		"indian": "Indian",
-		"thai": "Thai",
-		"korean": "Korean",
-		"hauteCuisine": "Haute cuisine"
-	},
 	"general": {
 		"from": "From",
 		"cancel": "Cancel",

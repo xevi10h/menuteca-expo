@@ -1,11 +1,9 @@
 import { allCuisines } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
-import { useUserStore } from '@/zustand/UserStore';
+
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 export default function CuisineHorizontalScroll() {
-	const language = useUserStore((state) => state.user.language);
-
 	return (
 		<View style={styles.container}>
 			<ScrollView
@@ -23,7 +21,7 @@ export default function CuisineHorizontalScroll() {
 						}}
 					>
 						<Image src={cuisine.image} style={styles.image} />
-						<Text style={styles.text}>{cuisine.name[language]}</Text>
+						<Text style={styles.text}>{cuisine.name}</Text>
 					</View>
 				))}
 			</ScrollView>

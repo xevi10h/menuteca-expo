@@ -2,7 +2,6 @@ import { getCuisineById } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Restaurant } from '@/shared/types';
-import { useUserStore } from '@/zustand/UserStore';
 import { Image, StyleSheet, Text, View } from 'react-native';
 
 interface RestaurantBasicInformationProps {
@@ -17,7 +16,6 @@ export default function RestaurantBasicInformation({
 	const { t } = useTranslation();
 	const colorToUse = color || colors.primary;
 	const cuisine = getCuisineById(restaurant.cuisineId);
-	const language = useUserStore((state) => state.user.language);
 
 	return (
 		<View style={styles.headerInfo}>
@@ -48,7 +46,7 @@ export default function RestaurantBasicInformation({
 					</Text>
 					{cuisine?.name && (
 						<Text style={[styles.cuisineText, { color: colorToUse }]}>
-							{cuisine.name[language]}
+							{cuisine.name}
 						</Text>
 					)}
 				</View>

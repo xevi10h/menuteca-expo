@@ -2,7 +2,6 @@ import { getCuisineById } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Restaurant } from '@/shared/types';
-import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect } from 'react';
 import {
@@ -42,7 +41,6 @@ export default function MapRestaurantModal({
 	const selectedCuisine = restaurant?.cuisineId
 		? getCuisineById(restaurant?.cuisineId)
 		: null;
-	const language = useUserStore((state) => state.user.language);
 
 	const handleClose = () => {
 		opacity.value = withTiming(0, { duration: 200 });
@@ -124,9 +122,7 @@ export default function MapRestaurantModal({
 							<View style={{ flex: 1, width: '50%' }}>
 								<Text style={styles.restaurantName}>{restaurant.name}</Text>
 								{selectedCuisine?.name && (
-									<Text style={styles.cuisineText}>
-										{selectedCuisine.name[language]}
-									</Text>
+									<Text style={styles.cuisineText}>{selectedCuisine.name}</Text>
 								)}
 							</View>
 							<View>

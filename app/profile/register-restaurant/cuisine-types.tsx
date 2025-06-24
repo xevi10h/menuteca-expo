@@ -2,7 +2,6 @@ import { allCuisines } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
-import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -20,7 +19,6 @@ const { width, height } = Dimensions.get('window');
 
 export default function CuisineTypesScreen() {
 	const { t } = useTranslation();
-	const language = useUserStore((state) => state.user.language);
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
 	const [selectedCuisine, setSelectedCuisine] = useState<string | null>(null);
@@ -102,7 +100,7 @@ export default function CuisineTypesScreen() {
 										styles.cuisineButtonTextSelected,
 								]}
 							>
-								{cuisine.name[language]}
+								{cuisine.name}
 							</Text>
 						</TouchableOpacity>
 					))}
