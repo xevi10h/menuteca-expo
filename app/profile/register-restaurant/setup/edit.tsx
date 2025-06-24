@@ -80,7 +80,11 @@ export default function EditTab() {
 		const menuToCopy = registerRestaurant.menus?.[index];
 		if (menuToCopy) {
 			setCopyingMenuIndex(index);
-			setNewMenuName(`${menuToCopy.name} - Copia`);
+			setNewMenuName(
+				t('registerRestaurant.menuNameCopy', {
+					menuName: menuToCopy.name,
+				}),
+			);
 			setShowCopyMenuModal(true);
 		}
 	};

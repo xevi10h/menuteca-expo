@@ -225,7 +225,9 @@ const Information: React.FC<InformationProps> = ({
 						)}
 					</View>
 					<View style={styles.viewReviewsButton}>
-						<Text style={styles.viewReviewsText}>Ver todas las opiniones</Text>
+						<Text style={styles.viewReviewsText}>
+							{t('restaurantDetail.viewAllReviews')}
+						</Text>
 						{/* Mostrar número de opiniones */}
 						<Text style={styles.reviewsCount}>({MOCK_REVIEWS_COUNT})</Text>
 						<Ionicons name="chevron-forward" size={16} color={colors.primary} />
@@ -238,7 +240,9 @@ const Information: React.FC<InformationProps> = ({
 					onPress={() => setShowAddReviewModal(true)}
 				>
 					<Ionicons name="create-outline" size={16} color={colors.quaternary} />
-					<Text style={styles.writeReviewButtonText}>Escribir opinión</Text>
+					<Text style={styles.writeReviewButtonText}>
+						{t('restaurantDetail.writeReview')}
+					</Text>
 				</TouchableOpacity>
 			</View>
 

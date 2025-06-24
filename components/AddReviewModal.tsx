@@ -167,15 +167,13 @@ export default function AddReviewModal({
 
 			onSubmit(newReview);
 
-			Alert.alert('¡Opinión enviada!', 'Gracias por compartir tu experiencia', [
+			Alert.alert(t('addReview.reviewSent'), t('addReview.thankYouMessage'), [
 				{ text: t('general.ok'), onPress: handleClose },
 			]);
 		} catch (error) {
-			Alert.alert(
-				t('reviews.error'),
-				'No se pudo enviar tu opinión. Inténtalo de nuevo.',
-				[{ text: t('general.ok'), style: 'default' }],
-			);
+			Alert.alert(t('reviews.error'), t('addReview.couldNotSend'), [
+				{ text: t('general.ok'), style: 'default' },
+			]);
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -229,7 +227,10 @@ export default function AddReviewModal({
 					<View style={styles.section}>
 						<Text style={styles.sectionTitle}>
 							{t('reviews.yourComment')}
-							<Text style={styles.optionalText}> (opcional)</Text>
+							<Text style={styles.optionalText}>
+								{' '}
+								{t('addReview.optional')}
+							</Text>
 						</Text>
 						<View style={styles.commentCard}>
 							<TextInput

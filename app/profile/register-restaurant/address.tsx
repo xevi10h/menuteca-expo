@@ -58,10 +58,6 @@ export default function AddressScreen() {
 		setHasSelectedSuggestion(true);
 	};
 
-	const handleAdditionalInfoChange = (value: string) => {
-		setAdditionalInfo(value);
-	};
-
 	useEffect(() => {
 		// Enable next button if we have a selected address
 		if (selectedAddress) {

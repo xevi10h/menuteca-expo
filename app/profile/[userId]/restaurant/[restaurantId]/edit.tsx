@@ -110,11 +110,13 @@ export default function UserRestaurantEdit() {
 				updateUserRestaurantStatus(restaurantId, isActive);
 			}
 
-			Alert.alert('Éxito', 'Restaurante actualizado correctamente', [
-				{ text: 'OK', onPress: () => router.back() },
-			]);
+			Alert.alert(
+				t('validation.success'),
+				t('editRestaurant.restaurantUpdated'),
+				[{ text: 'OK', onPress: () => router.back() }],
+			);
 		} catch (error) {
-			Alert.alert('Error', 'No se pudo actualizar el restaurante');
+			Alert.alert(t('validation.error'), t('editRestaurant.couldNotUpdate'));
 		} finally {
 			setSaving(false);
 		}
@@ -171,7 +173,11 @@ export default function UserRestaurantEdit() {
 		const menuToCopy = restaurant?.menus?.[index];
 		if (menuToCopy) {
 			setCopyingMenuIndex(index);
-			setNewMenuName(`${menuToCopy.name} - Copia`);
+			setNewMenuName(
+				t('registerRestaurant.menuNameCopy', {
+					menuName: menuToCopy.name,
+				}),
+			);
 			setShowCopyMenuModal(true);
 		}
 	};
@@ -297,7 +303,9 @@ export default function UserRestaurantEdit() {
 					<TouchableOpacity onPress={handleBack} style={styles.backButton}>
 						<Ionicons name="chevron-back" size={24} color={colors.primary} />
 					</TouchableOpacity>
-					<Text style={styles.headerTitle}>Restaurante no encontrado</Text>
+					<Text style={styles.headerTitle}>
+						{t('notFound.restaurant.title')}
+					</Text>
 				</View>
 			</View>
 		);
@@ -310,14 +318,18 @@ export default function UserRestaurantEdit() {
 				<TouchableOpacity onPress={handleBack} style={styles.backButton}>
 					<Ionicons name="chevron-back" size={24} color={colors.primary} />
 				</TouchableOpacity>
-				<Text style={styles.headerTitle}>Editar {restaurant.name}</Text>
+				<Text style={styles.headerTitle}>
+					{t('editRestaurant.editTitle', {
+						name: restaurant.name,
+					})}
+				</Text>
 				<TouchableOpacity
 					onPress={handleSave}
 					style={[styles.saveButton, saving && styles.saveButtonDisabled]}
 					disabled={saving}
 				>
 					<Text style={styles.saveButtonText}>
-						{saving ? 'Guardando...' : 'Guardar'}
+						{saving ? t('validation.saving') : t('general.save')}
 					</Text>
 				</TouchableOpacity>
 			</View>
@@ -327,11 +339,13 @@ export default function UserRestaurantEdit() {
 				<View style={styles.sectionContainer}>
 					<View style={styles.statusSection}>
 						<View style={styles.statusInfo}>
-							<Text style={styles.statusTitle}>Estado del restaurante</Text>
+							<Text style={styles.statusTitle}>
+								{t('editRestaurant.restaurantStatus')}
+							</Text>
 							<Text style={styles.statusDescription}>
 								{isActive
-									? 'Tu restaurante está visible para los usuarios'
-									: 'Tu restaurante está oculto y no aparecerá en las búsquedas'}
+									? t('editRestaurant.statusActiveDescription')
+									: t('editRestaurant.statusInactiveDescription')}
 							</Text>
 						</View>
 						<Switch

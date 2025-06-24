@@ -54,7 +54,9 @@
 		"edit": "Edit",
 		"preview": "Preview",
 		"delete": "Delete",
-		"ok": "OK"
+		"ok": "OK",
+		"gallery": "Gallery",
+		"camera": "Camera"
 	},
 	"restaurant": {
 		"information": "Information",
@@ -181,7 +183,8 @@
 		"addressRequired": "Address is required",
 		"noResultsFound": "No results found for \"%{query}\"",
 		"noResultsSubtext": "Try a more specific search or use manual mode",
-		"noResultsSubtextAddressScreen": "Try a more specific search"
+		"noResultsSubtextAddressScreen": "Try a more specific search",
+		"menuNameCopy": "{{menuName}} - Copy"
 	},
 	"menuCreation": {
 		"menuName": "Menu name",
@@ -369,12 +372,134 @@
 		"noRestaurantsYet": "You don't have any restaurants yet",
 		"averageRating": "Average rating",
 		"active": "Active",
-		"inactive": "Inactive"
+		"inactive": "Inactive",
+		"myProfile": "My Profile",
+		"settings": "Settings",
+		"changePassword": "Change password",
+		"changeUsername": "Change username",
+		"changeLanguage": "Change language",
+		"memberSince": "Member since",
+		"noRestaurantsRegistered": "You have no registered restaurants",
+		"logout": "Sign out",
+		"confirmLogout": "Are you sure you want to sign out?",
+		"limitReached": "Limit reached",
+		"maxRestaurantsReached": "You have reached the maximum limit of {{count}} restaurants per user",
+		"permissionsRequired": "Permissions required",
+		"photoAccessMessage": "We need access to your gallery to change the profile photo"
 	},
 	"languages": {
 		"es_ES": "Spanish",
 		"ca_ES": "Catalan",
 		"en_US": "English",
 		"fr_FR": "French"
+	},
+	"auth": {
+		"login": "Sign In",
+		"register": "Sign Up",
+		"welcomeBack": "Welcome back",
+		"createAccount": "Create account",
+		"loginSubtitle": "Sign in to access your profile",
+		"registerSubtitle": "Sign up to start using the app",
+		"fullName": "Full name",
+		"username": "Username",
+		"email": "Email",
+		"password": "Password",
+		"enterFullName": "Enter your full name",
+		"enterUsername": "Enter your username",
+		"enterEmail": "Enter your email",
+		"enterPassword": "Enter your password",
+		"processing": "Processing...",
+		"noAccount": "Don't have an account? Sign up",
+		"hasAccount": "Already have an account? Sign in",
+		"completeAllFields": "Please complete all required fields",
+		"errorOccurred": "An error occurred. Please try again."
+	},
+	"changePassword": {
+		"title": "Change password",
+		"currentPassword": "Current password",
+		"newPassword": "New password",
+		"confirmPassword": "Confirm new password",
+		"enterCurrentPassword": "Enter your current password",
+		"enterNewPassword": "Enter your new password",
+		"confirmNewPassword": "Confirm your new password",
+		"minimumChars": "Minimum 6 characters",
+		"saving": "Saving...",
+		"passwordsDontMatch": "Passwords don't match",
+		"minimumLength": "New password must be at least 6 characters",
+		"success": "Success",
+		"passwordChanged": "Password changed successfully",
+		"couldNotChange": "Could not change password. Please try again."
+	},
+	"changeUsername": {
+		"title": "Change Username",
+		"username": "Username",
+		"enterNewUsername": "Enter your new username",
+		"requirements": "Minimum 3 characters, no spaces",
+		"validUsernameRequired": "Please enter a valid username",
+		"minimumLength": "Username must be at least 3 characters",
+		"usernameChanged": "Username changed successfully",
+		"couldNotChange": "Could not change username. Please try again."
+	},
+	"changeLanguage": {
+		"title": "Change Language",
+		"selectPreferred": "Select your preferred language",
+		"languageChanged": "Language changed successfully",
+		"couldNotChange": "Could not change language. Please try again."
+	},
+	"editRestaurant": {
+		"editTitle": "Edit {{name}}",
+		"saving": "Saving...",
+		"restaurantStatus": "Restaurant status",
+		"statusActiveDescription": "Your restaurant is visible to users",
+		"statusInactiveDescription": "Your restaurant is hidden and won't appear in searches",
+		"restaurantUpdated": "Restaurant updated successfully",
+		"couldNotUpdate": "Could not update restaurant",
+		"restaurantNotFound": "Restaurant not found"
+	},
+	"previewRestaurant": {
+		"addMenuFromEditTab": "Add a menu from the edit tab"
+	},
+	"addReview": {
+		"reviewSent": "Review sent!",
+		"thankYouMessage": "Thank you for sharing your experience",
+		"couldNotSend": "Could not send your review. Please try again.",
+		"optional": "(optional)"
+	},
+	"restaurantDetail": {
+		"viewAllReviews": "View all reviews",
+		"writeReview": "Write review"
+	},
+	"user": {
+		"defaultUserName": "Your User",
+		"currentUser": "Current User"
+	},
+	"validation": {
+		"error": "Error",
+		"success": "Success",
+		"loading": "Loading...",
+		"processing": "Processing...",
+		"saving": "Saving...",
+		"networkError": "Network error",
+		"tryAgain": "Try again",
+		"requiredField": "This field is required",
+		"invalidFormat": "Invalid format",
+		"connectionError": "Connection error",
+		"checkConnection": "Check your internet connection"
+	},
+	"navigation": {
+		"back": "Back",
+		"close": "Close",
+		"done": "Done",
+		"continue": "Continue",
+		"skip": "Skip",
+		"add": "Add",
+		"remove": "Remove",
+		"edit": "Edit",
+		"copy": "Copy",
+		"share": "Share",
+		"search": "Search",
+		"filter": "Filter",
+		"sort": "Sort",
+		"refresh": "Refresh"
 	}
 }

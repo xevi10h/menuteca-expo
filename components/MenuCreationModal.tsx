@@ -277,11 +277,11 @@ export default function MenuCreationModal({
 					style: 'cancel',
 				},
 				{
-					text: 'Cámara',
+					text: t('general.camera'),
 					onPress: () => openCamera(),
 				},
 				{
-					text: 'Galería',
+					text: t('general.gallery'),
 					onPress: () => openGallery(),
 				},
 			]);

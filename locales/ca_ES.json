@@ -54,7 +54,9 @@
 		"edit": "Editar",
 		"preview": "Vista prèvia",
 		"delete": "Eliminar",
-		"ok": "D'acord"
+		"ok": "D'acord",
+		"gallery": "Galeria",
+		"camera": "Càmera"
 	},
 	"restaurant": {
 		"information": "Informació",
@@ -181,7 +183,8 @@
 		"addressRequired": "L'adreça és obligatòria",
 		"noResultsFound": "No s'han trobat resultats per \"%{query}\"",
 		"noResultsSubtext": "Prova amb una cerca més específica o usa el mode manual",
-		"noResultsSubtextAddressScreen": "Prova amb una cerca més específica"
+		"noResultsSubtextAddressScreen": "Prova amb una cerca més específica",
+		"menuNameCopy": "{{menuName}} - Còpia"
 	},
 	"menuCreation": {
 		"menuName": "Nom del menú",
@@ -369,12 +372,134 @@
 		"noRestaurantsYet": "Encara no tens restaurants",
 		"averageRating": "Puntuació mitjana",
 		"active": "Actiu",
-		"inactive": "Inactiu"
+		"inactive": "Inactiu",
+		"myProfile": "El Meu Perfil",
+		"settings": "Configuració",
+		"changePassword": "Canviar contrasenya",
+		"changeUsername": "Canviar nom d'usuari",
+		"changeLanguage": "Canviar idioma",
+		"memberSince": "Membre des de",
+		"noRestaurantsRegistered": "No tens restaurants registrats",
+		"logout": "Tancar sessió",
+		"confirmLogout": "Estàs segur que vols tancar la sessió?",
+		"limitReached": "Límit assolit",
+		"maxRestaurantsReached": "Has assolit el límit màxim de {{count}} restaurants per usuari",
+		"permissionsRequired": "Permisos requerits",
+		"photoAccessMessage": "Necessitem accés a la teva galeria per canviar la foto de perfil"
 	},
 	"languages": {
 		"es_ES": "Espanyol",
 		"ca_ES": "Català",
 		"en_US": "Anglès",
 		"fr_FR": "Francès"
+	},
+	"auth": {
+		"login": "Iniciar Sessió",
+		"register": "Registrar-se",
+		"welcomeBack": "Benvingut de nou",
+		"createAccount": "Crear compte",
+		"loginSubtitle": "Inicia sessió per accedir al teu perfil",
+		"registerSubtitle": "Registra't per començar a usar l'app",
+		"fullName": "Nom complet",
+		"username": "Nom d'usuari",
+		"email": "Correu electrònic",
+		"password": "Contrasenya",
+		"enterFullName": "Introdueix el teu nom complet",
+		"enterUsername": "Introdueix el teu nom d'usuari",
+		"enterEmail": "Introdueix el teu correu electrònic",
+		"enterPassword": "Introdueix la teva contrasenya",
+		"processing": "Processant...",
+		"noAccount": "No tens compte? Registra't",
+		"hasAccount": "Ja tens compte? Inicia sessió",
+		"completeAllFields": "Si us plau, completa tots els camps requerits",
+		"errorOccurred": "Ha ocorregut un error. Torna-ho a intentar."
+	},
+	"changePassword": {
+		"title": "Canviar contrasenya",
+		"currentPassword": "Contrasenya actual",
+		"newPassword": "Nova contrasenya",
+		"confirmPassword": "Confirmar nova contrasenya",
+		"enterCurrentPassword": "Introdueix la teva contrasenya actual",
+		"enterNewPassword": "Introdueix la teva nova contrasenya",
+		"confirmNewPassword": "Confirma la teva nova contrasenya",
+		"minimumChars": "Mínim 6 caràcters",
+		"saving": "Desant...",
+		"passwordsDontMatch": "Les contrasenyes no coincideixen",
+		"minimumLength": "La nova contrasenya ha de tenir almenys 6 caràcters",
+		"success": "Èxit",
+		"passwordChanged": "Contrasenya canviada correctament",
+		"couldNotChange": "No s'ha pogut canviar la contrasenya. Torna-ho a intentar."
+	},
+	"changeUsername": {
+		"title": "Canviar Usuari",
+		"username": "Nom d'usuari",
+		"enterNewUsername": "Introdueix el teu nou nom d'usuari",
+		"requirements": "Mínim 3 caràcters, sense espais",
+		"validUsernameRequired": "Si us plau, introdueix un nom d'usuari vàlid",
+		"minimumLength": "El nom d'usuari ha de tenir almenys 3 caràcters",
+		"usernameChanged": "Nom d'usuari canviat correctament",
+		"couldNotChange": "No s'ha pogut canviar el nom d'usuari. Torna-ho a intentar."
+	},
+	"changeLanguage": {
+		"title": "Canviar Idioma",
+		"selectPreferred": "Selecciona el teu idioma preferit",
+		"languageChanged": "Idioma canviat correctament",
+		"couldNotChange": "No s'ha pogut canviar l'idioma. Torna-ho a intentar."
+	},
+	"editRestaurant": {
+		"editTitle": "Editar {{name}}",
+		"saving": "Desant...",
+		"restaurantStatus": "Estat del restaurant",
+		"statusActiveDescription": "El teu restaurant és visible per als usuaris",
+		"statusInactiveDescription": "El teu restaurant està ocult i no apareixerà en les cerques",
+		"restaurantUpdated": "Restaurant actualitzat correctament",
+		"couldNotUpdate": "No s'ha pogut actualitzar el restaurant",
+		"restaurantNotFound": "Restaurant no trobat"
+	},
+	"previewRestaurant": {
+		"addMenuFromEditTab": "Afegeix un menú des de la pestanya d'edició"
+	},
+	"addReview": {
+		"reviewSent": "Opinió enviada!",
+		"thankYouMessage": "Gràcies per compartir la teva experiència",
+		"couldNotSend": "No s'ha pogut enviar la teva opinió. Torna-ho a intentar.",
+		"optional": "(opcional)"
+	},
+	"restaurantDetail": {
+		"viewAllReviews": "Veure totes les opinions",
+		"writeReview": "Escriure opinió"
+	},
+	"user": {
+		"defaultUserName": "El Teu Usuari",
+		"currentUser": "Usuari Actual"
+	},
+	"validation": {
+		"error": "Error",
+		"success": "Èxit",
+		"loading": "Carregant...",
+		"processing": "Processant...",
+		"saving": "Desant...",
+		"networkError": "Error de xarxa",
+		"tryAgain": "Tornar a intentar",
+		"requiredField": "Aquest camp és obligatori",
+		"invalidFormat": "Format invàlid",
+		"connectionError": "Error de connexió",
+		"checkConnection": "Verifica la teva connexió a internet"
+	},
+	"navigation": {
+		"back": "Enrere",
+		"close": "Tancar",
+		"done": "Fet",
+		"continue": "Continuar",
+		"skip": "Ometre",
+		"add": "Afegir",
+		"remove": "Eliminar",
+		"edit": "Editar",
+		"copy": "Copiar",
+		"share": "Compartir",
+		"search": "Cercar",
+		"filter": "Filtrar",
+		"sort": "Ordenar",
+		"refresh": "Actualitzar"
 	}
 }

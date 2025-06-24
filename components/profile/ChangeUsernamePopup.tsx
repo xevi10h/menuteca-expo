@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { useTranslation } from '@/hooks/useTranslation';
 import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
@@ -24,6 +25,7 @@ export default function ChangeUsernamePopup({
 	visible,
 	onClose,
 }: ChangeUsernamePopupProps) {
+	const { t } = useTranslation();
 	const user = useUserStore((state) => state.user);
 	const updateUsername = useUserStore((state) => state.updateUsername);
 	const [newUsername, setNewUsername] = useState('');
@@ -47,15 +49,15 @@ export default function ChangeUsernamePopup({
 
 	const handleChangeUsername = async () => {
 		if (!newUsername.trim()) {
-			Alert.alert('Error', 'Por favor, ingresa un nombre de usuario válido');
+			Alert.alert(
+				t('validation.error'),
+				t('changeUsername.validUsernameRequired'),
+			);
 			return;
 		}
 
 		if (newUsername.trim().length < 3) {
-			Alert.alert(
-				'Error',
-				'El nombre de usuario debe tener al menos 3 caracteres',
-			);
+			Alert.alert(t('validation.error'), t('changeUsername.minimumLength'));
 			return;
 		}
 
@@ -72,14 +74,13 @@ export default function ChangeUsernamePopup({
 
 			updateUsername(newUsername.trim());
 
-			Alert.alert('Éxito', 'Nombre de usuario cambiado correctamente', [
-				{ text: 'OK', onPress: handleClose },
-			]);
-		} catch (error) {
 			Alert.alert(
-				'Error',
-				'No se pudo cambiar el nombre de usuario. Inténtalo de nuevo.',
+				t('validation.success'),
+				t('changeUsername.usernameChanged'),
+				[{ text: 'OK', onPress: handleClose }],
 			);
+		} catch (error) {
+			Alert.alert(t('validation.error'), t('changeUsername.couldNotChange'));
 		} finally {
 			setIsChangingUsername(false);
 		}
@@ -102,7 +103,7 @@ export default function ChangeUsernamePopup({
 				<View style={styles.popup}>
 					{/* Header */}
 					<View style={styles.header}>
-						<Text style={styles.title}>Cambiar Usuario</Text>
+						<Text style={styles.title}>{t('changeUsername.title')}</Text>
 						<TouchableOpacity onPress={handleClose} style={styles.closeButton}>
 							<Ionicons name="close" size={24} color={colors.primary} />
 						</TouchableOpacity>
@@ -111,18 +112,20 @@ export default function ChangeUsernamePopup({
 					{/* Content */}
 					<View style={styles.content}>
 						<View style={styles.inputContainer}>
-							<Text style={styles.inputLabel}>Nombre de usuario</Text>
+							<Text style={styles.inputLabel}>
+								{t('changeUsername.username')}
+							</Text>
 							<TextInput
 								style={styles.input}
 								value={newUsername}
 								onChangeText={setNewUsername}
-								placeholder="Ingresa tu nuevo nombre de usuario"
+								placeholder={t('changeUsername.enterNewUsername')}
 								placeholderTextColor={colors.primaryLight}
 								autoCapitalize="none"
 								autoCorrect={false}
 							/>
 							<Text style={styles.inputHelper}>
-								Mínimo 3 caracteres, sin espacios
+								{t('changeUsername.requirements')}
 							</Text>
 						</View>
 					</View>
@@ -130,7 +133,7 @@ export default function ChangeUsernamePopup({
 					{/* Footer */}
 					<View style={styles.footer}>
 						<TouchableOpacity style={styles.cancelButton} onPress={handleClose}>
-							<Text style={styles.cancelButtonText}>Cancelar</Text>
+							<Text style={styles.cancelButtonText}>{t('general.cancel')}</Text>
 						</TouchableOpacity>
 
 						<TouchableOpacity
@@ -147,7 +150,9 @@ export default function ChangeUsernamePopup({
 									isChangingUsername && styles.saveButtonTextDisabled,
 								]}
 							>
-								{isChangingUsername ? 'Guardando...' : 'Guardar'}
+								{isChangingUsername
+									? t('validation.saving')
+									: t('general.save')}
 							</Text>
 						</TouchableOpacity>
 					</View>

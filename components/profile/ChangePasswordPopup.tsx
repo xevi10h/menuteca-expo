@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { useTranslation } from '@/hooks/useTranslation';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
@@ -24,6 +25,7 @@ export default function ChangePasswordPopup({
 	visible,
 	onClose,
 }: ChangePasswordPopupProps) {
+	const { t } = useTranslation();
 	const [currentPassword, setCurrentPassword] = useState('');
 	const [newPassword, setNewPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
@@ -48,20 +50,20 @@ export default function ChangePasswordPopup({
 
 	const handleChangePassword = async () => {
 		if (!currentPassword || !newPassword || !confirmPassword) {
-			Alert.alert('Error', 'Por favor, completa todos los campos');
+			Alert.alert(t('validation.error'), t('auth.completeAllFields'));
 			return;
 		}
 
 		if (newPassword !== confirmPassword) {
-			Alert.alert('Error', 'Las contraseñas no coinciden');
+			Alert.alert(
+				t('validation.error'),
+				t('changePassword.passwordsDontMatch'),
+			);
 			return;
 		}
 
 		if (newPassword.length < 6) {
-			Alert.alert(
-				'Error',
-				'La nueva contraseña debe tener al menos 6 caracteres',
-			);
+			Alert.alert(t('validation.error'), t('changePassword.minimumLength'));
 			return;
 		}
 
@@ -71,14 +73,13 @@ export default function ChangePasswordPopup({
 			// Simular llamada a API
 			await new Promise((resolve) => setTimeout(resolve, 1500));
 
-			Alert.alert('Éxito', 'Contraseña cambiada correctamente', [
-				{ text: 'OK', onPress: handleClose },
-			]);
-		} catch (error) {
 			Alert.alert(
-				'Error',
-				'No se pudo cambiar la contraseña. Inténtalo de nuevo.',
+				t('changePassword.success'),
+				t('changePassword.passwordChanged'),
+				[{ text: 'OK', onPress: handleClose }],
 			);
+		} catch (error) {
+			Alert.alert(t('validation.error'), t('changePassword.couldNotChange'));
 		} finally {
 			setIsChangingPassword(false);
 		}
@@ -101,7 +102,7 @@ export default function ChangePasswordPopup({
 				<View style={styles.popup}>
 					{/* Header */}
 					<View style={styles.header}>
-						<Text style={styles.title}>Cambiar Contraseña</Text>
+						<Text style={styles.title}>{t('profile.changePassword')}</Text>
 						<TouchableOpacity onPress={handleClose} style={styles.closeButton}>
 							<Ionicons name="close" size={24} color={colors.primary} />
 						</TouchableOpacity>
@@ -113,13 +114,15 @@ export default function ChangePasswordPopup({
 						showsVerticalScrollIndicator={false}
 					>
 						<View style={styles.inputContainer}>
-							<Text style={styles.inputLabel}>Contraseña actual</Text>
+							<Text style={styles.inputLabel}>
+								{t('changePassword.currentPassword')}
+							</Text>
 							<View style={styles.passwordInputContainer}>
 								<TextInput
 									style={styles.passwordInput}
 									value={currentPassword}
 									onChangeText={setCurrentPassword}
-									placeholder="Ingresa tu contraseña actual"
+									placeholder={t('changePassword.enterCurrentPassword')}
 									placeholderTextColor={colors.primaryLight}
 									secureTextEntry={!showCurrentPassword}
 									autoCapitalize="none"
@@ -138,13 +141,15 @@ export default function ChangePasswordPopup({
 						</View>
 
 						<View style={styles.inputContainer}>
-							<Text style={styles.inputLabel}>Nueva contraseña</Text>
+							<Text style={styles.inputLabel}>
+								{t('changePassword.newPassword')}
+							</Text>
 							<View style={styles.passwordInputContainer}>
 								<TextInput
 									style={styles.passwordInput}
 									value={newPassword}
 									onChangeText={setNewPassword}
-									placeholder="Ingresa tu nueva contraseña"
+									placeholder={t('changePassword.enterNewPassword')}
 									placeholderTextColor={colors.primaryLight}
 									secureTextEntry={!showNewPassword}
 									autoCapitalize="none"
@@ -160,17 +165,21 @@ export default function ChangePasswordPopup({
 									/>
 								</TouchableOpacity>
 							</View>
-							<Text style={styles.inputHelper}>Mínimo 6 caracteres</Text>
+							<Text style={styles.inputHelper}>
+								{t('changePassword.minimumChars')}
+							</Text>
 						</View>
 
 						<View style={styles.inputContainer}>
-							<Text style={styles.inputLabel}>Confirmar nueva contraseña</Text>
+							<Text style={styles.inputLabel}>
+								{t('changePassword.confirmPassword')}
+							</Text>
 							<View style={styles.passwordInputContainer}>
 								<TextInput
 									style={styles.passwordInput}
 									value={confirmPassword}
 									onChangeText={setConfirmPassword}
-									placeholder="Confirma tu nueva contraseña"
+									placeholder={t('changePassword.confirmNewPassword')}
 									placeholderTextColor={colors.primaryLight}
 									secureTextEntry={!showConfirmPassword}
 									autoCapitalize="none"
@@ -192,7 +201,7 @@ export default function ChangePasswordPopup({
 					{/* Footer */}
 					<View style={styles.footer}>
 						<TouchableOpacity style={styles.cancelButton} onPress={handleClose}>
-							<Text style={styles.cancelButtonText}>Cancelar</Text>
+							<Text style={styles.cancelButtonText}>{t('general.cancel')}</Text>
 						</TouchableOpacity>
 
 						<TouchableOpacity
@@ -209,7 +218,9 @@ export default function ChangePasswordPopup({
 									isChangingPassword && styles.saveButtonTextDisabled,
 								]}
 							>
-								{isChangingPassword ? 'Guardando...' : 'Guardar'}
+								{isChangingPassword
+									? t('changePassword.saving')
+									: t('general.save')}
 							</Text>
 						</TouchableOpacity>
 					</View>

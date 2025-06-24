@@ -54,7 +54,9 @@
 		"edit": "Editar",
 		"preview": "Vista previa",
 		"delete": "Eliminar",
-		"ok": "OK"
+		"ok": "OK",
+		"gallery": "Galería",
+		"camera": "Cámara"
 	},
 	"restaurant": {
 		"information": "Información",
@@ -181,7 +183,8 @@
 		"addressRequired": "La dirección es obligatoria",
 		"noResultsFound": "No se encontraron resultados para \"%{query}\"",
 		"noResultsSubtext": "Prueba con una búsqueda más específica o usa el modo manual",
-		"noResultsSubtextAddressScreen": "Prueba con una búsqueda más específica"
+		"noResultsSubtextAddressScreen": "Prueba con una búsqueda más específica",
+		"menuNameCopy": "{{menuName}} - Copia"
 	},
 	"menuCreation": {
 		"menuName": "Nombre del menú",
@@ -368,12 +371,134 @@
 		"noRestaurantsYet": "Aún no tienes restaurantes",
 		"averageRating": "Puntuación media",
 		"active": "Activo",
-		"inactive": "Inactivo"
+		"inactive": "Inactivo",
+		"myProfile": "Mi Perfil",
+		"settings": "Configuración",
+		"changePassword": "Cambiar contraseña",
+		"changeUsername": "Cambiar nombre de usuario",
+		"changeLanguage": "Cambiar idioma",
+		"memberSince": "Miembro desde",
+		"noRestaurantsRegistered": "No tienes restaurantes registrados",
+		"logout": "Cerrar sesión",
+		"confirmLogout": "¿Estás seguro de que quieres cerrar sesión?",
+		"limitReached": "Límite alcanzado",
+		"maxRestaurantsReached": "Has alcanzado el límite máximo de {{count}} restaurantes por usuario",
+		"permissionsRequired": "Permisos requeridos",
+		"photoAccessMessage": "Necesitamos acceso a tu galería para cambiar la foto de perfil"
 	},
 	"languages": {
 		"es_ES": "Español",
 		"ca_ES": "Catalan",
 		"en_US": "Inglés",
 		"fr_FR": "Francés"
+	},
+	"auth": {
+		"login": "Iniciar Sesión",
+		"register": "Registrarse",
+		"welcomeBack": "Bienvenido de nuevo",
+		"createAccount": "Crear cuenta",
+		"loginSubtitle": "Inicia sesión para acceder a tu perfil",
+		"registerSubtitle": "Regístrate para comenzar a usar la app",
+		"fullName": "Nombre completo",
+		"username": "Nombre de usuario",
+		"email": "Email",
+		"password": "Contraseña",
+		"enterFullName": "Ingresa tu nombre completo",
+		"enterUsername": "Ingresa tu nombre de usuario",
+		"enterEmail": "Ingresa tu email",
+		"enterPassword": "Ingresa tu contraseña",
+		"processing": "Procesando...",
+		"noAccount": "¿No tienes cuenta? Regístrate",
+		"hasAccount": "¿Ya tienes cuenta? Inicia sesión",
+		"completeAllFields": "Por favor, completa todos los campos requeridos",
+		"errorOccurred": "Ha ocurrido un error. Inténtalo de nuevo."
+	},
+	"changePassword": {
+		"title": "Cambiar contraseña",
+		"currentPassword": "Contraseña actual",
+		"newPassword": "Nueva contraseña",
+		"confirmPassword": "Confirmar nueva contraseña",
+		"enterCurrentPassword": "Ingresa tu contraseña actual",
+		"enterNewPassword": "Ingresa tu nueva contraseña",
+		"confirmNewPassword": "Confirma tu nueva contraseña",
+		"minimumChars": "Mínimo 6 caracteres",
+		"saving": "Guardando...",
+		"passwordsDontMatch": "Las contraseñas no coinciden",
+		"minimumLength": "La nueva contraseña debe tener al menos 6 caracteres",
+		"success": "Éxito",
+		"passwordChanged": "Contraseña cambiada correctamente",
+		"couldNotChange": "No se pudo cambiar la contraseña. Inténtalo de nuevo."
+	},
+	"changeUsername": {
+		"title": "Cambiar Usuario",
+		"username": "Nombre de usuario",
+		"enterNewUsername": "Ingresa tu nuevo nombre de usuario",
+		"requirements": "Mínimo 3 caracteres, sin espacios",
+		"validUsernameRequired": "Por favor, ingresa un nombre de usuario válido",
+		"minimumLength": "El nombre de usuario debe tener al menos 3 caracteres",
+		"usernameChanged": "Nombre de usuario cambiado correctamente",
+		"couldNotChange": "No se pudo cambiar el nombre de usuario. Inténtalo de nuevo."
+	},
+	"changeLanguage": {
+		"title": "Cambiar Idioma",
+		"selectPreferred": "Selecciona tu idioma preferido",
+		"languageChanged": "Idioma cambiado correctamente",
+		"couldNotChange": "No se pudo cambiar el idioma. Inténtalo de nuevo."
+	},
+	"editRestaurant": {
+		"editTitle": "Editar {{name}}",
+		"saving": "Guardando...",
+		"restaurantStatus": "Estado del restaurante",
+		"statusActiveDescription": "Tu restaurante está visible para los usuarios",
+		"statusInactiveDescription": "Tu restaurante está oculto y no aparecerá en las búsquedas",
+		"restaurantUpdated": "Restaurante actualizado correctamente",
+		"couldNotUpdate": "No se pudo actualizar el restaurante",
+		"restaurantNotFound": "Restaurante no encontrado"
+	},
+	"previewRestaurant": {
+		"addMenuFromEditTab": "Añade un menú desde la pestaña de edición"
+	},
+	"addReview": {
+		"reviewSent": "¡Opinión enviada!",
+		"thankYouMessage": "Gracias por compartir tu experiencia",
+		"couldNotSend": "No se pudo enviar tu opinión. Inténtalo de nuevo.",
+		"optional": "(opcional)"
+	},
+	"restaurantDetail": {
+		"viewAllReviews": "Ver todas las opiniones",
+		"writeReview": "Escribir opinión"
+	},
+	"user": {
+		"defaultUserName": "Tu Usuario",
+		"currentUser": "Usuario Actual"
+	},
+	"validation": {
+		"error": "Error",
+		"success": "Éxito",
+		"loading": "Cargando...",
+		"processing": "Procesando...",
+		"saving": "Guardando...",
+		"networkError": "Error de red",
+		"tryAgain": "Intentar de nuevo",
+		"requiredField": "Este campo es obligatorio",
+		"invalidFormat": "Formato inválido",
+		"connectionError": "Error de conexión",
+		"checkConnection": "Verifica tu conexión a internet"
+	},
+	"navigation": {
+		"back": "Atrás",
+		"close": "Cerrar",
+		"done": "Hecho",
+		"continue": "Continuar",
+		"skip": "Omitir",
+		"add": "Añadir",
+		"remove": "Eliminar",
+		"edit": "Editar",
+		"copy": "Copiar",
+		"share": "Compartir",
+		"search": "Buscar",
+		"filter": "Filtrar",
+		"sort": "Ordenar",
+		"refresh": "Actualizar"
 	}
 }

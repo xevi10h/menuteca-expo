@@ -71,11 +71,13 @@ export default function LanguageSelectorPopup({
 
 			setLanguage(selectedLanguage);
 
-			Alert.alert('Éxito', 'Idioma cambiado correctamente', [
-				{ text: 'OK', onPress: onClose },
-			]);
+			Alert.alert(
+				t('validation.success'),
+				t('changeLanguage.languageChanged'),
+				[{ text: t('general.ok'), onPress: onClose }],
+			);
 		} catch (error) {
-			Alert.alert('Error', 'No se pudo cambiar el idioma. Inténtalo de nuevo.');
+			Alert.alert(t('validation.error'), t('changeLanguage.couldNotChange'));
 		} finally {
 			setIsChangingLanguage(false);
 		}
@@ -102,7 +104,7 @@ export default function LanguageSelectorPopup({
 				<View style={styles.popup}>
 					{/* Header */}
 					<View style={styles.header}>
-						<Text style={styles.title}>Cambiar Idioma</Text>
+						<Text style={styles.title}>{t('profile.changeLanguage')}</Text>
 						<TouchableOpacity onPress={handleClose} style={styles.closeButton}>
 							<Ionicons name="close" size={24} color={colors.primary} />
 						</TouchableOpacity>
@@ -110,7 +112,9 @@ export default function LanguageSelectorPopup({
 
 					{/* Content */}
 					<View style={styles.content}>
-						<Text style={styles.subtitle}>Selecciona tu idioma preferido</Text>
+						<Text style={styles.subtitle}>
+							{t('changeLanguage.selectPreferred')}
+						</Text>
 
 						<View style={styles.languagesList}>
 							{availableLanguages.map((language) => (
@@ -149,7 +153,7 @@ export default function LanguageSelectorPopup({
 					{/* Footer */}
 					<View style={styles.footer}>
 						<TouchableOpacity style={styles.cancelButton} onPress={handleClose}>
-							<Text style={styles.cancelButtonText}>Cancelar</Text>
+							<Text style={styles.cancelButtonText}>{t('general.cancel')}</Text>
 						</TouchableOpacity>
 
 						<TouchableOpacity
@@ -166,7 +170,9 @@ export default function LanguageSelectorPopup({
 									isChangingLanguage && styles.saveButtonTextDisabled,
 								]}
 							>
-								{isChangingLanguage ? 'Guardando...' : 'Guardar'}
+								{isChangingLanguage
+									? t('validation.saving')
+									: t('general.save')}
 							</Text>
 						</TouchableOpacity>
 					</View>

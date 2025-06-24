@@ -43,29 +43,25 @@ export default function ProfileScreen() {
 	};
 
 	const handleLogout = () => {
-		Alert.alert(
-			'Cerrar sesión',
-			'¿Estás seguro de que quieres cerrar sesión?',
-			[
-				{ text: 'Cancelar', style: 'cancel' },
-				{
-					text: 'Cerrar sesión',
-					style: 'destructive',
-					onPress: () => {
-						setDefaultUser();
-						router.replace('/');
-					},
+		Alert.alert(t('profile.logout'), t('profile.logoutConfirmation'), [
+			{ text: t('general.cancel'), style: 'cancel' },
+			{
+				text: t('general.logout'),
+				style: 'destructive',
+				onPress: () => {
+					setDefaultUser();
+					router.replace('/');
 				},
-			],
-		);
+			},
+		]);
 	};
 
 	const handleChangePhoto = async () => {
 		const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 		if (status !== 'granted') {
 			Alert.alert(
-				'Permisos requeridos',
-				'Necesitamos acceso a tu galería para cambiar la foto de perfil',
+				t('profile.permissionsRequired'),
+				t('profile.photoAccessMessage'),
 			);
 			return;
 		}
@@ -85,8 +81,8 @@ export default function ProfileScreen() {
 	const handleAddRestaurant = () => {
 		if (userRestaurants.length >= 10) {
 			Alert.alert(
-				'Límite alcanzado',
-				'Has alcanzado el límite máximo de 10 restaurantes por usuario',
+				t('profile.limitReached'),
+				t('profile.maxRestaurantsReached', { count: 10 }),
 			);
 			return;
 		}
@@ -129,7 +125,7 @@ export default function ProfileScreen() {
 				<TouchableOpacity onPress={handleBack} style={styles.backButton}>
 					<Ionicons name="chevron-back" size={24} color={colors.primary} />
 				</TouchableOpacity>
-				<Text style={styles.headerTitle}>Mi Perfil</Text>
+				<Text style={styles.headerTitle}>{t('profile.myProfile')}</Text>
 				<TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
 					<Ionicons name="log-out-outline" size={24} color={colors.primary} />
 				</TouchableOpacity>
@@ -152,7 +148,7 @@ export default function ProfileScreen() {
 						<Text style={styles.userName}>{user.name || user.username}</Text>
 						<Text style={styles.userEmail}>{user.email}</Text>
 						<Text style={styles.userSince}>
-							Miembro desde{' '}
+							{t('profile.memberSince')}{' '}
 							{new Date(user.createdAt).toLocaleDateString('es-ES')}
 						</Text>
 					</View>
@@ -160,15 +156,20 @@ export default function ProfileScreen() {
 
 				{/* Profile Actions */}
 				<View style={styles.section}>
-					<Text style={styles.sectionTitle}>Configuración</Text>
+					<Text style={styles.sectionTitle}>{t('profile.settings')}</Text>
 
 					<TouchableOpacity
-						style={styles.actionItem}
+						style={[
+							styles.actionItem,
+							{
+								marginTop: 10,
+							},
+						]}
 						onPress={() => setShowChangePasswordPopup(true)}
 					>
 						<View style={styles.actionLeft}>
-							<Ionicons name="key-outline" size={20} color={colors.primary} />
-							<Text style={styles.actionText}>Cambiar contraseña</Text>
+							<Ionicons name="key-outline" size={18} color={colors.primary} />
+							<Text style={styles.actionText}>{t('changePassword.title')}</Text>
 						</View>
 						<Ionicons
 							name="chevron-forward"
@@ -184,16 +185,18 @@ export default function ProfileScreen() {
 						<View style={styles.actionLeft}>
 							<Ionicons
 								name="person-outline"
-								size={20}
+								size={18}
 								color={colors.primary}
 							/>
-							<Text style={styles.actionText}>Cambiar nombre de usuario</Text>
+							<Text style={styles.actionText}>
+								{t('profile.changeUsername')}
+							</Text>
 						</View>
 						<View style={styles.actionRight}>
 							<Text style={styles.currentValueText}>@{user.username}</Text>
 							<Ionicons
 								name="chevron-forward"
-								size={20}
+								size={18}
 								color={colors.primaryLight}
 							/>
 						</View>
@@ -209,7 +212,9 @@ export default function ProfileScreen() {
 								size={20}
 								color={colors.primary}
 							/>
-							<Text style={styles.actionText}>Cambiar idioma</Text>
+							<Text style={styles.actionText}>
+								{t('profile.changeLanguage')}
+							</Text>
 						</View>
 						<View style={styles.actionRight}>
 							<Text style={styles.currentValueText}>
@@ -228,7 +233,7 @@ export default function ProfileScreen() {
 				<View style={styles.section}>
 					<View style={styles.sectionHeader}>
 						<Text style={styles.sectionTitle}>
-							Mis Restaurantes ({userRestaurants.length}/10)
+							{t('profile.myRestaurants')} ({userRestaurants.length}/10)
 						</Text>
 						<TouchableOpacity
 							onPress={handleAddRestaurant}
@@ -255,10 +260,10 @@ export default function ProfileScreen() {
 								color={colors.primaryLight}
 							/>
 							<Text style={styles.emptyStateText}>
-								No tienes restaurantes registrados
+								{t('profile.noRestaurantsRegistered')}
 							</Text>
 							<Text style={styles.emptyStateSubtext}>
-								Añade tu primer restaurante para comenzar
+								{t('profile.addFirstRestaurant')}
 							</Text>
 						</View>
 					)}
@@ -267,9 +272,7 @@ export default function ProfileScreen() {
 				{/* Reviews Section */}
 				<View style={styles.section}>
 					<View style={styles.sectionHeader}>
-						<Text style={styles.sectionTitle}>
-							Mis Reseñas ({mockUserReviews.length})
-						</Text>
+						<Text style={styles.sectionTitle}>{t('profile.myReviews')}</Text>
 						{mockUserReviews.length > 2 && (
 							<TouchableOpacity
 								onPress={handleViewAllReviews}
@@ -492,13 +495,13 @@ const styles = StyleSheet.create({
 		gap: 8,
 	},
 	actionText: {
-		fontSize: 16,
+		fontSize: 14,
 		fontFamily: 'Manrope',
 		fontWeight: '500',
 		color: colors.primary,
 	},
 	currentValueText: {
-		fontSize: 14,
+		fontSize: 12,
 		fontFamily: 'Manrope',
 		fontWeight: '400',
 		color: colors.primaryLight,

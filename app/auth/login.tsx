@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { useTranslation } from '@/hooks/useTranslation';
 import { Language } from '@/shared/types';
 import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,6 +19,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function LoginScreen() {
+	const { t } = useTranslation();
 	const [isLogin, setIsLogin] = useState(true);
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
@@ -29,12 +31,12 @@ export default function LoginScreen() {
 
 	const handleAuth = async () => {
 		if (!email || !password) {
-			Alert.alert('Error', 'Por favor, completa todos los campos requeridos');
+			Alert.alert(t('validation.error'), t('validation.completeAllFields'));
 			return;
 		}
 
 		if (!isLogin && (!username || !name)) {
-			Alert.alert('Error', 'Por favor, completa todos los campos requeridos');
+			Alert.alert(t('validation.error'), t('validation.completeAllFields'));
 			return;
 		}
 
@@ -79,7 +81,7 @@ export default function LoginScreen() {
 
 			router.replace('/profile');
 		} catch (error) {
-			Alert.alert('Error', 'Ha ocurrido un error. Inténtalo de nuevo.');
+			Alert.alert(t('validation.error'), t('auth.errorOccurred'));
 		} finally {
 			setLoading(false);
 		}
@@ -99,7 +101,7 @@ export default function LoginScreen() {
 					<Ionicons name="arrow-back" size={24} color={colors.primary} />
 				</TouchableOpacity>
 				<Text style={styles.headerTitle}>
-					{isLogin ? 'Iniciar Sesión' : 'Registrarse'}
+					{isLogin ? t('auth.login') : t('auth.register')}
 				</Text>
 				<View style={styles.placeholder} />
 			</View>
@@ -107,34 +109,32 @@ export default function LoginScreen() {
 			<ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
 				<View style={styles.form}>
 					<Text style={styles.title}>
-						{isLogin ? 'Bienvenido de nuevo' : 'Crear cuenta'}
+						{isLogin ? t('auth.welcomeBack') : t('auth.createAccount')}
 					</Text>
 					<Text style={styles.subtitle}>
-						{isLogin
-							? 'Inicia sesión para acceder a tu perfil'
-							: 'Regístrate para comenzar a usar la app'}
+						{isLogin ? t('auth.loginSubtitle') : t('auth.registerSubtitle')}
 					</Text>
 
 					{!isLogin && (
 						<>
 							<View style={styles.inputContainer}>
-								<Text style={styles.label}>Nombre completo</Text>
+								<Text style={styles.label}>{t('auth.fullName')}</Text>
 								<TextInput
 									style={styles.input}
 									value={name}
 									onChangeText={setName}
-									placeholder="Ingresa tu nombre completo"
+									placeholder={t('auth.enterFullName')}
 									placeholderTextColor={colors.primaryLight}
 								/>
 							</View>
 
 							<View style={styles.inputContainer}>
-								<Text style={styles.label}>Nombre de usuario</Text>
+								<Text style={styles.label}>{t('auth.username')}</Text>
 								<TextInput
 									style={styles.input}
 									value={username}
 									onChangeText={setUsername}
-									placeholder="Ingresa tu nombre de usuario"
+									placeholder={t('auth.enterUsername')}
 									placeholderTextColor={colors.primaryLight}
 									autoCapitalize="none"
 								/>
@@ -143,12 +143,12 @@ export default function LoginScreen() {
 					)}
 
 					<View style={styles.inputContainer}>
-						<Text style={styles.label}>Email</Text>
+						<Text style={styles.label}>{t('auth.email')}</Text>
 						<TextInput
 							style={styles.input}
 							value={email}
 							onChangeText={setEmail}
-							placeholder="Ingresa tu email"
+							placeholder={t('auth.enterEmail')}
 							placeholderTextColor={colors.primaryLight}
 							keyboardType="email-address"
 							autoCapitalize="none"
@@ -156,12 +156,12 @@ export default function LoginScreen() {
 					</View>
 
 					<View style={styles.inputContainer}>
-						<Text style={styles.label}>Contraseña</Text>
+						<Text style={styles.label}>{t('auth.password')}</Text>
 						<TextInput
 							style={styles.input}
 							value={password}
 							onChangeText={setPassword}
-							placeholder="Ingresa tu contraseña"
+							placeholder={t('auth.enterPassword')}
 							placeholderTextColor={colors.primaryLight}
 							secureTextEntry
 						/>
@@ -174,10 +174,10 @@ export default function LoginScreen() {
 					>
 						<Text style={styles.authButtonText}>
 							{loading
-								? 'Procesando...'
+								? t('auth.processing')
 								: isLogin
-								? 'Iniciar Sesión'
-								: 'Registrarse'}
+								? t('auth.login')
+								: t('auth.register')}
 						</Text>
 					</TouchableOpacity>
 
@@ -186,9 +186,7 @@ export default function LoginScreen() {
 						onPress={() => setIsLogin(!isLogin)}
 					>
 						<Text style={styles.switchModeText}>
-							{isLogin
-								? '¿No tienes cuenta? Regístrate'
-								: '¿Ya tienes cuenta? Inicia sesión'}
+							{isLogin ? t('auth.noAccount') : t('auth.hasAccount')}
 						</Text>
 					</TouchableOpacity>
 				</View>

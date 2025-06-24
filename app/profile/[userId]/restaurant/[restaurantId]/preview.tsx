@@ -122,7 +122,7 @@ export default function UserRestaurantPreview() {
 						{t('restaurant.noMenuAvailable')}
 					</Text>
 					<Text style={styles.emptySubtext}>
-						Añade un menú desde la pestaña de edición
+						{t('previewRestaurant.addMenuFromEditTab')}
 					</Text>
 				</View>
 			);
@@ -201,7 +201,9 @@ export default function UserRestaurantPreview() {
 					<TouchableOpacity onPress={handleBack} style={styles.backButton}>
 						<Ionicons name="chevron-back" size={24} color={colors.primary} />
 					</TouchableOpacity>
-					<Text style={styles.headerTitle}>Restaurante no encontrado</Text>
+					<Text style={styles.headerTitle}>
+						{t('editRestaurant.restaurantNotFound')}
+					</Text>
 				</View>
 			</View>
 		);
@@ -238,7 +240,7 @@ export default function UserRestaurantPreview() {
 							]}
 						/>
 						<Text style={styles.statusText}>
-							{status.isActive ? 'Activo' : 'Inactivo'}
+							{status.isActive ? t('profile.active') : t('profile.inactive')}
 						</Text>
 					</View>
 				</View>
