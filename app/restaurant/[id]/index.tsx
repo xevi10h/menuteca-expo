@@ -186,8 +186,7 @@ export default function RestaurantDetail() {
 
 	const handleTabLayout = (tab: 'information' | 'menu', event: any) => {
 		const { width } = event.nativeEvent.layout;
-		const tabIndicator =
-			tab === 'information' ? -(width / 2 + 2) : width / 2 + 38;
+		const tabIndicator = tab === 'information' ? -(width / 2) : width / 2 + 42;
 
 		setTabMeasurements((prev) => {
 			const newMeasurements = {
