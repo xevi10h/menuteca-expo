@@ -1,13 +1,8 @@
-import { apiClient } from '@/api/client';
+import { CuisineService } from '@/api/services';
+import { Cuisine } from '@/shared/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-
-export interface Cuisine {
-	id: string;
-	name: string;
-	image: string;
-}
 
 interface CuisineState {
 	cuisines: Cuisine[];
@@ -17,6 +12,8 @@ interface CuisineState {
 	fetchCuisines: () => Promise<void>;
 	getCuisineById: (id: string) => Cuisine | undefined;
 	clearCuisines: () => void;
+	searchCuisines: (query: string) => Promise<Cuisine[]>;
+	refreshCuisines: () => Promise<void>;
 }
 
 // Cache duration: 24 hours
@@ -46,10 +43,7 @@ export const useCuisineStore = create<CuisineState>()(
 				set({ isLoading: true, error: null });
 
 				try {
-					const response = await apiClient.get<{
-						success: boolean;
-						data: Cuisine[];
-					}>('/cuisines');
+					const response = await CuisineService.getAllCuisines();
 
 					if (response.success) {
 						set({
@@ -69,6 +63,53 @@ export const useCuisineStore = create<CuisineState>()(
 						error: errorMessage,
 					});
 					console.error('Error fetching cuisines:', error);
+				}
+			},
+
+			refreshCuisines: async () => {
+				set({ isLoading: true, error: null });
+
+				try {
+					const response = await CuisineService.getAllCuisines();
+
+					if (response.success) {
+						const now = Date.now();
+						set({
+							cuisines: response.data,
+							isLoading: false,
+							error: null,
+							lastFetched: now,
+						});
+					} else {
+						throw new Error('Failed to refresh cuisines');
+					}
+				} catch (error) {
+					const errorMessage =
+						error instanceof Error ? error.message : 'Unknown error';
+					set({
+						isLoading: false,
+						error: errorMessage,
+					});
+					console.error('Error refreshing cuisines:', error);
+				}
+			},
+
+			searchCuisines: async (query: string): Promise<Cuisine[]> => {
+				try {
+					const response = await CuisineService.searchCuisines(query);
+
+					if (response.success) {
+						return response.data;
+					} else {
+						throw new Error('Failed to search cuisines');
+					}
+				} catch (error) {
+					console.error('Error searching cuisines:', error);
+					// Return filtered local results as fallback
+					const state = get();
+					return state.cuisines.filter((cuisine) =>
+						cuisine.name.toLowerCase().includes(query.toLowerCase()),
+					);
 				}
 			},
 

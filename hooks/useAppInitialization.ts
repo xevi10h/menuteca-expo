@@ -7,6 +7,7 @@ export const useAppInitialization = () => {
 	const [initError, setInitError] = useState<string | null>(null);
 
 	const fetchCuisines = useCuisineStore((state) => state.fetchCuisines);
+	const refreshCuisines = useCuisineStore((state) => state.refreshCuisines);
 	const cuisinesLoading = useCuisineStore((state) => state.isLoading);
 	const cuisinesError = useCuisineStore((state) => state.error);
 
@@ -42,12 +43,25 @@ export const useAppInitialization = () => {
 		initializeApp();
 	}, []); // Only run once on app start
 
-	// Re-run profile refresh if authentication status changes
+	// Re-run profile refresh and cuisines refresh if authentication status changes
 	useEffect(() => {
 		if (isAuthenticated && isInitialized) {
-			refreshProfile().catch(console.error);
+			const refreshUserData = async () => {
+				try {
+					// Refresh both profile and cuisines when user logs in
+					// Cuisines might change based on user's region/language
+					await Promise.all([
+						refreshProfile(),
+						refreshCuisines(), // Refresh cuisines for the user's region
+					]);
+				} catch (error) {
+					console.error('Error refreshing user data:', error);
+				}
+			};
+
+			refreshUserData();
 		}
-	}, [isAuthenticated, isInitialized, refreshProfile]);
+	}, [isAuthenticated, isInitialized, refreshProfile, refreshCuisines]);
 
 	return {
 		isInitialized,

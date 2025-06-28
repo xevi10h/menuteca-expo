@@ -1,5 +1,12 @@
 import { RestaurantTag } from '@/shared/enums';
-import { Address, MenuData, Restaurant, Review, User } from '@/shared/types';
+import {
+	Address,
+	Cuisine,
+	MenuData,
+	Restaurant,
+	Review,
+	User,
+} from '@/shared/types';
 import { apiClient } from './client';
 
 // Auth Service
@@ -57,6 +64,73 @@ export class AuthService {
 				token: string;
 			};
 		}>('/auth/google', googleData);
+	}
+}
+
+// Cuisine Service
+export class CuisineService {
+	static async getAllCuisines() {
+		return apiClient.get<{
+			success: boolean;
+			data: Cuisine[];
+		}>('/cuisines');
+	}
+
+	static async getCuisineById(id: string) {
+		return apiClient.get<{
+			success: boolean;
+			data: Cuisine;
+		}>(`/cuisines/${id}`);
+	}
+
+	static async searchCuisines(query: string, limit?: number) {
+		const queryParams = new URLSearchParams({ q: query });
+		if (limit) queryParams.append('limit', limit.toString());
+
+		return apiClient.get<{
+			success: boolean;
+			data: Cuisine[];
+		}>(`/cuisines/search?${queryParams.toString()}`);
+	}
+
+	static async getCuisineStats() {
+		return apiClient.get<{
+			success: boolean;
+			data: {
+				total: number;
+				mostPopular: Cuisine | null;
+			};
+		}>('/cuisines/stats');
+	}
+
+	// Admin functions (require authentication)
+	static async createCuisine(cuisineData: {
+		name: { [key: string]: string };
+		image: string;
+	}) {
+		return apiClient.post<{
+			success: boolean;
+			data: Cuisine;
+		}>('/cuisines', cuisineData);
+	}
+
+	static async updateCuisine(
+		id: string,
+		cuisineData: {
+			name?: { [key: string]: string };
+			image?: string;
+		},
+	) {
+		return apiClient.put<{
+			success: boolean;
+			data: Cuisine;
+		}>(`/cuisines/${id}`, cuisineData);
+	}
+
+	static async deleteCuisine(id: string) {
+		return apiClient.delete<{
+			success: boolean;
+		}>(`/cuisines/${id}`);
 	}
 }
 

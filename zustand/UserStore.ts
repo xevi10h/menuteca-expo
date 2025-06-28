@@ -150,6 +150,22 @@ export const useUserStore = create<UserState>()(
 				if (state.isAuthenticated) {
 					try {
 						await UserService.updateProfile({ language });
+
+						// Refresh cuisines when language changes as they are localized
+						// We'll import this dynamically to avoid circular dependencies
+						const { useCuisineStore } = await import('@/zustand/CuisineStore');
+						const { refreshCuisines } = useCuisineStore.getState();
+
+						// Refresh cuisines for the new language
+						try {
+							await refreshCuisines();
+						} catch (cuisineError) {
+							console.error(
+								'Failed to refresh cuisines after language change:',
+								cuisineError,
+							);
+							// Don't throw error as language change was successful
+						}
 					} catch (error) {
 						console.error('Failed to update language on server:', error);
 						// Don't revert the local change as it's not critical

@@ -1,13 +1,13 @@
-import { RestaurantService } from '@/api/services';
 import { colors } from '@/assets/styles/colors';
 import LoadingScreen from '@/components/LoadingScreen';
 import { useTranslation } from '@/hooks/useTranslation';
-import { Cuisine } from '@/shared/types';
+import { useCuisineStore } from '@/zustand/CuisineStore';
 import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
+	Alert,
 	Dimensions,
 	Image,
 	StyleSheet,
@@ -23,84 +23,62 @@ export default function CuisineTypesScreen() {
 	const { t } = useTranslation();
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
-	const [cuisines, setCuisines] = useState<Cuisine[]>([]);
-	const [loading, setLoading] = useState(true);
+
+	// Zustand stores
+	const { cuisines, isLoading, error, fetchCuisines } = useCuisineStore();
+
+	const { setRegisterRestaurantCuisineId } = useRegisterRestaurantStore();
+
+	// Local state
 	const [selectedCuisine, setSelectedCuisine] = useState<string | null>(null);
 	const [isNextDisabled, setIsNextDisabled] = useState(true);
-	const setRegisterRestaurantCuisineId = useRegisterRestaurantStore(
-		(state) => state.setRegisterRestaurantCuisineId,
-	);
 
-	// Load cuisines data
+	// Load cuisines on component mount
 	useEffect(() => {
 		const loadCuisines = async () => {
 			try {
-				setLoading(true);
-				// Since there's no specific cuisine endpoint in the services,
-				// we'll use a general approach or create a mock endpoint
-				// For now, we'll simulate getting cuisines from a restaurant query
-				const response = await RestaurantService.getAllRestaurants({
-					page: 1,
-					limit: 1,
-				});
-
-				// In a real implementation, you'd have a dedicated cuisine endpoint
-				// For now, we'll use a fallback with common cuisines
-				const mockCuisines: Cuisine[] = [
-					{ id: '1', name: 'Italian', description: 'Italian cuisine' },
-					{
-						id: '2',
-						name: 'Mediterranean',
-						description: 'Mediterranean cuisine',
-					},
-					{ id: '3', name: 'Spanish', description: 'Spanish cuisine' },
-					{ id: '4', name: 'Asian', description: 'Asian cuisine' },
-					{ id: '5', name: 'Mexican', description: 'Mexican cuisine' },
-					{ id: '6', name: 'French', description: 'French cuisine' },
-					{ id: '7', name: 'American', description: 'American cuisine' },
-					{ id: '8', name: 'Japanese', description: 'Japanese cuisine' },
-					{ id: '9', name: 'Chinese', description: 'Chinese cuisine' },
-					{ id: '10', name: 'Indian', description: 'Indian cuisine' },
-					{ id: '11', name: 'Thai', description: 'Thai cuisine' },
-					{ id: '12', name: 'Greek', description: 'Greek cuisine' },
-					{ id: '13', name: 'Turkish', description: 'Turkish cuisine' },
-					{ id: '14', name: 'Lebanese', description: 'Lebanese cuisine' },
-					{ id: '15', name: 'Moroccan', description: 'Moroccan cuisine' },
-					{ id: '16', name: 'Vegetarian', description: 'Vegetarian cuisine' },
-					{ id: '17', name: 'Vegan', description: 'Vegan cuisine' },
-					{ id: '18', name: 'Fusion', description: 'Fusion cuisine' },
-				];
-
-				setCuisines(mockCuisines);
-			} catch (error) {
-				console.error('Error loading cuisines:', error);
-				// Set fallback cuisines in case of error
-				const fallbackCuisines: Cuisine[] = [
-					{ id: '1', name: 'Italian', description: 'Italian cuisine' },
-					{
-						id: '2',
-						name: 'Mediterranean',
-						description: 'Mediterranean cuisine',
-					},
-					{ id: '3', name: 'Spanish', description: 'Spanish cuisine' },
-					{ id: '4', name: 'Asian', description: 'Asian cuisine' },
-					{ id: '5', name: 'Mexican', description: 'Mexican cuisine' },
-				];
-				setCuisines(fallbackCuisines);
-			} finally {
-				setLoading(false);
+				await fetchCuisines();
+			} catch (err) {
+				console.error('Error loading cuisines:', err);
+				Alert.alert(
+					t('validation.error'),
+					t('registerRestaurant.errorLoadingCuisines') ||
+						'Error loading cuisines. Please try again.',
+					[
+						{
+							text: t('general.retry'),
+							onPress: () => loadCuisines(),
+						},
+						{
+							text: t('general.cancel'),
+							style: 'cancel',
+							onPress: () => router.back(),
+						},
+					],
+				);
 			}
 		};
 
 		loadCuisines();
 	}, []);
 
+	// Update next button state when cuisine selection changes
+	useEffect(() => {
+		setIsNextDisabled(!selectedCuisine);
+	}, [selectedCuisine]);
+
 	const handleBack = () => {
 		router.back();
 	};
 
 	const handleNext = () => {
-		setRegisterRestaurantCuisineId(selectedCuisine);
+		if (selectedCuisine) {
+			setRegisterRestaurantCuisineId(selectedCuisine);
+			router.push('/profile/register-restaurant/setup/edit');
+		}
+	};
+
+	const handleSkip = () => {
 		router.push('/profile/register-restaurant/setup/edit');
 	};
 
@@ -108,16 +86,53 @@ export default function CuisineTypesScreen() {
 		setSelectedCuisine((prev) => (prev === cuisineId ? null : cuisineId));
 	};
 
-	useEffect(() => {
-		if (selectedCuisine) {
-			setIsNextDisabled(false);
-		} else {
-			setIsNextDisabled(true);
+	const handleRetry = async () => {
+		try {
+			await fetchCuisines();
+		} catch (err) {
+			console.error('Error retrying cuisines fetch:', err);
 		}
-	}, [selectedCuisine]);
+	};
 
-	if (loading) {
+	// Show loading screen while fetching
+	if (isLoading && cuisines.length === 0) {
 		return <LoadingScreen />;
+	}
+
+	// Show error state with retry option
+	if (error && cuisines.length === 0) {
+		return (
+			<View style={[styles.container, { paddingTop: insets.top }]}>
+				<View style={styles.header}>
+					<TouchableOpacity onPress={handleBack} style={styles.backButton}>
+						<Ionicons name="chevron-back" size={24} color={colors.secondary} />
+					</TouchableOpacity>
+				</View>
+
+				<View style={styles.errorContainer}>
+					<Ionicons name="warning-outline" size={64} color={colors.secondary} />
+					<Text style={styles.errorTitle}>
+						{t('registerRestaurant.errorLoadingCuisines') ||
+							'Error loading cuisines'}
+					</Text>
+					<Text style={styles.errorMessage}>{error}</Text>
+
+					<View style={styles.errorActions}>
+						<TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
+							<Text style={styles.retryButtonText}>
+								{t('general.retry') || 'Retry'}
+							</Text>
+						</TouchableOpacity>
+
+						<TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
+							<Text style={styles.skipButtonText}>
+								{t('registerRestaurant.configureLater') || 'Configure later'}
+							</Text>
+						</TouchableOpacity>
+					</View>
+				</View>
+			</View>
+		);
 	}
 
 	return (
@@ -155,35 +170,46 @@ export default function CuisineTypesScreen() {
 					</Text>
 				</View>
 
-				<View style={styles.cuisineGrid}>
-					{cuisines.map((cuisine) => (
-						<TouchableOpacity
-							key={cuisine.id}
-							style={[
-								styles.cuisineButton,
-								selectedCuisine === cuisine.id && styles.cuisineButtonSelected,
-							]}
-							onPress={() => handleCuisineToggle(cuisine.id)}
-						>
-							<Text
+				{cuisines.length > 0 ? (
+					<View style={styles.cuisineGrid}>
+						{cuisines.map((cuisine) => (
+							<TouchableOpacity
+								key={cuisine.id}
 								style={[
-									styles.cuisineButtonText,
+									styles.cuisineButton,
 									selectedCuisine === cuisine.id &&
-										styles.cuisineButtonTextSelected,
+										styles.cuisineButtonSelected,
 								]}
+								onPress={() => handleCuisineToggle(cuisine.id)}
 							>
-								{cuisine.name}
-							</Text>
-						</TouchableOpacity>
-					))}
-				</View>
+								<Text
+									style={[
+										styles.cuisineButtonText,
+										selectedCuisine === cuisine.id &&
+											styles.cuisineButtonTextSelected,
+									]}
+								>
+									{cuisine.name}
+								</Text>
+							</TouchableOpacity>
+						))}
+					</View>
+				) : (
+					<View style={styles.emptyState}>
+						<Text style={styles.emptyStateText}>
+							{t('registerRestaurant.noCuisinesAvailable') ||
+								'No cuisines available'}
+						</Text>
+					</View>
+				)}
 
-				<TouchableOpacity onPress={handleNext}>
+				<TouchableOpacity onPress={handleSkip}>
 					<Text style={styles.skipButtonText}>
 						{t('registerRestaurant.configureLater')}
 					</Text>
 				</TouchableOpacity>
 			</View>
+
 			<TouchableOpacity
 				style={[
 					styles.nextButton,
@@ -224,6 +250,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 40,
 		justifyContent: 'center',
 		marginBottom: 100,
+		width: '100%',
 	},
 	iconContainer: {
 		justifyContent: 'center',
@@ -286,6 +313,17 @@ const styles = StyleSheet.create({
 	cuisineButtonTextSelected: {
 		color: colors.primary,
 	},
+	emptyState: {
+		alignItems: 'center',
+		paddingVertical: 40,
+	},
+	emptyStateText: {
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.secondary,
+		textAlign: 'center',
+	},
 	skipButtonText: {
 		color: colors.secondary,
 		fontSize: 16,
@@ -302,5 +340,50 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '500',
 		textAlign: 'center',
+	},
+	// Error styles
+	errorContainer: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingHorizontal: 40,
+	},
+	errorTitle: {
+		fontSize: 20,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.secondary,
+		textAlign: 'center',
+		marginTop: 20,
+		marginBottom: 10,
+	},
+	errorMessage: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.secondary,
+		textAlign: 'center',
+		marginBottom: 30,
+		opacity: 0.8,
+	},
+	errorActions: {
+		gap: 15,
+		alignItems: 'center',
+	},
+	retryButton: {
+		backgroundColor: colors.secondary,
+		paddingHorizontal: 30,
+		paddingVertical: 12,
+		borderRadius: 25,
+	},
+	retryButtonText: {
+		color: colors.primary,
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+	},
+	skipButton: {
+		paddingHorizontal: 20,
+		paddingVertical: 8,
 	},
 });

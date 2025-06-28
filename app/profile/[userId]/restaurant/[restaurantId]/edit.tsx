@@ -1,9 +1,4 @@
-import {
-	getUserRestaurantById,
-	getUserRestaurantMenus,
-	getUserRestaurantStatus,
-	updateUserRestaurantStatus,
-} from '@/api/responses';
+import { MenuService, RestaurantService } from '@/api/services';
 import { colors } from '@/assets/styles/colors';
 import LoadingScreen from '@/components/LoadingScreen';
 import MenuCreationModal from '@/components/MenuCreationModal';
@@ -65,26 +60,49 @@ export default function UserRestaurantEdit() {
 
 	useEffect(() => {
 		const loadRestaurantData = async () => {
+			if (!restaurant_id) {
+				setLoading(false);
+				return;
+			}
+
 			setLoading(true);
 			try {
-				// Simular delay de carga
-				await new Promise((resolve) => setTimeout(resolve, 500));
+				// Load restaurant data
+				const restaurantResponse = await RestaurantService.getRestaurantById(
+					restaurant_id,
+				);
 
-				if (restaurant_id) {
-					const restaurantData = getUserRestaurantById(restaurant_id);
-					const menusData = getUserRestaurantMenus(restaurant_id);
-					const statusData = getUserRestaurantStatus(restaurant_id);
+				if (restaurantResponse.success) {
+					const restaurantData = restaurantResponse.data;
 
-					if (restaurantData) {
-						setRestaurant({
-							...restaurantData,
-							menus: menusData,
-						});
-						setIsActive(statusData.isActive);
-					}
+					// Load restaurant menus
+					const menusResponse = await MenuService.getRestaurantMenus(
+						restaurant_id,
+					);
+
+					// Combine restaurant data with menus
+					const completeRestaurant: Restaurant = {
+						...restaurantData,
+						menus: menusResponse.success ? menusResponse.data : [],
+					};
+
+					setRestaurant(completeRestaurant);
+					setIsActive(restaurantData.is_active || false);
+				} else {
+					Alert.alert(
+						t('validation.error'),
+						t('editRestaurant.restaurantNotFound') || 'Restaurant not found',
+					);
+					router.back();
 				}
 			} catch (error) {
 				console.error('Error loading restaurant data:', error);
+				Alert.alert(
+					t('validation.error'),
+					t('editRestaurant.errorLoadingRestaurant') ||
+						'Error loading restaurant data',
+				);
+				router.back();
 			} finally {
 				setLoading(false);
 			}
@@ -98,24 +116,36 @@ export default function UserRestaurantEdit() {
 	};
 
 	const handleSave = async () => {
-		if (!restaurant) return;
+		if (!restaurant || !restaurant_id) return;
 
 		setSaving(true);
 		try {
-			// Simular guardado
-			await new Promise((resolve) => setTimeout(resolve, 1000));
+			// Update restaurant status and other fields
+			const updateData = {
+				is_active: isActive,
+				phone: restaurant.phone,
+				reservation_link: restaurant.reservation_link,
+				tags: restaurant.tags,
+				profile_image: restaurant.profile_image,
+				images: restaurant.images,
+			};
 
-			// Actualizar estado del restaurante
-			if (restaurant_id) {
-				updateUserRestaurantStatus(restaurant_id, isActive);
-			}
-
-			Alert.alert(
-				t('validation.success'),
-				t('editRestaurant.restaurantUpdated'),
-				[{ text: 'OK', onPress: () => router.back() }],
+			const response = await RestaurantService.updateRestaurant(
+				restaurant_id,
+				updateData,
 			);
+
+			if (response.success) {
+				Alert.alert(
+					t('validation.success'),
+					t('editRestaurant.restaurantUpdated'),
+					[{ text: 'OK', onPress: () => router.back() }],
+				);
+			} else {
+				throw new Error('Failed to update restaurant');
+			}
 		} catch (error) {
+			console.error('Error updating restaurant:', error);
 			Alert.alert(t('validation.error'), t('editRestaurant.couldNotUpdate'));
 		} finally {
 			setSaving(false);
@@ -138,7 +168,7 @@ export default function UserRestaurantEdit() {
 		});
 	};
 
-	const handleSetprofile_image = (imageUri: string) => {
+	const handleSetProfileImage = (imageUri: string) => {
 		if (!restaurant) return;
 		setRestaurant({
 			...restaurant,
@@ -146,22 +176,44 @@ export default function UserRestaurantEdit() {
 		});
 	};
 
-	const handleAddMenu = (menu: MenuData) => {
-		if (!restaurant) return;
+	const handleAddMenu = async (menu: MenuData) => {
+		if (!restaurant || !restaurant_id) return;
 
-		const updatedMenus = [...restaurant.menus];
-		if (editingMenuIndex !== null) {
-			updatedMenus[editingMenuIndex] = menu;
+		try {
+			if (editingMenuIndex !== null) {
+				// Update existing menu
+				const menuToUpdate = restaurant.menus[editingMenuIndex];
+				const response = await MenuService.updateMenu(menuToUpdate.id, menu);
+
+				if (response.success) {
+					const updatedMenus = [...restaurant.menus];
+					updatedMenus[editingMenuIndex] = response.data;
+					setRestaurant({
+						...restaurant,
+						menus: updatedMenus,
+					});
+				}
+			} else {
+				// Create new menu
+				const response = await MenuService.createMenu(restaurant_id, menu);
+
+				if (response.success) {
+					setRestaurant({
+						...restaurant,
+						menus: [...restaurant.menus, response.data],
+					});
+				}
+			}
+
 			setEditingMenuIndex(null);
-		} else {
-			updatedMenus.push(menu);
+			setShowMenuModal(false);
+		} catch (error) {
+			console.error('Error saving menu:', error);
+			Alert.alert(
+				t('validation.error'),
+				t('editRestaurant.errorSavingMenu') || 'Error saving menu',
+			);
 		}
-
-		setRestaurant({
-			...restaurant,
-			menus: updatedMenus,
-		});
-		setShowMenuModal(false);
 	};
 
 	const handleEditMenu = (index: number) => {
@@ -182,21 +234,44 @@ export default function UserRestaurantEdit() {
 		}
 	};
 
-	const handleConfirmCopyMenu = () => {
-		if (!restaurant || copyingMenuIndex === null || !newMenuName.trim()) return;
+	const handleConfirmCopyMenu = async () => {
+		if (
+			!restaurant ||
+			copyingMenuIndex === null ||
+			!newMenuName.trim() ||
+			!restaurant_id
+		)
+			return;
 
 		const menuToCopy = restaurant.menus[copyingMenuIndex];
 		if (menuToCopy) {
-			const copiedMenu: MenuData = {
-				...menuToCopy,
-				id: Date.now().toString(),
-				name: newMenuName.trim(),
-			};
+			try {
+				const copiedMenuData = {
+					...menuToCopy,
+					name: newMenuName.trim(),
+				};
 
-			setRestaurant({
-				...restaurant,
-				menus: [...restaurant.menus, copiedMenu],
-			});
+				// Remove ID and other fields that shouldn't be copied
+				const { id, ...menuDataWithoutId } = copiedMenuData;
+
+				const response = await MenuService.createMenu(
+					restaurant_id,
+					menuDataWithoutId,
+				);
+
+				if (response.success) {
+					setRestaurant({
+						...restaurant,
+						menus: [...restaurant.menus, response.data],
+					});
+				}
+			} catch (error) {
+				console.error('Error copying menu:', error);
+				Alert.alert(
+					t('validation.error'),
+					t('editRestaurant.errorCopyingMenu') || 'Error copying menu',
+				);
+			}
 		}
 
 		setShowCopyMenuModal(false);
@@ -227,11 +302,21 @@ export default function UserRestaurantEdit() {
 				{
 					text: t('general.delete'),
 					style: 'destructive',
-					onPress: () => {
-						setRestaurant({
-							...restaurant,
-							menus: restaurant.menus.filter((_, i) => i !== index),
-						});
+					onPress: async () => {
+						try {
+							await MenuService.deleteMenu(menuToDelete.id);
+
+							setRestaurant({
+								...restaurant,
+								menus: restaurant.menus.filter((_, i) => i !== index),
+							});
+						} catch (error) {
+							console.error('Error deleting menu:', error);
+							Alert.alert(
+								t('validation.error'),
+								t('editRestaurant.errorDeletingMenu') || 'Error deleting menu',
+							);
+						}
 					},
 				},
 			],
@@ -363,7 +448,7 @@ export default function UserRestaurantEdit() {
 				{/* Profile Photo Section */}
 				<ProfilePhotoSection
 					profile_image={restaurant.profile_image}
-					onImageSelected={handleSetprofile_image}
+					onImageSelected={handleSetProfileImage}
 				/>
 
 				{/* Contact Info */}
