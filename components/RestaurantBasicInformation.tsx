@@ -1,7 +1,8 @@
-import { getCuisineById } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Restaurant } from '@/shared/types';
+import { useCuisineStore } from '@/zustand/CuisineStore';
+import { useEffect } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 
 interface RestaurantBasicInformationProps {
@@ -15,6 +16,18 @@ export default function RestaurantBasicInformation({
 }: RestaurantBasicInformationProps) {
 	const { t } = useTranslation();
 	const colorToUse = color || colors.primary;
+
+	// Use CuisineStore for getting cuisine data with caching
+	const { getCuisineById, fetchCuisines, cuisines } = useCuisineStore();
+
+	// Ensure cuisines are loaded if needed
+	useEffect(() => {
+		if (cuisines.length === 0) {
+			fetchCuisines();
+		}
+	}, [cuisines.length, fetchCuisines]);
+
+	// Get cuisine from store (cached)
 	const cuisine = getCuisineById(restaurant.cuisineId);
 
 	return (

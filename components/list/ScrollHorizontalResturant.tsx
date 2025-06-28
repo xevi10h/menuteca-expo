@@ -1,8 +1,8 @@
-import { RestaurantService } from '@/api/services';
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Restaurant } from '@/shared/types';
 import { useCuisineStore } from '@/zustand/CuisineStore';
+import { useRestaurantStore } from '@/zustand/RestaurantStore';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
@@ -18,23 +18,26 @@ import {
 
 const { width } = Dimensions.get('window');
 
-export type ScrollHorizontalResturantProps = {
+export type ScrollHorizontalRestaurantProps = {
 	title: string;
 	sortBy: string;
 };
 
-export default function ScrollHorizontalResturant({
+export default function ScrollHorizontalRestaurant({
 	title,
 	sortBy,
-}: ScrollHorizontalResturantProps) {
+}: ScrollHorizontalRestaurantProps) {
 	const { t } = useTranslation();
 	const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
-	const getCuisineById = useCuisineStore((state) => state.getCuisineById);
+
+	// Zustand stores
+	const { fetchRestaurants, isLoading: storeLoading } = useRestaurantStore();
+	const { getCuisineById } = useCuisineStore();
 
 	useEffect(() => {
-		const fetchRestaurants = async () => {
+		const fetchRestaurantsData = async () => {
 			setLoading(true);
 			setError(null);
 
@@ -81,13 +84,9 @@ export default function ScrollHorizontalResturant({
 						params.sortOrder = 'desc';
 				}
 
-				const response = await RestaurantService.getAllRestaurants(params);
-
-				if (response.success) {
-					setRestaurants(response.data.data);
-				} else {
-					throw new Error('Failed to fetch restaurants');
-				}
+				// Use RestaurantStore which handles caching
+				const fetchedRestaurants = await fetchRestaurants(params);
+				setRestaurants(fetchedRestaurants);
 			} catch (err) {
 				const errorMessage =
 					err instanceof Error ? err.message : 'Failed to load restaurants';
@@ -98,14 +97,17 @@ export default function ScrollHorizontalResturant({
 			}
 		};
 
-		fetchRestaurants();
-	}, [sortBy, title]);
+		fetchRestaurantsData();
+	}, [sortBy, title, fetchRestaurants]);
 
 	const handleRestaurantPress = (restaurant_id: string) => {
 		router.push(`/restaurant/${restaurant_id}`);
 	};
 
-	if (loading) {
+	// Show loading state
+	const isLoading = loading || storeLoading;
+
+	if (isLoading) {
 		return (
 			<View style={styles.container}>
 				<View style={{ marginLeft: 24 }}>
@@ -146,6 +148,7 @@ export default function ScrollHorizontalResturant({
 				}}
 			>
 				{restaurants.map((restaurant) => {
+					// Use CuisineStore to get cuisine data (with caching)
 					const cuisine = getCuisineById(restaurant.cuisineId);
 
 					return (

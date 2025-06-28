@@ -1,8 +1,8 @@
-import { getMenusByRestaurantId } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import AddReviewModal from '@/components/AddReviewModal';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Restaurant, Review } from '@/shared/types';
+import { useMenuStore } from '@/zustand/MenuStore';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -57,7 +57,13 @@ export default function ExpandableMapRestaurantModal({
 	const modalHeight = useSharedValue(150); // Initial collapsed height
 	const isExpanded = useSharedValue(false);
 
-	const menus = getMenusByRestaurantId(restaurant?.id?.toString());
+	// Menu store for caching
+	const {
+		fetchRestaurantMenus,
+		getMenusByRestaurantId,
+		isLoading: menusLoading,
+	} = useMenuStore();
+	const [menus, setMenus] = useState(restaurant?.menus || []);
 
 	// Estado para las pestañas
 	const [activeTab, setActiveTab] = useState<'information' | 'menu'>(
@@ -76,6 +82,28 @@ export default function ExpandableMapRestaurantModal({
 	const translateX = useSharedValue(0);
 	const tabIndicatorX = useSharedValue(0);
 	const tabIndicatorWidth = useSharedValue(0);
+
+	// Load menus when restaurant changes
+	useEffect(() => {
+		if (restaurant?.id && isVisible) {
+			// First check if we have cached menus
+			const cachedMenus = getMenusByRestaurantId(restaurant.id);
+
+			if (cachedMenus) {
+				setMenus(cachedMenus);
+			} else {
+				// If restaurant already has menus, use them while fetching fresh data
+				if (restaurant.menus && restaurant.menus.length > 0) {
+					setMenus(restaurant.menus);
+				}
+
+				// Fetch fresh menu data
+				fetchRestaurantMenus(restaurant.id).then((fetchedMenus) => {
+					setMenus(fetchedMenus);
+				});
+			}
+		}
+	}, [restaurant?.id, isVisible, fetchRestaurantMenus, getMenusByRestaurantId]);
 
 	const informationComponent = useMemo(
 		() => (
@@ -551,29 +579,10 @@ const styles = StyleSheet.create({
 	},
 	collapsedContent: {
 		flex: 1,
-
 		paddingBottom: 15,
 	},
 	content: {
 		flex: 1,
-	},
-	writeReviewCollapsedButton: {
-		backgroundColor: colors.primary,
-		borderRadius: 20,
-		paddingVertical: 8,
-		paddingHorizontal: 15,
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
-		gap: 6,
-		marginTop: 10,
-		alignSelf: 'center',
-	},
-	writeReviewCollapsedText: {
-		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
-		color: colors.quaternary,
 	},
 	expandedContent: {
 		flex: 1,
