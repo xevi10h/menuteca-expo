@@ -1,8 +1,6 @@
 import { colors } from '@/assets/styles/colors';
 import { useCuisineStore } from '@/zustand/CuisineStore';
-import { useEffect } from 'react';
 import {
-	ActivityIndicator,
 	Image,
 	ScrollView,
 	StyleSheet,
@@ -18,42 +16,13 @@ interface CuisineHorizontalScrollProps {
 export default function CuisineHorizontalScroll({
 	onCuisinePress,
 }: CuisineHorizontalScrollProps) {
-	const { cuisines, isLoading, error, fetchCuisines } = useCuisineStore();
-
-	useEffect(() => {
-		// Only fetch if we don't have cuisines or there's an error
-		if (cuisines.length === 0 && !isLoading) {
-			fetchCuisines();
-		}
-	}, [cuisines.length, isLoading, fetchCuisines]);
+	const { cuisines } = useCuisineStore();
 
 	const handleCuisinePress = (cuisineId: string) => {
 		if (onCuisinePress) {
 			onCuisinePress(cuisineId);
 		}
 	};
-
-	if (isLoading && cuisines.length === 0) {
-		return (
-			<View style={styles.container}>
-				<View style={styles.loadingContainer}>
-					<ActivityIndicator size="small" color={colors.primary} />
-				</View>
-			</View>
-		);
-	}
-
-	if (error && cuisines.length === 0) {
-		return (
-			<View style={styles.container}>
-				<View style={styles.errorContainer}>
-					<Text style={styles.errorText}>
-						Error loading cuisines. Please try again.
-					</Text>
-				</View>
-			</View>
-		);
-	}
 
 	if (cuisines.length === 0) {
 		return null; // Don't show anything if no cuisines

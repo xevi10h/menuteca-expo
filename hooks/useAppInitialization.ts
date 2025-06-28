@@ -21,12 +21,7 @@ export const useAppInitialization = () => {
 				setInitError(null);
 
 				// Always try to fetch cuisines on app start, but don't fail if it doesn't work
-				try {
-					await fetchCuisines();
-				} catch (cuisineError) {
-					console.warn('Failed to fetch cuisines on app start:', cuisineError);
-					// Don't throw - cuisines can be loaded later when needed
-				}
+				await fetchCuisines();
 
 				// If user is authenticated, try to refresh their profile
 				if (isAuthenticated) {
@@ -58,37 +53,6 @@ export const useAppInitialization = () => {
 
 		return () => clearTimeout(timer);
 	}, []); // Only run once on app start
-
-	// Re-run profile refresh and cuisines refresh if authentication status changes
-	useEffect(() => {
-		if (isAuthenticated && isInitialized) {
-			const refreshUserData = async () => {
-				try {
-					// Refresh both profile and cuisines when user logs in
-					const promises = [refreshProfile()];
-
-					// Only refresh cuisines if they're not already loaded or have errors
-					if (cuisinesError || !cuisinesLoading) {
-						promises.push(refreshCuisines());
-					}
-
-					await Promise.allSettled(promises); // Use allSettled to not fail if one fails
-				} catch (error) {
-					console.warn('Error refreshing user data:', error);
-					// Don't throw - not critical for app functionality
-				}
-			};
-
-			refreshUserData();
-		}
-	}, [
-		isAuthenticated,
-		isInitialized,
-		refreshProfile,
-		refreshCuisines,
-		cuisinesError,
-		cuisinesLoading,
-	]);
 
 	return {
 		isInitialized,

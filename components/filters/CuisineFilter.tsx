@@ -4,7 +4,6 @@ import { useFilterStore } from '@/zustand/FilterStore';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo } from 'react';
 import {
-	ActivityIndicator,
 	Image,
 	ScrollView,
 	StyleSheet,
@@ -15,7 +14,7 @@ import {
 
 export default function CuisineFilter() {
 	const { main: filters, setCuisines } = useFilterStore();
-	const { cuisines, isLoading, error, fetchCuisines } = useCuisineStore();
+	const { cuisines } = useCuisineStore();
 
 	const selectedCuisines = filters.cuisines || [];
 
@@ -42,47 +41,6 @@ export default function CuisineFilter() {
 			setCuisines([...selectedCuisines, cuisineId]);
 		}
 	};
-
-	const handleRetry = () => {
-		fetchCuisines();
-	};
-
-	// Show loading state
-	if (isLoading && cuisines.length === 0) {
-		return (
-			<View style={styles.container}>
-				<View style={styles.loadingContainer}>
-					<ActivityIndicator size="small" color={colors.primary} />
-					<Text style={styles.loadingText}>Cargando cocinas...</Text>
-				</View>
-			</View>
-		);
-	}
-
-	// Show error state
-	if (error && cuisines.length === 0) {
-		return (
-			<View style={styles.container}>
-				<View style={styles.errorContainer}>
-					<Text style={styles.errorText}>Error al cargar cocinas</Text>
-					<TouchableOpacity onPress={handleRetry} style={styles.retryButton}>
-						<Text style={styles.retryText}>Reintentar</Text>
-					</TouchableOpacity>
-				</View>
-			</View>
-		);
-	}
-
-	// Show empty state
-	if (!isLoading && cuisines.length === 0) {
-		return (
-			<View style={styles.container}>
-				<View style={styles.emptyContainer}>
-					<Text style={styles.emptyText}>No hay cocinas disponibles</Text>
-				</View>
-			</View>
-		);
-	}
 
 	return (
 		<View style={styles.container}>

@@ -1,5 +1,4 @@
 import { colors } from '@/assets/styles/colors';
-import LoadingScreen from '@/components/LoadingScreen';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useCuisineStore } from '@/zustand/CuisineStore';
 import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
@@ -7,7 +6,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-	Alert,
 	Dimensions,
 	Image,
 	StyleSheet,
@@ -25,42 +23,13 @@ export default function CuisineTypesScreen() {
 	const insets = useSafeAreaInsets();
 
 	// Zustand stores
-	const { cuisines, isLoading, error, fetchCuisines } = useCuisineStore();
+	const { cuisines } = useCuisineStore();
 
 	const { setRegisterRestaurantCuisineId } = useRegisterRestaurantStore();
 
 	// Local state
 	const [selectedCuisine, setSelectedCuisine] = useState<string | null>(null);
 	const [isNextDisabled, setIsNextDisabled] = useState(true);
-
-	// Load cuisines on component mount
-	useEffect(() => {
-		const loadCuisines = async () => {
-			try {
-				await fetchCuisines();
-			} catch (err) {
-				console.error('Error loading cuisines:', err);
-				Alert.alert(
-					t('validation.error'),
-					t('registerRestaurant.errorLoadingCuisines') ||
-						'Error loading cuisines. Please try again.',
-					[
-						{
-							text: t('general.retry'),
-							onPress: () => loadCuisines(),
-						},
-						{
-							text: t('general.cancel'),
-							style: 'cancel',
-							onPress: () => router.back(),
-						},
-					],
-				);
-			}
-		};
-
-		loadCuisines();
-	}, []);
 
 	// Update next button state when cuisine selection changes
 	useEffect(() => {
@@ -85,55 +54,6 @@ export default function CuisineTypesScreen() {
 	const handleCuisineToggle = (cuisineId: string) => {
 		setSelectedCuisine((prev) => (prev === cuisineId ? null : cuisineId));
 	};
-
-	const handleRetry = async () => {
-		try {
-			await fetchCuisines();
-		} catch (err) {
-			console.error('Error retrying cuisines fetch:', err);
-		}
-	};
-
-	// Show loading screen while fetching
-	if (isLoading && cuisines.length === 0) {
-		return <LoadingScreen />;
-	}
-
-	// Show error state with retry option
-	if (error && cuisines.length === 0) {
-		return (
-			<View style={[styles.container, { paddingTop: insets.top }]}>
-				<View style={styles.header}>
-					<TouchableOpacity onPress={handleBack} style={styles.backButton}>
-						<Ionicons name="chevron-back" size={24} color={colors.secondary} />
-					</TouchableOpacity>
-				</View>
-
-				<View style={styles.errorContainer}>
-					<Ionicons name="warning-outline" size={64} color={colors.secondary} />
-					<Text style={styles.errorTitle}>
-						{t('registerRestaurant.errorLoadingCuisines') ||
-							'Error loading cuisines'}
-					</Text>
-					<Text style={styles.errorMessage}>{error}</Text>
-
-					<View style={styles.errorActions}>
-						<TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
-							<Text style={styles.retryButtonText}>
-								{t('general.retry') || 'Retry'}
-							</Text>
-						</TouchableOpacity>
-
-						<TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
-							<Text style={styles.skipButtonText}>
-								{t('registerRestaurant.configureLater') || 'Configure later'}
-							</Text>
-						</TouchableOpacity>
-					</View>
-				</View>
-			</View>
-		);
-	}
 
 	return (
 		<View style={[styles.container, { paddingTop: insets.top }]}>

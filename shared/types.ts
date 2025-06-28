@@ -88,6 +88,8 @@ export type Restaurant = {
 	phone?: string;
 	reservation_link?: string;
 	is_active: boolean;
+	cuisine: Cuisine;
+	reviews?: Review[];
 };
 
 export type Cuisine = {

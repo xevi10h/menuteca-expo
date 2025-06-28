@@ -1,6 +1,5 @@
 import { colors } from '@/assets/styles/colors';
 import CenterLocationMapButton from '@/components/CenterLocationMapButton';
-import DebugPanel from '@/components/DebugPanel';
 import ExpandableMapRestaurantModal from '@/components/ExpandableMapRestaurantModal';
 import ListFilter from '@/components/ListFilter';
 import MainSearcher from '@/components/MainSearcher';
@@ -10,17 +9,26 @@ import MapView from '@/components/crossPlatformMap/MapView';
 import Marker from '@/components/crossPlatformMap/Marker';
 import CuisineFilter from '@/components/filters/CuisineFilter';
 import RestaurantList from '@/components/list/RestaurantList';
-import ScrollHorizontalResturant from '@/components/list/ScrollHorizontalResturant';
+import ScrollHorizontalRestaurant from '@/components/list/ScrollHorizontalResturant';
 import { Restaurant } from '@/shared/types';
 import { useFilterStore } from '@/zustand/FilterStore';
 import { useRestaurantStore } from '@/zustand/RestaurantStore';
 import * as Location from 'expo-location';
-import { useEffect, useRef, useState } from 'react';
-import { Alert, Image, Platform, ScrollView, Text, View } from 'react-native';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+	ActivityIndicator,
+	Alert,
+	Image,
+	Platform,
+	ScrollView,
+	Text,
+	View,
+} from 'react-native';
 import MapViewType, { Camera } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function Index() {
+	const { top } = useSafeAreaInsets();
 	const [statusForegroundPermissions, requestStatusForegroundPermissions] =
 		Location.useForegroundPermissions();
 	const [view, setView] = useState<'list' | 'map'>('list');
@@ -30,6 +38,7 @@ export default function Index() {
 	const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [loadingError, setLoadingError] = useState<string | null>(null);
+	const [hasInitialLoad, setHasInitialLoad] = useState(false);
 	const mapViewRef = useRef<MapViewType>(null);
 
 	// Get filter state to determine view mode
@@ -40,6 +49,8 @@ export default function Index() {
 		fetchRestaurants,
 		isLoading: storeLoading,
 		error: storeError,
+		isRateLimited,
+		clearError,
 	} = useRestaurantStore();
 
 	// Check if any non-persistent filters are active (excludes sort and cuisines)
@@ -53,61 +64,80 @@ export default function Index() {
 		filters.distance !== null;
 
 	// Load restaurants data with proper error handling
+	const loadRestaurants = useCallback(async () => {
+		// Don't load if already loading or rate limited
+		if (storeLoading || loading || isRateLimited) {
+			console.log('Skipping load: already loading or rate limited');
+			return;
+		}
+
+		try {
+			setLoading(true);
+			setLoadingError(null);
+
+			const { coords } = await Location.getCurrentPositionAsync();
+			const { longitude, latitude } = coords;
+
+			// Use store's fetchRestaurants which handles caching
+			const restaurantData = await fetchRestaurants({
+				page: 1,
+				limit: 100,
+				latitude,
+				longitude,
+			});
+
+			setRestaurants(restaurantData);
+			setHasInitialLoad(true);
+
+			// Clear any previous errors on successful load
+			clearError();
+		} catch (error) {
+			console.error('Error loading restaurants:', error);
+			const errorMessage =
+				error instanceof Error ? error.message : 'Unknown error';
+			setLoadingError(errorMessage);
+		} finally {
+			setLoading(false);
+		}
+	}, [storeLoading, loading, isRateLimited, fetchRestaurants, clearError]);
+
+	// Initial load effect - only runs once
 	useEffect(() => {
-		const loadRestaurants = async () => {
-			// Don't load if already loading
-			if (storeLoading || loading) return;
-
-			try {
-				setLoading(true);
-				setLoadingError(null);
-
-				// Use store's fetchRestaurants which handles caching
-				const restaurantData = await fetchRestaurants({
-					page: 1,
-					limit: 100, // Load more restaurants for map
-				});
-
-				setRestaurants(restaurantData);
-			} catch (error) {
-				console.error('Error loading restaurants:', error);
-				const errorMessage =
-					error instanceof Error ? error.message : 'Unknown error';
-				setLoadingError(errorMessage);
-
-				// Don't show alert immediately, let user try again
-				if (restaurants.length === 0) {
-					// Only show error if we have no cached data
-					setTimeout(() => {
-						if (loadingError && restaurants.length === 0) {
-							Alert.alert(
-								'Error loading restaurants',
-								'Could not load restaurant data. Please check your connection and try again.',
-								[
-									{ text: 'Retry', onPress: loadRestaurants },
-									{ text: 'OK', style: 'cancel' },
-								],
-							);
-						}
-					}, 2000);
-				}
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		// Only load if we don't have restaurants or if there's an error
-		if (restaurants.length === 0 || storeError) {
+		if (!hasInitialLoad && restaurants.length === 0) {
 			loadRestaurants();
 		}
-	}, [
-		fetchRestaurants,
-		storeLoading,
-		loading,
-		storeError,
-		restaurants.length,
-		loadingError,
-	]);
+	}, [hasInitialLoad]); // Remove dependencies that cause loops
+
+	// Handle store errors
+	useEffect(() => {
+		if (storeError && !loading) {
+			// Show error alert only once, not continuously
+			if (!loadingError || loadingError !== storeError) {
+				setLoadingError(storeError);
+
+				// Only show alert for non-rate-limit errors
+				if (!storeError.includes('Rate limited')) {
+					setTimeout(() => {
+						Alert.alert(
+							'Error loading restaurants',
+							storeError,
+							[
+								{
+									text: 'Retry',
+									onPress: () => {
+										clearError();
+										loadRestaurants();
+									},
+								},
+								{ text: 'OK', style: 'cancel' },
+							],
+							{ cancelable: true },
+						);
+					}, 500);
+				}
+			}
+		}
+	}, [storeError, loading, loadingError, clearError, loadRestaurants]);
 
 	const handleMarkerPress = async (restaurant: Restaurant) => {
 		await centerCoordinatesMarker(restaurant);
@@ -173,12 +203,78 @@ export default function Index() {
 		}
 	};
 
+	// Show loading indicator for initial load
+	if (!hasInitialLoad && loading) {
+		return (
+			<View
+				style={{
+					flex: 1,
+					backgroundColor: colors.secondary,
+					paddingTop: top,
+					justifyContent: 'center',
+					alignItems: 'center',
+				}}
+			>
+				<ActivityIndicator size="large" color={colors.primary} />
+				<Text
+					style={{
+						marginTop: 20,
+						fontSize: 16,
+						fontFamily: 'Manrope',
+						color: colors.primary,
+					}}
+				>
+					Loading restaurants...
+				</Text>
+			</View>
+		);
+	}
+
+	// Show rate limit message
+	if (isRateLimited && restaurants.length === 0) {
+		return (
+			<View
+				style={{
+					flex: 1,
+					backgroundColor: colors.secondary,
+					paddingTop: top,
+					justifyContent: 'center',
+					alignItems: 'center',
+					paddingHorizontal: 40,
+				}}
+			>
+				<Text
+					style={{
+						fontSize: 18,
+						fontFamily: 'Manrope',
+						fontWeight: '600',
+						color: colors.primary,
+						textAlign: 'center',
+						marginBottom: 20,
+					}}
+				>
+					Too many requests
+				</Text>
+				<Text
+					style={{
+						fontSize: 14,
+						fontFamily: 'Manrope',
+						color: colors.primaryLight,
+						textAlign: 'center',
+					}}
+				>
+					Please wait a moment before trying again.
+				</Text>
+			</View>
+		);
+	}
+
 	return (
 		<View
 			style={{
 				alignItems: 'center',
 				backgroundColor: colors.secondary,
-				paddingTop: useSafeAreaInsets().top,
+				paddingTop: top,
 				flex: 1,
 				zIndex: -1,
 			}}
@@ -233,24 +329,42 @@ export default function Index() {
 			{view === 'list' ? (
 				hasActiveFilters ? (
 					// Show filtered list when filters are active
-					<RestaurantList />
+					<RestaurantList restaurants={restaurants} />
 				) : (
 					// Show original horizontal scrolls when no filters are active
 					<ScrollView
 						showsVerticalScrollIndicator={false}
 						style={{ marginTop: 10 }}
 					>
-						<ScrollHorizontalResturant title="bestRating" sortBy="rating" />
-						<ScrollHorizontalResturant title="mostPopular" sortBy="popular" />
-						<ScrollHorizontalResturant title="newest" sortBy="created_at" />
-						<ScrollHorizontalResturant title="closest" sortBy="distance" />
-						<ScrollHorizontalResturant
+						<ScrollHorizontalRestaurant
+							title="bestRating"
+							sortBy="rating"
+							restaurants={restaurants}
+						/>
+						<ScrollHorizontalRestaurant
+							title="mostPopular"
+							sortBy="popular"
+							restaurants={restaurants}
+						/>
+						<ScrollHorizontalRestaurant
+							title="newest"
+							sortBy="created_at"
+							restaurants={restaurants}
+						/>
+						<ScrollHorizontalRestaurant
+							title="closest"
+							sortBy="distance"
+							restaurants={restaurants}
+						/>
+						<ScrollHorizontalRestaurant
 							title="recommended"
 							sortBy="recommended"
+							restaurants={restaurants}
 						/>
-						<ScrollHorizontalResturant
+						<ScrollHorizontalRestaurant
 							title="alreadyTried"
 							sortBy="alreadyTried"
+							restaurants={restaurants}
 						/>
 						<View style={{ height: 100 }} />
 					</ScrollView>
@@ -356,9 +470,6 @@ export default function Index() {
 				iconName="map-outline"
 				active={view === 'map'}
 			/>
-
-			{/* Debug Panel - Only in development */}
-			<DebugPanel />
 
 			{/* Modal para detalles del restaurante desde el mapa */}
 			{selectedRestaurant && (

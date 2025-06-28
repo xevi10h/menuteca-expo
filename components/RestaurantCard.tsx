@@ -1,9 +1,8 @@
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Restaurant } from '@/shared/types';
-import { useCuisineStore } from '@/zustand/CuisineStore';
 import { useRouter } from 'expo-router';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface RestaurantCardProps {
@@ -13,19 +12,6 @@ interface RestaurantCardProps {
 export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
 	const { t } = useTranslation();
 	const router = useRouter();
-
-	// Use CuisineStore for getting cuisine data with caching
-	const { getCuisineById, fetchCuisines, cuisines } = useCuisineStore();
-
-	// Ensure cuisines are loaded if needed
-	useEffect(() => {
-		if (cuisines.length === 0) {
-			fetchCuisines();
-		}
-	}, [cuisines.length, fetchCuisines]);
-
-	// Get cuisine from store (cached)
-	const cuisine = getCuisineById(restaurant.cuisineId);
 
 	const handlePress = () => {
 		router.push(`/restaurant/${restaurant.id}`);
@@ -61,9 +47,9 @@ export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
 				</View>
 
 				<View style={styles.details}>
-					{cuisine && (
+					{restaurant.cuisine.name && (
 						<Text style={styles.cuisine} numberOfLines={1}>
-							{cuisine.name}
+							{restaurant.cuisine.name}
 						</Text>
 					)}
 					<Text style={styles.distance}>{restaurant.distance} km</Text>
@@ -127,6 +113,8 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.2,
 		shadowRadius: 2,
 		elevation: 2,
+		borderWidth: 1,
+		borderColor: colors.quaternary,
 	},
 	ratingText: {
 		fontSize: 12,

@@ -3,15 +3,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { useCuisineStore } from '@/zustand/CuisineStore';
 import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
 import React, { useEffect, useState } from 'react';
-import {
-	ActivityIndicator,
-	Alert,
-	Modal,
-	StyleSheet,
-	Text,
-	TouchableOpacity,
-	View,
-} from 'react-native';
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import HeaderModal from './HeaderModal';
 
 interface CuisineSelectionModalProps {
@@ -30,40 +22,11 @@ export default function CuisineSelectionModal({
 		(state) => state.registerRestaurant.cuisineId,
 	);
 
-	// Zustand store para cuisines con cache inteligente
-	const { cuisines, isLoading, error, fetchCuisines } = useCuisineStore();
+	const { cuisines } = useCuisineStore();
 
 	const [tempSelected, setTempSelected] = useState<string | undefined>(
 		selectedCuisineId,
 	);
-
-	// Cargar cuisines cuando se abre el modal si no están en cache
-	useEffect(() => {
-		if (visible && cuisines.length === 0 && !isLoading) {
-			fetchCuisines();
-		}
-	}, [visible, cuisines.length, isLoading, fetchCuisines]);
-
-	// Manejar errores de carga
-	useEffect(() => {
-		if (error && visible) {
-			Alert.alert(
-				t('validation.error'),
-				t('registerRestaurant.errorLoadingCuisines') || error,
-				[
-					{
-						text: t('general.retry'),
-						onPress: () => fetchCuisines(),
-					},
-					{
-						text: t('general.cancel'),
-						style: 'cancel',
-						onPress: onClose,
-					},
-				],
-			);
-		}
-	}, [error, visible, t, onClose, fetchCuisines]);
 
 	const handleToggleCuisine = (cuisineId: string) => {
 		setTempSelected((prev) => (prev === cuisineId ? undefined : cuisineId));
@@ -92,19 +55,12 @@ export default function CuisineSelectionModal({
 					handleClose={onClose}
 					handleSave={handleSave}
 					hasBorderBottom={true}
-					saveDisabled={isLoading}
 				/>
 				<View style={styles.modalContent}>
 					<Text style={styles.label}>
 						{t('registerRestaurant.cuisine_typesSubtitle')}
 					</Text>
-
-					{isLoading ? (
-						<View style={styles.loadingContainer}>
-							<ActivityIndicator size="large" color={colors.primary} />
-							<Text style={styles.loadingText}>{t('general.loading')}...</Text>
-						</View>
-					) : cuisines.length > 0 ? (
+					{cuisines.length > 0 && (
 						<View style={styles.cuisineGrid}>
 							{cuisines.map((cuisine) => (
 								<TouchableOpacity
@@ -126,19 +82,6 @@ export default function CuisineSelectionModal({
 									</Text>
 								</TouchableOpacity>
 							))}
-						</View>
-					) : (
-						<View style={styles.emptyContainer}>
-							<Text style={styles.emptyText}>
-								{t('registerRestaurant.noCuisinesAvailable') ||
-									'No cuisines available'}
-							</Text>
-							<TouchableOpacity
-								style={styles.retryButton}
-								onPress={fetchCuisines}
-							>
-								<Text style={styles.retryButtonText}>{t('general.retry')}</Text>
-							</TouchableOpacity>
 						</View>
 					)}
 				</View>

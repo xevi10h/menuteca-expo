@@ -108,7 +108,7 @@ export default function AddressEditModal({
 					street: address.street || '',
 					number: address.streetNumber || '',
 					city: address.city || '',
-					postal_code: address.postal_code || '',
+					postal_code: address.postalCode || '',
 					country: address.country || '',
 					formatted_address: formatted_address,
 				}));

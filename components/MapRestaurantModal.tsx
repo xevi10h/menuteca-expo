@@ -1,7 +1,6 @@
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Restaurant } from '@/shared/types';
-import { useCuisineStore } from '@/zustand/CuisineStore';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect } from 'react';
 import {
@@ -38,21 +37,6 @@ export default function MapRestaurantModal({
 	const insets = useSafeAreaInsets();
 	const translateY = useSharedValue(SCREEN_HEIGHT);
 	const opacity = useSharedValue(0);
-
-	// Use CuisineStore for getting cuisine data with caching
-	const { getCuisineById, fetchCuisines, cuisines } = useCuisineStore();
-
-	// Ensure cuisines are loaded if needed
-	useEffect(() => {
-		if (cuisines.length === 0) {
-			fetchCuisines();
-		}
-	}, [cuisines.length, fetchCuisines]);
-
-	// Get cuisine from store (cached)
-	const selectedCuisine = restaurant?.cuisineId
-		? getCuisineById(restaurant?.cuisineId)
-		: null;
 
 	const handleClose = () => {
 		opacity.value = withTiming(0, { duration: 200 });
@@ -133,8 +117,10 @@ export default function MapRestaurantModal({
 						<View style={styles.restaurantDetails}>
 							<View style={{ flex: 1, width: '50%' }}>
 								<Text style={styles.restaurant_name}>{restaurant.name}</Text>
-								{selectedCuisine?.name && (
-									<Text style={styles.cuisineText}>{selectedCuisine.name}</Text>
+								{restaurant.cuisine?.name && (
+									<Text style={styles.cuisineText}>
+										{restaurant.cuisine.name}
+									</Text>
 								)}
 							</View>
 							<View>

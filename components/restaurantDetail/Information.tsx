@@ -231,7 +231,9 @@ const Information: React.FC<InformationProps> = ({
 							{t('restaurantDetail.viewAllReviews')}
 						</Text>
 						{/* Mostrar número de opiniones */}
-						<Text style={styles.reviewsCount}>({MOCK_REVIEWS_COUNT})</Text>
+						<Text style={styles.reviewsCount}>
+							({restaurant?.reviews?.length})
+						</Text>
 						<Ionicons name="chevron-forward" size={16} color={colors.primary} />
 					</View>
 				</TouchableOpacity>

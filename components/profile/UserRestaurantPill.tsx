@@ -1,11 +1,10 @@
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Restaurant } from '@/shared/types';
-import { useCuisineStore } from '@/zustand/CuisineStore';
 import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface UserRestaurantPillProps {
@@ -18,18 +17,6 @@ export default function UserRestaurantPill({
 	const { t } = useTranslation();
 	const router = useRouter();
 	const user_id = useUserStore((state) => state.user.id);
-
-	// Usar Zustand store para obtener cuisine
-	const { getCuisineById, fetchCuisines, cuisines } = useCuisineStore();
-
-	// Asegurar que tenemos cuisines cargadas
-	useEffect(() => {
-		if (restaurant.cuisineId && cuisines.length === 0) {
-			fetchCuisines();
-		}
-	}, [restaurant.cuisineId, cuisines.length, fetchCuisines]);
-
-	const cuisine = getCuisineById(restaurant.cuisineId);
 
 	// El status se puede obtener directamente del restaurant object
 	const status = {
@@ -99,9 +86,9 @@ export default function UserRestaurantPill({
 				</View>
 
 				<View style={styles.detailsRow}>
-					{cuisine && (
+					{restaurant.cuisine && (
 						<Text style={styles.cuisineText} numberOfLines={1}>
-							{cuisine.name}
+							{restaurant.cuisine.name}
 						</Text>
 					)}
 					<Text style={styles.priceText}>

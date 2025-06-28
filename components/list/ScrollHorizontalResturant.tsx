@@ -1,12 +1,8 @@
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Restaurant } from '@/shared/types';
-import { useCuisineStore } from '@/zustand/CuisineStore';
-import { useRestaurantStore } from '@/zustand/RestaurantStore';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
 import {
-	ActivityIndicator,
 	Dimensions,
 	Image,
 	ScrollView,
@@ -20,120 +16,19 @@ const { width } = Dimensions.get('window');
 
 export type ScrollHorizontalRestaurantProps = {
 	title: string;
+	restaurants: Restaurant[];
 	sortBy: string;
 };
 
 export default function ScrollHorizontalRestaurant({
 	title,
-	sortBy,
+	restaurants,
 }: ScrollHorizontalRestaurantProps) {
 	const { t } = useTranslation();
-	const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
-
-	// Zustand stores
-	const { fetchRestaurants, isLoading: storeLoading } = useRestaurantStore();
-	const { getCuisineById } = useCuisineStore();
-
-	useEffect(() => {
-		const fetchRestaurantsData = async () => {
-			setLoading(true);
-			setError(null);
-
-			try {
-				const params: any = {
-					limit: 10,
-				};
-
-				// Map sortBy to API parameters
-				switch (sortBy) {
-					case 'rating':
-						params.sortBy = 'rating';
-						params.sortOrder = 'desc';
-						params.min_rating = 4.0; // Only show highly rated
-						break;
-					case 'popular':
-						params.sortBy = 'rating';
-						params.sortOrder = 'desc';
-						break;
-					case 'created_at':
-					case 'newest':
-						params.sortBy = 'created_at';
-						params.sortOrder = 'desc';
-						break;
-					case 'distance':
-					case 'closest':
-						params.sortBy = 'distance';
-						params.sortOrder = 'asc';
-						// TODO: Add user location for distance sorting
-						break;
-					case 'recommended':
-						params.sortBy = 'rating';
-						params.sortOrder = 'desc';
-						params.min_rating = 3.5;
-						break;
-					case 'alreadyTried':
-						// For now, just show random restaurants
-						// In the future, this could be based on user's review history
-						params.sortBy = 'rating';
-						params.sortOrder = 'desc';
-						break;
-					default:
-						params.sortBy = 'created_at';
-						params.sortOrder = 'desc';
-				}
-
-				// Use RestaurantStore which handles caching
-				const fetchedRestaurants = await fetchRestaurants(params);
-				setRestaurants(fetchedRestaurants);
-			} catch (err) {
-				const errorMessage =
-					err instanceof Error ? err.message : 'Failed to load restaurants';
-				setError(errorMessage);
-				console.error(`Error fetching restaurants for ${title}:`, err);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		fetchRestaurantsData();
-	}, [sortBy, title, fetchRestaurants]);
 
 	const handleRestaurantPress = (restaurant_id: string) => {
 		router.push(`/restaurant/${restaurant_id}`);
 	};
-
-	// Show loading state
-	const isLoading = loading || storeLoading;
-
-	if (isLoading) {
-		return (
-			<View style={styles.container}>
-				<View style={{ marginLeft: 24 }}>
-					<Text style={styles.title}>{t(`horizontalScroll.${title}`)}</Text>
-				</View>
-				<View style={styles.loadingContainer}>
-					<ActivityIndicator size="small" color={colors.primary} />
-				</View>
-			</View>
-		);
-	}
-
-	if (error || restaurants.length === 0) {
-		return (
-			<View style={styles.container}>
-				<View style={{ marginLeft: 24 }}>
-					<Text style={styles.title}>{t(`horizontalScroll.${title}`)}</Text>
-				</View>
-				<View style={styles.errorContainer}>
-					<Text style={styles.errorText}>
-						{error || 'No hay restaurantes disponibles'}
-					</Text>
-				</View>
-			</View>
-		);
-	}
 
 	return (
 		<View style={styles.container}>
@@ -148,9 +43,6 @@ export default function ScrollHorizontalRestaurant({
 				}}
 			>
 				{restaurants.map((restaurant) => {
-					// Use CuisineStore to get cuisine data (with caching)
-					const cuisine = getCuisineById(restaurant.cuisineId);
-
 					return (
 						<TouchableOpacity
 							key={restaurant.id}
@@ -245,7 +137,7 @@ export default function ScrollHorizontalRestaurant({
 									}}
 									numberOfLines={1}
 								>
-									{cuisine?.name || ''}
+									{restaurant?.cuisine?.name || ''}
 								</Text>
 								<Text
 									style={{

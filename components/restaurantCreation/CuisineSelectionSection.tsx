@@ -2,7 +2,7 @@ import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useCuisineStore } from '@/zustand/CuisineStore';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface CuisineSelectionSectionProps {
@@ -19,14 +19,7 @@ export default function CuisineSelectionSection({
 	const { t } = useTranslation();
 
 	// Usar Zustand store para obtener cuisine por ID
-	const { getCuisineById, fetchCuisines, cuisines } = useCuisineStore();
-
-	// Asegurar que tenemos cuisines cargadas si necesitamos mostrar una
-	useEffect(() => {
-		if (selectedCuisineId && cuisines.length === 0) {
-			fetchCuisines();
-		}
-	}, [selectedCuisineId, cuisines.length, fetchCuisines]);
+	const { getCuisineById } = useCuisineStore();
 
 	const selectedCuisine = selectedCuisineId
 		? getCuisineById(selectedCuisineId)

@@ -38,6 +38,11 @@ interface RestaurantState {
 	isLoading: boolean;
 	error: string | null;
 	lastError: Date | null;
+	retryCount: number;
+	maxRetries: number;
+	retryDelay: number;
+	isRateLimited: boolean;
+	rateLimitResetTime: Date | null;
 
 	// Actions
 	fetchRestaurants: (filters?: RestaurantFilters) => Promise<Restaurant[]>;
@@ -45,11 +50,11 @@ interface RestaurantState {
 	clearCache: () => void;
 	removeFromCache: (cacheKey: string) => void;
 	clearError: () => void;
+	resetRetryCount: () => void;
 }
 
 // Helper function to create cache key from filters
 const createCacheKey = (filters: RestaurantFilters = {}): string => {
-	// Sort keys to ensure consistent cache keys
 	const sortedEntries = Object.entries(filters)
 		.filter(([_, value]) => value !== undefined && value !== null)
 		.sort(([a], [b]) => a.localeCompare(b));
@@ -68,11 +73,19 @@ const filtersMatch = (
 // Cache duration: 5 minutes for restaurant data
 const CACHE_DURATION = 5 * 60 * 1000;
 
+// Rate limit reset duration: 1 minute
+const RATE_LIMIT_RESET_DURATION = 60 * 1000;
+
 export const useRestaurantStore = create<RestaurantState>((set, get) => ({
 	cache: new Map(),
 	isLoading: false,
 	error: null,
 	lastError: null,
+	retryCount: 0,
+	maxRetries: 3,
+	retryDelay: 1000, // Start with 1 second
+	isRateLimited: false,
+	rateLimitResetTime: null,
 
 	fetchRestaurants: async (
 		filters: RestaurantFilters = {},
@@ -86,8 +99,19 @@ export const useRestaurantStore = create<RestaurantState>((set, get) => ({
 			'RestaurantStore: fetchRestaurants called with filters:',
 			filters,
 		);
-		console.log('RestaurantStore: Cache key:', cacheKey);
-		console.log('RestaurantStore: Has cached data:', !!cachedData);
+
+		// Check if we're rate limited
+		if (state.isRateLimited && state.rateLimitResetTime) {
+			if (new Date() < state.rateLimitResetTime) {
+				console.log(
+					'RestaurantStore: Still rate limited, returning cached data or empty array',
+				);
+				return cachedData?.restaurants || [];
+			} else {
+				// Reset rate limit
+				set({ isRateLimited: false, rateLimitResetTime: null });
+			}
+		}
 
 		// Check if we have valid cached data
 		if (
@@ -99,13 +123,20 @@ export const useRestaurantStore = create<RestaurantState>((set, get) => ({
 			return cachedData.restaurants;
 		}
 
+		// Don't fetch if we're already loading this exact query
+		if (state.isLoading) {
+			console.log(
+				'RestaurantStore: Already loading, returning cached data or empty array',
+			);
+			return cachedData?.restaurants || [];
+		}
+
 		// Clear previous errors when starting new fetch
 		set({ isLoading: true, error: null });
 
 		try {
 			console.log('RestaurantStore: Fetching from API...');
 			const response = await RestaurantService.getAllRestaurants(filters);
-			console.log('respnse', response);
 
 			if (response.success) {
 				console.log(
@@ -130,6 +161,8 @@ export const useRestaurantStore = create<RestaurantState>((set, get) => ({
 					isLoading: false,
 					error: null,
 					lastError: null,
+					retryCount: 0, // Reset retry count on success
+					retryDelay: 1000, // Reset retry delay
 				});
 
 				return response.data.data;
@@ -145,16 +178,59 @@ export const useRestaurantStore = create<RestaurantState>((set, get) => ({
 				filters,
 				cacheKey,
 				timestamp: new Date().toISOString(),
+				retryCount: state.retryCount,
 			});
 
-			set({
-				isLoading: false,
-				error: errorMessage,
-				lastError: new Date(),
-			});
+			// Check if it's a rate limit error
+			if (errorMessage.toLowerCase().includes('too many requests')) {
+				const resetTime = new Date(Date.now() + RATE_LIMIT_RESET_DURATION);
+				set({
+					isLoading: false,
+					error: 'Rate limited. Please wait before trying again.',
+					lastError: new Date(),
+					isRateLimited: true,
+					rateLimitResetTime: resetTime,
+				});
 
-			// Return empty array on error to prevent app crashes
-			return [];
+				console.log(
+					'RestaurantStore: Rate limited until',
+					resetTime.toISOString(),
+				);
+
+				// Return cached data if available
+				return cachedData?.restaurants || [];
+			}
+
+			// Implement exponential backoff for other errors
+			if (state.retryCount < state.maxRetries) {
+				const nextRetryDelay = state.retryDelay * 2; // Exponential backoff
+
+				set({
+					isLoading: false,
+					error: errorMessage,
+					lastError: new Date(),
+					retryCount: state.retryCount + 1,
+					retryDelay: nextRetryDelay,
+				});
+
+				console.log(
+					`RestaurantStore: Will retry in ${nextRetryDelay}ms (attempt ${
+						state.retryCount + 1
+					}/${state.maxRetries})`,
+				);
+
+				// Don't automatically retry - let the component decide
+				return cachedData?.restaurants || [];
+			} else {
+				// Max retries reached
+				set({
+					isLoading: false,
+					error: `Failed after ${state.maxRetries} attempts: ${errorMessage}`,
+					lastError: new Date(),
+				});
+
+				return cachedData?.restaurants || [];
+			}
 		}
 	},
 
@@ -174,7 +250,14 @@ export const useRestaurantStore = create<RestaurantState>((set, get) => ({
 
 	clearCache: () => {
 		console.log('RestaurantStore: Clearing all cache');
-		set({ cache: new Map(), error: null });
+		set({
+			cache: new Map(),
+			error: null,
+			retryCount: 0,
+			retryDelay: 1000,
+			isRateLimited: false,
+			rateLimitResetTime: null,
+		});
 	},
 
 	removeFromCache: (cacheKey: string) => {
@@ -192,5 +275,9 @@ export const useRestaurantStore = create<RestaurantState>((set, get) => ({
 
 	clearError: () => {
 		set({ error: null, lastError: null });
+	},
+
+	resetRetryCount: () => {
+		set({ retryCount: 0, retryDelay: 1000 });
 	},
 }));
