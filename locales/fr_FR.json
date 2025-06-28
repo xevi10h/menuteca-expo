@@ -66,7 +66,9 @@
 		"viewAll": "Voir tout",
 		"basedOnReviews": "Basé sur {{count}} avis",
 		"writeReview": "Appuyez pour laisser un avis",
-		"beFirstToReview": "Soyez le premier à donner votre avis"
+		"beFirstToReview": "Soyez le premier à donner votre avis",
+		"noResults": "Aucun résultat trouvé",
+		"noResultsSubtitle": "Essayez de modifier vos filtres ou de rechercher un autre restaurant"
 	},
 	"notFound": {
 		"restaurant": {
@@ -383,7 +385,7 @@
 	},
 	"auth": {
 		"login": "Se connecter",
-		"register": "S'inscrire",
+		"register": "Inscrivez-vous",
 		"welcomeBack": "Bon retour",
 		"createAccount": "Créer un compte",
 		"loginSubtitle": "Connectez-vous pour accéder à votre profil",
@@ -397,10 +399,11 @@
 		"enterEmail": "Entrez votre email",
 		"enterPassword": "Entrez votre mot de passe",
 		"processing": "Traitement...",
-		"noAccount": "Pas de compte ? Inscrivez-vous",
+		"noAccount": "Pas de compte ?",
 		"hasAccount": "Déjà un compte ? Connectez-vous",
 		"completeAllFields": "Veuillez compléter tous les champs requis",
-		"errorOccurred": "Une erreur s'est produite. Veuillez réessayer."
+		"errorOccurred": "Une erreur s'est produite. Veuillez réessayer.",
+		"forgotPassword": "Mot de passe oublié ?"
 	},
 	"changePassword": {
 		"title": "Changer le mot de passe",

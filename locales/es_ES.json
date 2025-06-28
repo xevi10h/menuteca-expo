@@ -66,7 +66,9 @@
 		"viewAll": "Ver todas",
 		"basedOnReviews": "Basado en {{count}} opiniones",
 		"writeReview": "Toca para escribir una opinión",
-		"beFirstToReview": "Sé el primero en opinar"
+		"beFirstToReview": "Sé el primero en opinar",
+		"noResults": "No se encontraron restaurantes",
+		"noResultsSubtitle": "Intenta ajustar tus filtros o búsqueda"
 	},
 	"notFound": {
 		"restaurant": {
@@ -382,7 +384,7 @@
 	},
 	"auth": {
 		"login": "Iniciar Sesión",
-		"register": "Registrarse",
+		"register": "Regístrate",
 		"welcomeBack": "Bienvenido de nuevo",
 		"createAccount": "Crear cuenta",
 		"loginSubtitle": "Inicia sesión para acceder a tu perfil",
@@ -396,10 +398,11 @@
 		"enterEmail": "Ingresa tu email",
 		"enterPassword": "Ingresa tu contraseña",
 		"processing": "Procesando...",
-		"noAccount": "¿No tienes cuenta? Regístrate",
+		"noAccount": "¿No tienes cuenta?",
 		"hasAccount": "¿Ya tienes cuenta? Inicia sesión",
 		"completeAllFields": "Por favor, completa todos los campos requeridos",
-		"errorOccurred": "Ha ocurrido un error. Inténtalo de nuevo."
+		"errorOccurred": "Ha ocurrido un error. Inténtalo de nuevo.",
+		"forgotPassword": "¿Olvidaste tu contraseña?"
 	},
 	"changePassword": {
 		"title": "Cambiar contraseña",

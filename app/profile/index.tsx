@@ -110,10 +110,10 @@ export default function ProfileScreen() {
 	};
 
 	const handleLogout = () => {
-		Alert.alert(t('profile.logout'), t('profile.logoutConfirmation'), [
+		Alert.alert(t('profile.logout'), t('profile.confirmLogout'), [
 			{ text: t('general.cancel'), style: 'cancel' },
 			{
-				text: t('general.logout'),
+				text: t('profile.logout'),
 				style: 'destructive',
 				onPress: () => {
 					logout();

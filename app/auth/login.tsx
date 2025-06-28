@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import {
 	ActivityIndicator,
 	Alert,
+	Image,
 	KeyboardAvoidingView,
 	Platform,
 	ScrollView,
@@ -106,7 +107,11 @@ export default function LoginScreen() {
 
 					{/* Logo */}
 					<View style={styles.logoContainer}>
-						<Text style={styles.logoText}>🍽️</Text>
+						<Image
+							source={require('@/assets/images/logo_large_primary.png')}
+							style={{ width: 100, height: 80, marginBottom: 5 }}
+							resizeMode="contain"
+						/>
 						<Text style={styles.appName}>Menuteca</Text>
 						<Text style={styles.subtitle}>{t('auth.welcomeBack')}</Text>
 					</View>
@@ -123,7 +128,7 @@ export default function LoginScreen() {
 									setEmail(text);
 									if (emailError) setEmailError('');
 								}}
-								placeholder={t('auth.emailPlaceholder')}
+								placeholder={t('auth.enterEmail')}
 								placeholderTextColor={colors.primaryLight}
 								keyboardType="email-address"
 								autoCapitalize="none"
@@ -149,7 +154,7 @@ export default function LoginScreen() {
 										setPassword(text);
 										if (passwordError) setPasswordError('');
 									}}
-									placeholder={t('auth.passwordPlaceholder')}
+									placeholder={t('auth.enterPassword')}
 									placeholderTextColor={colors.primaryLight}
 									secureTextEntry={!showPassword}
 									editable={!isLoading}

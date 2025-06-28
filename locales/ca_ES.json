@@ -66,7 +66,9 @@
 		"viewAll": "Veure totes",
 		"basedOnReviews": "Basat en {{count}} opinions",
 		"writeReview": "Toca per escriure una opinió",
-		"beFirstToReview": "Sigues el primer a opinar"
+		"beFirstToReview": "Sigues el primer a opinar",
+		"noResults": "No s'han trobat resultats",
+		"noResultsSubtitle": "Prova amb una cerca més específica o canvia els filtres"
 	},
 	"notFound": {
 		"restaurant": {
@@ -383,7 +385,7 @@
 	},
 	"auth": {
 		"login": "Iniciar Sessió",
-		"register": "Registrar-se",
+		"register": "Registra't",
 		"welcomeBack": "Benvingut de nou",
 		"createAccount": "Crear compte",
 		"loginSubtitle": "Inicia sessió per accedir al teu perfil",
@@ -397,10 +399,11 @@
 		"enterEmail": "Introdueix el teu correu electrònic",
 		"enterPassword": "Introdueix la teva contrasenya",
 		"processing": "Processant...",
-		"noAccount": "No tens compte? Registra't",
+		"noAccount": "No tens compte?",
 		"hasAccount": "Ja tens compte? Inicia sessió",
 		"completeAllFields": "Si us plau, completa tots els camps requerits",
-		"errorOccurred": "Ha ocorregut un error. Torna-ho a intentar."
+		"errorOccurred": "Ha ocorregut un error. Torna-ho a intentar.",
+		"forgotPassword": "Has oblidat la contrasenya?"
 	},
 	"changePassword": {
 		"title": "Canviar contrasenya",

@@ -90,6 +90,8 @@ export type Restaurant = {
 	is_active: boolean;
 	cuisine: Cuisine;
 	reviews?: Review[];
+	created_at: string;
+	updated_at: string;
 };
 
 export type Cuisine = {

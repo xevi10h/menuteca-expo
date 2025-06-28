@@ -5,7 +5,15 @@ import { create } from 'zustand';
 export interface IFilter {
 	textSearch: string;
 	cuisines: string[] | null;
-	orderBy: 'recommended' | 'price' | 'value' | 'distance';
+	orderBy:
+		| 'recommended'
+		| 'price'
+		| 'value'
+		| 'distance'
+		| 'rating'
+		| 'popular'
+		| 'created_at'
+		| 'alreadyTried';
 	orderDirection: 'asc' | 'desc';
 	priceRange: {
 		min: number;
@@ -43,9 +51,13 @@ export const defaultFilter: IFilter = {
 
 interface FilterState {
 	main: IFilter;
+	// Helper computed properties
+	hasActiveFilters: () => boolean;
+	hasActiveRemovableFilters: () => boolean;
+
 	setCuisines: (cuisines: string[] | null) => void;
 	setTextSearch: (textSearch: string) => void;
-	setOrderBy: (orderBy: 'recommended' | 'price' | 'value' | 'distance') => void;
+	setOrderBy: (orderBy: IFilter['orderBy']) => void;
 	setOrderDirection: (orderDirection: 'asc' | 'desc') => void;
 	setPriceRange: (priceRange: { min: number; max: number }) => void;
 	setRatingRange: (ratingRange: { min: number; max: number }) => void;
@@ -56,15 +68,44 @@ interface FilterState {
 	resetRemovableFilters: () => void;
 }
 
-export const useFilterStore = create<FilterState>((set) => ({
+export const useFilterStore = create<FilterState>((set, get) => ({
 	main: defaultFilter,
+
+	// Helper function to check if there are active filters (excluding sort and cuisines)
+	hasActiveFilters: () => {
+		const { main } = get();
+		return (
+			main.textSearch.trim() !== '' ||
+			main.priceRange.min > 0 ||
+			main.priceRange.max < 1000 ||
+			main.ratingRange.min > 0 ||
+			(main.tags && main.tags.length > 0) ||
+			main.timeRange !== null ||
+			main.distance !== null
+		);
+	},
+
+	// Helper function to check if there are removable filters
+	hasActiveRemovableFilters: () => {
+		const { main } = get();
+		return (
+			main.textSearch.trim() !== '' ||
+			main.priceRange.min > 0 ||
+			main.priceRange.max < 1000 ||
+			main.ratingRange.min > 0 ||
+			(main.tags && main.tags.length > 0) ||
+			main.timeRange !== null ||
+			main.distance !== null
+		);
+	},
+
 	setCuisines: (cuisines: string[] | null) => {
 		set((state) => ({ main: { ...state.main, cuisines } }));
 	},
 	setTextSearch: (textSearch: string) => {
 		set((state) => ({ main: { ...state.main, textSearch } }));
 	},
-	setOrderBy: (orderBy: 'recommended' | 'price' | 'value' | 'distance') => {
+	setOrderBy: (orderBy: IFilter['orderBy']) => {
 		set((state) => ({ main: { ...state.main, orderBy } }));
 	},
 	setOrderDirection: (orderDirection: 'asc' | 'desc') => {
@@ -88,7 +129,6 @@ export const useFilterStore = create<FilterState>((set) => ({
 	resetAllFilters: () => {
 		set({ main: defaultFilter });
 	},
-	// Reset only removable filters (keeps sort and cuisines)
 	resetRemovableFilters: () => {
 		set((state) => ({
 			main: {

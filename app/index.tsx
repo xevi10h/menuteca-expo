@@ -41,6 +41,11 @@ export default function Index() {
 	const [hasInitialLoad, setHasInitialLoad] = useState(false);
 	const mapViewRef = useRef<MapViewType>(null);
 
+	// Estado para paginación cuando hay filtros activos
+	const [page, setPage] = useState(1);
+	const [hasMore, setHasMore] = useState(true);
+	const [loadingMore, setLoadingMore] = useState(false);
+
 	// Get filter state to determine view mode
 	const filters = useFilterStore((state) => state.main);
 
@@ -61,61 +66,267 @@ export default function Index() {
 		filters.ratingRange.min > 0 ||
 		(filters.tags && filters.tags.length > 0) ||
 		filters.timeRange !== null ||
-		filters.distance !== null;
+		filters.distance !== null ||
+		(filters.cuisines && filters.cuisines.length > 0);
+
+	// Función para aplicar filtros localmente
+	const applyLocalFilters = useCallback(
+		(restaurantList: Restaurant[]) => {
+			let filtered = [...restaurantList];
+
+			// Filtro de texto
+			if (filters.textSearch.trim()) {
+				const searchTerm = filters.textSearch.toLowerCase();
+				filtered = filtered.filter(
+					(restaurant) =>
+						restaurant.name.toLowerCase().includes(searchTerm) ||
+						restaurant.cuisine?.name?.toLowerCase().includes(searchTerm),
+				);
+			}
+
+			// Filtro de precio
+			if (filters.priceRange.min > 0 || filters.priceRange.max < 1000) {
+				filtered = filtered.filter(
+					(restaurant) =>
+						restaurant.minimum_price >= filters.priceRange.min &&
+						restaurant.minimum_price <= filters.priceRange.max,
+				);
+			}
+
+			// Filtro de rating
+			if (filters.ratingRange.min > 0) {
+				filtered = filtered.filter(
+					(restaurant) =>
+						restaurant.rating && restaurant.rating >= filters.ratingRange.min,
+				);
+			}
+
+			// Filtro de tags
+			if (filters.tags && filters.tags.length > 0) {
+				filtered = filtered.filter((restaurant) =>
+					filters.tags!.some((tag) => restaurant.tags?.includes(tag)),
+				);
+			}
+
+			// Filtro de cuisines
+			if (filters.cuisines && filters.cuisines.length > 0) {
+				filtered = filtered.filter((restaurant) =>
+					filters.cuisines!.includes(restaurant.cuisine?.id),
+				);
+			}
+
+			// Filtro de distancia
+			if (filters.distance !== null && filters.distance > 0) {
+				filtered = filtered.filter(
+					(restaurant) =>
+						restaurant.distance !== undefined &&
+						restaurant.distance <= filters.distance!,
+				);
+			}
+
+			// TODO: Implementar filtro de horario cuando esté disponible en el backend
+			// if (filters.timeRange) {
+			//   // Aquí iría la lógica para filtrar por horario
+			// }
+
+			return filtered;
+		},
+		[filters],
+	);
+
+	// Función para ordenar restaurantes
+	const applySorting = useCallback(
+		(restaurantList: Restaurant[]) => {
+			const sorted = [...restaurantList];
+
+			switch (filters.orderBy) {
+				case 'price':
+					sorted.sort((a, b) => {
+						if (filters.orderDirection === 'asc') {
+							return a.minimum_price - b.minimum_price;
+						}
+						return b.minimum_price - a.minimum_price;
+					});
+					break;
+				case 'distance':
+					sorted.sort((a, b) => {
+						const distA = a.distance || Infinity;
+						const distB = b.distance || Infinity;
+						return distA - distB;
+					});
+					break;
+				case 'recommended':
+				default:
+					// Lógica de recomendados (combina rating, distancia, etc.)
+					sorted.sort((a, b) => {
+						const scoreA =
+							(a.rating || 0) * 0.7 +
+							(a.distance ? (10 - a.distance) * 0.3 : 0);
+						const scoreB =
+							(b.rating || 0) * 0.7 +
+							(b.distance ? (10 - b.distance) * 0.3 : 0);
+						return scoreB - scoreA;
+					});
+					break;
+			}
+
+			return sorted;
+		},
+		[filters.orderBy, filters.orderDirection],
+	);
+
+	// Función para obtener restaurantes para categorías específicas (sin filtros)
+	const getRestaurantsByCategory = useCallback(
+		(category: string, restaurantList: Restaurant[]) => {
+			const sorted = [...restaurantList];
+
+			switch (category) {
+				case 'bestRating':
+					return sorted
+						.filter((r) => r.rating && r.rating > 0)
+						.sort((a, b) => (b.rating || 0) - (a.rating || 0))
+						.slice(0, 10);
+
+				case 'mostPopular':
+					// Simular popularidad con una combinación de rating y número de reviews
+					return sorted
+						.sort((a, b) => {
+							const popularityA = (a.rating || 0) * (a.reviews?.length || 1);
+							const popularityB = (b.rating || 0) * (b.reviews?.length || 1);
+							return popularityB - popularityA;
+						})
+						.slice(0, 10);
+
+				case 'newest':
+					return sorted
+						.sort(
+							(a, b) =>
+								new Date(b.created_at).getTime() -
+								new Date(a.created_at).getTime(),
+						)
+						.slice(0, 10);
+
+				case 'closest':
+					return sorted
+						.filter((r) => r.distance !== undefined)
+						.sort((a, b) => (a.distance || Infinity) - (b.distance || Infinity))
+						.slice(0, 10);
+
+				case 'recommended':
+					// Algoritmo de recomendación personalizado
+					return sorted
+						.sort((a, b) => {
+							const scoreA =
+								(a.rating || 0) * 0.6 +
+								(a.distance ? (10 - a.distance) * 0.4 : 0);
+							const scoreB =
+								(b.rating || 0) * 0.6 +
+								(b.distance ? (10 - b.distance) * 0.4 : 0);
+							return scoreB - scoreA;
+						})
+						.slice(0, 10);
+
+				default:
+					return sorted.slice(0, 10);
+			}
+		},
+		[],
+	);
 
 	// Load restaurants data with proper error handling
-	const loadRestaurants = useCallback(async () => {
-		// Don't load if already loading or rate limited
-		if (storeLoading || loading || isRateLimited) {
-			console.log('Skipping load: already loading or rate limited');
-			return;
+	const loadRestaurants = useCallback(
+		async (pageNumber = 1, append = false) => {
+			// Don't load if already loading or rate limited
+			if (storeLoading || loading || isRateLimited) {
+				console.log('Skipping load: already loading or rate limited');
+				return;
+			}
+
+			try {
+				if (pageNumber === 1) {
+					setLoading(true);
+				} else {
+					setLoadingMore(true);
+				}
+				setLoadingError(null);
+
+				const { coords } = await Location.getCurrentPositionAsync();
+				const { longitude, latitude } = coords;
+
+				// Use store's fetchRestaurants which handles caching
+				const restaurantData = await fetchRestaurants({
+					page: pageNumber,
+					limit: 50, // Usar 50 como límite base
+					latitude,
+					longitude,
+				});
+
+				if (append && pageNumber > 1) {
+					setRestaurants((prev) => [...prev, ...restaurantData]);
+				} else {
+					setRestaurants(restaurantData);
+					setHasInitialLoad(true);
+				}
+
+				// Determinar si hay más páginas (simplificado - en una app real vendría del backend)
+				setHasMore(restaurantData.length === 50);
+				setPage(pageNumber);
+
+				// Clear any previous errors on successful load
+				clearError();
+			} catch (error) {
+				console.error('Error loading restaurants:', error);
+				const errorMessage =
+					error instanceof Error ? error.message : 'Unknown error';
+				setLoadingError(errorMessage);
+			} finally {
+				setLoading(false);
+				setLoadingMore(false);
+			}
+		},
+		[storeLoading, loading, isRateLimited, fetchRestaurants, clearError],
+	);
+
+	// Función para cargar más restaurantes (paginación)
+	const loadMoreRestaurants = useCallback(() => {
+		if (hasActiveFilters && hasMore && !loadingMore && !loading) {
+			loadRestaurants(page + 1, true);
 		}
+	}, [hasActiveFilters, hasMore, loadingMore, loading, page, loadRestaurants]);
 
-		try {
-			setLoading(true);
-			setLoadingError(null);
-
-			const { coords } = await Location.getCurrentPositionAsync();
-			const { longitude, latitude } = coords;
-
-			// Use store's fetchRestaurants which handles caching
-			const restaurantData = await fetchRestaurants({
-				page: 1,
-				limit: 100,
-				latitude,
-				longitude,
-			});
-
-			setRestaurants(restaurantData);
-			setHasInitialLoad(true);
-
-			// Clear any previous errors on successful load
-			clearError();
-		} catch (error) {
-			console.error('Error loading restaurants:', error);
-			const errorMessage =
-				error instanceof Error ? error.message : 'Unknown error';
-			setLoadingError(errorMessage);
-		} finally {
-			setLoading(false);
+	// Reset page when filters change
+	useEffect(() => {
+		if (hasActiveFilters) {
+			setPage(1);
+			setHasMore(true);
+			loadRestaurants(1, false);
 		}
-	}, [storeLoading, loading, isRateLimited, fetchRestaurants, clearError]);
+	}, [
+		filters.textSearch,
+		filters.priceRange,
+		filters.ratingRange,
+		filters.tags,
+		filters.cuisines,
+		filters.distance,
+		filters.timeRange,
+		filters.orderBy,
+		filters.orderDirection,
+		hasActiveFilters,
+	]);
 
 	// Initial load effect - only runs once
 	useEffect(() => {
 		if (!hasInitialLoad && restaurants.length === 0) {
 			loadRestaurants();
 		}
-	}, [hasInitialLoad]); // Remove dependencies that cause loops
+	}, [hasInitialLoad]);
 
 	// Handle store errors
 	useEffect(() => {
 		if (storeError && !loading) {
-			// Show error alert only once, not continuously
 			if (!loadingError || loadingError !== storeError) {
 				setLoadingError(storeError);
 
-				// Only show alert for non-rate-limit errors
 				if (!storeError.includes('Rate limited')) {
 					setTimeout(() => {
 						Alert.alert(
@@ -139,6 +350,11 @@ export default function Index() {
 		}
 	}, [storeError, loading, loadingError, clearError, loadRestaurants]);
 
+	// Procesar restaurantes según si hay filtros o no
+	const processedRestaurants = hasActiveFilters
+		? applySorting(applyLocalFilters(restaurants))
+		: restaurants;
+
 	const handleMarkerPress = async (restaurant: Restaurant) => {
 		await centerCoordinatesMarker(restaurant);
 		setSelectedRestaurant(restaurant);
@@ -152,13 +368,10 @@ export default function Index() {
 
 	const centerCoordinatesButtonAction = async () => {
 		try {
-			// Verificar el estado del permiso
 			if (!statusForegroundPermissions?.granted) {
-				// Solicitar permisos si aún no se han concedido
 				const newPermissions = await requestStatusForegroundPermissions();
 				if (!newPermissions.granted) {
-					// Manejar la situación si los permisos no son concedidos
-					return; // Salir de la función si no hay permisos
+					return;
 				}
 			}
 
@@ -329,7 +542,12 @@ export default function Index() {
 			{view === 'list' ? (
 				hasActiveFilters ? (
 					// Show filtered list when filters are active
-					<RestaurantList restaurants={restaurants} />
+					<RestaurantList
+						restaurants={processedRestaurants}
+						onLoadMore={loadMoreRestaurants}
+						hasMore={hasMore}
+						loadingMore={loadingMore}
+					/>
 				) : (
 					// Show original horizontal scrolls when no filters are active
 					<ScrollView
@@ -337,40 +555,36 @@ export default function Index() {
 						style={{ marginTop: 10 }}
 					>
 						<ScrollHorizontalRestaurant
+							title="recommended"
+							sortBy="recommended"
+							restaurants={getRestaurantsByCategory('recommended', restaurants)}
+						/>
+						<ScrollHorizontalRestaurant
 							title="bestRating"
 							sortBy="rating"
-							restaurants={restaurants}
-						/>
-						<ScrollHorizontalRestaurant
-							title="mostPopular"
-							sortBy="popular"
-							restaurants={restaurants}
-						/>
-						<ScrollHorizontalRestaurant
-							title="newest"
-							sortBy="created_at"
-							restaurants={restaurants}
+							restaurants={getRestaurantsByCategory('bestRating', restaurants)}
 						/>
 						<ScrollHorizontalRestaurant
 							title="closest"
 							sortBy="distance"
-							restaurants={restaurants}
+							restaurants={getRestaurantsByCategory('closest', restaurants)}
 						/>
 						<ScrollHorizontalRestaurant
-							title="recommended"
-							sortBy="recommended"
-							restaurants={restaurants}
+							title="mostPopular"
+							sortBy="popular"
+							restaurants={getRestaurantsByCategory('mostPopular', restaurants)}
 						/>
 						<ScrollHorizontalRestaurant
-							title="alreadyTried"
-							sortBy="alreadyTried"
-							restaurants={restaurants}
+							title="newest"
+							sortBy="created_at"
+							restaurants={getRestaurantsByCategory('newest', restaurants)}
 						/>
+
 						<View style={{ height: 100 }} />
 					</ScrollView>
 				)
 			) : (
-				// Map view
+				// Map view - usar restaurantes procesados también en el mapa
 				<View
 					style={{
 						position: 'absolute',
@@ -402,7 +616,7 @@ export default function Index() {
 							longitudeDelta: 0.0421,
 						}}
 					>
-						{restaurants.map((restaurant) => (
+						{processedRestaurants.map((restaurant) => (
 							<Marker
 								key={restaurant.id}
 								coordinate={{
