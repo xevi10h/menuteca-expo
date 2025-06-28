@@ -1,6 +1,7 @@
-import { mockReviews } from '@/api/responses';
+import { ReviewService } from '@/api/services';
 import { colors } from '@/assets/styles/colors';
 import AddReviewModal from '@/components/AddReviewModal';
+import LoadingScreen from '@/components/LoadingScreen';
 import ReviewItem from '@/components/reviews/ReviewItem';
 import ReviewsSummary from '@/components/reviews/ReviewsSummary';
 import SortButton from '@/components/reviews/SortButton';
@@ -8,9 +9,11 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { Review } from '@/shared/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
+	Alert,
 	FlatList,
+	RefreshControl,
 	ScrollView,
 	StyleSheet,
 	Text,
@@ -32,13 +35,94 @@ export default function ReviewsScreen() {
 	const { id } = useLocalSearchParams<{ id: string }>();
 	const insets = useSafeAreaInsets();
 
-	const [reviews, setReviews] = useState<Review[]>(mockReviews);
+	const [reviews, setReviews] = useState<Review[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [refreshing, setRefreshing] = useState(false);
+	const [loadingMore, setLoadingMore] = useState(false);
 	const [showAddReviewModal, setShowAddReviewModal] = useState(false);
 	const [currentSort, setCurrentSort] = useState<SortOption>('newest');
+	const [page, setPage] = useState(1);
+	const [hasMore, setHasMore] = useState(true);
+	const [restaurantName, setRestaurantName] = useState('');
 
 	// Animated scroll value
 	const scrollY = useSharedValue(0);
 	const flatListRef = useRef<FlatList>(null);
+
+	// Load reviews data
+	useEffect(() => {
+		if (id) {
+			loadReviews(1);
+		}
+	}, [id, currentSort]);
+
+	const loadReviews = async (pageNumber = 1, isRefresh = false) => {
+		if (!id) return;
+
+		try {
+			if (isRefresh) {
+				setRefreshing(true);
+			} else if (pageNumber === 1) {
+				setLoading(true);
+			} else {
+				setLoadingMore(true);
+			}
+
+			const response = await ReviewService.getRestaurantReviews(id, {
+				page: pageNumber,
+				limit: 10,
+				sortBy: getSortByField(currentSort),
+				sortOrder: getSortOrder(currentSort),
+			});
+
+			if (response.success) {
+				const newReviews = response.data.data;
+
+				if (pageNumber === 1 || isRefresh) {
+					setReviews(newReviews);
+				} else {
+					setReviews((prev) => [...prev, ...newReviews]);
+				}
+
+				setHasMore(response.data.pagination.hasNext);
+				setPage(pageNumber);
+			}
+		} catch (error) {
+			console.error('Error loading reviews:', error);
+			Alert.alert(t('validation.error'), t('reviews.errorLoading'));
+		} finally {
+			setLoading(false);
+			setRefreshing(false);
+			setLoadingMore(false);
+		}
+	};
+
+	// Helper functions for sorting
+	const getSortByField = (sort: SortOption): string => {
+		switch (sort) {
+			case 'newest':
+			case 'oldest':
+				return 'created_at';
+			case 'highest':
+			case 'lowest':
+				return 'rating';
+			default:
+				return 'created_at';
+		}
+	};
+
+	const getSortOrder = (sort: SortOption): 'asc' | 'desc' => {
+		switch (sort) {
+			case 'newest':
+			case 'highest':
+				return 'desc';
+			case 'oldest':
+			case 'lowest':
+				return 'asc';
+			default:
+				return 'desc';
+		}
+	};
 
 	// Calculate average rating
 	const averageRating = useMemo(() => {
@@ -48,18 +132,22 @@ export default function ReviewsScreen() {
 		);
 	}, [reviews]);
 
-	// Sort reviews based on current sort option
+	// Sort reviews based on current sort option (backup in case API doesn't support sorting)
 	const sortedReviews = useMemo(() => {
 		const reviewsCopy = [...reviews];
 
 		switch (currentSort) {
 			case 'newest':
 				return reviewsCopy.sort(
-					(a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+					(a, b) =>
+						new Date(b.date || b.created_at).getTime() -
+						new Date(a.date || a.created_at).getTime(),
 				);
 			case 'oldest':
 				return reviewsCopy.sort(
-					(a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+					(a, b) =>
+						new Date(a.date || a.created_at).getTime() -
+						new Date(b.date || b.created_at).getTime(),
 				);
 			case 'highest':
 				return reviewsCopy.sort((a, b) => b.rating - a.rating);
@@ -74,15 +162,50 @@ export default function ReviewsScreen() {
 		router.back();
 	};
 
-	const handleAddReview = (newReview: Omit<Review, 'id' | 'date'>) => {
-		const review: Review = {
-			...newReview,
-			id: Date.now().toString(),
-			date: new Date().toISOString().split('T')[0],
-		};
+	const handleRefresh = () => {
+		setPage(1);
+		setHasMore(true);
+		loadReviews(1, true);
+	};
 
-		setReviews((prev) => [review, ...prev]);
-		setShowAddReviewModal(false);
+	const handleLoadMore = () => {
+		if (hasMore && !loadingMore && !loading) {
+			loadReviews(page + 1);
+		}
+	};
+
+	const handleSortChange = (sort: SortOption) => {
+		if (sort !== currentSort) {
+			setCurrentSort(sort);
+			setPage(1);
+			setHasMore(true);
+		}
+	};
+
+	const handleAddReview = async (
+		newReview: Omit<Review, 'id' | 'date' | 'created_at'>,
+	) => {
+		if (!id) return;
+
+		try {
+			const response = await ReviewService.createReview(id, {
+				rating: newReview.rating,
+				comment: newReview.comment,
+				photos: newReview.photos,
+			});
+
+			if (response.success) {
+				// Add new review to the beginning of the list
+				setReviews((prev) => [response.data, ...prev]);
+				setShowAddReviewModal(false);
+
+				// Show success message
+				Alert.alert(t('validation.success'), t('reviews.reviewAdded'));
+			}
+		} catch (error) {
+			console.error('Error adding review:', error);
+			Alert.alert(t('validation.error'), t('reviews.errorAdding'));
+		}
 	};
 
 	const handleWriteReview = () => {
@@ -121,6 +244,15 @@ export default function ReviewsScreen() {
 
 	const renderSeparator = () => <View style={styles.separator} />;
 
+	const renderFooter = () => {
+		if (!loadingMore) return null;
+		return (
+			<View style={styles.loadingFooter}>
+				<Text style={styles.loadingText}>{t('general.loading')}</Text>
+			</View>
+		);
+	};
+
 	const renderHeader = () => (
 		<View>
 			{/* Reviews Summary */}
@@ -153,7 +285,7 @@ export default function ReviewsScreen() {
 							key={option}
 							label={label}
 							isActive={currentSort === option}
-							onPress={() => setCurrentSort(option)}
+							onPress={() => handleSortChange(option)}
 							icon={icon}
 						/>
 					))}
@@ -183,6 +315,11 @@ export default function ReviewsScreen() {
 		</View>
 	);
 
+	// Show loading screen on initial load
+	if (loading && reviews.length === 0) {
+		return <LoadingScreen />;
+	}
+
 	return (
 		<View style={[styles.container, { paddingTop: insets.top }]}>
 			{/* Header */}
@@ -207,11 +344,22 @@ export default function ReviewsScreen() {
 					renderItem={renderReviewItem}
 					keyExtractor={(item) => item.id}
 					ListHeaderComponent={renderHeader}
+					ListFooterComponent={renderFooter}
 					ItemSeparatorComponent={renderSeparator}
 					onScroll={scrollHandler}
 					scrollEventThrottle={16}
 					showsVerticalScrollIndicator={false}
 					contentContainerStyle={styles.listContent}
+					refreshControl={
+						<RefreshControl
+							refreshing={refreshing}
+							onRefresh={handleRefresh}
+							colors={[colors.primary]}
+							tintColor={colors.primary}
+						/>
+					}
+					onEndReached={handleLoadMore}
+					onEndReachedThreshold={0.1}
 				/>
 			) : (
 				renderEmptyState()
@@ -223,7 +371,7 @@ export default function ReviewsScreen() {
 				onClose={() => setShowAddReviewModal(false)}
 				onSubmit={handleAddReview}
 				restaurant_id={id || ''}
-				restaurant_name="Restaurante Ejemplo"
+				restaurant_name={restaurantName || 'Restaurant'}
 			/>
 		</View>
 	);
@@ -294,6 +442,16 @@ const styles = StyleSheet.create({
 	},
 	separator: {
 		height: 15,
+	},
+	loadingFooter: {
+		paddingVertical: 20,
+		alignItems: 'center',
+	},
+	loadingText: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primaryLight,
 	},
 	emptyState: {
 		flex: 1,

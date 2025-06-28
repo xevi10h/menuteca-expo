@@ -68,6 +68,8 @@ export type Review = {
 	restaurant_id: string;
 	restaurant_name: string;
 	restaurant_image: string;
+	created_at: string;
+	updated_at: string;
 };
 
 export type Restaurant = {
@@ -85,6 +87,7 @@ export type Restaurant = {
 	menus: MenuData[];
 	phone?: string;
 	reservation_link?: string;
+	is_active: boolean;
 };
 
 export type Cuisine = {

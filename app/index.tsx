@@ -1,4 +1,4 @@
-import { allRestaurants } from '@/api/responses';
+import { RestaurantService } from '@/api/services';
 import { colors } from '@/assets/styles/colors';
 import CenterLocationMapButton from '@/components/CenterLocationMapButton';
 import ExpandableMapRestaurantModal from '@/components/ExpandableMapRestaurantModal';
@@ -14,7 +14,7 @@ import ScrollHorizontalResturant from '@/components/list/ScrollHorizontalRestura
 import { Restaurant } from '@/shared/types';
 import { useFilterStore } from '@/zustand/FilterStore';
 import * as Location from 'expo-location';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Image, Platform, ScrollView, Text, View } from 'react-native';
 import MapViewType, { Camera } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -26,6 +26,8 @@ export default function Index() {
 	const [selectedRestaurant, setSelectedRestaurant] =
 		useState<Restaurant | null>(null);
 	const [modalVisible, setModalVisible] = useState(false);
+	const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+	const [loading, setLoading] = useState(true);
 	const mapViewRef = useRef<MapViewType>(null);
 
 	// Get filter state to determine view mode
@@ -40,6 +42,29 @@ export default function Index() {
 		(filters.tags && filters.tags.length > 0) ||
 		filters.timeRange !== null ||
 		filters.distance !== null;
+
+	// Load restaurants data
+	useEffect(() => {
+		const loadRestaurants = async () => {
+			try {
+				setLoading(true);
+				const response = await RestaurantService.getAllRestaurants({
+					page: 1,
+					limit: 100, // Load more restaurants for map
+				});
+
+				if (response.success) {
+					setRestaurants(response.data.data);
+				}
+			} catch (error) {
+				console.error('Error loading restaurants:', error);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		loadRestaurants();
+	}, []);
 
 	const handleMarkerPress = async (restaurant: Restaurant) => {
 		await centerCoordinatesMarker(restaurant);
@@ -220,7 +245,7 @@ export default function Index() {
 							longitudeDelta: 0.0421,
 						}}
 					>
-						{allRestaurants.map((restaurant) => (
+						{restaurants.map((restaurant) => (
 							<Marker
 								key={restaurant.id}
 								coordinate={{

@@ -1,8 +1,4 @@
-import {
-	getUserRestaurantById,
-	getUserRestaurantMenus,
-	getUserRestaurantStatus,
-} from '@/api/responses';
+import { MenuService, RestaurantService } from '@/api/services';
 import { colors } from '@/assets/styles/colors';
 import LoadingScreen from '@/components/LoadingScreen';
 import RestaurantBasicInformation from '@/components/RestaurantBasicInformation';
@@ -72,19 +68,27 @@ export default function UserRestaurantPreview() {
 
 	useEffect(() => {
 		const loadRestaurantData = async () => {
+			if (!restaurant_id) return;
+
 			setLoading(true);
 			try {
-				// Simular delay de carga
-				await new Promise((resolve) => setTimeout(resolve, 500));
+				// Load restaurant data
+				const restaurantResponse = await RestaurantService.getRestaurantById(
+					restaurant_id,
+				);
 
-				if (restaurant_id) {
-					const restaurantData = getUserRestaurantById(restaurant_id);
-					const menusData = getUserRestaurantMenus(restaurant_id);
-					const statusData = getUserRestaurantStatus(restaurant_id);
+				if (restaurantResponse.success) {
+					setRestaurant(restaurantResponse.data);
+					setStatus({ isActive: restaurantResponse.data.is_active || false });
+				}
 
-					setRestaurant(restaurantData || null);
-					setMenus(menusData);
-					setStatus(statusData);
+				// Load restaurant menus
+				const menusResponse = await MenuService.getRestaurantMenus(
+					restaurant_id,
+				);
+
+				if (menusResponse.success) {
+					setMenus(menusResponse.data);
 				}
 			} catch (error) {
 				console.error('Error loading restaurant data:', error);

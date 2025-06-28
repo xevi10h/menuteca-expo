@@ -1,5 +1,6 @@
-import { mockUserReviews } from '@/api/responses';
+import { ReviewService } from '@/api/services';
 import { colors } from '@/assets/styles/colors';
+import LoadingScreen from '@/components/LoadingScreen';
 import SortButton from '@/components/reviews/SortButton';
 import UserReviewItem from '@/components/reviews/UserReviewItem';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -7,10 +8,11 @@ import { Review } from '@/shared/types';
 import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
 	FlatList,
 	Image,
+	RefreshControl,
 	ScrollView,
 	StyleSheet,
 	Text,
@@ -26,9 +28,15 @@ export default function UserReviewsScreen() {
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
 	const user = useUserStore((state) => state.user);
+	const isAuthenticated = useUserStore((state) => state.isAuthenticated);
 
 	const [currentSort, setCurrentSort] = useState<SortOption>('newest');
-	const [reviews] = useState<Review[]>(mockUserReviews);
+	const [reviews, setReviews] = useState<Review[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [refreshing, setRefreshing] = useState(false);
+	const [page, setPage] = useState(1);
+	const [hasMore, setHasMore] = useState(true);
+	const [loadingMore, setLoadingMore] = useState(false);
 
 	// Calculate average rating
 	const averageRating = useMemo(() => {
@@ -38,18 +46,95 @@ export default function UserReviewsScreen() {
 		);
 	}, [reviews]);
 
-	// Ordenar reseñas
+	// Load user reviews
+	const loadReviews = async (pageNumber = 1, isRefresh = false) => {
+		if (!isAuthenticated) return;
+
+		try {
+			if (isRefresh) {
+				setRefreshing(true);
+			} else if (pageNumber === 1) {
+				setLoading(true);
+			} else {
+				setLoadingMore(true);
+			}
+
+			const response = await ReviewService.getMyReviews({
+				page: pageNumber,
+				limit: 10,
+				sortBy: getSortByField(currentSort),
+				sortOrder: getSortOrder(currentSort),
+			});
+
+			if (response.success) {
+				const newReviews = response.data.data;
+
+				if (pageNumber === 1 || isRefresh) {
+					setReviews(newReviews);
+				} else {
+					setReviews((prev) => [...prev, ...newReviews]);
+				}
+
+				setHasMore(response.data.pagination.hasNext);
+				setPage(pageNumber);
+			}
+		} catch (error) {
+			console.error('Error loading reviews:', error);
+		} finally {
+			setLoading(false);
+			setRefreshing(false);
+			setLoadingMore(false);
+		}
+	};
+
+	// Load reviews on component mount and when sort changes
+	useEffect(() => {
+		loadReviews(1);
+	}, [isAuthenticated, currentSort]);
+
+	// Helper functions for sorting
+	const getSortByField = (sort: SortOption): string => {
+		switch (sort) {
+			case 'newest':
+			case 'oldest':
+				return 'created_at';
+			case 'highest':
+			case 'lowest':
+				return 'rating';
+			default:
+				return 'created_at';
+		}
+	};
+
+	const getSortOrder = (sort: SortOption): 'asc' | 'desc' => {
+		switch (sort) {
+			case 'newest':
+			case 'highest':
+				return 'desc';
+			case 'oldest':
+			case 'lowest':
+				return 'asc';
+			default:
+				return 'desc';
+		}
+	};
+
+	// Ordenar reseñas localmente (backup in case API doesn't support sorting)
 	const sortedReviews = useMemo(() => {
 		const reviewsCopy = [...reviews];
 
 		switch (currentSort) {
 			case 'newest':
 				return reviewsCopy.sort(
-					(a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+					(a, b) =>
+						new Date(b.date || b.created_at).getTime() -
+						new Date(a.date || a.created_at).getTime(),
 				);
 			case 'oldest':
 				return reviewsCopy.sort(
-					(a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+					(a, b) =>
+						new Date(a.date || a.created_at).getTime() -
+						new Date(b.date || b.created_at).getTime(),
 				);
 			case 'highest':
 				return reviewsCopy.sort((a, b) => b.rating - a.rating);
@@ -81,6 +166,26 @@ export default function UserReviewsScreen() {
 
 	const handleBack = () => {
 		router.back();
+	};
+
+	const handleRefresh = () => {
+		setPage(1);
+		setHasMore(true);
+		loadReviews(1, true);
+	};
+
+	const handleLoadMore = () => {
+		if (hasMore && !loadingMore && !loading) {
+			loadReviews(page + 1);
+		}
+	};
+
+	const handleSortChange = (sort: SortOption) => {
+		if (sort !== currentSort) {
+			setCurrentSort(sort);
+			setPage(1);
+			setHasMore(true);
+		}
 	};
 
 	const renderUserInfo = () => {
@@ -116,6 +221,15 @@ export default function UserReviewsScreen() {
 		<UserReviewItem review={item} showRestaurantInfo={true} />
 	);
 
+	const renderFooter = () => {
+		if (!loadingMore) return null;
+		return (
+			<View style={styles.loadingFooter}>
+				<Text style={styles.loadingText}>{t('general.loading')}</Text>
+			</View>
+		);
+	};
+
 	const renderHeader = () => (
 		<View style={styles.headerContent}>
 			{/* User Info */}
@@ -150,7 +264,7 @@ export default function UserReviewsScreen() {
 							key={option}
 							label={label}
 							isActive={currentSort === option}
-							onPress={() => setCurrentSort(option)}
+							onPress={() => handleSortChange(option)}
 							icon={icon}
 						/>
 					))}
@@ -173,6 +287,31 @@ export default function UserReviewsScreen() {
 		</View>
 	);
 
+	// Show loading screen on initial load
+	if (loading && reviews.length === 0) {
+		return <LoadingScreen />;
+	}
+
+	// Check if user is authenticated
+	if (!isAuthenticated) {
+		return (
+			<View style={[styles.container, { paddingTop: insets.top }]}>
+				<View style={styles.header}>
+					<TouchableOpacity onPress={handleBack} style={styles.backButton}>
+						<Ionicons name="chevron-back" size={24} color={colors.primary} />
+					</TouchableOpacity>
+					<Text style={styles.headerTitle}>{t('profile.myReviews')}</Text>
+					<View style={styles.headerSpacer} />
+				</View>
+				<View style={styles.notAuthenticatedContainer}>
+					<Text style={styles.notAuthenticatedText}>
+						{t('profile.notAuthenticated')}
+					</Text>
+				</View>
+			</View>
+		);
+	}
+
 	return (
 		<View style={[styles.container, { paddingTop: insets.top }]}>
 			{/* Header */}
@@ -191,9 +330,20 @@ export default function UserReviewsScreen() {
 					renderItem={renderReviewItem}
 					keyExtractor={(item) => item.id}
 					ListHeaderComponent={renderHeader}
+					ListFooterComponent={renderFooter}
 					contentContainerStyle={styles.listContent}
 					showsVerticalScrollIndicator={false}
 					ItemSeparatorComponent={() => <View style={styles.separator} />}
+					refreshControl={
+						<RefreshControl
+							refreshing={refreshing}
+							onRefresh={handleRefresh}
+							colors={[colors.primary]}
+							tintColor={colors.primary}
+						/>
+					}
+					onEndReached={handleLoadMore}
+					onEndReachedThreshold={0.1}
 				/>
 			) : (
 				<>
@@ -338,6 +488,16 @@ const styles = StyleSheet.create({
 	separator: {
 		height: 12,
 	},
+	loadingFooter: {
+		paddingVertical: 20,
+		alignItems: 'center',
+	},
+	loadingText: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primaryLight,
+	},
 	emptyState: {
 		flex: 1,
 		justifyContent: 'center',
@@ -359,5 +519,18 @@ const styles = StyleSheet.create({
 		color: colors.primaryLight,
 		textAlign: 'center',
 		lineHeight: 20,
+	},
+	notAuthenticatedContainer: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingHorizontal: 20,
+	},
+	notAuthenticatedText: {
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		color: colors.primary,
+		textAlign: 'center',
 	},
 });
