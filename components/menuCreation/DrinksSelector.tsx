@@ -29,7 +29,7 @@ export default function DrinksSelector({
 				newDrinks.wine = !newDrinks.wine;
 				break;
 			case DrinkType.SOFT_DRINKS:
-				newDrinks.softDrinks = !newDrinks.softDrinks;
+				newDrinks.soft_drinks = !newDrinks.soft_drinks;
 				break;
 			case DrinkType.BEER:
 				newDrinks.beer = !newDrinks.beer;
@@ -44,7 +44,7 @@ export default function DrinksSelector({
 		onDrinksChange({
 			water: true,
 			wine: true,
-			softDrinks: true,
+			soft_drinks: true,
 			beer: true,
 		});
 	};
@@ -56,7 +56,7 @@ export default function DrinksSelector({
 
 	// Verificar si todas las bebidas están seleccionadas
 	const allSelected =
-		drinks.water && drinks.wine && drinks.softDrinks && drinks.beer;
+		drinks.water && drinks.wine && drinks.soft_drinks && drinks.beer;
 
 	// Verificar si no hay bebidas seleccionadas
 	const noneSelected = !hasDrinks(drinks);
@@ -83,7 +83,7 @@ export default function DrinksSelector({
 			case DrinkType.WINE:
 				return drinks.wine;
 			case DrinkType.SOFT_DRINKS:
-				return drinks.softDrinks;
+				return drinks.soft_drinks;
 			case DrinkType.BEER:
 				return drinks.beer;
 		}
@@ -183,7 +183,7 @@ export default function DrinksSelector({
 				{renderDrinkButton(DrinkType.WINE, 'menuCreation.drinks.wine')}
 				{renderDrinkButton(
 					DrinkType.SOFT_DRINKS,
-					'menuCreation.drinks.softDrinks',
+					'menuCreation.drinks.soft_drinks',
 				)}
 				{renderDrinkButton(DrinkType.BEER, 'menuCreation.drinks.beer')}
 			</View>

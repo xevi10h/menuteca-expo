@@ -217,7 +217,7 @@ export default function AddressSearchInput({
 			return {
 				...addressComponents,
 				coordinates,
-				formattedAddress: result.formatted_address,
+				formatted_address: result.formatted_address,
 			};
 		} catch (error) {
 			console.error('❌ Error getting place details:', error);
@@ -236,8 +236,8 @@ export default function AddressSearchInput({
 		const result: Omit<Address, 'coordinates'> = {
 			street: '',
 			number: '',
-			additionalInformation: '',
-			postalCode: '',
+			additional_information: '',
+			postal_code: '',
 			city: '',
 			country: '',
 		};
@@ -255,11 +255,11 @@ export default function AddressSearchInput({
 			) {
 				result.city = component.long_name;
 			} else if (types.includes('postal_code')) {
-				result.postalCode = component.long_name;
+				result.postal_code = component.long_name;
 			} else if (types.includes('country')) {
 				result.country = component.long_name;
 			} else if (types.includes('subpremise')) {
-				result.additionalInformation = component.long_name;
+				result.additional_information = component.long_name;
 			}
 		});
 
@@ -313,7 +313,9 @@ export default function AddressSearchInput({
 		const addressDetails = await getPlaceDetails(suggestion.placeId);
 
 		if (addressDetails) {
-			setSearchQuery(addressDetails.formattedAddress || suggestion.description);
+			setSearchQuery(
+				addressDetails.formatted_address || suggestion.description,
+			);
 			setSuggestions([]);
 			setShowSuggestions(false);
 			onAddressSelected(addressDetails);
@@ -326,7 +328,7 @@ export default function AddressSearchInput({
 			// Create a basic address from the suggestion
 			const basicAddress: Address = {
 				...createEmptyAddress(),
-				formattedAddress: suggestion.description,
+				formatted_address: suggestion.description,
 			};
 			onAddressSelected(basicAddress);
 		}

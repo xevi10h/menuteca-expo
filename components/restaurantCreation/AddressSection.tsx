@@ -8,19 +8,19 @@ import MapView, { Marker } from 'react-native-maps';
 
 interface AddressSectionProps {
 	address?: Address;
-	restaurantName: string;
+	restaurant_name: string;
 	onEditPress: () => void;
 }
 
 export default function AddressSection({
 	address,
-	restaurantName,
+	restaurant_name,
 	onEditPress,
 }: AddressSectionProps) {
 	const { t } = useTranslation();
 
 	const displayAddress =
-		address?.formattedAddress || t('registerRestaurant.noAddressSelected');
+		address?.formatted_address || t('registerRestaurant.noAddressSelected');
 
 	return (
 		<View>
@@ -44,8 +44,8 @@ export default function AddressSection({
 								latitude: address.coordinates.latitude,
 								longitude: address.coordinates.longitude,
 							}}
-							title={restaurantName}
-							description={address?.formattedAddress}
+							title={restaurant_name}
+							description={address?.formatted_address}
 						/>
 					</MapView>
 					<Text style={styles.addressText}>{displayAddress}</Text>

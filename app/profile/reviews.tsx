@@ -86,7 +86,9 @@ export default function UserReviewsScreen() {
 	const renderUserInfo = () => {
 		const renderProfilePhoto = () => {
 			if (user.photo) {
-				return <Image source={{ uri: user.photo }} style={styles.userAvatar} />;
+				return (
+					<Image source={{ uri: user.photo }} style={styles.user_avatar} />
+				);
 			} else {
 				const initial = user.username
 					? user.username.charAt(0).toUpperCase()
@@ -103,7 +105,7 @@ export default function UserReviewsScreen() {
 			<View style={styles.userInfoContainer}>
 				{renderProfilePhoto()}
 				<View style={styles.userDetails}>
-					<Text style={styles.userName}>{user.name || user.username}</Text>
+					<Text style={styles.user_name}>{user.name || user.username}</Text>
 					<Text style={styles.userEmail}>{user.email}</Text>
 				</View>
 			</View>
@@ -257,7 +259,7 @@ const styles = StyleSheet.create({
 		shadowRadius: 8,
 		elevation: 3,
 	},
-	userAvatar: {
+	user_avatar: {
 		width: 60,
 		height: 60,
 		borderRadius: 30,
@@ -281,7 +283,7 @@ const styles = StyleSheet.create({
 	userDetails: {
 		flex: 1,
 	},
-	userName: {
+	user_name: {
 		fontSize: 18,
 		fontFamily: 'Manrope',
 		fontWeight: '600',

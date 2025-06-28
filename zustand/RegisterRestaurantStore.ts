@@ -13,16 +13,16 @@ export const defaultRegisterRestaurant: Restaurant = {
 	name: '',
 	address: createEmptyAddress(),
 	cuisineId: '',
-	profileImage: undefined,
+	profile_image: undefined,
 	images: [],
 	menus: [],
 	tags: [],
-	minimumPrice: 0,
+	minimum_price: 0,
 	rating: undefined,
-	mainImage: '',
+	main_image: '',
 	distance: 0,
 	phone: '',
-	reservationLink: '',
+	reservation_link: '',
 };
 
 interface RegisterRestaurantValidation {
@@ -42,7 +42,7 @@ interface RegisterRestaurantState {
 	setRegisterRestaurantCuisineId: (cuisineId: string | null) => void;
 	setRegisterRestaurantAddress: (address: Address) => void;
 	setRegisterRestaurantName: (name: string) => void;
-	setRegisterRestaurantProfileImage: (image: string) => void;
+	setRegisterRestaurantprofile_image: (image: string) => void;
 	addRegisterRestaurantImage: (image: string) => void;
 	removeRegisterRestaurantImage: (index: number) => void;
 	addRegisterRestaurantMenu: (menu: MenuData) => void;
@@ -72,8 +72,8 @@ const validateRestaurant = (
 	const hasValidAddress = Boolean(
 		restaurant.address &&
 			// Debe tener al menos una dirección formateada O street + city
-			((restaurant.address.formattedAddress &&
-				restaurant.address.formattedAddress.trim() !== '') ||
+			((restaurant.address.formatted_address &&
+				restaurant.address.formatted_address.trim() !== '') ||
 				(restaurant.address.street &&
 					restaurant.address.street.trim() !== '' &&
 					restaurant.address.city &&
@@ -151,11 +151,11 @@ export const useRegisterRestaurantStore = create<RegisterRestaurantState>(
 			});
 		},
 
-		setRegisterRestaurantProfileImage: (image: string) => {
+		setRegisterRestaurantprofile_image: (image: string) => {
 			set((state) => {
 				const newRestaurant = {
 					...state.registerRestaurant,
-					profileImage: image,
+					profile_image: image,
 				};
 				return {
 					registerRestaurant: newRestaurant,
@@ -271,11 +271,11 @@ export const useRegisterRestaurantStore = create<RegisterRestaurantState>(
 			});
 		},
 
-		setRegisterRestaurantReservationLink: (reservationLink: string) => {
+		setRegisterRestaurantReservationLink: (reservation_link: string) => {
 			set((state) => {
 				const newRestaurant = {
 					...state.registerRestaurant,
-					reservationLink,
+					reservation_link,
 				};
 				return {
 					registerRestaurant: newRestaurant,

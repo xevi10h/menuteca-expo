@@ -41,7 +41,11 @@ export default function DishDescriptionModal({
 	const toggleDietaryOption = (
 		option: keyof Pick<
 			Dish,
-			'isGlutenFree' | 'isLactoseFree' | 'isVegetarian' | 'isSpicy' | 'isVegan'
+			| 'is_gluten_free'
+			| 'is_lactose_free'
+			| 'is_vegetarian'
+			| 'is_spicy'
+			| 'is_vegan'
 		>,
 	) => {
 		if (currentDish) {
@@ -92,20 +96,22 @@ export default function DishDescriptionModal({
 						<TouchableOpacity
 							style={[
 								styles.dietaryOption,
-								currentDish.isGlutenFree && styles.dietaryOptionSelected,
+								currentDish.is_gluten_free && styles.dietaryOptionSelected,
 							]}
-							onPress={() => toggleDietaryOption('isGlutenFree')}
+							onPress={() => toggleDietaryOption('is_gluten_free')}
 						>
 							<GlutenFreeIcon
 								width={20}
 								color={
-									currentDish.isGlutenFree ? colors.quaternary : colors.primary
+									currentDish.is_gluten_free
+										? colors.quaternary
+										: colors.primary
 								}
 							/>
 							<Text
 								style={[
 									styles.dietaryText,
-									currentDish.isGlutenFree && styles.dietaryTextSelected,
+									currentDish.is_gluten_free && styles.dietaryTextSelected,
 								]}
 							>
 								{t('menuCreation.dietary.glutenFree')}
@@ -115,20 +121,22 @@ export default function DishDescriptionModal({
 						<TouchableOpacity
 							style={[
 								styles.dietaryOption,
-								currentDish.isLactoseFree && styles.dietaryOptionSelected,
+								currentDish.is_lactose_free && styles.dietaryOptionSelected,
 							]}
-							onPress={() => toggleDietaryOption('isLactoseFree')}
+							onPress={() => toggleDietaryOption('is_lactose_free')}
 						>
 							<LactoseFreeIcon
 								width={20}
 								color={
-									currentDish.isLactoseFree ? colors.quaternary : colors.primary
+									currentDish.is_lactose_free
+										? colors.quaternary
+										: colors.primary
 								}
 							/>
 							<Text
 								style={[
 									styles.dietaryText,
-									currentDish.isLactoseFree && styles.dietaryTextSelected,
+									currentDish.is_lactose_free && styles.dietaryTextSelected,
 								]}
 							>
 								{t('menuCreation.dietary.lactoseFree')}
@@ -138,18 +146,20 @@ export default function DishDescriptionModal({
 						<TouchableOpacity
 							style={[
 								styles.dietaryOption,
-								currentDish.isSpicy && styles.dietaryOptionSelected,
+								currentDish.is_spicy && styles.dietaryOptionSelected,
 							]}
-							onPress={() => toggleDietaryOption('isSpicy')}
+							onPress={() => toggleDietaryOption('is_spicy')}
 						>
 							<SpicyIcon
 								width={20}
-								color={currentDish.isSpicy ? colors.quaternary : colors.primary}
+								color={
+									currentDish.is_spicy ? colors.quaternary : colors.primary
+								}
 							/>
 							<Text
 								style={[
 									styles.dietaryText,
-									currentDish.isSpicy && styles.dietaryTextSelected,
+									currentDish.is_spicy && styles.dietaryTextSelected,
 								]}
 							>
 								{t('menuCreation.dietary.spicy')}
@@ -158,21 +168,21 @@ export default function DishDescriptionModal({
 						<TouchableOpacity
 							style={[
 								styles.dietaryOption,
-								currentDish.isVegetarian && styles.dietaryOptionSelected,
+								currentDish.is_vegetarian && styles.dietaryOptionSelected,
 							]}
-							onPress={() => toggleDietaryOption('isVegetarian')}
+							onPress={() => toggleDietaryOption('is_vegetarian')}
 						>
 							<Ionicons
 								name="leaf-outline"
 								size={20}
 								color={
-									currentDish.isVegetarian ? colors.quaternary : colors.primary
+									currentDish.is_vegetarian ? colors.quaternary : colors.primary
 								}
 							/>
 							<Text
 								style={[
 									styles.dietaryText,
-									currentDish.isVegetarian && styles.dietaryTextSelected,
+									currentDish.is_vegetarian && styles.dietaryTextSelected,
 								]}
 							>
 								{t('menuCreation.dietary.vegetarian')}
@@ -181,18 +191,20 @@ export default function DishDescriptionModal({
 						<TouchableOpacity
 							style={[
 								styles.dietaryOption,
-								currentDish.isVegan && styles.dietaryOptionSelected,
+								currentDish.is_vegan && styles.dietaryOptionSelected,
 							]}
-							onPress={() => toggleDietaryOption('isVegan')}
+							onPress={() => toggleDietaryOption('is_vegan')}
 						>
 							<VeganIcon
 								width={20}
-								color={currentDish.isVegan ? colors.quaternary : colors.primary}
+								color={
+									currentDish.is_vegan ? colors.quaternary : colors.primary
+								}
 							/>
 							<Text
 								style={[
 									styles.dietaryText,
-									currentDish.isVegan && styles.dietaryTextSelected,
+									currentDish.is_vegan && styles.dietaryTextSelected,
 								]}
 							>
 								{t('menuCreation.dietary.vegan')}

@@ -328,7 +328,7 @@ export default function ExpandableMapRestaurantModal({
 						style={[styles.headerImageContainer, headerImageStyle]}
 					>
 						<Image
-							source={{ uri: restaurant.mainImage }}
+							source={{ uri: restaurant.main_image }}
 							style={[styles.headerImage, { height: 200 + insets.top }]}
 							resizeMode="cover"
 						/>
@@ -485,8 +485,8 @@ export default function ExpandableMapRestaurantModal({
 				visible={showAddReviewModal}
 				onClose={() => setShowAddReviewModal(false)}
 				onSubmit={handleAddReview}
-				restaurantId={restaurant.id}
-				restaurantName={restaurant.name}
+				restaurant_id={restaurant.id}
+				restaurant_name={restaurant.name}
 			/>
 		</View>
 	);

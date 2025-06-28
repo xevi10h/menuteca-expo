@@ -40,8 +40,8 @@ export const applyFiltersToRestaurants = (
 	if (filters.priceRange.min > 0 || filters.priceRange.max < 1000) {
 		filteredRestaurants = filteredRestaurants.filter(
 			(restaurant) =>
-				restaurant.minimumPrice >= filters.priceRange.min &&
-				restaurant.minimumPrice <= filters.priceRange.max,
+				restaurant.minimum_price >= filters.priceRange.min &&
+				restaurant.minimum_price <= filters.priceRange.max,
 		);
 	}
 
@@ -68,8 +68,8 @@ export const applyFiltersToRestaurants = (
 		filteredRestaurants = filteredRestaurants.filter((restaurant) =>
 			restaurant.menus.some((menu) => {
 				// Verificar si el menú está disponible en el rango de tiempo especificado
-				const menuStart = timeStringToMinutes(menu.startTime);
-				const menuEnd = timeStringToMinutes(menu.endTime);
+				const menuStart = timeStringToMinutes(menu.start_time);
+				const menuEnd = timeStringToMinutes(menu.end_time);
 				const filterStart = timeStringToMinutes(start);
 				const filterEnd = timeStringToMinutes(end);
 
@@ -119,7 +119,7 @@ const sortRestaurants = (
 
 		switch (orderBy) {
 			case 'price':
-				comparison = a.minimumPrice - b.minimumPrice;
+				comparison = a.minimum_price - b.minimum_price;
 				break;
 			case 'distance':
 				comparison = a.distance - b.distance;
@@ -160,7 +160,7 @@ const calculateRecommendationScore = (restaurant: Restaurant): number => {
 	const maxPrice = 100; // €
 	const priceScore = Math.max(
 		0,
-		(maxPrice - restaurant.minimumPrice) / maxPrice,
+		(maxPrice - restaurant.minimum_price) / maxPrice,
 	);
 
 	const totalScore =

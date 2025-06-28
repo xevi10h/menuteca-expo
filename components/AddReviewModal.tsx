@@ -25,8 +25,8 @@ interface AddReviewModalProps {
 	visible: boolean;
 	onClose: () => void;
 	onSubmit: (review: Omit<Review, 'id' | 'date'>) => void;
-	restaurantId: string;
-	restaurantName: string;
+	restaurant_id: string;
+	restaurant_name: string;
 }
 
 interface StarRatingInputProps {
@@ -88,8 +88,8 @@ export default function AddReviewModal({
 	visible,
 	onClose,
 	onSubmit,
-	restaurantId,
-	restaurantName,
+	restaurant_id,
+	restaurant_name,
 }: AddReviewModalProps) {
 	const { t } = useTranslation();
 	const insets = useSafeAreaInsets();
@@ -154,15 +154,15 @@ export default function AddReviewModal({
 			await new Promise((resolve) => setTimeout(resolve, 1500));
 
 			const newReview: Omit<Review, 'id' | 'date'> = {
-				userId: 'current_user',
-				userName: 'Tu Usuario',
-				userAvatar: 'https://randomuser.me/api/portraits/men/10.jpg',
+				user_id: 'current_user',
+				user_name: 'Tu Usuario',
+				user_avatar: 'https://randomuser.me/api/portraits/men/10.jpg',
 				rating,
 				comment: comment.trim() || '', // Permitir comentarios vacíos
 				photos,
-				restaurantId,
-				restaurantName,
-				restaurantImage: 'https://example.com/restaurant.jpg',
+				restaurant_id,
+				restaurant_name,
+				restaurant_image: 'https://example.com/restaurant.jpg',
 			};
 
 			onSubmit(newReview);
@@ -208,7 +208,7 @@ export default function AddReviewModal({
 							<Ionicons name="restaurant" size={24} color={colors.primary} />
 						</View>
 						<View style={styles.restaurantInfo}>
-							<Text style={styles.restaurantName}>{restaurantName}</Text>
+							<Text style={styles.restaurant_name}>{restaurant_name}</Text>
 							<Text style={styles.reviewPrompt}>
 								{t('reviews.writeComment')}
 							</Text>
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
 	restaurantInfo: {
 		flex: 1,
 	},
-	restaurantName: {
+	restaurant_name: {
 		fontSize: 18,
 		fontFamily: 'Manrope',
 		fontWeight: '700',

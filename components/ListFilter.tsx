@@ -83,8 +83,8 @@ export default function ListFilter() {
 	// Time picker states
 	const [showStartTimePicker, setShowStartTimePicker] = useState(false);
 	const [showEndTimePicker, setShowEndTimePicker] = useState(false);
-	const [startTime, setStartTime] = useState(new Date());
-	const [endTime, setEndTime] = useState(new Date());
+	const [start_time, setStartTime] = useState(new Date());
+	const [end_time, setEndTime] = useState(new Date());
 
 	// Check if specific filter types are active (excluding sort and cuisines)
 	const hasPriceFilter =
@@ -175,8 +175,8 @@ export default function ListFilter() {
 	};
 
 	const applyScheduleFilter = () => {
-		const startTimeStr = formatTimeFromDate(startTime);
-		const endTimeStr = formatTimeFromDate(endTime);
+		const startTimeStr = formatTimeFromDate(start_time);
+		const endTimeStr = formatTimeFromDate(end_time);
 
 		setTimeRange({ start: startTimeStr, end: endTimeStr });
 		closeModal();
@@ -614,7 +614,7 @@ export default function ListFilter() {
 									onPress={() => setShowStartTimePicker(true)}
 								>
 									<Text style={styles.timePickerText}>
-										{formatTimeFromDate(startTime)}
+										{formatTimeFromDate(start_time)}
 									</Text>
 									<Ionicons
 										name="time-outline"
@@ -633,7 +633,7 @@ export default function ListFilter() {
 									onPress={() => setShowEndTimePicker(true)}
 								>
 									<Text style={styles.timePickerText}>
-										{formatTimeFromDate(endTime)}
+										{formatTimeFromDate(end_time)}
 									</Text>
 									<Ionicons
 										name="time-outline"
@@ -648,7 +648,7 @@ export default function ListFilter() {
 						{showStartTimePicker && (
 							<View style={styles.timePickerContainer}>
 								<DateTimePicker
-									value={startTime}
+									value={start_time}
 									mode="time"
 									is24Hour={true}
 									display={Platform.OS === 'ios' ? 'spinner' : 'default'}
@@ -672,7 +672,7 @@ export default function ListFilter() {
 						{showEndTimePicker && (
 							<View style={styles.timePickerContainer}>
 								<DateTimePicker
-									value={endTime}
+									value={end_time}
 									mode="time"
 									is24Hour={true}
 									display={Platform.OS === 'ios' ? 'spinner' : 'default'}

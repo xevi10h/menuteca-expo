@@ -6,12 +6,12 @@ export type User = {
 	id: string;
 	email: string;
 	username: string;
-	createdAt: string;
+	created_at: string;
 	name: string;
 	photo: string;
-	googleId: string;
+	google_id: string;
 	token: string;
-	hasPassword: boolean;
+	has_password: boolean;
 	language: Language;
 };
 
@@ -19,72 +19,72 @@ export type UserRestaurant = {
 	id: string;
 	name: string;
 	address: string;
-	profileImage?: string;
+	profile_image?: string;
 	phone?: string;
-	cuisineType?: string;
-	userId: string;
-	createdAt: string;
-	updatedAt: string;
+	cuisine_type?: string;
+	user_id: string;
+	created_at: string;
+	updated_at: string;
 };
 
 export type UserReview = {
 	id: string;
-	restaurantId: string;
-	restaurantName: string;
-	userId: string;
+	restaurant_id: string;
+	restaurant_name: string;
+	user_id: string;
 	rating: number;
 	comment: string;
-	createdAt: string;
-	updatedAt: string;
+	created_at: string;
+	updated_at: string;
 };
 
 export type Address = {
 	street: string;
 	number: string;
-	additionalInformation: string; // Pis/Porta, etc.
-	postalCode: string;
+	additional_information: string; // Pis/Porta, etc.
+	postal_code: string;
 	city: string;
 	country: string;
 	coordinates: {
 		latitude: number;
 		longitude: number;
 	};
-	formattedAddress?: string; // Human readable full address
+	formatted_address?: string; // Human readable full address
 };
 
 export type Review = {
 	id: string;
-	userId: string;
-	userName: string;
-	userAvatar: string;
+	user_id: string;
+	user_name: string;
+	user_avatar: string;
 	rating: number; // 1-5
 	comment: string;
 	date: string; // ISO date string
 	photos: string[]; // Array of image URLs
-	restaurantResponse?: {
+	restaurant_response?: {
 		message: string;
 		date: string; // ISO date string
 	};
-	restaurantId: string;
-	restaurantName: string;
-	restaurantImage: string;
+	restaurant_id: string;
+	restaurant_name: string;
+	restaurant_image: string;
 };
 
 export type Restaurant = {
 	id: string;
 	name: string;
-	minimumPrice: number;
+	minimum_price: number;
 	cuisineId: string;
 	rating?: number;
-	mainImage: string;
-	profileImage?: string;
+	main_image: string;
+	profile_image?: string;
 	images: string[];
 	distance: number;
 	address: Address;
 	tags?: RestaurantTag[];
 	menus: MenuData[];
 	phone?: string;
-	reservationLink?: string;
+	reservation_link?: string;
 };
 
 export type Cuisine = {
@@ -108,17 +108,17 @@ export type MenuItem = {
 	description: string;
 	extraPrice?: number;
 	category: string;
-	isVegetarian?: boolean;
-	isVegan?: boolean;
-	isGlutenFree?: boolean;
-	isLactoseFree?: boolean;
-	isSpicy?: boolean;
+	is_vegetarian?: boolean;
+	is_vegan?: boolean;
+	is_gluten_free?: boolean;
+	is_lactose_free?: boolean;
+	is_spicy?: boolean;
 };
 
 export interface DrinkInclusion {
 	water: boolean;
 	wine: boolean;
-	softDrinks: boolean;
+	soft_drinks: boolean;
 	beer: boolean;
 }
 
@@ -126,18 +126,18 @@ export type MenuData = {
 	id: string;
 	name: string;
 	days: string[];
-	startTime: string;
-	endTime: string;
+	start_time: string;
+	end_time: string;
 	price: number;
 	dishes: Dish[];
-	firstCoursesToShare?: boolean;
-	secondCoursesToShare?: boolean;
-	dessertsToShare?: boolean;
-	includesBread?: boolean;
+	first_courses_to_share?: boolean;
+	second_courses_to_share?: boolean;
+	desserts_to_share?: boolean;
+	includes_bread?: boolean;
 	drinks?: DrinkInclusion;
-	includesCoffeeAndDessert?: 'none' | 'coffee' | 'dessert' | 'both';
-	minimumPeople?: number;
-	hasMinimumPeople?: boolean;
+	includes_coffee_and_dessert?: 'none' | 'coffee' | 'dessert' | 'both';
+	minimum_people?: number;
+	has_minimum_people?: boolean;
 };
 
 export type Dish = {
@@ -145,18 +145,18 @@ export type Dish = {
 	name: string;
 	description: string;
 	extraPrice: number;
-	isVegetarian: boolean;
-	isLactoseFree: boolean;
-	isSpicy: boolean;
-	isGlutenFree: boolean;
-	isVegan: boolean;
+	is_vegetarian: boolean;
+	is_lactose_free: boolean;
+	is_spicy: boolean;
+	is_gluten_free: boolean;
+	is_vegan: boolean;
 	category: DishCategory;
 };
 
 // Utility functions for Address handling
 export const formatAddress = (address: Address): string => {
-	if (address.formattedAddress) {
-		return address.formattedAddress;
+	if (address.formatted_address) {
+		return address.formatted_address;
 	}
 
 	const parts: string[] = [];
@@ -167,16 +167,16 @@ export const formatAddress = (address: Address): string => {
 		if (address.number) {
 			streetPart += ` ${address.number}`;
 		}
-		if (address.additionalInformation) {
-			streetPart += `, ${address.additionalInformation}`;
+		if (address.additional_information) {
+			streetPart += `, ${address.additional_information}`;
 		}
 		parts.push(streetPart);
 	}
 
 	// City and postal code
 	if (address.city) {
-		if (address.postalCode) {
-			parts.push(`${address.postalCode} ${address.city}`);
+		if (address.postal_code) {
+			parts.push(`${address.postal_code} ${address.city}`);
 		} else {
 			parts.push(address.city);
 		}
@@ -211,8 +211,8 @@ export const getShortAddress = (address: Address): string => {
 export const createEmptyAddress = (): Address => ({
 	street: '',
 	number: '',
-	additionalInformation: '',
-	postalCode: '',
+	additional_information: '',
+	postal_code: '',
 	city: '',
 	country: '',
 	coordinates: {
@@ -246,14 +246,14 @@ export const parseStringToAddress = (
 
 	// Extract city and postal code
 	let city = '';
-	let postalCode = '';
+	let postal_code = '';
 	let country = 'España'; // Default
 
 	if (parts.length > 1) {
 		// Look for postal code pattern (5 digits)
 		const postalMatch = parts.find((part) => /^\d{5}$/.test(part.trim()));
 		if (postalMatch) {
-			postalCode = postalMatch.trim();
+			postal_code = postalMatch.trim();
 		}
 
 		// Get city (usually after street, before or with postal code)
@@ -274,12 +274,12 @@ export const parseStringToAddress = (
 	return {
 		street,
 		number,
-		additionalInformation: additionalInfo,
-		postalCode,
+		additional_information: additionalInfo,
+		postal_code,
 		city,
 		country,
 		coordinates: coordinates || { latitude: 0, longitude: 0 },
-		formattedAddress: addressString,
+		formatted_address: addressString,
 	};
 };
 
@@ -289,14 +289,14 @@ export const parseStringToAddress = (
 export const createEmptyDrinks = (): DrinkInclusion => ({
 	water: false,
 	wine: false,
-	softDrinks: false,
+	soft_drinks: false,
 	beer: false,
 });
 
 // Verificar si incluye alguna bebida
 export const hasDrinks = (drinks?: DrinkInclusion): boolean => {
 	if (!drinks) return false;
-	return drinks.water || drinks.wine || drinks.softDrinks || drinks.beer;
+	return drinks.water || drinks.wine || drinks.soft_drinks || drinks.beer;
 };
 
 // Obtener bebidas seleccionadas como array
@@ -306,7 +306,7 @@ export const getSelectedDrinks = (drinks?: DrinkInclusion): DrinkType[] => {
 
 	if (drinks.water) selected.push(DrinkType.WATER);
 	if (drinks.wine) selected.push(DrinkType.WINE);
-	if (drinks.softDrinks) selected.push(DrinkType.SOFT_DRINKS);
+	if (drinks.soft_drinks) selected.push(DrinkType.SOFT_DRINKS);
 	if (drinks.beer) selected.push(DrinkType.BEER);
 
 	return selected;
@@ -319,7 +319,7 @@ export const createDrinksFromArray = (
 	return {
 		water: drinkTypes.includes(DrinkType.WATER),
 		wine: drinkTypes.includes(DrinkType.WINE),
-		softDrinks: drinkTypes.includes(DrinkType.SOFT_DRINKS),
+		soft_drinks: drinkTypes.includes(DrinkType.SOFT_DRINKS),
 		beer: drinkTypes.includes(DrinkType.BEER),
 	};
 };

@@ -55,7 +55,7 @@ export default function CuisineSelectionModal({
 				/>
 				<View style={styles.modalContent}>
 					<Text style={styles.label}>
-						{t('registerRestaurant.cuisineTypesSubtitle')}
+						{t('registerRestaurant.cuisine_typesSubtitle')}
 					</Text>
 					<View style={styles.cuisineGrid}>
 						{allCuisines.map((cuisine) => (

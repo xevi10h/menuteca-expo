@@ -6,7 +6,7 @@ import { StyleSheet, Text, TextInput, View } from 'react-native';
 
 interface ContactInfoSectionProps {
 	phone: string;
-	reservationLink: string;
+	reservation_link: string;
 	onPhoneChange: (phone: string) => void;
 	onReservationLinkChange: (link: string) => void;
 	showTitle?: boolean;
@@ -14,7 +14,7 @@ interface ContactInfoSectionProps {
 
 export default function ContactInfoSection({
 	phone,
-	reservationLink,
+	reservation_link,
 	onPhoneChange,
 	onReservationLinkChange,
 	showTitle = false,
@@ -53,7 +53,7 @@ export default function ContactInfoSection({
 				<View style={styles.labelContainer}>
 					<Ionicons name="calendar-outline" size={16} color={colors.primary} />
 					<Text style={styles.label}>
-						{t('registerRestaurant.reservationLink')}
+						{t('registerRestaurant.reservation_link')}
 					</Text>
 				</View>
 				<Text style={styles.subtitle}>
@@ -63,7 +63,7 @@ export default function ContactInfoSection({
 					style={styles.input}
 					placeholder={t('registerRestaurant.reservationLinkPlaceholder')}
 					placeholderTextColor={colors.primaryLight}
-					value={reservationLink}
+					value={reservation_link}
 					onChangeText={onReservationLinkChange}
 					keyboardType="url"
 					autoCapitalize="none"

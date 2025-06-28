@@ -35,7 +35,7 @@ export default function CuisineSelectionSection({
 				</View>
 			)}
 			<Text style={styles.sectionSubtitle}>
-				{t('registerRestaurant.cuisineTypes')}
+				{t('registerRestaurant.cuisine_types')}
 			</Text>
 
 			<View style={styles.selectedCuisine}>

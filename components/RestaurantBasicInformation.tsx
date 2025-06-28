@@ -20,9 +20,9 @@ export default function RestaurantBasicInformation({
 	return (
 		<View style={styles.headerInfo}>
 			<View style={styles.restaurantIcon}>
-				{restaurant.profileImage ? (
+				{restaurant.profile_image ? (
 					<Image
-						src={restaurant.profileImage}
+						src={restaurant.profile_image}
 						style={{ width: '100%', height: '100%', borderRadius: 30 }}
 						resizeMode="cover"
 					/>
@@ -39,7 +39,7 @@ export default function RestaurantBasicInformation({
 			<View style={styles.restaurantDetails}>
 				<View style={{ flex: 1, width: '50%' }}>
 					<Text
-						style={[styles.restaurantName, { color: colorToUse }]}
+						style={[styles.restaurant_name, { color: colorToUse }]}
 						numberOfLines={2}
 					>
 						{restaurant.name}
@@ -78,7 +78,7 @@ export default function RestaurantBasicInformation({
 							{t('general.from')}
 						</Text>
 						<Text style={[styles.priceText, { color: colorToUse }]}>
-							{restaurant.minimumPrice}€
+							{restaurant.minimum_price}€
 						</Text>
 					</View>
 				</View>
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		gap: 20,
 	},
-	restaurantName: {
+	restaurant_name: {
 		fontSize: 20,
 		fontFamily: 'Manrope',
 		fontWeight: '700',

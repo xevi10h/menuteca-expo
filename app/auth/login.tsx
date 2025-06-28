@@ -1,11 +1,11 @@
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
-import { Language } from '@/shared/types';
 import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
+	ActivityIndicator,
 	Alert,
 	KeyboardAvoidingView,
 	Platform,
@@ -16,75 +16,73 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function LoginScreen() {
 	const { t } = useTranslation();
-	const [isLogin, setIsLogin] = useState(true);
+	const router = useRouter();
+	const login = useUserStore((state) => state.login);
+	const isLoading = useUserStore((state) => state.isLoading);
+	const error = useUserStore((state) => state.error);
+
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
-	const [username, setUsername] = useState('');
-	const [name, setName] = useState('');
-	const [loading, setLoading] = useState(false);
-	const setUser = useUserStore((state) => state.setUser);
-	const insets = useSafeAreaInsets();
+	const [showPassword, setShowPassword] = useState(false);
+	const [emailError, setEmailError] = useState('');
+	const [passwordError, setPasswordError] = useState('');
 
-	const handleAuth = async () => {
-		if (!email || !password) {
-			Alert.alert(t('validation.error'), t('validation.completeAllFields'));
-			return;
+	const validateEmail = (email: string) => {
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		return emailRegex.test(email);
+	};
+
+	const handleLogin = async () => {
+		// Reset errors
+		setEmailError('');
+		setPasswordError('');
+
+		// Validate inputs
+		let hasErrors = false;
+
+		if (!email.trim()) {
+			setEmailError(t('validation.emailRequired'));
+			hasErrors = true;
+		} else if (!validateEmail(email)) {
+			setEmailError(t('validation.emailInvalid'));
+			hasErrors = true;
 		}
 
-		if (!isLogin && (!username || !name)) {
-			Alert.alert(t('validation.error'), t('validation.completeAllFields'));
-			return;
+		if (!password.trim()) {
+			setPasswordError(t('validation.passwordRequired'));
+			hasErrors = true;
 		}
 
-		setLoading(true);
+		if (hasErrors) return;
 
 		try {
-			// Aquí iría la lógica real de autenticación
-			// Por ahora simulamos una respuesta exitosa
-			await new Promise((resolve) => setTimeout(resolve, 1000));
+			const success = await login(email.trim(), password);
 
-			if (isLogin) {
-				// Simular login exitoso
-				const userData = {
-					id: '123',
-					email,
-					username: email.split('@')[0],
-					name: 'Usuario Test',
-					token: 'fake-jwt-token',
-					photo: '',
-					googleId: '',
-					hasPassword: true,
-					language: 'es_ES' as Language,
-					createdAt: new Date().toISOString(),
-				};
-				setUser(userData);
+			if (success) {
+				// Navigation will be handled by the authentication state change
+				router.replace('/');
 			} else {
-				// Simular registro exitoso
-				const userData = {
-					id: '123',
-					email,
-					username,
-					name,
-					token: 'fake-jwt-token',
-					photo: '',
-					googleId: '',
-					hasPassword: true,
-					language: 'es_ES' as Language,
-					createdAt: new Date().toISOString(),
-				};
-				setUser(userData);
+				// Error is handled by the store
+				if (error) {
+					Alert.alert(t('auth.loginError'), error);
+				}
 			}
-
-			router.replace('/profile');
-		} catch (error) {
-			Alert.alert(t('validation.error'), t('auth.errorOccurred'));
-		} finally {
-			setLoading(false);
+		} catch (err) {
+			Alert.alert(t('auth.loginError'), t('auth.loginFailed'));
 		}
+	};
+
+	const handleForgotPassword = () => {
+		// TODO: Implement forgot password
+		Alert.alert(t('auth.forgotPassword'), t('auth.forgotPasswordMessage'));
+	};
+
+	const handleGoToRegister = () => {
+		// router.push('/auth/register');
 	};
 
 	const handleBack = () => {
@@ -92,106 +90,128 @@ export default function LoginScreen() {
 	};
 
 	return (
-		<KeyboardAvoidingView
-			style={[styles.container, { paddingTop: insets.top }]}
-			behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-		>
-			<View style={styles.header}>
-				<TouchableOpacity onPress={handleBack} style={styles.backButton}>
-					<Ionicons name="arrow-back" size={24} color={colors.primary} />
-				</TouchableOpacity>
-				<Text style={styles.headerTitle}>
-					{isLogin ? t('auth.login') : t('auth.register')}
-				</Text>
-				<View style={styles.placeholder} />
-			</View>
-
-			<ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-				<View style={styles.form}>
-					<Text style={styles.title}>
-						{isLogin ? t('auth.welcomeBack') : t('auth.createAccount')}
-					</Text>
-					<Text style={styles.subtitle}>
-						{isLogin ? t('auth.loginSubtitle') : t('auth.registerSubtitle')}
-					</Text>
-
-					{!isLogin && (
-						<>
-							<View style={styles.inputContainer}>
-								<Text style={styles.label}>{t('auth.fullName')}</Text>
-								<TextInput
-									style={styles.input}
-									value={name}
-									onChangeText={setName}
-									placeholder={t('auth.enterFullName')}
-									placeholderTextColor={colors.primaryLight}
-								/>
-							</View>
-
-							<View style={styles.inputContainer}>
-								<Text style={styles.label}>{t('auth.username')}</Text>
-								<TextInput
-									style={styles.input}
-									value={username}
-									onChangeText={setUsername}
-									placeholder={t('auth.enterUsername')}
-									placeholderTextColor={colors.primaryLight}
-									autoCapitalize="none"
-								/>
-							</View>
-						</>
-					)}
-
-					<View style={styles.inputContainer}>
-						<Text style={styles.label}>{t('auth.email')}</Text>
-						<TextInput
-							style={styles.input}
-							value={email}
-							onChangeText={setEmail}
-							placeholder={t('auth.enterEmail')}
-							placeholderTextColor={colors.primaryLight}
-							keyboardType="email-address"
-							autoCapitalize="none"
-						/>
+		<SafeAreaView style={styles.container}>
+			<KeyboardAvoidingView
+				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+				style={styles.keyboardView}
+			>
+				<ScrollView contentContainerStyle={styles.scrollContent}>
+					{/* Header */}
+					<View style={styles.header}>
+						<TouchableOpacity onPress={handleBack} style={styles.backButton}>
+							<Ionicons name="chevron-back" size={24} color={colors.primary} />
+						</TouchableOpacity>
+						<Text style={styles.headerTitle}>{t('auth.login')}</Text>
 					</View>
 
-					<View style={styles.inputContainer}>
-						<Text style={styles.label}>{t('auth.password')}</Text>
-						<TextInput
-							style={styles.input}
-							value={password}
-							onChangeText={setPassword}
-							placeholder={t('auth.enterPassword')}
-							placeholderTextColor={colors.primaryLight}
-							secureTextEntry
-						/>
+					{/* Logo */}
+					<View style={styles.logoContainer}>
+						<Text style={styles.logoText}>🍽️</Text>
+						<Text style={styles.appName}>Menuteca</Text>
+						<Text style={styles.subtitle}>{t('auth.welcomeBack')}</Text>
 					</View>
 
-					<TouchableOpacity
-						style={[styles.authButton, loading && styles.authButtonDisabled]}
-						onPress={handleAuth}
-						disabled={loading}
-					>
-						<Text style={styles.authButtonText}>
-							{loading
-								? t('auth.processing')
-								: isLogin
-								? t('auth.login')
-								: t('auth.register')}
-						</Text>
-					</TouchableOpacity>
+					{/* Form */}
+					<View style={styles.form}>
+						{/* Email Input */}
+						<View style={styles.inputContainer}>
+							<Text style={styles.inputLabel}>{t('auth.email')}</Text>
+							<TextInput
+								style={[styles.input, emailError ? styles.inputError : null]}
+								value={email}
+								onChangeText={(text) => {
+									setEmail(text);
+									if (emailError) setEmailError('');
+								}}
+								placeholder={t('auth.emailPlaceholder')}
+								placeholderTextColor={colors.primaryLight}
+								keyboardType="email-address"
+								autoCapitalize="none"
+								autoCorrect={false}
+								editable={!isLoading}
+							/>
+							{emailError ? (
+								<Text style={styles.errorText}>{emailError}</Text>
+							) : null}
+						</View>
 
-					<TouchableOpacity
-						style={styles.switchModeButton}
-						onPress={() => setIsLogin(!isLogin)}
-					>
-						<Text style={styles.switchModeText}>
-							{isLogin ? t('auth.noAccount') : t('auth.hasAccount')}
-						</Text>
-					</TouchableOpacity>
-				</View>
-			</ScrollView>
-		</KeyboardAvoidingView>
+						{/* Password Input */}
+						<View style={styles.inputContainer}>
+							<Text style={styles.inputLabel}>{t('auth.password')}</Text>
+							<View style={styles.passwordContainer}>
+								<TextInput
+									style={[
+										styles.passwordInput,
+										passwordError ? styles.inputError : null,
+									]}
+									value={password}
+									onChangeText={(text) => {
+										setPassword(text);
+										if (passwordError) setPasswordError('');
+									}}
+									placeholder={t('auth.passwordPlaceholder')}
+									placeholderTextColor={colors.primaryLight}
+									secureTextEntry={!showPassword}
+									editable={!isLoading}
+								/>
+								<TouchableOpacity
+									style={styles.eyeButton}
+									onPress={() => setShowPassword(!showPassword)}
+									disabled={isLoading}
+								>
+									<Ionicons
+										name={showPassword ? 'eye-off' : 'eye'}
+										size={20}
+										color={colors.primaryLight}
+									/>
+								</TouchableOpacity>
+							</View>
+							{passwordError ? (
+								<Text style={styles.errorText}>{passwordError}</Text>
+							) : null}
+						</View>
+
+						{/* Forgot Password */}
+						<TouchableOpacity
+							style={styles.forgotPasswordButton}
+							onPress={handleForgotPassword}
+							disabled={isLoading}
+						>
+							<Text style={styles.forgotPasswordText}>
+								{t('auth.forgotPassword')}
+							</Text>
+						</TouchableOpacity>
+
+						{/* Login Button */}
+						<TouchableOpacity
+							style={[
+								styles.loginButton,
+								isLoading && styles.loginButtonDisabled,
+							]}
+							onPress={handleLogin}
+							disabled={isLoading}
+						>
+							{isLoading ? (
+								<ActivityIndicator size="small" color={colors.quaternary} />
+							) : (
+								<Text style={styles.loginButtonText}>{t('auth.login')}</Text>
+							)}
+						</TouchableOpacity>
+
+						{/* Register Link */}
+						<View style={styles.registerContainer}>
+							<Text style={styles.registerText}>{t('auth.noAccount')}</Text>
+							<TouchableOpacity
+								onPress={handleGoToRegister}
+								disabled={isLoading}
+							>
+								<Text style={styles.registerLink}>{t('auth.register')}</Text>
+							</TouchableOpacity>
+						</View>
+					</View>
+				</ScrollView>
+			</KeyboardAvoidingView>
+		</SafeAreaView>
 	);
 }
 
@@ -200,14 +220,17 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: colors.secondary,
 	},
+	keyboardView: {
+		flex: 1,
+	},
+	scrollContent: {
+		flexGrow: 1,
+	},
 	header: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		justifyContent: 'space-between',
 		paddingHorizontal: 20,
 		paddingVertical: 15,
-		borderBottomWidth: 1,
-		borderBottomColor: colors.primaryLight,
 	},
 	backButton: {
 		width: 40,
@@ -220,24 +243,21 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.primary,
+		marginLeft: 10,
 	},
-	placeholder: {
-		width: 40,
+	logoContainer: {
+		alignItems: 'center',
+		paddingVertical: 40,
 	},
-	content: {
-		flex: 1,
-		paddingHorizontal: 20,
+	logoText: {
+		fontSize: 60,
+		marginBottom: 10,
 	},
-	form: {
-		paddingTop: 40,
-		paddingBottom: 40,
-	},
-	title: {
-		fontSize: 28,
+	appName: {
+		fontSize: 32,
 		fontFamily: 'Manrope',
 		fontWeight: '700',
 		color: colors.primary,
-		textAlign: 'center',
 		marginBottom: 10,
 	},
 	subtitle: {
@@ -246,13 +266,16 @@ const styles = StyleSheet.create({
 		fontWeight: '400',
 		color: colors.primaryLight,
 		textAlign: 'center',
-		marginBottom: 40,
-		lineHeight: 22,
+	},
+	form: {
+		flex: 1,
+		paddingHorizontal: 20,
+		paddingTop: 20,
 	},
 	inputContainer: {
 		marginBottom: 20,
 	},
-	label: {
+	inputLabel: {
 		fontSize: 14,
 		fontFamily: 'Manrope',
 		fontWeight: '500',
@@ -263,38 +286,85 @@ const styles = StyleSheet.create({
 		backgroundColor: colors.quaternary,
 		borderRadius: 12,
 		paddingHorizontal: 16,
-		paddingVertical: 15,
+		paddingVertical: 14,
 		fontSize: 16,
 		fontFamily: 'Manrope',
 		color: colors.primary,
 		borderWidth: 1,
 		borderColor: colors.primaryLight,
 	},
-	authButton: {
+	inputError: {
+		borderColor: '#D32F2F',
+	},
+	passwordContainer: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		backgroundColor: colors.quaternary,
+		borderRadius: 12,
+		borderWidth: 1,
+		borderColor: colors.primaryLight,
+	},
+	passwordInput: {
+		flex: 1,
+		paddingHorizontal: 16,
+		paddingVertical: 14,
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		color: colors.primary,
+	},
+	eyeButton: {
+		paddingHorizontal: 16,
+		paddingVertical: 14,
+	},
+	errorText: {
+		fontSize: 12,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: '#D32F2F',
+		marginTop: 4,
+	},
+	forgotPasswordButton: {
+		alignSelf: 'flex-end',
+		marginBottom: 30,
+	},
+	forgotPasswordText: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		color: colors.primary,
+	},
+	loginButton: {
 		backgroundColor: colors.primary,
 		borderRadius: 12,
 		paddingVertical: 16,
 		alignItems: 'center',
-		marginTop: 20,
-		marginBottom: 20,
+		marginBottom: 30,
 	},
-	authButtonDisabled: {
+	loginButtonDisabled: {
 		opacity: 0.6,
 	},
-	authButtonText: {
+	loginButtonText: {
 		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.quaternary,
 	},
-	switchModeButton: {
+	registerContainer: {
+		flexDirection: 'row',
+		justifyContent: 'center',
 		alignItems: 'center',
-		paddingVertical: 12,
+		gap: 8,
 	},
-	switchModeText: {
+	registerText: {
 		fontSize: 14,
 		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontWeight: '400',
+		color: colors.primaryLight,
+	},
+	registerLink: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
 		color: colors.primary,
 	},
 });

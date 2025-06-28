@@ -47,9 +47,9 @@ const Information: React.FC<InformationProps> = ({
 		}
 	};
 
-	const handleMakeReservation = (reservationLink: string) => {
-		if (reservationLink) {
-			Linking.openURL(reservationLink);
+	const handleMakeReservation = (reservation_link: string) => {
+		if (reservation_link) {
+			Linking.openURL(reservation_link);
 		}
 	};
 
@@ -73,7 +73,7 @@ const Information: React.FC<InformationProps> = ({
 	return (
 		<>
 			{/* Contact Information */}
-			{(restaurant.phone || restaurant.reservationLink) && (
+			{(restaurant.phone || restaurant.reservation_link) && (
 				<View style={styles.contactContainer}>
 					{restaurant.phone && (
 						<TouchableOpacity
@@ -87,10 +87,12 @@ const Information: React.FC<InformationProps> = ({
 						</TouchableOpacity>
 					)}
 
-					{restaurant.reservationLink && (
+					{restaurant.reservation_link && (
 						<TouchableOpacity
 							style={styles.contactButton}
-							onPress={() => handleMakeReservation(restaurant.reservationLink!)}
+							onPress={() =>
+								handleMakeReservation(restaurant.reservation_link!)
+							}
 						>
 							<Ionicons name="calendar" size={14} color={colors.quaternary} />
 							<Text style={styles.contactText}>
@@ -128,7 +130,7 @@ const Information: React.FC<InformationProps> = ({
 							color={colors.primary}
 						/>
 						<Text style={styles.addressText}>
-							{restaurant.address.formattedAddress}
+							{restaurant.address.formatted_address}
 						</Text>
 					</TouchableOpacity>
 
@@ -154,7 +156,7 @@ const Information: React.FC<InformationProps> = ({
 										longitude: restaurant.address.coordinates.longitude,
 									}}
 									title={restaurant.name}
-									description={restaurant.address.formattedAddress}
+									description={restaurant.address.formatted_address}
 								/>
 							</MapView>
 							<View style={styles.mapOverlay}>
@@ -251,8 +253,8 @@ const Information: React.FC<InformationProps> = ({
 				visible={showAddReviewModal}
 				onClose={() => setShowAddReviewModal(false)}
 				onSubmit={handleAddReview}
-				restaurantId={restaurant.id}
-				restaurantName={restaurant.name}
+				restaurant_id={restaurant.id}
+				restaurant_name={restaurant.name}
 			/>
 
 			{/* Photo Gallery Modal */}

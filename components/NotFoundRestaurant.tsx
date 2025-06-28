@@ -16,11 +16,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 const { width, height } = Dimensions.get('window');
 
 interface NotFoundRestaurantProps {
-	restaurantId?: string;
+	restaurant_id?: string;
 }
 
 export default function NotFoundRestaurant({
-	restaurantId,
+	restaurant_id,
 }: NotFoundRestaurantProps) {
 	const { t } = useTranslation();
 	const router = useRouter();
@@ -87,10 +87,10 @@ export default function NotFoundRestaurant({
 					</Text>
 
 					{/* Restaurant ID if provided */}
-					{restaurantId && (
+					{restaurant_id && (
 						<View style={styles.idContainer}>
 							<Text style={styles.idLabel}>ID:</Text>
-							<Text style={styles.idValue}>{restaurantId}</Text>
+							<Text style={styles.idValue}>{restaurant_id}</Text>
 						</View>
 					)}
 

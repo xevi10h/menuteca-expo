@@ -49,11 +49,11 @@ export default function ManualMenuSection({
 				name: '',
 				description: '',
 				extraPrice: 0,
-				isVegetarian: false,
-				isLactoseFree: false,
-				isSpicy: false,
-				isGlutenFree: false,
-				isVegan: false,
+				is_vegetarian: false,
+				is_lactose_free: false,
+				is_spicy: false,
+				is_gluten_free: false,
+				is_vegan: false,
 				category: DishCategory.FIRST_COURSES,
 			},
 			{
@@ -61,11 +61,11 @@ export default function ManualMenuSection({
 				name: '',
 				description: '',
 				extraPrice: 0,
-				isVegetarian: false,
-				isLactoseFree: false,
-				isSpicy: false,
-				isGlutenFree: false,
-				isVegan: false,
+				is_vegetarian: false,
+				is_lactose_free: false,
+				is_spicy: false,
+				is_gluten_free: false,
+				is_vegan: false,
 				category: DishCategory.SECOND_COURSES,
 			},
 			{
@@ -73,55 +73,55 @@ export default function ManualMenuSection({
 				name: '',
 				description: '',
 				extraPrice: 0,
-				isVegetarian: false,
-				isLactoseFree: false,
-				isSpicy: false,
-				isGlutenFree: false,
-				isVegan: false,
+				is_vegetarian: false,
+				is_lactose_free: false,
+				is_spicy: false,
+				is_gluten_free: false,
+				is_vegan: false,
 				category: DishCategory.DESSERTS,
 			},
 		];
 	});
 
 	// Estados para opciones del menú con valores iniciales desde props
-	const [firstCoursesToShare, setFirstCoursesToShare] = useState(
-		initialMenuOptions?.firstCoursesToShare ||
-			editingMenu?.firstCoursesToShare ||
+	const [first_courses_to_share, setFirstCoursesToShare] = useState(
+		initialMenuOptions?.first_courses_to_share ||
+			editingMenu?.first_courses_to_share ||
 			false,
 	);
-	const [secondCoursesToShare, setSecondCoursesToShare] = useState(
-		initialMenuOptions?.secondCoursesToShare ||
-			editingMenu?.secondCoursesToShare ||
+	const [second_courses_to_share, setSecondCoursesToShare] = useState(
+		initialMenuOptions?.second_courses_to_share ||
+			editingMenu?.second_courses_to_share ||
 			false,
 	);
-	const [dessertsToShare, setDessertsToShare] = useState(
-		initialMenuOptions?.dessertsToShare ||
-			editingMenu?.dessertsToShare ||
+	const [desserts_to_share, setDessertsToShare] = useState(
+		initialMenuOptions?.desserts_to_share ||
+			editingMenu?.desserts_to_share ||
 			false,
 	);
-	const [includesBread, setIncludesBread] = useState(
-		initialMenuOptions?.includesBread || editingMenu?.includesBread || false,
+	const [includes_bread, setIncludesBread] = useState(
+		initialMenuOptions?.includes_bread || editingMenu?.includes_bread || false,
 	);
 
 	const [drinks, setDrinks] = useState<DrinkInclusion>(
 		initialMenuOptions?.drinks || editingMenu?.drinks || createEmptyDrinks(),
 	);
 
-	const [includesCoffeeAndDessert, setIncludesCoffeeAndDessert] = useState<
+	const [includes_coffee_and_dessert, setIncludesCoffeeAndDessert] = useState<
 		'none' | 'coffee' | 'dessert' | 'both'
 	>(
-		initialMenuOptions?.includesCoffeeAndDessert ||
-			editingMenu?.includesCoffeeAndDessert ||
+		initialMenuOptions?.includes_coffee_and_dessert ||
+			editingMenu?.includes_coffee_and_dessert ||
 			'none',
 	);
-	const [hasMinimumPeople, setHasMinimumPeople] = useState(
-		initialMenuOptions?.hasMinimumPeople ||
-			editingMenu?.hasMinimumPeople ||
+	const [has_minimum_people, setHasMinimumPeople] = useState(
+		initialMenuOptions?.has_minimum_people ||
+			editingMenu?.has_minimum_people ||
 			false,
 	);
-	const [minimumPeople, setMinimumPeople] = useState(
+	const [minimum_people, setMinimumPeople] = useState(
 		(
-			initialMenuOptions?.minimumPeople || editingMenu?.minimumPeople
+			initialMenuOptions?.minimum_people || editingMenu?.minimum_people
 		)?.toString() || '2',
 	);
 
@@ -157,31 +157,31 @@ export default function ManualMenuSection({
 				JSON.stringify(initialMenuOptions) !==
 				JSON.stringify(prevInitialMenuOptionsRef.current);
 			if (hasChanged) {
-				if (initialMenuOptions.firstCoursesToShare !== undefined) {
-					setFirstCoursesToShare(initialMenuOptions.firstCoursesToShare);
+				if (initialMenuOptions.first_courses_to_share !== undefined) {
+					setFirstCoursesToShare(initialMenuOptions.first_courses_to_share);
 				}
-				if (initialMenuOptions.secondCoursesToShare !== undefined) {
-					setSecondCoursesToShare(initialMenuOptions.secondCoursesToShare);
+				if (initialMenuOptions.second_courses_to_share !== undefined) {
+					setSecondCoursesToShare(initialMenuOptions.second_courses_to_share);
 				}
-				if (initialMenuOptions.dessertsToShare !== undefined) {
-					setDessertsToShare(initialMenuOptions.dessertsToShare);
+				if (initialMenuOptions.desserts_to_share !== undefined) {
+					setDessertsToShare(initialMenuOptions.desserts_to_share);
 				}
-				if (initialMenuOptions.includesBread !== undefined) {
-					setIncludesBread(initialMenuOptions.includesBread);
+				if (initialMenuOptions.includes_bread !== undefined) {
+					setIncludesBread(initialMenuOptions.includes_bread);
 				}
 				if (initialMenuOptions.drinks !== undefined) {
 					setDrinks(initialMenuOptions.drinks);
 				}
-				if (initialMenuOptions.includesCoffeeAndDessert !== undefined) {
+				if (initialMenuOptions.includes_coffee_and_dessert !== undefined) {
 					setIncludesCoffeeAndDessert(
-						initialMenuOptions.includesCoffeeAndDessert,
+						initialMenuOptions.includes_coffee_and_dessert,
 					);
 				}
-				if (initialMenuOptions.hasMinimumPeople !== undefined) {
-					setHasMinimumPeople(initialMenuOptions.hasMinimumPeople);
+				if (initialMenuOptions.has_minimum_people !== undefined) {
+					setHasMinimumPeople(initialMenuOptions.has_minimum_people);
 				}
-				if (initialMenuOptions.minimumPeople !== undefined) {
-					setMinimumPeople(initialMenuOptions.minimumPeople.toString());
+				if (initialMenuOptions.minimum_people !== undefined) {
+					setMinimumPeople(initialMenuOptions.minimum_people.toString());
 				}
 				prevInitialMenuOptionsRef.current = { ...initialMenuOptions };
 			}
@@ -194,11 +194,11 @@ export default function ManualMenuSection({
 			name: '',
 			description: '',
 			extraPrice: 0,
-			isVegetarian: false,
-			isLactoseFree: false,
-			isSpicy: false,
-			isGlutenFree: false,
-			isVegan: false,
+			is_vegetarian: false,
+			is_lactose_free: false,
+			is_spicy: false,
+			is_gluten_free: false,
+			is_vegan: false,
 			category,
 		};
 		setDishes((prev) => [...prev, newDish]);
@@ -258,29 +258,29 @@ export default function ManualMenuSection({
 		);
 
 		const menuOptions = {
-			firstCoursesToShare,
-			secondCoursesToShare,
-			dessertsToShare,
-			includesBread,
+			first_courses_to_share,
+			second_courses_to_share,
+			desserts_to_share,
+			includes_bread,
 			drinks,
-			includesCoffeeAndDessert,
-			hasMinimumPeople,
-			minimumPeople: hasMinimumPeople
-				? parseInt(minimumPeople) || 2
+			includes_coffee_and_dessert,
+			has_minimum_people,
+			minimum_people: has_minimum_people
+				? parseInt(minimum_people) || 2
 				: undefined,
 		};
 
 		stableOnSave(validDishes, menuOptions);
 	}, [
 		dishes,
-		firstCoursesToShare,
-		secondCoursesToShare,
-		dessertsToShare,
-		includesBread,
+		first_courses_to_share,
+		second_courses_to_share,
+		desserts_to_share,
+		includes_bread,
 		drinks,
-		includesCoffeeAndDessert,
-		hasMinimumPeople,
-		minimumPeople,
+		includes_coffee_and_dessert,
+		has_minimum_people,
+		minimum_people,
 		stableOnSave,
 	]);
 
@@ -297,11 +297,11 @@ export default function ManualMenuSection({
 
 		const dishHasDescription =
 			dish.description.trim() !== '' ||
-			dish.isGlutenFree ||
-			dish.isLactoseFree ||
-			dish.isSpicy ||
-			dish.isVegan ||
-			dish.isVegetarian;
+			dish.is_gluten_free ||
+			dish.is_lactose_free ||
+			dish.is_spicy ||
+			dish.is_vegan ||
+			dish.is_vegetarian;
 
 		return (
 			<View key={dish.id} style={styles.dishItem}>
@@ -369,7 +369,7 @@ export default function ManualMenuSection({
 							key={option.key}
 							style={[
 								styles.optionButton,
-								includesCoffeeAndDessert === option.key &&
+								includes_coffee_and_dessert === option.key &&
 									styles.optionButtonSelected,
 							]}
 							onPress={() => setIncludesCoffeeAndDessert(option.key as any)}
@@ -377,7 +377,7 @@ export default function ManualMenuSection({
 							<Text
 								style={[
 									styles.optionButtonText,
-									includesCoffeeAndDessert === option.key &&
+									includes_coffee_and_dessert === option.key &&
 										styles.optionButtonTextSelected,
 								]}
 							>
@@ -404,7 +404,7 @@ export default function ManualMenuSection({
 					<View style={styles.shareToggle}>
 						<Text style={styles.shareLabel}>{t('menuCreation.toShare')}</Text>
 						<Switch
-							value={firstCoursesToShare}
+							value={first_courses_to_share}
 							onValueChange={setFirstCoursesToShare}
 							trackColor={{ false: colors.primaryLight, true: colors.primary }}
 							thumbColor={colors.quaternary}
@@ -437,7 +437,7 @@ export default function ManualMenuSection({
 					<View style={styles.shareToggle}>
 						<Text style={styles.shareLabel}>{t('menuCreation.toShare')}</Text>
 						<Switch
-							value={secondCoursesToShare}
+							value={second_courses_to_share}
 							onValueChange={setSecondCoursesToShare}
 							trackColor={{ false: colors.primaryLight, true: colors.primary }}
 							thumbColor={colors.quaternary}
@@ -465,7 +465,7 @@ export default function ManualMenuSection({
 					<View style={styles.shareToggle}>
 						<Text style={styles.shareLabel}>{t('menuCreation.toShare')}</Text>
 						<Switch
-							value={dessertsToShare}
+							value={desserts_to_share}
 							onValueChange={setDessertsToShare}
 							trackColor={{ false: colors.primaryLight, true: colors.primary }}
 							thumbColor={colors.quaternary}
@@ -493,10 +493,10 @@ export default function ManualMenuSection({
 				{/* Bread Option */}
 				<View style={styles.optionRow}>
 					<Text style={styles.optionLabel}>
-						{t('menuCreation.includesBread')}
+						{t('menuCreation.includes_bread')}
 					</Text>
 					<Switch
-						value={includesBread}
+						value={includes_bread}
 						onValueChange={setIncludesBread}
 						trackColor={{ false: colors.primaryLight, true: colors.primary }}
 						thumbColor={colors.quaternary}
@@ -511,10 +511,10 @@ export default function ManualMenuSection({
 				{/* Minimum People Option */}
 				<View style={styles.optionRow}>
 					<Text style={styles.optionLabel}>
-						{t('menuCreation.hasMinimumPeople')}
+						{t('menuCreation.has_minimum_people')}
 					</Text>
 					<Switch
-						value={hasMinimumPeople}
+						value={has_minimum_people}
 						onValueChange={setHasMinimumPeople}
 						trackColor={{ false: colors.primaryLight, true: colors.primary }}
 						thumbColor={colors.quaternary}
@@ -522,14 +522,14 @@ export default function ManualMenuSection({
 				</View>
 
 				{/* Minimum People Input */}
-				{hasMinimumPeople && (
+				{has_minimum_people && (
 					<View style={styles.minimumPeopleContainer}>
 						<Text style={styles.minimumPeopleLabel}>
 							{t('menuCreation.minimumPeopleLabel')}
 						</Text>
 						<TextInput
 							style={styles.minimumPeopleInput}
-							value={minimumPeople}
+							value={minimum_people}
 							onChangeText={setMinimumPeople}
 							keyboardType="numeric"
 							placeholder="2"

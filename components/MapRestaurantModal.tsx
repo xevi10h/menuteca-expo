@@ -102,9 +102,9 @@ export default function MapRestaurantModal({
 					{/* Restaurant Info Header */}
 					<View style={styles.headerInfo}>
 						<View style={styles.restaurantIcon}>
-							{restaurant.profileImage ? (
+							{restaurant.profile_image ? (
 								<Image
-									source={{ uri: restaurant.profileImage }}
+									source={{ uri: restaurant.profile_image }}
 									style={{ width: '100%', height: '100%', borderRadius: 25 }}
 									resizeMode="cover"
 								/>
@@ -120,7 +120,7 @@ export default function MapRestaurantModal({
 						</View>
 						<View style={styles.restaurantDetails}>
 							<View style={{ flex: 1, width: '50%' }}>
-								<Text style={styles.restaurantName}>{restaurant.name}</Text>
+								<Text style={styles.restaurant_name}>{restaurant.name}</Text>
 								{selectedCuisine?.name && (
 									<Text style={styles.cuisineText}>{selectedCuisine.name}</Text>
 								)}
@@ -157,7 +157,7 @@ export default function MapRestaurantModal({
 								>
 									<Text style={styles.priceFromText}>{t('general.from')}</Text>
 									<Text style={styles.priceText}>
-										{restaurant.minimumPrice}€
+										{restaurant.minimum_price}€
 									</Text>
 								</View>
 							</View>
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		alignItems: 'center',
 	},
-	restaurantName: {
+	restaurant_name: {
 		fontSize: 20,
 		fontFamily: 'Manrope',
 		fontWeight: '700',

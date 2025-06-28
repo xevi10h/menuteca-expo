@@ -1,4 +1,5 @@
-import { getUserRestaurants, mockUserReviews } from '@/api/responses';
+// app/profile/index.tsx (Updated)
+import { RestaurantService, ReviewService } from '@/api/services';
 import { colors } from '@/assets/styles/colors';
 import ChangePasswordPopup from '@/components/profile/ChangePasswordPopup';
 import ChangeUsernamePopup from '@/components/profile/ChangeUsernamePopup';
@@ -6,14 +7,17 @@ import LanguageSelectorPopup from '@/components/profile/LanguageSelectorPopup';
 import UserRestaurantPill from '@/components/profile/UserRestaurantPill';
 import UserReviewItem from '@/components/reviews/UserReviewItem';
 import { useTranslation } from '@/hooks/useTranslation';
+import { Restaurant, Review } from '@/shared/types';
 import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+	ActivityIndicator,
 	Alert,
 	Image,
+	RefreshControl,
 	ScrollView,
 	StyleSheet,
 	Text,
@@ -25,7 +29,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 export default function ProfileScreen() {
 	const user = useUserStore((state) => state.user);
 	const updatePhoto = useUserStore((state) => state.updatePhoto);
-	const setDefaultUser = useUserStore((state) => state.setDefaultUser);
+	const logout = useUserStore((state) => state.logout);
+	const isAuthenticated = useUserStore((state) => state.isAuthenticated);
+	const userLoading = useUserStore((state) => state.isLoading);
+	const userError = useUserStore((state) => state.error);
+	const refreshProfile = useUserStore((state) => state.refreshProfile);
+
 	const { t } = useTranslation();
 	const insets = useSafeAreaInsets();
 
@@ -34,9 +43,67 @@ export default function ProfileScreen() {
 	const [showChangeUsernamePopup, setShowChangeUsernamePopup] = useState(false);
 	const [showLanguagePopup, setShowLanguagePopup] = useState(false);
 
-	// Get user restaurants and reviews
-	const userRestaurants = getUserRestaurants();
-	const userReviews = mockUserReviews.slice(0, 2);
+	// Local states for restaurants and reviews
+	const [userRestaurants, setUserRestaurants] = useState<Restaurant[]>([]);
+	const [userReviews, setUserReviews] = useState<Review[]>([]);
+	const [restaurantsLoading, setRestaurantsLoading] = useState(false);
+	const [reviewsLoading, setReviewsLoading] = useState(false);
+	const [refreshing, setRefreshing] = useState(false);
+
+	// Load user data on component mount
+	useEffect(() => {
+		if (isAuthenticated) {
+			loadUserData();
+		}
+	}, [isAuthenticated]);
+
+	const loadUserData = async () => {
+		await Promise.all([loadUserRestaurants(), loadUserReviews()]);
+	};
+
+	const loadUserRestaurants = async () => {
+		if (!isAuthenticated) return;
+
+		setRestaurantsLoading(true);
+		try {
+			const response = await RestaurantService.getMyRestaurants();
+			if (response.success) {
+				setUserRestaurants(response.data);
+			}
+		} catch (error) {
+			console.error('Error loading user restaurants:', error);
+		} finally {
+			setRestaurantsLoading(false);
+		}
+	};
+
+	const loadUserReviews = async () => {
+		if (!isAuthenticated) return;
+
+		setReviewsLoading(true);
+		try {
+			const response = await ReviewService.getMyReviews({ limit: 2 });
+			if (response.success) {
+				setUserReviews(response.data.data);
+			}
+		} catch (error) {
+			console.error('Error loading user reviews:', error);
+		} finally {
+			setReviewsLoading(false);
+		}
+	};
+
+	const handleRefresh = async () => {
+		setRefreshing(true);
+		try {
+			await refreshProfile();
+			await loadUserData();
+		} catch (error) {
+			console.error('Error refreshing profile:', error);
+		} finally {
+			setRefreshing(false);
+		}
+	};
 
 	const handleBack = () => {
 		router.back();
@@ -49,7 +116,7 @@ export default function ProfileScreen() {
 				text: t('general.logout'),
 				style: 'destructive',
 				onPress: () => {
-					setDefaultUser();
+					logout();
 					router.replace('/');
 				},
 			},
@@ -74,7 +141,11 @@ export default function ProfileScreen() {
 		});
 
 		if (!result.canceled && result.assets[0]) {
-			updatePhoto(result.assets[0].uri);
+			try {
+				await updatePhoto(result.assets[0].uri);
+			} catch (error) {
+				Alert.alert(t('validation.error'), t('profile.photoUpdateError'));
+			}
 		}
 	};
 
@@ -105,18 +176,45 @@ export default function ProfileScreen() {
 
 	const renderProfilePhoto = () => {
 		if (user.photo) {
-			return <Image source={{ uri: user.photo }} style={styles.profileImage} />;
+			return (
+				<Image source={{ uri: user.photo }} style={styles.profile_image} />
+			);
 		} else {
 			const initial = user.username
 				? user.username.charAt(0).toUpperCase()
 				: 'U';
 			return (
-				<View style={styles.profileImagePlaceholder}>
-					<Text style={styles.profileImageText}>{initial}</Text>
+				<View style={styles.profile_imagePlaceholder}>
+					<Text style={styles.profile_imageText}>{initial}</Text>
 				</View>
 			);
 		}
 	};
+
+	// Show loading if not authenticated
+	if (!isAuthenticated) {
+		return (
+			<View style={[styles.container, { paddingTop: insets.top }]}>
+				<View style={styles.header}>
+					<TouchableOpacity onPress={handleBack} style={styles.backButton}>
+						<Ionicons name="chevron-back" size={24} color={colors.primary} />
+					</TouchableOpacity>
+					<Text style={styles.headerTitle}>{t('profile.myProfile')}</Text>
+				</View>
+				<View style={styles.notAuthenticatedContainer}>
+					<Text style={styles.notAuthenticatedText}>
+						{t('profile.notAuthenticated')}
+					</Text>
+					<TouchableOpacity
+						style={styles.loginButton}
+						onPress={() => router.push('/auth/login')}
+					>
+						<Text style={styles.loginButtonText}>{t('auth.login')}</Text>
+					</TouchableOpacity>
+				</View>
+			</View>
+		);
+	}
 
 	return (
 		<View style={[styles.container, { paddingTop: insets.top }]}>
@@ -131,27 +229,50 @@ export default function ProfileScreen() {
 				</TouchableOpacity>
 			</View>
 
-			<ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+			<ScrollView
+				style={styles.content}
+				showsVerticalScrollIndicator={false}
+				refreshControl={
+					<RefreshControl
+						refreshing={refreshing}
+						onRefresh={handleRefresh}
+						colors={[colors.primary]}
+						tintColor={colors.primary}
+					/>
+				}
+			>
 				{/* Profile Info Section */}
 				<View style={styles.profileSection}>
 					<TouchableOpacity
 						onPress={handleChangePhoto}
-						style={styles.profileImageContainer}
+						style={styles.profile_imageContainer}
+						disabled={userLoading}
 					>
 						{renderProfilePhoto()}
 						<View style={styles.editPhotoIcon}>
-							<Ionicons name="camera" size={16} color={colors.quaternary} />
+							{userLoading ? (
+								<ActivityIndicator size="small" color={colors.quaternary} />
+							) : (
+								<Ionicons name="camera" size={16} color={colors.quaternary} />
+							)}
 						</View>
 					</TouchableOpacity>
 
 					<View style={styles.profileInfo}>
-						<Text style={styles.userName}>{user.name || user.username}</Text>
+						<Text style={styles.user_name}>{user.name || user.username}</Text>
 						<Text style={styles.userEmail}>{user.email}</Text>
 						<Text style={styles.userSince}>
 							{t('profile.memberSince')}{' '}
-							{new Date(user.createdAt).toLocaleDateString('es-ES')}
+							{new Date(user.created_at).toLocaleDateString('es-ES')}
 						</Text>
 					</View>
+
+					{/* Show error if any */}
+					{userError && (
+						<View style={styles.errorContainer}>
+							<Text style={styles.errorText}>{userError}</Text>
+						</View>
+					)}
 				</View>
 
 				{/* Profile Actions */}
@@ -243,7 +364,11 @@ export default function ProfileScreen() {
 						</TouchableOpacity>
 					</View>
 
-					{userRestaurants.length > 0 ? (
+					{restaurantsLoading ? (
+						<View style={styles.loadingContainer}>
+							<ActivityIndicator size="small" color={colors.primary} />
+						</View>
+					) : userRestaurants.length > 0 ? (
 						<View style={styles.restaurantsContainer}>
 							{userRestaurants.map((restaurant) => (
 								<UserRestaurantPill
@@ -273,14 +398,14 @@ export default function ProfileScreen() {
 				<View style={styles.section}>
 					<View style={styles.sectionHeader}>
 						<Text style={styles.sectionTitle}>{t('profile.myReviews')}</Text>
-						{mockUserReviews.length > 2 && (
+						{userReviews.length > 0 && (
 							<TouchableOpacity
 								onPress={handleViewAllReviews}
 								style={styles.viewAllButton}
 							>
 								<Text style={styles.viewAllText}>
 									{t('profile.viewAllReviews', {
-										count: mockUserReviews.length,
+										count: userReviews.length,
 									})}
 								</Text>
 								<Ionicons
@@ -292,7 +417,11 @@ export default function ProfileScreen() {
 						)}
 					</View>
 
-					{userReviews.length > 0 ? (
+					{reviewsLoading ? (
+						<View style={styles.loadingContainer}>
+							<ActivityIndicator size="small" color={colors.primary} />
+						</View>
+					) : userReviews.length > 0 ? (
 						<View style={styles.reviewsContainer}>
 							{userReviews.map((review) => (
 								<UserReviewItem
@@ -381,16 +510,16 @@ const styles = StyleSheet.create({
 		borderBottomWidth: 1,
 		borderBottomColor: colors.primaryLight,
 	},
-	profileImageContainer: {
+	profile_imageContainer: {
 		position: 'relative',
 		marginBottom: 16,
 	},
-	profileImage: {
+	profile_image: {
 		width: 80,
 		height: 80,
 		borderRadius: 40,
 	},
-	profileImagePlaceholder: {
+	profile_imagePlaceholder: {
 		width: 80,
 		height: 80,
 		borderRadius: 40,
@@ -398,7 +527,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
-	profileImageText: {
+	profile_imageText: {
 		fontSize: 32,
 		fontFamily: 'Manrope',
 		fontWeight: '700',
@@ -420,7 +549,7 @@ const styles = StyleSheet.create({
 	profileInfo: {
 		alignItems: 'center',
 	},
-	userName: {
+	user_name: {
 		fontSize: 24,
 		fontFamily: 'Manrope',
 		fontWeight: '700',
@@ -439,6 +568,19 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '400',
 		color: colors.primaryLight,
+	},
+	errorContainer: {
+		marginTop: 10,
+		padding: 10,
+		backgroundColor: '#FFEBEE',
+		borderRadius: 8,
+	},
+	errorText: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		color: '#D32F2F',
+		textAlign: 'center',
 	},
 	section: {
 		paddingHorizontal: 20,
@@ -512,6 +654,10 @@ const styles = StyleSheet.create({
 	reviewsContainer: {
 		gap: 12,
 	},
+	loadingContainer: {
+		padding: 20,
+		alignItems: 'center',
+	},
 	emptyState: {
 		alignItems: 'center',
 		paddingVertical: 40,
@@ -530,5 +676,31 @@ const styles = StyleSheet.create({
 		fontWeight: '400',
 		color: colors.primaryLight,
 		textAlign: 'center',
+	},
+	notAuthenticatedContainer: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingHorizontal: 20,
+	},
+	notAuthenticatedText: {
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		color: colors.primary,
+		textAlign: 'center',
+		marginBottom: 20,
+	},
+	loginButton: {
+		backgroundColor: colors.primary,
+		paddingHorizontal: 24,
+		paddingVertical: 12,
+		borderRadius: 8,
+	},
+	loginButtonText: {
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.quaternary,
 	},
 });

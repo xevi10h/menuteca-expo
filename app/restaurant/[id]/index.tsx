@@ -1,4 +1,5 @@
-import { getMenusByRestaurantId, getRestaurantById } from '@/api/responses';
+// app/restaurant/[id]/index.tsx (Updated)
+import { MenuService, RestaurantService } from '@/api/services';
 import { colors } from '@/assets/styles/colors';
 import LoadingScreen from '@/components/LoadingScreen';
 import NotFoundRestaurant from '@/components/NotFoundRestaurant';
@@ -39,43 +40,6 @@ interface TabMeasurements {
 	information: { x: number; width: number };
 	menu: { x: number; width: number };
 }
-
-// Simular llamada a API para obtener restaurante
-const fetchRestaurantById = async (
-	id: string,
-): Promise<{
-	restaurant: Restaurant | null;
-	menus: MenuData[];
-	status: LoadingState;
-}> => {
-	// Simular delay de red
-	await new Promise((resolve) => setTimeout(resolve, 800));
-
-	// Simular posibles errores de red (5% de probabilidad)
-	if (Math.random() < 0.05) {
-		throw new Error('Network error');
-	}
-
-	// Intentar obtener el restaurante
-	const restaurant = getRestaurantById(id);
-
-	if (!restaurant) {
-		return {
-			restaurant: null,
-			menus: [],
-			status: 'not-found',
-		};
-	}
-
-	// Obtener menús
-	const menus = getMenusByRestaurantId(id);
-
-	return {
-		restaurant,
-		menus,
-		status: 'success',
-	};
-};
 
 // Componente de error genérico
 const ErrorScreen = ({ onRetry }: { onRetry: () => void }) => {
@@ -156,11 +120,32 @@ export default function RestaurantDetail() {
 
 		try {
 			setLoadingState('loading');
-			const result = await fetchRestaurantById(id);
 
-			setRestaurant(result.restaurant);
-			setMenus(result.menus);
-			setLoadingState(result.status);
+			// Fetch restaurant details
+			const restaurant_response = await RestaurantService.getRestaurantById(id);
+
+			if (!restaurant_response.success) {
+				setLoadingState('not-found');
+				return;
+			}
+
+			setRestaurant(restaurant_response.data);
+
+			// Fetch restaurant menus
+			try {
+				const menusResponse = await MenuService.getRestaurantMenus(id);
+				if (menusResponse.success) {
+					setMenus(menusResponse.data);
+				} else {
+					// If menus fail, continue with empty array
+					setMenus([]);
+				}
+			} catch (menuError) {
+				console.error('Error loading menus:', menuError);
+				setMenus([]);
+			}
+
+			setLoadingState('success');
 		} catch (error) {
 			console.error('Error loading restaurant:', error);
 			setLoadingState('error');
@@ -300,7 +285,7 @@ export default function RestaurantDetail() {
 	}
 
 	if (loadingState === 'not-found' || !restaurant) {
-		return <NotFoundRestaurant restaurantId={id} />;
+		return <NotFoundRestaurant restaurant_id={id} />;
 	}
 
 	// Renderizar restaurante exitosamente cargado
@@ -309,7 +294,7 @@ export default function RestaurantDetail() {
 			{/* Header Image */}
 			<View style={styles.imageContainer}>
 				<Image
-					source={{ uri: restaurant.mainImage }}
+					source={{ uri: restaurant.main_image }}
 					style={[styles.headerImage, { height: 250 + insets.top }]}
 					resizeMode="cover"
 				/>

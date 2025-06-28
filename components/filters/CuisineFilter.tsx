@@ -1,9 +1,10 @@
-import { allCuisines } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
+import { useCuisineStore } from '@/zustand/CuisineStore';
 import { useFilterStore } from '@/zustand/FilterStore';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo } from 'react';
 import {
+	ActivityIndicator,
 	Image,
 	ScrollView,
 	StyleSheet,
@@ -14,18 +15,20 @@ import {
 
 export default function CuisineFilter() {
 	const { main: filters, setCuisines } = useFilterStore();
+	const { cuisines, isLoading, error, fetchCuisines } = useCuisineStore();
+
 	const selectedCuisines = filters.cuisines || [];
 
 	// Reorder cuisines: selected ones first, then the rest
 	const orderedCuisines = useMemo(() => {
-		const selected = allCuisines.filter((cuisine) =>
+		const selected = cuisines.filter((cuisine) =>
 			selectedCuisines.includes(cuisine.id),
 		);
-		const unselected = allCuisines.filter(
+		const unselected = cuisines.filter(
 			(cuisine) => !selectedCuisines.includes(cuisine.id),
 		);
 		return [...selected, ...unselected];
-	}, [selectedCuisines]);
+	}, [selectedCuisines, cuisines]);
 
 	const toggleCuisine = (cuisineId: string) => {
 		const isSelected = selectedCuisines.includes(cuisineId);
@@ -39,6 +42,47 @@ export default function CuisineFilter() {
 			setCuisines([...selectedCuisines, cuisineId]);
 		}
 	};
+
+	const handleRetry = () => {
+		fetchCuisines();
+	};
+
+	// Show loading state
+	if (isLoading && cuisines.length === 0) {
+		return (
+			<View style={styles.container}>
+				<View style={styles.loadingContainer}>
+					<ActivityIndicator size="small" color={colors.primary} />
+					<Text style={styles.loadingText}>Cargando cocinas...</Text>
+				</View>
+			</View>
+		);
+	}
+
+	// Show error state
+	if (error && cuisines.length === 0) {
+		return (
+			<View style={styles.container}>
+				<View style={styles.errorContainer}>
+					<Text style={styles.errorText}>Error al cargar cocinas</Text>
+					<TouchableOpacity onPress={handleRetry} style={styles.retryButton}>
+						<Text style={styles.retryText}>Reintentar</Text>
+					</TouchableOpacity>
+				</View>
+			</View>
+		);
+	}
+
+	// Show empty state
+	if (!isLoading && cuisines.length === 0) {
+		return (
+			<View style={styles.container}>
+				<View style={styles.emptyContainer}>
+					<Text style={styles.emptyText}>No hay cocinas disponibles</Text>
+				</View>
+			</View>
+		);
+	}
 
 	return (
 		<View style={styles.container}>
@@ -57,7 +101,7 @@ export default function CuisineFilter() {
 						>
 							<View style={styles.imageContainer}>
 								<Image
-									src={cuisine.image}
+									source={{ uri: cuisine.image }}
 									style={[styles.image, isSelected && styles.imageSelected]}
 								/>
 								{isSelected && (
@@ -100,25 +144,53 @@ const styles = StyleSheet.create({
 	scrollView: {
 		paddingHorizontal: 10,
 	},
-	clearAllButton: {
+	loadingContainer: {
+		flex: 1,
+		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		marginRight: 20,
-		paddingHorizontal: 12,
-		paddingVertical: 8,
-		backgroundColor: colors.quaternary,
-		borderRadius: 12,
-		borderWidth: 1,
-		borderColor: colors.primary,
-		height: 48,
-		flexDirection: 'row',
-		gap: 4,
+		gap: 8,
 	},
-	clearAllText: {
+	loadingText: {
 		color: colors.primary,
-		fontSize: 10,
-		fontWeight: '600',
+		fontSize: 12,
 		fontFamily: 'Manrope',
+		fontWeight: '500',
+	},
+	errorContainer: {
+		flex: 1,
+		alignItems: 'center',
+		justifyContent: 'center',
+		gap: 8,
+	},
+	errorText: {
+		color: colors.primaryLight,
+		fontSize: 12,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+	},
+	retryButton: {
+		paddingHorizontal: 12,
+		paddingVertical: 6,
+		backgroundColor: colors.primary,
+		borderRadius: 8,
+	},
+	retryText: {
+		color: colors.quaternary,
+		fontSize: 12,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+	},
+	emptyContainer: {
+		flex: 1,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	emptyText: {
+		color: colors.primaryLight,
+		fontSize: 12,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
 	},
 	cuisineItem: {
 		alignItems: 'center',

@@ -17,7 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
 
-export default function CuisineTypesScreen() {
+export default function cuisine_typesScreen() {
 	const { t } = useTranslation();
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
@@ -73,13 +73,13 @@ export default function CuisineTypesScreen() {
 
 				<View style={styles.questionContainer}>
 					<Text style={styles.question}>
-						{t('registerRestaurant.cuisineTypes')}
+						{t('registerRestaurant.cuisine_types')}
 					</Text>
 				</View>
 
 				<View style={styles.labelContainer}>
 					<Text style={styles.label}>
-						{t('registerRestaurant.cuisineTypesSubtitle')}
+						{t('registerRestaurant.cuisine_typesSubtitle')}
 					</Text>
 				</View>
 

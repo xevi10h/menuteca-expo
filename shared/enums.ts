@@ -46,6 +46,6 @@ export enum RestaurantTag {
 export enum DrinkType {
 	WATER = 'water',
 	WINE = 'wine',
-	SOFT_DRINKS = 'softDrinks',
+	SOFT_DRINKS = 'soft_drinks',
 	BEER = 'beer',
 }

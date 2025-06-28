@@ -13,17 +13,17 @@ import {
 } from 'react-native';
 
 interface ProfilePhotoSectionProps {
-	profileImage?: string;
+	profile_image?: string;
 	onImageSelected: (imageUri: string) => void;
 }
 
 export default function ProfilePhotoSection({
-	profileImage,
+	profile_image,
 	onImageSelected,
 }: ProfilePhotoSectionProps) {
 	const { t } = useTranslation();
 
-	const handlePickProfileImage = async () => {
+	const handlePickprofile_image = async () => {
 		const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 		if (status !== 'granted') {
 			Alert.alert(
@@ -52,12 +52,12 @@ export default function ProfilePhotoSection({
 			</Text>
 			<TouchableOpacity
 				style={styles.photoPlaceholder}
-				onPress={handlePickProfileImage}
+				onPress={handlePickprofile_image}
 			>
-				{profileImage ? (
+				{profile_image ? (
 					<Image
-						source={{ uri: profileImage }}
-						style={styles.profileImage}
+						source={{ uri: profile_image }}
+						style={styles.profile_image}
 						resizeMode="cover"
 					/>
 				) : (
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		overflow: 'hidden',
 	},
-	profileImage: {
+	profile_image: {
 		width: '100%',
 		height: '100%',
 		borderRadius: 50,

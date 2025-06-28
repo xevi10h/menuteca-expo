@@ -6,15 +6,15 @@ interface UserRestaurant {
 	id: string;
 	name: string;
 	address: string;
-	profileImage?: string;
+	profile_image?: string;
 	phone?: string;
-	cuisineType?: string;
+	cuisine_type?: string;
 }
 
 interface UserReview {
 	id: string;
-	restaurantId: string;
-	restaurantName: string;
+	restaurant_id: string;
+	restaurant_name: string;
 	rating: number;
 	comment: string;
 	date: string;

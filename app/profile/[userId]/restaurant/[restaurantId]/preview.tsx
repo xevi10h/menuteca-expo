@@ -40,9 +40,9 @@ interface TabMeasurements {
 export default function UserRestaurantPreview() {
 	const { t } = useTranslation();
 	const router = useRouter();
-	const { userId, restaurantId } = useLocalSearchParams<{
-		userId: string;
-		restaurantId: string;
+	const { user_id, restaurant_id } = useLocalSearchParams<{
+		user_id: string;
+		restaurant_id: string;
 	}>();
 	const insets = useSafeAreaInsets();
 
@@ -77,10 +77,10 @@ export default function UserRestaurantPreview() {
 				// Simular delay de carga
 				await new Promise((resolve) => setTimeout(resolve, 500));
 
-				if (restaurantId) {
-					const restaurantData = getUserRestaurantById(restaurantId);
-					const menusData = getUserRestaurantMenus(restaurantId);
-					const statusData = getUserRestaurantStatus(restaurantId);
+				if (restaurant_id) {
+					const restaurantData = getUserRestaurantById(restaurant_id);
+					const menusData = getUserRestaurantMenus(restaurant_id);
+					const statusData = getUserRestaurantStatus(restaurant_id);
 
 					setRestaurant(restaurantData || null);
 					setMenus(menusData);
@@ -94,14 +94,14 @@ export default function UserRestaurantPreview() {
 		};
 
 		loadRestaurantData();
-	}, [restaurantId]);
+	}, [restaurant_id]);
 
 	const handleBack = () => {
 		router.back();
 	};
 
 	const handleEdit = () => {
-		router.push(`/profile/${userId}/restaurant/${restaurantId}/edit`);
+		router.push(`/profile/${user_id}/restaurant/${restaurant_id}/edit`);
 	};
 
 	const handleMapPress = () => {
@@ -213,9 +213,9 @@ export default function UserRestaurantPreview() {
 		<View style={styles.container}>
 			{/* Header Image */}
 			<View style={styles.imageContainer}>
-				{restaurant.mainImage && (
+				{restaurant.main_image && (
 					<Image
-						source={{ uri: restaurant.mainImage }}
+						source={{ uri: restaurant.main_image }}
 						style={[styles.headerImage, { height: 250 + insets.top }]}
 						resizeMode="cover"
 					/>

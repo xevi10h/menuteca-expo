@@ -42,7 +42,7 @@ export default function EditTab() {
 
 	const {
 		registerRestaurant,
-		setRegisterRestaurantProfileImage,
+		setRegisterRestaurantprofile_image,
 		addRegisterRestaurantImage,
 		removeRegisterRestaurantImage,
 		addRegisterRestaurantMenu,
@@ -164,8 +164,8 @@ export default function EditTab() {
 			<ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
 				{/* Profile Photo Section */}
 				<ProfilePhotoSection
-					profileImage={registerRestaurant.profileImage}
-					onImageSelected={setRegisterRestaurantProfileImage}
+					profile_image={registerRestaurant.profile_image}
+					onImageSelected={setRegisterRestaurantprofile_image}
 				/>
 				<View style={styles.sectionContainer}>
 					<View style={styles.labelContainer}>
@@ -175,7 +175,7 @@ export default function EditTab() {
 					</View>
 					<ContactInfoSection
 						phone={registerRestaurant.phone || ''}
-						reservationLink={registerRestaurant.reservationLink || ''}
+						reservation_link={registerRestaurant.reservation_link || ''}
 						onPhoneChange={setRegisterRestaurantPhone}
 						onReservationLinkChange={setRegisterRestaurantReservationLink}
 						showTitle={false}
@@ -200,7 +200,7 @@ export default function EditTab() {
 					</View>
 					<AddressSection
 						address={registerRestaurant.address}
-						restaurantName={registerRestaurant.name}
+						restaurant_name={registerRestaurant.name}
 						onEditPress={() => setShowAddressModal(true)}
 					/>
 				</View>

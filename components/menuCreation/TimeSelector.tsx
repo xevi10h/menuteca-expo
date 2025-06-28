@@ -13,15 +13,15 @@ import {
 } from 'react-native';
 
 interface TimeSelectorProps {
-	startTime: string;
-	endTime: string;
+	start_time: string;
+	end_time: string;
 	onStartTimeChange: (time: string) => void;
 	onEndTimeChange: (time: string) => void;
 }
 
 export default function TimeSelector({
-	startTime,
-	endTime,
+	start_time,
+	end_time,
 	onStartTimeChange,
 	onEndTimeChange,
 }: TimeSelectorProps) {
@@ -46,12 +46,12 @@ export default function TimeSelector({
 	}, []);
 
 	const handleStartTimePress = () => {
-		setTempTime(createTimeFromString(startTime));
+		setTempTime(createTimeFromString(start_time));
 		setShowStartTimePicker(true);
 	};
 
 	const handleEndTimePress = () => {
-		setTempTime(createTimeFromString(endTime));
+		setTempTime(createTimeFromString(end_time));
 		setShowEndTimePicker(true);
 	};
 
@@ -80,7 +80,7 @@ export default function TimeSelector({
 					style={styles.timeInputButton}
 					onPress={handleStartTimePress}
 				>
-					<Text style={styles.timeInputText}>{startTime}</Text>
+					<Text style={styles.timeInputText}>{start_time}</Text>
 					<Ionicons name="time-outline" size={16} color={colors.primary} />
 				</TouchableOpacity>
 
@@ -90,7 +90,7 @@ export default function TimeSelector({
 					style={styles.timeInputButton}
 					onPress={handleEndTimePress}
 				>
-					<Text style={styles.timeInputText}>{endTime}</Text>
+					<Text style={styles.timeInputText}>{end_time}</Text>
 					<Ionicons name="time-outline" size={16} color={colors.primary} />
 				</TouchableOpacity>
 			</View>

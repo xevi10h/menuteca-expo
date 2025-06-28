@@ -21,7 +21,7 @@ export default function RestaurantNameScreen() {
 	const { t } = useTranslation();
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
-	const [restaurantName, setRestaurantName] = useState('');
+	const [restaurant_name, setRestaurantName] = useState('');
 	const [isNextDisabled, setIsNextDisabled] = useState(true);
 	const setRegisterRestaurantName = useRegisterRestaurantStore(
 		(state) => state.setRegisterRestaurantName,
@@ -32,17 +32,17 @@ export default function RestaurantNameScreen() {
 	};
 
 	const handleNext = () => {
-		setRegisterRestaurantName(restaurantName);
+		setRegisterRestaurantName(restaurant_name);
 		router.push('/profile/register-restaurant/address');
 	};
 
 	useEffect(() => {
-		if (restaurantName.trim().length > 0) {
+		if (restaurant_name.trim().length > 0) {
 			setIsNextDisabled(false);
 		} else {
 			setIsNextDisabled(true);
 		}
-	}, [restaurantName]);
+	}, [restaurant_name]);
 
 	return (
 		<View style={[styles.container, { paddingTop: insets.top }]}>
@@ -69,7 +69,7 @@ export default function RestaurantNameScreen() {
 
 				<View style={styles.questionContainer}>
 					<Text style={styles.question}>
-						{t('registerRestaurant.restaurantName')}
+						{t('registerRestaurant.restaurant_name')}
 					</Text>
 				</View>
 				<View style={styles.labelContainer}>
@@ -81,7 +81,7 @@ export default function RestaurantNameScreen() {
 					style={styles.textInput}
 					placeholder={t('registerRestaurant.restaurantNamePlaceholder')}
 					placeholderTextColor={colors.primaryLight}
-					value={restaurantName}
+					value={restaurant_name}
 					onChangeText={setRestaurantName}
 				/>
 			</View>

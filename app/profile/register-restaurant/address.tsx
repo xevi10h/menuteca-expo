@@ -42,7 +42,7 @@ export default function AddressScreen() {
 			// Update the address with additional information if provided
 			const finalAddress: Address = {
 				...selectedAddress,
-				additionalInformation: additionalInfo,
+				additional_information: additionalInfo,
 			};
 			setRegisterRestaurantAddress(finalAddress);
 		}
@@ -69,9 +69,9 @@ export default function AddressScreen() {
 
 	// Initialize with current address if exists
 	useEffect(() => {
-		if (currentAddress?.formattedAddress) {
+		if (currentAddress?.formatted_address) {
 			setSelectedAddress(currentAddress);
-			setAdditionalInfo(currentAddress.additionalInformation || '');
+			setAdditionalInfo(currentAddress.additional_information || '');
 			setHasSelectedSuggestion(true);
 		}
 	}, [currentAddress]);
@@ -113,7 +113,7 @@ export default function AddressScreen() {
 				<AddressSearchInput
 					onAddressSelected={handleAddressSelected}
 					placeholder={t('registerRestaurant.addressPlaceholder')}
-					initialValue={currentAddress?.formattedAddress || ''}
+					initialValue={currentAddress?.formatted_address || ''}
 				/>
 
 				{/* Selected Address Preview */}
@@ -123,7 +123,7 @@ export default function AddressScreen() {
 							{t('registerRestaurant.addressPreview')}
 						</Text>
 						<Text style={styles.previewText}>
-							{selectedAddress.formattedAddress}
+							{selectedAddress.formatted_address}
 							{additionalInfo ? `, ${additionalInfo}` : ''}
 						</Text>
 					</View>

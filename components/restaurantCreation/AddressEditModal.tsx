@@ -57,7 +57,7 @@ export default function AddressEditModal({
 		if (visible) {
 			if (initialAddress) {
 				setCurrentAddress(initialAddress);
-				setHasSelectedSuggestion(!!initialAddress.formattedAddress);
+				setHasSelectedSuggestion(!!initialAddress.formatted_address);
 			} else {
 				resetForm();
 			}
@@ -99,7 +99,7 @@ export default function AddressEditModal({
 			});
 			if (addresses.length > 0) {
 				const address = addresses[0];
-				const formattedAddress = `${address.street || ''} ${
+				const formatted_address = `${address.street || ''} ${
 					address.streetNumber || ''
 				}, ${address.city || ''}, ${address.country || ''}`.trim();
 
@@ -108,9 +108,9 @@ export default function AddressEditModal({
 					street: address.street || '',
 					number: address.streetNumber || '',
 					city: address.city || '',
-					postalCode: address.postalCode || '',
+					postal_code: address.postal_code || '',
 					country: address.country || '',
-					formattedAddress: formattedAddress,
+					formatted_address: formatted_address,
 				}));
 			}
 		} catch (error) {
@@ -127,7 +127,7 @@ export default function AddressEditModal({
 			const formatted = formatAddress(updated);
 			return {
 				...updated,
-				formattedAddress: formatted,
+				formatted_address: formatted,
 			};
 		});
 	};
@@ -137,7 +137,7 @@ export default function AddressEditModal({
 		const hasRequiredFields =
 			currentAddress.street ||
 			currentAddress.city ||
-			currentAddress.formattedAddress;
+			currentAddress.formatted_address;
 
 		if (!hasRequiredFields) {
 			Alert.alert(
@@ -150,8 +150,8 @@ export default function AddressEditModal({
 		// Ensure formatted address is up to date
 		const finalAddress: Address = {
 			...currentAddress,
-			formattedAddress:
-				currentAddress.formattedAddress || formatAddress(currentAddress),
+			formatted_address:
+				currentAddress.formatted_address || formatAddress(currentAddress),
 		};
 
 		onSave(finalAddress);
@@ -226,7 +226,7 @@ export default function AddressEditModal({
 							<AddressSearchInput
 								onAddressSelected={handleAddressSelected}
 								placeholder={t('registerRestaurant.searchAddressPlaceholder')}
-								initialValue={currentAddress.formattedAddress || ''}
+								initialValue={currentAddress.formatted_address || ''}
 							/>
 						</>
 					) : (
@@ -275,9 +275,9 @@ export default function AddressEditModal({
 										placeholder={t(
 											'registerRestaurant.additionalNumberPlaceholder',
 										)}
-										value={currentAddress.additionalInformation}
+										value={currentAddress.additional_information}
 										onChangeText={(text) =>
-											updateAddressField('additionalInformation', text)
+											updateAddressField('additional_information', text)
 										}
 									/>
 								</View>
@@ -296,14 +296,14 @@ export default function AddressEditModal({
 									</View>
 									<View style={[styles.inputContainer, { flex: 1 }]}>
 										<Text style={styles.inputLabel}>
-											{t('registerRestaurant.postalCode')}
+											{t('registerRestaurant.postal_code')}
 										</Text>
 										<TextInput
 											style={styles.input}
 											placeholder="08001"
-											value={currentAddress.postalCode}
+											value={currentAddress.postal_code}
 											onChangeText={(text) =>
-												updateAddressField('postalCode', text)
+												updateAddressField('postal_code', text)
 											}
 										/>
 									</View>
@@ -345,7 +345,7 @@ export default function AddressEditModal({
 								coordinate={currentAddress.coordinates}
 								title={t('registerRestaurant.selectedLocation')}
 								description={
-									currentAddress.formattedAddress ||
+									currentAddress.formatted_address ||
 									formatAddress(currentAddress)
 								}
 							/>
@@ -353,13 +353,13 @@ export default function AddressEditModal({
 					</MapView>
 
 					{/* Preview */}
-					{(currentAddress.formattedAddress || currentAddress.street) && (
+					{(currentAddress.formatted_address || currentAddress.street) && (
 						<View style={styles.previewContainer}>
 							<Text style={styles.previewLabel}>
 								{t('registerRestaurant.addressPreview')}
 							</Text>
 							<Text style={styles.previewText}>
-								{currentAddress.formattedAddress ||
+								{currentAddress.formatted_address ||
 									formatAddress(currentAddress)}
 							</Text>
 						</View>

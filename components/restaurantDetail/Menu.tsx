@@ -72,12 +72,12 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 	};
 
 	// Función para formatear horarios
-	const formatSchedule = (startTime: string, endTime: string): string => {
+	const formatSchedule = (start_time: string, end_time: string): string => {
 		// Si ambos horarios son 00:00, no mostrar horario
-		if (startTime === '00:00' && endTime === '00:00') {
+		if (start_time === '00:00' && end_time === '00:00') {
 			return '';
 		}
-		return `${startTime} - ${endTime}`;
+		return `${start_time} - ${end_time}`;
 	};
 
 	// Función para formatear coffee/dessert option
@@ -87,7 +87,7 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 		if (!option || option === 'none') return '';
 		if (option === 'coffee') return t('menuCreation.includesCoffee');
 		if (option === 'dessert') return t('menuCreation.includesDessert');
-		if (option === 'both') return t('menuCreation.includesCoffeeAndDessert');
+		if (option === 'both') return t('menuCreation.includes_coffee_and_dessert');
 		return '';
 	};
 
@@ -101,8 +101,8 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 					return t('menuCreation.drinks.water');
 				case 'wine':
 					return t('menuCreation.drinks.wine');
-				case 'softDrinks':
-					return t('menuCreation.drinks.softDrinks');
+				case 'soft_drinks':
+					return t('menuCreation.drinks.soft_drinks');
 				case 'beer':
 					return t('menuCreation.drinks.beer');
 				default:
@@ -118,7 +118,7 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 
 		const selectedDrinks = getSelectedDrinks(drinks);
 
-		if (selectedDrinks.length === 1 && selectedDrinks[0] === 'softDrinks') {
+		if (selectedDrinks.length === 1 && selectedDrinks[0] === 'soft_drinks') {
 			return 'custom';
 		}
 
@@ -189,13 +189,13 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 
 	const showSchedule =
 		currentMenu.days?.length > 0 ||
-		currentMenu.startTime !== '00:00' ||
-		currentMenu.endTime !== '00:00';
+		currentMenu.start_time !== '00:00' ||
+		currentMenu.end_time !== '00:00';
 
 	const showOptions =
-		currentMenu.includesBread ||
-		currentMenu.includesCoffeeAndDessert !== 'none' ||
-		currentMenu.hasMinimumPeople ||
+		currentMenu.includes_bread ||
+		currentMenu.includes_coffee_and_dessert !== 'none' ||
+		currentMenu.has_minimum_people ||
 		hasDrinks(currentMenu.drinks);
 
 	const renderMenuItem = ({ item }: { item: Dish }) => (
@@ -203,7 +203,7 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 			<View style={styles.menuItemHeader}>
 				<Text style={styles.menuItemName}>{item.name}</Text>
 				<View style={styles.menuItemIcons}>
-					{item.isLactoseFree && (
+					{item.is_lactose_free && (
 						<View style={styles.dietIcon}>
 							<Image
 								source={require('@/assets/images/lactose_free_icon.png')}
@@ -212,7 +212,7 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 							/>
 						</View>
 					)}
-					{item.isSpicy && (
+					{item.is_spicy && (
 						<View style={styles.dietIcon}>
 							<Image
 								source={require('@/assets/images/spicy_icon.png')}
@@ -221,7 +221,7 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 							/>
 						</View>
 					)}
-					{item.isGlutenFree && (
+					{item.is_gluten_free && (
 						<View style={styles.dietIcon}>
 							<Image
 								source={require('@/assets/images/gluten_free_icon.png')}
@@ -230,12 +230,12 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 							/>
 						</View>
 					)}
-					{item.isVegetarian && (
+					{item.is_vegetarian && (
 						<View style={styles.dietIcon}>
 							<Ionicons name="leaf-outline" size={18} color={colors.primary} />
 						</View>
 					)}
-					{item.isVegan && (
+					{item.is_vegan && (
 						<View style={styles.dietIcon}>
 							<Image
 								source={require('@/assets/images/vegetarian_icon.png')}
@@ -260,10 +260,11 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 	const renderCategoryHeader = ({ item }: { item: GroupedDishes }) => {
 		const isToShare =
 			(item.category === DishCategory.FIRST_COURSES &&
-				currentMenu.firstCoursesToShare) ||
+				currentMenu.first_courses_to_share) ||
 			(item.category === DishCategory.SECOND_COURSES &&
-				currentMenu.secondCoursesToShare) ||
-			(item.category === DishCategory.DESSERTS && currentMenu.dessertsToShare);
+				currentMenu.second_courses_to_share) ||
+			(item.category === DishCategory.DESSERTS &&
+				currentMenu.desserts_to_share);
 
 		return (
 			<View style={styles.categoryHeaderContainer}>
@@ -369,7 +370,7 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 									</Text>
 								</View>
 							)}
-							{formatSchedule(currentMenu.startTime, currentMenu.endTime) && (
+							{formatSchedule(currentMenu.start_time, currentMenu.end_time) && (
 								<View style={[styles.scheduleItem]}>
 									<Ionicons
 										name="time-outline"
@@ -377,7 +378,10 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 										color={colors.primary}
 									/>
 									<Text style={styles.scheduleText}>
-										{formatSchedule(currentMenu.startTime, currentMenu.endTime)}
+										{formatSchedule(
+											currentMenu.start_time,
+											currentMenu.end_time,
+										)}
 									</Text>
 								</View>
 							)}
@@ -391,7 +395,7 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 								{t('menuCreation.menuOptions')}
 							</Text>
 							<View style={styles.includesGrid}>
-								{currentMenu.includesBread && (
+								{currentMenu.includes_bread && (
 									<View style={styles.includeTag}>
 										<Ionicons
 											name="restaurant-outline"
@@ -399,7 +403,7 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 											color={colors.quaternary}
 										/>
 										<Text style={styles.includeTagText}>
-											{t('menuCreation.includesBread')}
+											{t('menuCreation.includes_bread')}
 										</Text>
 									</View>
 								)}
@@ -413,8 +417,8 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 									</View>
 								)}
 
-								{currentMenu.includesCoffeeAndDessert &&
-									currentMenu.includesCoffeeAndDessert !== 'none' && (
+								{currentMenu.includes_coffee_and_dessert &&
+									currentMenu.includes_coffee_and_dessert !== 'none' && (
 										<View style={styles.includeTag}>
 											<Ionicons
 												name="cafe-outline"
@@ -423,24 +427,25 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 											/>
 											<Text style={styles.includeTagText}>
 												{formatCoffeeDesert(
-													currentMenu.includesCoffeeAndDessert,
+													currentMenu.includes_coffee_and_dessert,
 												)}
 											</Text>
 										</View>
 									)}
-								{currentMenu.hasMinimumPeople && currentMenu.minimumPeople && (
-									<View style={styles.includeTag}>
-										<Ionicons
-											name="people-outline"
-											size={12}
-											color={colors.quaternary}
-										/>
-										<Text style={styles.includeTagText}>
-											{t('menuCreation.minimumPeopleLabel')}{' '}
-											{currentMenu.minimumPeople}
-										</Text>
-									</View>
-								)}
+								{currentMenu.has_minimum_people &&
+									currentMenu.minimum_people && (
+										<View style={styles.includeTag}>
+											<Ionicons
+												name="people-outline"
+												size={12}
+												color={colors.quaternary}
+											/>
+											<Text style={styles.includeTagText}>
+												{t('menuCreation.minimumPeopleLabel')}{' '}
+												{currentMenu.minimum_people}
+											</Text>
+										</View>
+									)}
 							</View>
 						</View>
 					)}

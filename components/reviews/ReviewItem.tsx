@@ -29,11 +29,11 @@ export default function ReviewItem({ review }: ReviewItemProps) {
 			<View style={styles.reviewHeader}>
 				<View style={styles.userInfo}>
 					<Image
-						source={{ uri: review.userAvatar }}
-						style={styles.userAvatar}
+						source={{ uri: review.user_avatar }}
+						style={styles.user_avatar}
 					/>
 					<View style={styles.userDetails}>
-						<Text style={styles.userName}>{review.userName}</Text>
+						<Text style={styles.user_name}>{review.user_name}</Text>
 						<Text style={styles.reviewDate}>{formatDate(review.date)}</Text>
 					</View>
 				</View>
@@ -55,19 +55,19 @@ export default function ReviewItem({ review }: ReviewItemProps) {
 			<ReviewPhotos photos={review.photos} />
 
 			{/* Restaurant Response */}
-			{review.restaurantResponse && (
-				<View style={styles.restaurantResponse}>
+			{review.restaurant_response && (
+				<View style={styles.restaurant_response}>
 					<View style={styles.responseHeader}>
 						<Ionicons name="storefront" size={16} color={colors.primary} />
 						<Text style={styles.responseLabel}>
-							{t('reviews.restaurantResponse')}
+							{t('reviews.restaurant_response')}
 						</Text>
 						<Text style={styles.responseDate}>
-							{formatDate(review.restaurantResponse.date)}
+							{formatDate(review.restaurant_response.date)}
 						</Text>
 					</View>
 					<Text style={styles.responseMessage}>
-						{review.restaurantResponse.message}
+						{review.restaurant_response.message}
 					</Text>
 				</View>
 			)}
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		flex: 1,
 	},
-	userAvatar: {
+	user_avatar: {
 		width: 45,
 		height: 45,
 		borderRadius: 22.5,
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
 	userDetails: {
 		flex: 1,
 	},
-	userName: {
+	user_name: {
 		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '600',
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
 		lineHeight: 22,
 		marginBottom: 15,
 	},
-	restaurantResponse: {
+	restaurant_response: {
 		backgroundColor: colors.secondary,
 		borderRadius: 12,
 		padding: 15,

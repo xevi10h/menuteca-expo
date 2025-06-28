@@ -119,8 +119,8 @@ export default function MenuCreationModal({
 	// Estados básicos del menú
 	const [menuName, setMenuName] = useState('');
 	const [selectedDays, setSelectedDays] = useState<string[]>([]);
-	const [startTime, setStartTime] = useState('00:00');
-	const [endTime, setEndTime] = useState('00:00');
+	const [start_time, setStartTime] = useState('00:00');
+	const [end_time, setEndTime] = useState('00:00');
 	const [price, setPrice] = useState('');
 	const [showManualMenu, setShowManualMenu] = useState(false);
 	const [menuDishes, setMenuDishes] = useState<Dish[]>([]);
@@ -157,11 +157,11 @@ export default function MenuCreationModal({
 					'Lechuga, tomate, cebolla, aceitunas y vinagreta de la casa',
 				extraPrice: 0,
 				category: DishCategory.FIRST_COURSES,
-				isVegetarian: true,
-				isLactoseFree: true,
-				isSpicy: false,
-				isGlutenFree: true,
-				isVegan: true,
+				is_vegetarian: true,
+				is_lactose_free: true,
+				is_spicy: false,
+				is_gluten_free: true,
+				is_vegan: true,
 			},
 			{
 				id: Date.now().toString() + '_2',
@@ -170,11 +170,11 @@ export default function MenuCreationModal({
 					'Sopa casera preparada con ingredientes frescos de temporada',
 				extraPrice: 0,
 				category: DishCategory.FIRST_COURSES,
-				isVegetarian: true,
-				isLactoseFree: false,
-				isSpicy: false,
-				isGlutenFree: false,
-				isVegan: false,
+				is_vegetarian: true,
+				is_lactose_free: false,
+				is_spicy: false,
+				is_gluten_free: false,
+				is_vegan: false,
 			},
 			{
 				id: Date.now().toString() + '_3',
@@ -182,11 +182,11 @@ export default function MenuCreationModal({
 				description: 'Pechuga de pollo a la plancha con guarnición de verduras',
 				extraPrice: 0,
 				category: DishCategory.SECOND_COURSES,
-				isVegetarian: false,
-				isLactoseFree: true,
-				isSpicy: false,
-				isGlutenFree: true,
-				isVegan: false,
+				is_vegetarian: false,
+				is_lactose_free: true,
+				is_spicy: false,
+				is_gluten_free: true,
+				is_vegan: false,
 			},
 			{
 				id: Date.now().toString() + '_4',
@@ -194,11 +194,11 @@ export default function MenuCreationModal({
 				description: 'Merluza fresca al horno con patatas panaderas',
 				extraPrice: 2.5,
 				category: DishCategory.SECOND_COURSES,
-				isVegetarian: false,
-				isLactoseFree: true,
-				isSpicy: false,
-				isGlutenFree: true,
-				isVegan: false,
+				is_vegetarian: false,
+				is_lactose_free: true,
+				is_spicy: false,
+				is_gluten_free: true,
+				is_vegan: false,
 			},
 			{
 				id: Date.now().toString() + '_5',
@@ -206,11 +206,11 @@ export default function MenuCreationModal({
 				description: 'Flan casero con caramelo líquido',
 				extraPrice: 0,
 				category: DishCategory.DESSERTS,
-				isVegetarian: true,
-				isLactoseFree: false,
-				isSpicy: false,
-				isGlutenFree: true,
-				isVegan: false,
+				is_vegetarian: true,
+				is_lactose_free: false,
+				is_spicy: false,
+				is_gluten_free: true,
+				is_vegan: false,
 			},
 			{
 				id: Date.now().toString() + '_6',
@@ -218,28 +218,28 @@ export default function MenuCreationModal({
 				description: 'Selección de fruta fresca de temporada',
 				extraPrice: 0,
 				category: DishCategory.DESSERTS,
-				isVegetarian: true,
-				isLactoseFree: true,
-				isSpicy: false,
-				isGlutenFree: true,
-				isVegan: true,
+				is_vegetarian: true,
+				is_lactose_free: true,
+				is_spicy: false,
+				is_gluten_free: true,
+				is_vegan: true,
 			},
 		];
 
 		const simulatedMenuData: Partial<MenuData> = {
-			firstCoursesToShare: false,
-			secondCoursesToShare: false,
-			dessertsToShare: false,
-			includesBread: true,
+			first_courses_to_share: false,
+			second_courses_to_share: false,
+			desserts_to_share: false,
+			includes_bread: true,
 			drinks: {
 				water: true,
 				wine: false,
-				softDrinks: true,
+				soft_drinks: true,
 				beer: false,
 			},
-			includesCoffeeAndDessert: 'coffee',
-			hasMinimumPeople: false,
-			minimumPeople: undefined,
+			includes_coffee_and_dessert: 'coffee',
+			has_minimum_people: false,
+			minimum_people: undefined,
 		};
 
 		return { dishes: simulatedDishes, menuData: simulatedMenuData };
@@ -377,20 +377,20 @@ export default function MenuCreationModal({
 			if (editingMenu) {
 				setMenuName(editingMenu.name);
 				setSelectedDays([...editingMenu.days]);
-				setStartTime(editingMenu.startTime);
-				setEndTime(editingMenu.endTime);
+				setStartTime(editingMenu.start_time);
+				setEndTime(editingMenu.end_time);
 				setPrice(editingMenu.price.toString());
 				setShowManualMenu(editingMenu.dishes.length > 0);
 				setMenuDishes([...editingMenu.dishes]);
 				setMenuOptions({
-					firstCoursesToShare: editingMenu.firstCoursesToShare,
-					secondCoursesToShare: editingMenu.secondCoursesToShare,
-					dessertsToShare: editingMenu.dessertsToShare,
-					includesBread: editingMenu.includesBread,
+					first_courses_to_share: editingMenu.first_courses_to_share,
+					second_courses_to_share: editingMenu.second_courses_to_share,
+					desserts_to_share: editingMenu.desserts_to_share,
+					includes_bread: editingMenu.includes_bread,
 					drinks: editingMenu.drinks,
-					includesCoffeeAndDessert: editingMenu.includesCoffeeAndDessert,
-					hasMinimumPeople: editingMenu.hasMinimumPeople,
-					minimumPeople: editingMenu.minimumPeople,
+					includes_coffee_and_dessert: editingMenu.includes_coffee_and_dessert,
+					has_minimum_people: editingMenu.has_minimum_people,
+					minimum_people: editingMenu.minimum_people,
 				});
 			} else {
 				resetForm();
@@ -463,8 +463,8 @@ export default function MenuCreationModal({
 			id: editingMenu?.id || Date.now().toString(),
 			name: menuName,
 			days: selectedDays,
-			startTime,
-			endTime,
+			start_time,
+			end_time,
 			price: parseFloat(price) || 0,
 			dishes: menuDishes,
 			...menuOptions,
@@ -474,8 +474,8 @@ export default function MenuCreationModal({
 	}, [
 		menuName,
 		selectedDays,
-		startTime,
-		endTime,
+		start_time,
+		end_time,
 		price,
 		menuDishes,
 		menuOptions,
@@ -539,8 +539,8 @@ export default function MenuCreationModal({
 					<View style={styles.section}>
 						<Text style={styles.label}>{t('menuCreation.whatTime')}</Text>
 						<TimeSelector
-							startTime={startTime}
-							endTime={endTime}
+							start_time={start_time}
+							end_time={end_time}
 							onStartTimeChange={setStartTime}
 							onEndTimeChange={setEndTime}
 						/>

@@ -1,4 +1,3 @@
-// app/index.tsx (Updated)
 import { allRestaurants } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import CenterLocationMapButton from '@/components/CenterLocationMapButton';
@@ -175,7 +174,7 @@ export default function Index() {
 					>
 						<ScrollHorizontalResturant title="bestRating" sortBy="rating" />
 						<ScrollHorizontalResturant title="mostPopular" sortBy="popular" />
-						<ScrollHorizontalResturant title="newest" sortBy="createdAt" />
+						<ScrollHorizontalResturant title="newest" sortBy="created_at" />
 						<ScrollHorizontalResturant title="closest" sortBy="distance" />
 						<ScrollHorizontalResturant
 							title="recommended"
@@ -230,9 +229,9 @@ export default function Index() {
 								}}
 								onPress={async () => handleMarkerPress(restaurant)}
 							>
-								{restaurant.profileImage ? (
+								{restaurant.profile_image ? (
 									<Image
-										src={restaurant.profileImage}
+										src={restaurant.profile_image}
 										style={{ width: 40, height: 40, borderRadius: 20 }}
 										resizeMode="cover"
 									/>

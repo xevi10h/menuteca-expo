@@ -62,7 +62,7 @@ export default function ProfileLayout() {
 			/>
 			{/* User Restaurant Routes */}
 			<Stack.Screen
-				name="[userId]/restaurant/[restaurantId]/preview"
+				name="[user_id]/restaurant/[restaurant_id]/preview"
 				options={{
 					presentation: 'card',
 					gestureEnabled: true,
@@ -70,7 +70,7 @@ export default function ProfileLayout() {
 				}}
 			/>
 			<Stack.Screen
-				name="[userId]/restaurant/[restaurantId]/edit"
+				name="[user_id]/restaurant/[restaurant_id]/edit"
 				options={{
 					presentation: 'card',
 					gestureEnabled: true,

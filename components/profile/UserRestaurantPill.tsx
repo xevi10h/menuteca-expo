@@ -17,25 +17,25 @@ export default function UserRestaurantPill({
 }: UserRestaurantPillProps) {
 	const { t } = useTranslation();
 	const router = useRouter();
-	const userId = useUserStore((state) => state.user.id);
+	const user_id = useUserStore((state) => state.user.id);
 
 	const cuisine = getCuisineById(restaurant.cuisineId);
 	const status = getUserRestaurantStatus(restaurant.id);
 
 	const handlePreview = () => {
-		router.push(`/profile/${userId}/restaurant/${restaurant.id}/preview`);
+		router.push(`/profile/${user_id}/restaurant/${restaurant.id}/preview`);
 	};
 
 	const handleEdit = () => {
-		router.push(`/profile/${userId}/restaurant/${restaurant.id}/edit`);
+		router.push(`/profile/${user_id}/restaurant/${restaurant.id}/edit`);
 	};
 
 	const renderRestaurantImage = () => {
-		if (restaurant.profileImage) {
+		if (restaurant.profile_image) {
 			return (
 				<Image
-					source={{ uri: restaurant.profileImage }}
-					style={styles.restaurantImage}
+					source={{ uri: restaurant.profile_image }}
+					style={styles.restaurant_image}
 				/>
 			);
 		} else {
@@ -56,7 +56,7 @@ export default function UserRestaurantPill({
 			{/* Restaurant Info */}
 			<View style={styles.infoContainer}>
 				<View style={styles.headerRow}>
-					<Text style={styles.restaurantName} numberOfLines={1}>
+					<Text style={styles.restaurant_name} numberOfLines={1}>
 						{restaurant.name}
 					</Text>
 					<View style={styles.statusContainer}>
@@ -84,7 +84,7 @@ export default function UserRestaurantPill({
 						</Text>
 					)}
 					<Text style={styles.priceText}>
-						{t('general.from')} {restaurant.minimumPrice}€
+						{t('general.from')} {restaurant.minimum_price}€
 					</Text>
 				</View>
 
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
 	imageContainer: {
 		marginRight: 12,
 	},
-	restaurantImage: {
+	restaurant_image: {
 		width: 50,
 		height: 50,
 		borderRadius: 12,
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		marginBottom: 4,
 	},
-	restaurantName: {
+	restaurant_name: {
 		fontSize: 12,
 		fontFamily: 'Manrope',
 		fontWeight: '600',

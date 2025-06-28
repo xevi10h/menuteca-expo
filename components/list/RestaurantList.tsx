@@ -1,41 +1,30 @@
-import { allRestaurants } from '@/api/responses';
 import RestaurantCard from '@/components/RestaurantCard';
-import { useFilteredRestaurants } from '@/helpers/filterHelper';
-import { useFilterStore } from '@/zustand/FilterStore';
+import { Restaurant } from '@/shared/types';
 import React from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 
-const ITEMS_PER_PAGE = 10;
+interface RestaurantListProps {
+	restaurants: Restaurant[];
+}
 
-export default function RestaurantList() {
-	const filters = useFilterStore((state) => state.main);
-
-	// Use the filter helper to get filtered restaurants
-	const filteredRestaurants = useFilteredRestaurants(allRestaurants, filters);
-
-	const renderRestaurantItem = ({
-		item,
-	}: {
-		item: (typeof allRestaurants)[0];
-	}) => (
+export default function RestaurantList({ restaurants }: RestaurantListProps) {
+	const renderRestaurantItem = ({ item }: { item: Restaurant }) => (
 		<View style={styles.itemContainer}>
 			<RestaurantCard restaurant={item} />
 		</View>
 	);
 
-	const keyExtractor = (item: (typeof allRestaurants)[0]) => item.id;
+	const keyExtractor = (item: Restaurant) => item.id;
 
 	return (
 		<FlatList
-			data={filteredRestaurants}
+			data={restaurants}
 			renderItem={renderRestaurantItem}
 			keyExtractor={keyExtractor}
 			contentContainerStyle={styles.container}
 			showsVerticalScrollIndicator={false}
-			// Infinite scroll setup
-			onEndReachedThreshold={0.1}
 			removeClippedSubviews={true}
-			maxToRenderPerBatch={ITEMS_PER_PAGE}
+			maxToRenderPerBatch={10}
 			windowSize={10}
 			// Add some padding at the bottom
 			ListFooterComponent={<View style={styles.footer} />}

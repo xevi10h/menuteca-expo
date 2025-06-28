@@ -222,8 +222,8 @@ export default function ReviewsScreen() {
 				visible={showAddReviewModal}
 				onClose={() => setShowAddReviewModal(false)}
 				onSubmit={handleAddReview}
-				restaurantId={id || ''}
-				restaurantName="Restaurante Ejemplo"
+				restaurant_id={id || ''}
+				restaurant_name="Restaurante Ejemplo"
 			/>
 		</View>
 	);

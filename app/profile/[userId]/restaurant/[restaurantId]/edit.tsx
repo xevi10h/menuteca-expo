@@ -39,9 +39,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 export default function UserRestaurantEdit() {
 	const { t } = useTranslation();
 	const router = useRouter();
-	const { restaurantId } = useLocalSearchParams<{
-		userId: string;
-		restaurantId: string;
+	const { restaurant_id } = useLocalSearchParams<{
+		user_id: string;
+		restaurant_id: string;
 	}>();
 	const insets = useSafeAreaInsets();
 
@@ -70,10 +70,10 @@ export default function UserRestaurantEdit() {
 				// Simular delay de carga
 				await new Promise((resolve) => setTimeout(resolve, 500));
 
-				if (restaurantId) {
-					const restaurantData = getUserRestaurantById(restaurantId);
-					const menusData = getUserRestaurantMenus(restaurantId);
-					const statusData = getUserRestaurantStatus(restaurantId);
+				if (restaurant_id) {
+					const restaurantData = getUserRestaurantById(restaurant_id);
+					const menusData = getUserRestaurantMenus(restaurant_id);
+					const statusData = getUserRestaurantStatus(restaurant_id);
 
 					if (restaurantData) {
 						setRestaurant({
@@ -91,7 +91,7 @@ export default function UserRestaurantEdit() {
 		};
 
 		loadRestaurantData();
-	}, [restaurantId]);
+	}, [restaurant_id]);
 
 	const handleBack = () => {
 		router.back();
@@ -106,8 +106,8 @@ export default function UserRestaurantEdit() {
 			await new Promise((resolve) => setTimeout(resolve, 1000));
 
 			// Actualizar estado del restaurante
-			if (restaurantId) {
-				updateUserRestaurantStatus(restaurantId, isActive);
+			if (restaurant_id) {
+				updateUserRestaurantStatus(restaurant_id, isActive);
 			}
 
 			Alert.alert(
@@ -138,11 +138,11 @@ export default function UserRestaurantEdit() {
 		});
 	};
 
-	const handleSetProfileImage = (imageUri: string) => {
+	const handleSetprofile_image = (imageUri: string) => {
 		if (!restaurant) return;
 		setRestaurant({
 			...restaurant,
-			profileImage: imageUri,
+			profile_image: imageUri,
 		});
 	};
 
@@ -270,11 +270,11 @@ export default function UserRestaurantEdit() {
 		});
 	};
 
-	const handleReservationLinkChange = (reservationLink: string) => {
+	const handleReservationLinkChange = (reservation_link: string) => {
 		if (!restaurant) return;
 		setRestaurant({
 			...restaurant,
-			reservationLink,
+			reservation_link,
 		});
 	};
 
@@ -362,8 +362,8 @@ export default function UserRestaurantEdit() {
 
 				{/* Profile Photo Section */}
 				<ProfilePhotoSection
-					profileImage={restaurant.profileImage}
-					onImageSelected={handleSetProfileImage}
+					profile_image={restaurant.profile_image}
+					onImageSelected={handleSetprofile_image}
 				/>
 
 				{/* Contact Info */}
@@ -375,7 +375,7 @@ export default function UserRestaurantEdit() {
 					</View>
 					<ContactInfoSection
 						phone={restaurant.phone || ''}
-						reservationLink={restaurant.reservationLink || ''}
+						reservation_link={restaurant.reservation_link || ''}
 						onPhoneChange={handlePhoneChange}
 						onReservationLinkChange={handleReservationLinkChange}
 						showTitle={false}
@@ -401,7 +401,7 @@ export default function UserRestaurantEdit() {
 					</View>
 					<AddressSection
 						address={restaurant.address}
-						restaurantName={restaurant.name}
+						restaurant_name={restaurant.name}
 						onEditPress={() => setShowAddressModal(true)}
 					/>
 				</View>

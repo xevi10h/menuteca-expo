@@ -30,8 +30,8 @@ export default function UserReviewItem({
 	};
 
 	const handleRestaurantPress = () => {
-		if (review.restaurantId) {
-			router.push(`/restaurant/${review.restaurantId}`);
+		if (review.restaurant_id) {
+			router.push(`/restaurant/${review.restaurant_id}`);
 		}
 	};
 
@@ -45,12 +45,12 @@ export default function UserReviewItem({
 					activeOpacity={0.7}
 				>
 					<Image
-						source={{ uri: review.restaurantImage }}
-						style={styles.restaurantImage}
+						source={{ uri: review.restaurant_image }}
+						style={styles.restaurant_image}
 					/>
 					<View style={styles.restaurantInfo}>
-						<Text style={styles.restaurantName} numberOfLines={1}>
-							{review.restaurantName}
+						<Text style={styles.restaurant_name} numberOfLines={1}>
+							{review.restaurant_name}
 						</Text>
 						<Text style={styles.reviewDate}>{formatDate(review.date)}</Text>
 					</View>
@@ -76,11 +76,11 @@ export default function UserReviewItem({
 				<View style={styles.userHeader}>
 					<View style={styles.userInfo}>
 						<Image
-							source={{ uri: review.userAvatar }}
-							style={styles.userAvatar}
+							source={{ uri: review.user_avatar }}
+							style={styles.user_avatar}
 						/>
 						<View style={styles.userDetails}>
-							<Text style={styles.userName}>{review.userName}</Text>
+							<Text style={styles.user_name}>{review.user_name}</Text>
 							<Text style={styles.reviewDate}>{formatDate(review.date)}</Text>
 						</View>
 					</View>
@@ -103,19 +103,19 @@ export default function UserReviewItem({
 			<ReviewPhotos photos={review.photos} />
 
 			{/* Restaurant Response */}
-			{review.restaurantResponse && (
-				<View style={styles.restaurantResponse}>
+			{review.restaurant_response && (
+				<View style={styles.restaurant_response}>
 					<View style={styles.responseHeader}>
 						<Ionicons name="storefront" size={16} color={colors.primary} />
 						<Text style={styles.responseLabel} numberOfLines={1}>
-							{t('reviews.restaurantResponse')}
+							{t('reviews.restaurant_response')}
 						</Text>
 						<Text style={styles.responseDate} numberOfLines={1}>
-							{formatDate(review.restaurantResponse.date)}
+							{formatDate(review.restaurant_response.date)}
 						</Text>
 					</View>
 					<Text style={styles.responseMessage}>
-						{review.restaurantResponse.message}
+						{review.restaurant_response.message}
 					</Text>
 				</View>
 			)}
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
 		borderBottomColor: colors.secondary,
 		gap: 10,
 	},
-	restaurantImage: {
+	restaurant_image: {
 		width: 50,
 		height: 50,
 		borderRadius: 8,
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
 	restaurantInfo: {
 		flex: 1,
 	},
-	restaurantName: {
+	restaurant_name: {
 		fontSize: 14,
 
 		fontFamily: 'Manrope',
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		flex: 1,
 	},
-	userAvatar: {
+	user_avatar: {
 		width: 45,
 		height: 45,
 		borderRadius: 22.5,
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
 	userDetails: {
 		flex: 1,
 	},
-	userName: {
+	user_name: {
 		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '600',
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
 		color: colors.primary,
 		lineHeight: 22,
 	},
-	restaurantResponse: {
+	restaurant_response: {
 		backgroundColor: colors.secondary,
 		borderRadius: 12,
 		padding: 15,

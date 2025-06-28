@@ -27,7 +27,7 @@ export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
 			activeOpacity={0.8}
 		>
 			<Image
-				source={{ uri: restaurant.mainImage }}
+				source={{ uri: restaurant.main_image }}
 				style={styles.image}
 				resizeMode="cover"
 			/>
@@ -45,7 +45,7 @@ export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
 						{restaurant.name}
 					</Text>
 					<Text style={styles.price}>
-						{t('general.from')} {restaurant.minimumPrice}€
+						{t('general.from')} {restaurant.minimum_price}€
 					</Text>
 				</View>
 
