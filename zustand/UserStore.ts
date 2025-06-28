@@ -1,4 +1,4 @@
-// zustand/UserStore.ts (Updated)
+import { setAuthToken } from '@/api/client'; // Import the token setter
 import { AuthService, UserService } from '@/api/services';
 import { getDeviceLanguage } from '@/shared/functions/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -66,6 +66,9 @@ export const useUserStore = create<UserState>()(
 			error: null,
 
 			setUser: (user: User) => {
+				// Actualizar el token en el cliente API
+				setAuthToken(user.token);
+
 				set({
 					user,
 					isAuthenticated: !!user.id && !!user.token,
@@ -131,6 +134,9 @@ export const useUserStore = create<UserState>()(
 			},
 
 			setDefaultUser: () => {
+				// Limpiar el token del cliente API
+				setAuthToken(null);
+
 				set({
 					user: { ...undefinedUser, language: getDeviceLanguage() },
 					isAuthenticated: false,
@@ -189,6 +195,9 @@ export const useUserStore = create<UserState>()(
 							google_id: response.data.user.google_id || '',
 						};
 
+						// Actualizar token en cliente API
+						setAuthToken(userData.token);
+
 						set({
 							user: userData,
 							isAuthenticated: true,
@@ -222,6 +231,9 @@ export const useUserStore = create<UserState>()(
 							has_password: true,
 							google_id: '',
 						};
+
+						// Actualizar token en cliente API
+						setAuthToken(user.token);
 
 						set({
 							user,
@@ -257,6 +269,9 @@ export const useUserStore = create<UserState>()(
 							google_id: response.data.user.google_id || googleData.google_id,
 						};
 
+						// Actualizar token en cliente API
+						setAuthToken(userData.token);
+
 						set({
 							user: userData,
 							isAuthenticated: true,
@@ -278,6 +293,9 @@ export const useUserStore = create<UserState>()(
 			},
 
 			logout: () => {
+				// Limpiar token del cliente API
+				setAuthToken(null);
+
 				set({
 					user: { ...undefinedUser, language: get().user.language },
 					isAuthenticated: false,
@@ -380,6 +398,12 @@ export const useUserStore = create<UserState>()(
 				user: state.user,
 				isAuthenticated: state.isAuthenticated,
 			}),
+			onRehydrateStorage: () => (state) => {
+				// Cuando se rehidrata el store, actualizar el token en el cliente API
+				if (state?.user?.token) {
+					setAuthToken(state.user.token);
+				}
+			},
 		},
 	),
 );

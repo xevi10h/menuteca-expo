@@ -1,14 +1,14 @@
-import { getCuisineById } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useCuisineStore } from '@/zustand/CuisineStore';
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface CuisineSelectionSectionProps {
 	selectedCuisineId?: string;
 	onEditPress: () => void;
-	showTitle?: boolean; // Nueva prop para controlar si mostrar el título
+	showTitle?: boolean;
 }
 
 export default function CuisineSelectionSection({
@@ -17,6 +17,16 @@ export default function CuisineSelectionSection({
 	showTitle = false,
 }: CuisineSelectionSectionProps) {
 	const { t } = useTranslation();
+
+	// Usar Zustand store para obtener cuisine por ID
+	const { getCuisineById, fetchCuisines, cuisines } = useCuisineStore();
+
+	// Asegurar que tenemos cuisines cargadas si necesitamos mostrar una
+	useEffect(() => {
+		if (selectedCuisineId && cuisines.length === 0) {
+			fetchCuisines();
+		}
+	}, [selectedCuisineId, cuisines.length, fetchCuisines]);
 
 	const selectedCuisine = selectedCuisineId
 		? getCuisineById(selectedCuisineId)
@@ -53,7 +63,7 @@ export default function CuisineSelectionSection({
 
 const styles = StyleSheet.create({
 	foodTypesSection: {
-		marginVertical: 0, // Removed vertical margin since parent handles it
+		marginVertical: 0,
 	},
 	sectionHeader: {
 		flexDirection: 'row',

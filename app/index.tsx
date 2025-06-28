@@ -1,6 +1,6 @@
-import { RestaurantService } from '@/api/services';
 import { colors } from '@/assets/styles/colors';
 import CenterLocationMapButton from '@/components/CenterLocationMapButton';
+import DebugPanel from '@/components/DebugPanel';
 import ExpandableMapRestaurantModal from '@/components/ExpandableMapRestaurantModal';
 import ListFilter from '@/components/ListFilter';
 import MainSearcher from '@/components/MainSearcher';
@@ -13,9 +13,10 @@ import RestaurantList from '@/components/list/RestaurantList';
 import ScrollHorizontalResturant from '@/components/list/ScrollHorizontalResturant';
 import { Restaurant } from '@/shared/types';
 import { useFilterStore } from '@/zustand/FilterStore';
+import { useRestaurantStore } from '@/zustand/RestaurantStore';
 import * as Location from 'expo-location';
 import { useEffect, useRef, useState } from 'react';
-import { Image, Platform, ScrollView, Text, View } from 'react-native';
+import { Alert, Image, Platform, ScrollView, Text, View } from 'react-native';
 import MapViewType, { Camera } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -27,11 +28,19 @@ export default function Index() {
 		useState<Restaurant | null>(null);
 	const [modalVisible, setModalVisible] = useState(false);
 	const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-	const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState(false);
+	const [loadingError, setLoadingError] = useState<string | null>(null);
 	const mapViewRef = useRef<MapViewType>(null);
 
 	// Get filter state to determine view mode
 	const filters = useFilterStore((state) => state.main);
+
+	// Use restaurant store for caching
+	const {
+		fetchRestaurants,
+		isLoading: storeLoading,
+		error: storeError,
+	} = useRestaurantStore();
 
 	// Check if any non-persistent filters are active (excludes sort and cuisines)
 	const hasActiveFilters =
@@ -43,28 +52,62 @@ export default function Index() {
 		filters.timeRange !== null ||
 		filters.distance !== null;
 
-	// Load restaurants data
+	// Load restaurants data with proper error handling
 	useEffect(() => {
 		const loadRestaurants = async () => {
+			// Don't load if already loading
+			if (storeLoading || loading) return;
+
 			try {
 				setLoading(true);
-				const response = await RestaurantService.getAllRestaurants({
+				setLoadingError(null);
+
+				// Use store's fetchRestaurants which handles caching
+				const restaurantData = await fetchRestaurants({
 					page: 1,
 					limit: 100, // Load more restaurants for map
 				});
 
-				if (response.success) {
-					setRestaurants(response.data.data);
-				}
+				setRestaurants(restaurantData);
 			} catch (error) {
 				console.error('Error loading restaurants:', error);
+				const errorMessage =
+					error instanceof Error ? error.message : 'Unknown error';
+				setLoadingError(errorMessage);
+
+				// Don't show alert immediately, let user try again
+				if (restaurants.length === 0) {
+					// Only show error if we have no cached data
+					setTimeout(() => {
+						if (loadingError && restaurants.length === 0) {
+							Alert.alert(
+								'Error loading restaurants',
+								'Could not load restaurant data. Please check your connection and try again.',
+								[
+									{ text: 'Retry', onPress: loadRestaurants },
+									{ text: 'OK', style: 'cancel' },
+								],
+							);
+						}
+					}, 2000);
+				}
 			} finally {
 				setLoading(false);
 			}
 		};
 
-		loadRestaurants();
-	}, []);
+		// Only load if we don't have restaurants or if there's an error
+		if (restaurants.length === 0 || storeError) {
+			loadRestaurants();
+		}
+	}, [
+		fetchRestaurants,
+		storeLoading,
+		loading,
+		storeError,
+		restaurants.length,
+		loadingError,
+	]);
 
 	const handleMarkerPress = async (restaurant: Restaurant) => {
 		await centerCoordinatesMarker(restaurant);
@@ -105,7 +148,7 @@ export default function Index() {
 				mapViewRef.current?.animateCamera(newCamera, { duration: 1000 });
 			}
 		} catch (error) {
-			console.error(error);
+			console.error('Error getting location:', error);
 		}
 	};
 
@@ -126,7 +169,7 @@ export default function Index() {
 				mapViewRef.current?.animateCamera(newCamera, { duration: 1000 });
 			}
 		} catch (error) {
-			console.error(error);
+			console.error('Error centering on restaurant:', error);
 		}
 	};
 
@@ -313,6 +356,9 @@ export default function Index() {
 				iconName="map-outline"
 				active={view === 'map'}
 			/>
+
+			{/* Debug Panel - Only in development */}
+			<DebugPanel />
 
 			{/* Modal para detalles del restaurante desde el mapa */}
 			{selectedRestaurant && (

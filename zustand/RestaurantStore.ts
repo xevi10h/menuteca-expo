@@ -37,12 +37,14 @@ interface RestaurantState {
 	cache: Map<string, CachedRestaurantData>;
 	isLoading: boolean;
 	error: string | null;
+	lastError: Date | null;
 
 	// Actions
 	fetchRestaurants: (filters?: RestaurantFilters) => Promise<Restaurant[]>;
 	getRestaurantById: (id: string) => Restaurant | undefined;
 	clearCache: () => void;
 	removeFromCache: (cacheKey: string) => void;
+	clearError: () => void;
 }
 
 // Helper function to create cache key from filters
@@ -70,6 +72,7 @@ export const useRestaurantStore = create<RestaurantState>((set, get) => ({
 	cache: new Map(),
 	isLoading: false,
 	error: null,
+	lastError: null,
 
 	fetchRestaurants: async (
 		filters: RestaurantFilters = {},
@@ -79,21 +82,38 @@ export const useRestaurantStore = create<RestaurantState>((set, get) => ({
 		const cachedData = state.cache.get(cacheKey);
 		const now = Date.now();
 
+		console.log(
+			'RestaurantStore: fetchRestaurants called with filters:',
+			filters,
+		);
+		console.log('RestaurantStore: Cache key:', cacheKey);
+		console.log('RestaurantStore: Has cached data:', !!cachedData);
+
 		// Check if we have valid cached data
 		if (
 			cachedData &&
 			now - cachedData.lastFetched < CACHE_DURATION &&
 			filtersMatch(cachedData.filters, filters)
 		) {
+			console.log('RestaurantStore: Using cached data');
 			return cachedData.restaurants;
 		}
 
+		// Clear previous errors when starting new fetch
 		set({ isLoading: true, error: null });
 
 		try {
+			console.log('RestaurantStore: Fetching from API...');
 			const response = await RestaurantService.getAllRestaurants(filters);
+			console.log('respnse', response);
 
 			if (response.success) {
+				console.log(
+					'RestaurantStore: API success, got',
+					response.data.data.length,
+					'restaurants',
+				);
+
 				const newCachedData: CachedRestaurantData = {
 					restaurants: response.data.data,
 					pagination: response.data.pagination,
@@ -109,20 +129,31 @@ export const useRestaurantStore = create<RestaurantState>((set, get) => ({
 					cache: newCache,
 					isLoading: false,
 					error: null,
+					lastError: null,
 				});
 
 				return response.data.data;
 			} else {
-				throw new Error('Failed to fetch restaurants');
+				throw new Error('API returned success: false');
 			}
 		} catch (error) {
 			const errorMessage =
 				error instanceof Error ? error.message : 'Unknown error';
+
+			console.error('RestaurantStore: Error fetching restaurants:', {
+				error: errorMessage,
+				filters,
+				cacheKey,
+				timestamp: new Date().toISOString(),
+			});
+
 			set({
 				isLoading: false,
 				error: errorMessage,
+				lastError: new Date(),
 			});
-			console.error('Error fetching restaurants:', error);
+
+			// Return empty array on error to prevent app crashes
 			return [];
 		}
 	},
@@ -142,13 +173,24 @@ export const useRestaurantStore = create<RestaurantState>((set, get) => ({
 	},
 
 	clearCache: () => {
-		set({ cache: new Map() });
+		console.log('RestaurantStore: Clearing all cache');
+		set({ cache: new Map(), error: null });
 	},
 
 	removeFromCache: (cacheKey: string) => {
 		const state = get();
 		const newCache = new Map(state.cache);
-		newCache.delete(cacheKey);
+		const removed = newCache.delete(cacheKey);
+		console.log(
+			'RestaurantStore: Removed cache key:',
+			cacheKey,
+			'Success:',
+			removed,
+		);
 		set({ cache: newCache });
+	},
+
+	clearError: () => {
+		set({ error: null, lastError: null });
 	},
 }));

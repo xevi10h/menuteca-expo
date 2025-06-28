@@ -168,7 +168,7 @@ export class RestaurantService {
 		const endpoint = `/restaurants${
 			queryParams.toString() ? `?${queryParams.toString()}` : ''
 		}`;
-
+		console.log('Fetching restaurants with params:', endpoint);
 		return apiClient.get<{
 			success: boolean;
 			data: {

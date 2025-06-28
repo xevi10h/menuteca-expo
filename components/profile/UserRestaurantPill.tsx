@@ -1,11 +1,11 @@
-import { getCuisineById, getUserRestaurantStatus } from '@/api/responses';
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Restaurant } from '@/shared/types';
+import { useCuisineStore } from '@/zustand/CuisineStore';
 import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface UserRestaurantPillProps {
@@ -19,8 +19,22 @@ export default function UserRestaurantPill({
 	const router = useRouter();
 	const user_id = useUserStore((state) => state.user.id);
 
+	// Usar Zustand store para obtener cuisine
+	const { getCuisineById, fetchCuisines, cuisines } = useCuisineStore();
+
+	// Asegurar que tenemos cuisines cargadas
+	useEffect(() => {
+		if (restaurant.cuisineId && cuisines.length === 0) {
+			fetchCuisines();
+		}
+	}, [restaurant.cuisineId, cuisines.length, fetchCuisines]);
+
 	const cuisine = getCuisineById(restaurant.cuisineId);
-	const status = getUserRestaurantStatus(restaurant.id);
+
+	// El status se puede obtener directamente del restaurant object
+	const status = {
+		isActive: restaurant.is_active || false,
+	};
 
 	const handlePreview = () => {
 		router.push(`/profile/${user_id}/restaurant/${restaurant.id}/preview`);
@@ -46,6 +60,13 @@ export default function UserRestaurantPill({
 				</View>
 			);
 		}
+	};
+
+	const formatCity = (address: any): string => {
+		if (typeof address === 'string') {
+			return address; // Fallback para direcciones string
+		}
+		return address?.city || '';
 	};
 
 	return (
@@ -93,7 +114,7 @@ export default function UserRestaurantPill({
 						<Ionicons name="star" size={14} color="#FFD700" />
 						<Text style={styles.ratingText}>{restaurant.rating}</Text>
 						<Text style={styles.addressText} numberOfLines={1}>
-							• {restaurant.address.city}
+							• {formatCity(restaurant.address)}
 						</Text>
 					</View>
 				)}

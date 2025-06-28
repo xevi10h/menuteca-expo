@@ -1,4 +1,3 @@
-// app/_layout.tsx (actualización)
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import {
 	DarkTheme,
@@ -12,6 +11,7 @@ import { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import LoadingScreen from '@/components/LoadingScreen';
+import { useAppInitialization } from '@/hooks/useAppInitialization';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 SplashScreen.preventAutoHideAsync();
@@ -21,39 +21,46 @@ export default function RootLayout() {
 	const [loaded] = useFonts({
 		Manrope: require('../assets/fonts/Manrope-VariableFont_wght.ttf'),
 	});
-	const [isLoadingComplete, setIsLoadingComplete] = useState(false);
 	const [showCustomLoading, setShowCustomLoading] = useState(false);
+
+	// Use the app initialization hook
+	const { isInitialized, isLoading, error } = useAppInitialization();
 
 	useEffect(() => {
 		if (loaded) {
-			// Ocultar el splash screen nativo de Expo
+			// Hide native splash screen
 			SplashScreen.hideAsync();
-			// Mostrar nuestro loading screen personalizado
+			// Show our custom loading screen
 			setShowCustomLoading(true);
 		}
 	}, [loaded]);
 
 	const handleLoadingComplete = () => {
-		setIsLoadingComplete(true);
 		setShowCustomLoading(false);
 	};
 
-	// Si las fuentes no están cargadas, no mostrar nada (splash screen nativo se mantiene)
+	// Don't render anything if fonts aren't loaded
 	if (!loaded) {
 		return null;
 	}
 
-	// Mostrar loading screen personalizado
-	if (showCustomLoading && !isLoadingComplete) {
+	// Show custom loading screen during app initialization
+	if (showCustomLoading && (!isInitialized || isLoading)) {
 		return (
 			<LoadingScreen
 				onLoadingComplete={handleLoadingComplete}
-				duration={3000} // 3 segundos de loading
+				duration={isLoading ? undefined : 2000} // Show until loading completes, or 2s minimum
 			/>
 		);
 	}
 
-	// App principal
+	// Show error screen if initialization failed critically
+	if (error && !isInitialized) {
+		console.error('Critical app initialization error:', error);
+		// Still proceed to show the app - most errors aren't critical
+	}
+
+	// Main app
 	return (
 		<GestureHandlerRootView style={{ flex: 1 }}>
 			<ActionSheetProvider>
