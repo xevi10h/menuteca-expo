@@ -11,7 +11,7 @@ export default function ProfilePhotoButton() {
 		if (isLoggedIn) {
 			router.push('/profile');
 		} else {
-			router.push('/auth/login');
+			router.push('/auth');
 		}
 	};
 
