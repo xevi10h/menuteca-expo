@@ -3,7 +3,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
 import { Redirect, useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
 	ActivityIndicator,
 	Alert,
@@ -26,12 +26,28 @@ export default function LoginScreen() {
 	const isLoading = useUserStore((state) => state.isLoading);
 	const isAuthenticated = useUserStore((state) => state.isAuthenticated);
 	const error = useUserStore((state) => state.error);
+	const clearError = useUserStore((state) => state.clearError);
 
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [showPassword, setShowPassword] = useState(false);
 	const [emailError, setEmailError] = useState('');
 	const [passwordError, setPasswordError] = useState('');
+	const [isFormValid, setIsFormValid] = useState(false);
+
+	// Clear errors when user starts typing
+	useEffect(() => {
+		if (error) {
+			clearError();
+		}
+	}, [email, password]);
+
+	// Validate form in real time
+	useEffect(() => {
+		const isEmailValid = validateEmail(email);
+		const isPasswordValid = password.length >= 6;
+		setIsFormValid(isEmailValid && isPasswordValid && !isLoading);
+	}, [email, password, isLoading]);
 
 	// If already authenticated, redirect to main app
 	if (isAuthenticated) {
@@ -41,6 +57,16 @@ export default function LoginScreen() {
 	const validateEmail = (email: string) => {
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		return emailRegex.test(email);
+	};
+
+	const handleEmailChange = (text: string) => {
+		setEmail(text);
+		if (emailError) setEmailError('');
+	};
+
+	const handlePasswordChange = (text: string) => {
+		setPassword(text);
+		if (passwordError) setPasswordError('');
 	};
 
 	const handleLogin = async () => {
@@ -62,6 +88,9 @@ export default function LoginScreen() {
 		if (!password.trim()) {
 			setPasswordError(t('validation.passwordRequired'));
 			hasErrors = true;
+		} else if (password.length < 6) {
+			setPasswordError(t('validation.passwordMinLength'));
+			hasErrors = true;
 		}
 
 		if (hasErrors) return;
@@ -71,7 +100,6 @@ export default function LoginScreen() {
 
 			if (success) {
 				// Navigation will be handled automatically by the authentication state change
-				// The user will be redirected to the main app through the index.tsx redirect
 				router.replace('/');
 			} else {
 				// Error is handled by the store
@@ -80,6 +108,7 @@ export default function LoginScreen() {
 				}
 			}
 		} catch (err) {
+			console.error('Login error:', err);
 			Alert.alert(t('auth.loginError'), t('auth.loginFailed'));
 		}
 	};
@@ -102,10 +131,18 @@ export default function LoginScreen() {
 				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 				style={styles.keyboardView}
 			>
-				<ScrollView contentContainerStyle={styles.scrollContent}>
+				<ScrollView
+					contentContainerStyle={styles.scrollContent}
+					keyboardShouldPersistTaps="handled"
+					showsVerticalScrollIndicator={false}
+				>
 					{/* Header */}
 					<View style={styles.header}>
-						<TouchableOpacity onPress={handleBack} style={styles.backButton}>
+						<TouchableOpacity
+							onPress={handleBack}
+							style={styles.backButton}
+							disabled={isLoading}
+						>
 							<Ionicons name="chevron-back" size={24} color={colors.primary} />
 						</TouchableOpacity>
 						<Text style={styles.headerTitle}>{t('auth.login')}</Text>
@@ -115,7 +152,7 @@ export default function LoginScreen() {
 					<View style={styles.logoContainer}>
 						<Image
 							source={require('@/assets/images/logo_large_primary.png')}
-							style={{ width: 100, height: 80, marginBottom: 5 }}
+							style={styles.logo}
 							resizeMode="contain"
 						/>
 						<Text style={styles.appName}>Menuteca</Text>
@@ -127,20 +164,40 @@ export default function LoginScreen() {
 						{/* Email Input */}
 						<View style={styles.inputContainer}>
 							<Text style={styles.inputLabel}>{t('auth.email')}</Text>
-							<TextInput
-								style={[styles.input, emailError ? styles.inputError : null]}
-								value={email}
-								onChangeText={(text) => {
-									setEmail(text);
-									if (emailError) setEmailError('');
-								}}
-								placeholder={t('auth.enterEmail')}
-								placeholderTextColor={colors.primaryLight}
-								keyboardType="email-address"
-								autoCapitalize="none"
-								autoCorrect={false}
-								editable={!isLoading}
-							/>
+							<View style={styles.inputWrapper}>
+								<Ionicons
+									name="mail-outline"
+									size={20}
+									color={colors.primaryLight}
+									style={styles.inputIcon}
+								/>
+								<TextInput
+									style={[
+										styles.input,
+										emailError ? styles.inputError : null,
+										!validateEmail(email) && email.length > 0
+											? styles.inputWarning
+											: null,
+									]}
+									value={email}
+									onChangeText={handleEmailChange}
+									placeholder={t('auth.enterEmail')}
+									placeholderTextColor={colors.primaryLight}
+									keyboardType="email-address"
+									autoCapitalize="none"
+									autoCorrect={false}
+									editable={!isLoading}
+									autoComplete="email"
+								/>
+								{validateEmail(email) && (
+									<Ionicons
+										name="checkmark-circle"
+										size={20}
+										color="#10B981"
+										style={styles.validationIcon}
+									/>
+								)}
+							</View>
 							{emailError ? (
 								<Text style={styles.errorText}>{emailError}</Text>
 							) : null}
@@ -149,21 +206,25 @@ export default function LoginScreen() {
 						{/* Password Input */}
 						<View style={styles.inputContainer}>
 							<Text style={styles.inputLabel}>{t('auth.password')}</Text>
-							<View style={styles.passwordContainer}>
+							<View style={styles.inputWrapper}>
+								<Ionicons
+									name="lock-closed-outline"
+									size={20}
+									color={colors.primaryLight}
+									style={styles.inputIcon}
+								/>
 								<TextInput
 									style={[
-										styles.passwordInput,
+										styles.input,
 										passwordError ? styles.inputError : null,
 									]}
 									value={password}
-									onChangeText={(text) => {
-										setPassword(text);
-										if (passwordError) setPasswordError('');
-									}}
+									onChangeText={handlePasswordChange}
 									placeholder={t('auth.enterPassword')}
 									placeholderTextColor={colors.primaryLight}
 									secureTextEntry={!showPassword}
 									editable={!isLoading}
+									autoComplete="password"
 								/>
 								<TouchableOpacity
 									style={styles.eyeButton}
@@ -197,15 +258,23 @@ export default function LoginScreen() {
 						<TouchableOpacity
 							style={[
 								styles.loginButton,
-								isLoading && styles.loginButtonDisabled,
+								!isFormValid && styles.loginButtonDisabled,
 							]}
 							onPress={handleLogin}
-							disabled={isLoading}
+							disabled={!isFormValid}
+							activeOpacity={0.8}
 						>
 							{isLoading ? (
 								<ActivityIndicator size="small" color={colors.quaternary} />
 							) : (
-								<Text style={styles.loginButtonText}>{t('auth.login')}</Text>
+								<Text
+									style={[
+										styles.loginButtonText,
+										!isFormValid && styles.loginButtonTextDisabled,
+									]}
+								>
+									{t('auth.login')}
+								</Text>
 							)}
 						</TouchableOpacity>
 
@@ -216,7 +285,14 @@ export default function LoginScreen() {
 								onPress={handleGoToRegister}
 								disabled={isLoading}
 							>
-								<Text style={styles.registerLink}>{t('auth.register')}</Text>
+								<Text
+									style={[
+										styles.registerLink,
+										isLoading && styles.textDisabled,
+									]}
+								>
+									{t('auth.register')}
+								</Text>
 							</TouchableOpacity>
 						</View>
 					</View>
@@ -248,6 +324,7 @@ const styles = StyleSheet.create({
 		height: 40,
 		justifyContent: 'center',
 		alignItems: 'center',
+		borderRadius: 20,
 	},
 	headerTitle: {
 		fontSize: 18,
@@ -260,9 +337,10 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		paddingVertical: 40,
 	},
-	logoText: {
-		fontSize: 60,
-		marginBottom: 10,
+	logo: {
+		width: 100,
+		height: 80,
+		marginBottom: 5,
 	},
 	appName: {
 		fontSize: 32,
@@ -293,10 +371,21 @@ const styles = StyleSheet.create({
 		color: colors.primary,
 		marginBottom: 8,
 	},
+	inputWrapper: {
+		position: 'relative',
+		flexDirection: 'row',
+		alignItems: 'center',
+	},
+	inputIcon: {
+		position: 'absolute',
+		left: 16,
+		zIndex: 1,
+	},
 	input: {
+		flex: 1,
 		backgroundColor: colors.quaternary,
 		borderRadius: 12,
-		paddingHorizontal: 16,
+		paddingHorizontal: 48,
 		paddingVertical: 14,
 		fontSize: 16,
 		fontFamily: 'Manrope',
@@ -306,26 +395,21 @@ const styles = StyleSheet.create({
 	},
 	inputError: {
 		borderColor: '#D32F2F',
+		borderWidth: 2,
 	},
-	passwordContainer: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		backgroundColor: colors.quaternary,
-		borderRadius: 12,
-		borderWidth: 1,
-		borderColor: colors.primaryLight,
+	inputWarning: {
+		borderColor: '#FF9800',
 	},
-	passwordInput: {
-		flex: 1,
-		paddingHorizontal: 16,
-		paddingVertical: 14,
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		color: colors.primary,
+	validationIcon: {
+		position: 'absolute',
+		right: 16,
+		zIndex: 1,
 	},
 	eyeButton: {
-		paddingHorizontal: 16,
-		paddingVertical: 14,
+		position: 'absolute',
+		right: 16,
+		padding: 4,
+		zIndex: 1,
 	},
 	errorText: {
 		fontSize: 12,
@@ -333,10 +417,12 @@ const styles = StyleSheet.create({
 		fontWeight: '400',
 		color: '#D32F2F',
 		marginTop: 4,
+		marginLeft: 4,
 	},
 	forgotPasswordButton: {
 		alignSelf: 'flex-end',
 		marginBottom: 30,
+		padding: 4,
 	},
 	forgotPasswordText: {
 		fontSize: 14,
@@ -350,9 +436,21 @@ const styles = StyleSheet.create({
 		paddingVertical: 16,
 		alignItems: 'center',
 		marginBottom: 30,
+		shadowColor: colors.primary,
+		shadowOffset: {
+			width: 0,
+			height: 4,
+		},
+		shadowOpacity: 0.3,
+		shadowRadius: 8,
+		elevation: 8,
+		minHeight: 56,
+		justifyContent: 'center',
 	},
 	loginButtonDisabled: {
-		opacity: 0.6,
+		backgroundColor: colors.primaryLight,
+		shadowOpacity: 0,
+		elevation: 0,
 	},
 	loginButtonText: {
 		fontSize: 16,
@@ -360,11 +458,15 @@ const styles = StyleSheet.create({
 		fontWeight: '600',
 		color: colors.quaternary,
 	},
+	loginButtonTextDisabled: {
+		opacity: 0.7,
+	},
 	registerContainer: {
 		flexDirection: 'row',
 		justifyContent: 'center',
 		alignItems: 'center',
 		gap: 8,
+		paddingBottom: 20,
 	},
 	registerText: {
 		fontSize: 14,
@@ -377,5 +479,9 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.primary,
+		textDecorationLine: 'underline',
+	},
+	textDisabled: {
+		opacity: 0.6,
 	},
 });

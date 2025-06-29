@@ -1,8 +1,9 @@
 import { colors } from '@/assets/styles/colors';
+import ErrorDisplay from '@/components/auth/ErrorDisplay';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
 	ActivityIndicator,
 	Alert,
@@ -18,22 +19,35 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+type RequestStatus = 'idle' | 'loading' | 'success' | 'error';
+
 export default function ForgotPasswordScreen() {
 	const { t } = useTranslation();
 	const router = useRouter();
 
 	const [email, setEmail] = useState('');
-	const [isLoading, setIsLoading] = useState(false);
+	const [status, setStatus] = useState<RequestStatus>('idle');
+	const [error, setError] = useState('');
 	const [emailError, setEmailError] = useState('');
+
+	// Reset errors when email changes
+	useEffect(() => {
+		if (emailError) setEmailError('');
+		if (error) setError('');
+	}, [email]);
 
 	const validateEmail = (email: string) => {
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		return emailRegex.test(email);
 	};
 
+	const isFormValid =
+		email.trim() !== '' && validateEmail(email) && status !== 'loading';
+
 	const handleSendResetEmail = async () => {
 		// Reset errors
 		setEmailError('');
+		setError('');
 
 		// Validate email
 		if (!email.trim()) {
@@ -46,26 +60,49 @@ export default function ForgotPasswordScreen() {
 			return;
 		}
 
-		setIsLoading(true);
+		setStatus('loading');
 
 		try {
 			// TODO: Implement forgot password API call
 			// const response = await AuthService.forgotPassword(email.trim());
 
-			// Simulate API call
-			await new Promise((resolve) => setTimeout(resolve, 2000));
+			// Simulate API call with potential failure
+			await new Promise((resolve, reject) => {
+				setTimeout(() => {
+					// Simulate 80% success rate for demo
+					if (Math.random() > 0.2) {
+						resolve(true);
+					} else {
+						reject(new Error('Network error occurred'));
+					}
+				}, 2000);
+			});
 
-			Alert.alert(t('auth.resetEmailSent'), t('auth.resetEmailSentMessage'), [
-				{
-					text: t('general.ok'),
-					onPress: () => router.back(),
-				},
-			]);
+			setStatus('success');
+
+			// Show success message after a brief delay
+			setTimeout(() => {
+				Alert.alert(t('auth.resetEmailSent'), t('auth.resetEmailSentMessage'), [
+					{
+						text: t('general.ok'),
+						onPress: () => router.back(),
+					},
+				]);
+			}, 500);
 		} catch (error) {
-			Alert.alert(t('auth.resetEmailError'), t('auth.resetEmailErrorMessage'));
-		} finally {
-			setIsLoading(false);
+			console.error('Forgot password error:', error);
+			setStatus('error');
+			setError(
+				error instanceof Error
+					? error.message
+					: t('auth.resetEmailErrorMessage'),
+			);
 		}
+	};
+
+	const handleRetry = () => {
+		setStatus('idle');
+		setError('');
 	};
 
 	const handleBack = () => {
@@ -76,16 +113,163 @@ export default function ForgotPasswordScreen() {
 		router.push('/auth/login');
 	};
 
+	const renderContent = () => {
+		if (status === 'success') {
+			return (
+				<View style={styles.successContainer}>
+					<View style={styles.successIconContainer}>
+						<Ionicons name="checkmark-circle" size={80} color="#10B981" />
+					</View>
+					<Text style={styles.successTitle}>{t('auth.resetEmailSent')}</Text>
+					<Text style={styles.successMessage}>
+						{t('auth.resetEmailSentMessage')}
+					</Text>
+					<TouchableOpacity style={styles.successButton} onPress={handleBack}>
+						<Text style={styles.successButtonText}>{t('general.ok')}</Text>
+					</TouchableOpacity>
+				</View>
+			);
+		}
+
+		return (
+			<>
+				{/* Icon */}
+				<View style={styles.iconContainer}>
+					<View style={styles.iconCircle}>
+						<Ionicons name="mail-outline" size={48} color={colors.primary} />
+					</View>
+				</View>
+
+				{/* Text */}
+				<View style={styles.textContainer}>
+					<Text style={styles.title}>{t('auth.resetPassword')}</Text>
+					<Text style={styles.subtitle}>{t('auth.resetPasswordMessage')}</Text>
+				</View>
+
+				{/* Error Display */}
+				{status === 'error' && error && (
+					<ErrorDisplay
+						message={error}
+						type="network"
+						onRetry={handleRetry}
+						variant="inline"
+						animated={true}
+					/>
+				)}
+
+				{/* Form */}
+				<View style={styles.form}>
+					{/* Email Input */}
+					<View style={styles.inputContainer}>
+						<Text style={styles.inputLabel}>{t('auth.email')}</Text>
+						<View style={styles.inputWrapper}>
+							<Ionicons
+								name="mail-outline"
+								size={20}
+								color={colors.primaryLight}
+								style={styles.inputIcon}
+							/>
+							<TextInput
+								style={[
+									styles.input,
+									emailError ? styles.inputError : null,
+									!validateEmail(email) && email.length > 0
+										? styles.inputWarning
+										: null,
+								]}
+								value={email}
+								onChangeText={setEmail}
+								placeholder={t('auth.enterEmail')}
+								placeholderTextColor={colors.primaryLight}
+								keyboardType="email-address"
+								autoCapitalize="none"
+								autoCorrect={false}
+								editable={status !== 'loading'}
+								autoComplete="email"
+								autoFocus
+							/>
+							{validateEmail(email) && (
+								<Ionicons
+									name="checkmark-circle"
+									size={20}
+									color="#10B981"
+									style={styles.validationIcon}
+								/>
+							)}
+						</View>
+						{emailError ? (
+							<Text style={styles.errorText}>{emailError}</Text>
+						) : null}
+					</View>
+
+					{/* Send Reset Email Button */}
+					<TouchableOpacity
+						style={[
+							styles.sendButton,
+							!isFormValid && styles.sendButtonDisabled,
+						]}
+						onPress={handleSendResetEmail}
+						disabled={!isFormValid}
+						activeOpacity={0.8}
+					>
+						{status === 'loading' ? (
+							<ActivityIndicator size="small" color={colors.quaternary} />
+						) : (
+							<Text
+								style={[
+									styles.sendButtonText,
+									!isFormValid && styles.sendButtonTextDisabled,
+								]}
+							>
+								{t('auth.sendResetEmail')}
+							</Text>
+						)}
+					</TouchableOpacity>
+
+					{/* Back to Login */}
+					<TouchableOpacity
+						style={styles.backToLoginButton}
+						onPress={handleGoToLogin}
+						disabled={status === 'loading'}
+					>
+						<Ionicons
+							name="arrow-back"
+							size={16}
+							color={colors.primary}
+							style={styles.backIcon}
+						/>
+						<Text
+							style={[
+								styles.backToLoginText,
+								status === 'loading' && styles.textDisabled,
+							]}
+						>
+							{t('auth.backToLogin')}
+						</Text>
+					</TouchableOpacity>
+				</View>
+			</>
+		);
+	};
+
 	return (
 		<SafeAreaView style={styles.container}>
 			<KeyboardAvoidingView
 				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 				style={styles.keyboardView}
 			>
-				<ScrollView contentContainerStyle={styles.scrollContent}>
+				<ScrollView
+					contentContainerStyle={styles.scrollContent}
+					keyboardShouldPersistTaps="handled"
+					showsVerticalScrollIndicator={false}
+				>
 					{/* Header */}
 					<View style={styles.header}>
-						<TouchableOpacity onPress={handleBack} style={styles.backButton}>
+						<TouchableOpacity
+							onPress={handleBack}
+							style={styles.backButton}
+							disabled={status === 'loading'}
+						>
 							<Ionicons name="chevron-back" size={24} color={colors.primary} />
 						</TouchableOpacity>
 						<Text style={styles.headerTitle}>{t('auth.forgotPassword')}</Text>
@@ -95,93 +279,14 @@ export default function ForgotPasswordScreen() {
 					<View style={styles.logoContainer}>
 						<Image
 							source={require('@/assets/images/logo_large_primary.png')}
-							style={{ width: 100, height: 80, marginBottom: 5 }}
+							style={styles.logo}
 							resizeMode="contain"
 						/>
 						<Text style={styles.appName}>Menuteca</Text>
 					</View>
 
 					{/* Content */}
-					<View style={styles.content}>
-						{/* Icon */}
-						<View style={styles.iconContainer}>
-							<View style={styles.iconCircle}>
-								<Ionicons
-									name="mail-outline"
-									size={48}
-									color={colors.primary}
-								/>
-							</View>
-						</View>
-
-						{/* Text */}
-						<View style={styles.textContainer}>
-							<Text style={styles.title}>{t('auth.resetPassword')}</Text>
-							<Text style={styles.subtitle}>
-								{t('auth.resetPasswordMessage')}
-							</Text>
-						</View>
-
-						{/* Form */}
-						<View style={styles.form}>
-							{/* Email Input */}
-							<View style={styles.inputContainer}>
-								<Text style={styles.inputLabel}>{t('auth.email')}</Text>
-								<TextInput
-									style={[styles.input, emailError ? styles.inputError : null]}
-									value={email}
-									onChangeText={(text) => {
-										setEmail(text);
-										if (emailError) setEmailError('');
-									}}
-									placeholder={t('auth.enterEmail')}
-									placeholderTextColor={colors.primaryLight}
-									keyboardType="email-address"
-									autoCapitalize="none"
-									autoCorrect={false}
-									editable={!isLoading}
-								/>
-								{emailError ? (
-									<Text style={styles.errorText}>{emailError}</Text>
-								) : null}
-							</View>
-
-							{/* Send Reset Email Button */}
-							<TouchableOpacity
-								style={[
-									styles.sendButton,
-									isLoading && styles.sendButtonDisabled,
-								]}
-								onPress={handleSendResetEmail}
-								disabled={isLoading}
-							>
-								{isLoading ? (
-									<ActivityIndicator size="small" color={colors.quaternary} />
-								) : (
-									<Text style={styles.sendButtonText}>
-										{t('auth.sendResetEmail')}
-									</Text>
-								)}
-							</TouchableOpacity>
-
-							{/* Back to Login */}
-							<TouchableOpacity
-								style={styles.backToLoginButton}
-								onPress={handleGoToLogin}
-								disabled={isLoading}
-							>
-								<Ionicons
-									name="arrow-back"
-									size={16}
-									color={colors.primary}
-									style={styles.backIcon}
-								/>
-								<Text style={styles.backToLoginText}>
-									{t('auth.backToLogin')}
-								</Text>
-							</TouchableOpacity>
-						</View>
-					</View>
+					<View style={styles.content}>{renderContent()}</View>
 				</ScrollView>
 			</KeyboardAvoidingView>
 		</SafeAreaView>
@@ -210,6 +315,7 @@ const styles = StyleSheet.create({
 		height: 40,
 		justifyContent: 'center',
 		alignItems: 'center',
+		borderRadius: 20,
 	},
 	headerTitle: {
 		fontSize: 18,
@@ -221,6 +327,11 @@ const styles = StyleSheet.create({
 	logoContainer: {
 		alignItems: 'center',
 		paddingVertical: 40,
+	},
+	logo: {
+		width: 100,
+		height: 80,
+		marginBottom: 5,
 	},
 	appName: {
 		fontSize: 32,
@@ -246,10 +357,18 @@ const styles = StyleSheet.create({
 		borderColor: colors.primaryLight,
 		justifyContent: 'center',
 		alignItems: 'center',
+		shadowColor: '#000',
+		shadowOffset: {
+			width: 0,
+			height: 4,
+		},
+		shadowOpacity: 0.1,
+		shadowRadius: 8,
+		elevation: 4,
 	},
 	textContainer: {
 		alignItems: 'center',
-		marginBottom: 40,
+		marginBottom: 30,
 	},
 	title: {
 		fontSize: 24,
@@ -266,6 +385,7 @@ const styles = StyleSheet.create({
 		color: colors.primaryLight,
 		textAlign: 'center',
 		lineHeight: 22,
+		paddingHorizontal: 20,
 	},
 	form: {
 		flex: 1,
@@ -280,10 +400,21 @@ const styles = StyleSheet.create({
 		color: colors.primary,
 		marginBottom: 8,
 	},
+	inputWrapper: {
+		position: 'relative',
+		flexDirection: 'row',
+		alignItems: 'center',
+	},
+	inputIcon: {
+		position: 'absolute',
+		left: 16,
+		zIndex: 1,
+	},
 	input: {
+		flex: 1,
 		backgroundColor: colors.quaternary,
 		borderRadius: 12,
-		paddingHorizontal: 16,
+		paddingHorizontal: 48,
 		paddingVertical: 14,
 		fontSize: 16,
 		fontFamily: 'Manrope',
@@ -293,6 +424,15 @@ const styles = StyleSheet.create({
 	},
 	inputError: {
 		borderColor: '#D32F2F',
+		borderWidth: 2,
+	},
+	inputWarning: {
+		borderColor: '#FF9800',
+	},
+	validationIcon: {
+		position: 'absolute',
+		right: 16,
+		zIndex: 1,
 	},
 	errorText: {
 		fontSize: 12,
@@ -300,6 +440,7 @@ const styles = StyleSheet.create({
 		fontWeight: '400',
 		color: '#D32F2F',
 		marginTop: 4,
+		marginLeft: 4,
 	},
 	sendButton: {
 		backgroundColor: colors.primary,
@@ -307,15 +448,30 @@ const styles = StyleSheet.create({
 		paddingVertical: 16,
 		alignItems: 'center',
 		marginBottom: 20,
+		shadowColor: colors.primary,
+		shadowOffset: {
+			width: 0,
+			height: 4,
+		},
+		shadowOpacity: 0.3,
+		shadowRadius: 8,
+		elevation: 8,
+		minHeight: 56,
+		justifyContent: 'center',
 	},
 	sendButtonDisabled: {
-		opacity: 0.6,
+		backgroundColor: colors.primaryLight,
+		shadowOpacity: 0,
+		elevation: 0,
 	},
 	sendButtonText: {
 		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.quaternary,
+	},
+	sendButtonTextDisabled: {
+		opacity: 0.7,
 	},
 	backToLoginButton: {
 		flexDirection: 'row',
@@ -331,5 +487,48 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '500',
 		color: colors.primary,
+	},
+	textDisabled: {
+		opacity: 0.6,
+	},
+	// Success state styles
+	successContainer: {
+		alignItems: 'center',
+		paddingVertical: 40,
+	},
+	successIconContainer: {
+		marginBottom: 30,
+	},
+	successTitle: {
+		fontSize: 24,
+		fontFamily: 'Manrope',
+		fontWeight: '700',
+		color: colors.primary,
+		marginBottom: 12,
+		textAlign: 'center',
+	},
+	successMessage: {
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primaryLight,
+		textAlign: 'center',
+		lineHeight: 22,
+		marginBottom: 30,
+		paddingHorizontal: 20,
+	},
+	successButton: {
+		backgroundColor: colors.primary,
+		borderRadius: 12,
+		paddingVertical: 16,
+		paddingHorizontal: 32,
+		alignItems: 'center',
+		minWidth: 120,
+	},
+	successButtonText: {
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.quaternary,
 	},
 });

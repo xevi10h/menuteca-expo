@@ -94,19 +94,24 @@ export default function AuthIndexScreen() {
 				<View style={styles.buttonsSection}>
 					{/* Google Sign In Button */}
 					<TouchableOpacity
-						style={styles.googleButton}
+						style={[
+							styles.googleButton,
+							(isLoading || isGoogleLoading) && styles.buttonDisabled,
+						]}
 						onPress={handleGoogleAuth}
 						disabled={isLoading || isGoogleLoading}
+						activeOpacity={0.8}
 					>
 						<View style={styles.googleButtonContent}>
 							{isGoogleLoading ? (
 								<ActivityIndicator size="small" color={colors.primary} />
 							) : (
 								<>
-									{/* <Image
-										source={require('@/assets/images/google_logo.png')}
-										style={styles.googleIcon}
-									/> */}
+									<Ionicons
+										name="logo-google"
+										size={20}
+										color={colors.primary}
+									/>
 									<Text style={styles.googleButtonText}>
 										{t('auth.continueWithGoogle')}
 									</Text>
@@ -118,12 +123,13 @@ export default function AuthIndexScreen() {
 					{/* Apple Sign In Button (iOS only) */}
 					{Platform.OS === 'ios' && (
 						<TouchableOpacity
-							style={styles.appleButton}
+							style={[styles.appleButton, isLoading && styles.buttonDisabled]}
 							onPress={() => {
 								// TODO: Implement Apple Sign In
 								Alert.alert(t('auth.appleAuth'), t('auth.appleAuthMessage'));
 							}}
 							disabled={isLoading}
+							activeOpacity={0.8}
 						>
 							<View style={styles.appleButtonContent}>
 								<Ionicons
@@ -147,19 +153,32 @@ export default function AuthIndexScreen() {
 
 					{/* Email/Password Buttons */}
 					<TouchableOpacity
-						style={styles.primaryButton}
+						style={[styles.primaryButton, isLoading && styles.buttonDisabled]}
 						onPress={handleLogin}
 						disabled={isLoading}
+						activeOpacity={0.8}
 					>
-						<Text style={styles.primaryButtonText}>{t('auth.login')}</Text>
+						{isLoading ? (
+							<ActivityIndicator size="small" color={colors.quaternary} />
+						) : (
+							<Text style={styles.primaryButtonText}>{t('auth.login')}</Text>
+						)}
 					</TouchableOpacity>
 
 					<TouchableOpacity
-						style={styles.secondaryButton}
+						style={[styles.secondaryButton, isLoading && styles.buttonDisabled]}
 						onPress={handleRegister}
 						disabled={isLoading}
+						activeOpacity={0.8}
 					>
-						<Text style={styles.secondaryButtonText}>{t('auth.register')}</Text>
+						<Text
+							style={[
+								styles.secondaryButtonText,
+								isLoading && styles.textDisabled,
+							]}
+						>
+							{t('auth.register')}
+						</Text>
 					</TouchableOpacity>
 				</View>
 
@@ -167,23 +186,25 @@ export default function AuthIndexScreen() {
 				<View style={styles.termsContainer}>
 					<Text style={styles.termsText}>
 						{t('auth.byCreatingAccount')}{' '}
-						<TouchableOpacity
+						<Text
+							style={styles.termsLink}
 							onPress={() => {
 								// TODO: Open terms
 								Alert.alert(t('auth.terms'), t('auth.termsMessage'));
 							}}
 						>
-							<Text style={styles.termsLink}>{t('auth.termsOfService')}</Text>
-						</TouchableOpacity>{' '}
+							{t('auth.termsOfService')}
+						</Text>{' '}
 						{t('auth.and')}{' '}
-						<TouchableOpacity
+						<Text
+							style={styles.termsLink}
 							onPress={() => {
 								// TODO: Open privacy policy
 								Alert.alert(t('auth.privacy'), t('auth.privacyMessage'));
 							}}
 						>
-							<Text style={styles.termsLink}>{t('auth.privacyPolicy')}</Text>
-						</TouchableOpacity>
+							{t('auth.privacyPolicy')}
+						</Text>
 					</Text>
 				</View>
 			</View>
@@ -204,18 +225,19 @@ const styles = StyleSheet.create({
 	logoSection: {
 		alignItems: 'center',
 		paddingTop: height * 0.08,
+		paddingBottom: height * 0.05,
 	},
 	logo: {
 		width: 120,
 		height: 96,
-		marginBottom: 16,
+		marginBottom: 20,
 	},
 	appName: {
 		fontSize: 36,
 		fontFamily: 'Manrope',
 		fontWeight: '700',
 		color: colors.primary,
-		marginBottom: 8,
+		marginBottom: 12,
 	},
 	tagline: {
 		fontSize: 16,
@@ -224,6 +246,7 @@ const styles = StyleSheet.create({
 		color: colors.primaryLight,
 		textAlign: 'center',
 		paddingHorizontal: 20,
+		lineHeight: 22,
 	},
 	buttonsSection: {
 		paddingBottom: 20,
@@ -233,7 +256,7 @@ const styles = StyleSheet.create({
 		borderRadius: 12,
 		borderWidth: 1,
 		borderColor: colors.primaryLight,
-		paddingVertical: 14,
+		paddingVertical: 16,
 		marginBottom: 12,
 		shadowColor: '#000',
 		shadowOffset: {
@@ -248,11 +271,8 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-	},
-	googleIcon: {
-		width: 20,
-		height: 20,
-		marginRight: 12,
+		gap: 12,
+		minHeight: 24,
 	},
 	googleButtonText: {
 		fontSize: 16,
@@ -263,20 +283,21 @@ const styles = StyleSheet.create({
 	appleButton: {
 		backgroundColor: '#000',
 		borderRadius: 12,
-		paddingVertical: 14,
+		paddingVertical: 16,
 		marginBottom: 12,
 	},
 	appleButtonContent: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
+		gap: 12,
+		minHeight: 24,
 	},
 	appleButtonText: {
 		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '500',
 		color: colors.quaternary,
-		marginLeft: 8,
 	},
 	dividerContainer: {
 		flexDirection: 'row',
@@ -287,6 +308,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		height: 1,
 		backgroundColor: colors.primaryLight,
+		opacity: 0.3,
 	},
 	dividerText: {
 		fontSize: 14,
@@ -301,6 +323,16 @@ const styles = StyleSheet.create({
 		paddingVertical: 16,
 		alignItems: 'center',
 		marginBottom: 12,
+		shadowColor: colors.primary,
+		shadowOffset: {
+			width: 0,
+			height: 4,
+		},
+		shadowOpacity: 0.3,
+		shadowRadius: 8,
+		elevation: 8,
+		minHeight: 56,
+		justifyContent: 'center',
 	},
 	primaryButtonText: {
 		fontSize: 16,
@@ -309,13 +341,15 @@ const styles = StyleSheet.create({
 		color: colors.quaternary,
 	},
 	secondaryButton: {
-		backgroundColor: colors.quaternary,
+		backgroundColor: 'transparent',
 		borderRadius: 12,
 		borderWidth: 1,
 		borderColor: colors.primary,
 		paddingVertical: 16,
 		alignItems: 'center',
 		marginBottom: 20,
+		minHeight: 56,
+		justifyContent: 'center',
 	},
 	secondaryButtonText: {
 		fontSize: 16,
@@ -323,15 +357,11 @@ const styles = StyleSheet.create({
 		fontWeight: '500',
 		color: colors.primary,
 	},
-	guestButton: {
-		paddingVertical: 12,
-		alignItems: 'center',
+	buttonDisabled: {
+		opacity: 0.6,
 	},
-	guestButtonText: {
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
-		color: colors.primaryLight,
+	textDisabled: {
+		opacity: 0.6,
 	},
 	termsContainer: {
 		paddingVertical: 20,
@@ -350,5 +380,6 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '500',
 		color: colors.primary,
+		textDecorationLine: 'underline',
 	},
 });

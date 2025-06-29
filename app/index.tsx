@@ -5,67 +5,54 @@ import ListFilter from '@/components/ListFilter';
 import MainSearcher from '@/components/MainSearcher';
 import ProfilePhotoButton from '@/components/ProfileButton';
 import ViewButton from '@/components/ViewButton';
+import LoadingScreen from '@/components/auth/LoadingScreen';
 import MapView from '@/components/crossPlatformMap/MapView';
 import Marker from '@/components/crossPlatformMap/Marker';
 import CuisineFilter from '@/components/filters/CuisineFilter';
 import RestaurantList from '@/components/list/RestaurantList';
 import ScrollHorizontalRestaurant from '@/components/list/ScrollHorizontalResturant';
+import { useAppInitialization } from '@/hooks/useAppInitialization';
+import { useRequireAuth } from '@/hooks/useAuth';
 import { Restaurant } from '@/shared/types';
 import { useFilterStore } from '@/zustand/FilterStore';
 import { useRestaurantStore } from '@/zustand/RestaurantStore';
-import { useUserStore } from '@/zustand/UserStore';
 import * as Location from 'expo-location';
-import { Redirect } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import {
-	ActivityIndicator,
-	Alert,
-	Image,
-	Platform,
-	ScrollView,
-	Text,
-	View,
-} from 'react-native';
+import { Alert, Image, Platform, ScrollView, Text, View } from 'react-native';
 import MapViewType, { Camera } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function Index() {
-	// Check authentication status first
-	const isAuthenticated = useUserStore((state) => state.isAuthenticated);
-	const userLoading = useUserStore((state) => state.isLoading);
+	// Use require auth hook
+	const { isLoading: authLoading } = useRequireAuth();
 
-	// If not authenticated, redirect to auth
-	if (!userLoading && !isAuthenticated) {
-		return <Redirect href="/auth" />;
-	}
+	// Use app initialization hook
+	const {
+		isInitialized,
+		isLoading: appLoading,
+		error: appError,
+	} = useAppInitialization();
 
-	// Show loading while checking authentication
-	if (userLoading) {
+	// Show loading while checking authentication or initializing app
+	if (authLoading || appLoading || !isInitialized) {
 		return (
-			<View
-				style={{
-					flex: 1,
-					backgroundColor: colors.secondary,
-					justifyContent: 'center',
-					alignItems: 'center',
-				}}
-			>
-				<ActivityIndicator size="large" color={colors.primary} />
-				<Text
-					style={{
-						marginTop: 20,
-						fontSize: 16,
-						fontFamily: 'Manrope',
-						color: colors.primary,
-					}}
-				>
-					Loading...
-				</Text>
-			</View>
+			<LoadingScreen
+				showLogo={true}
+				message={
+					authLoading ? 'Checking authentication...' : 'Initializing app...'
+				}
+				showProgress={false}
+			/>
 		);
 	}
 
-	// If authenticated, show main app content
+	// Show error if app initialization failed critically
+	if (appError) {
+		console.error('Critical app initialization error:', appError);
+		// Still proceed to show the app - most errors aren't critical
+	}
+
+	// If authenticated and initialized, show main app content
 	return <MainAppContent />;
 }
 
@@ -166,11 +153,6 @@ function MainAppContent() {
 						restaurant.distance <= filters.distance!,
 				);
 			}
-
-			// TODO: Implementar filtro de horario cuando esté disponible en el backend
-			// if (filters.timeRange) {
-			//   // Aquí iría la lógica para filtrar por horario
-			// }
 
 			return filtered;
 		},
@@ -462,27 +444,11 @@ function MainAppContent() {
 	// Show loading indicator for initial load
 	if (!hasInitialLoad && loading) {
 		return (
-			<View
-				style={{
-					flex: 1,
-					backgroundColor: colors.secondary,
-					paddingTop: top,
-					justifyContent: 'center',
-					alignItems: 'center',
-				}}
-			>
-				<ActivityIndicator size="large" color={colors.primary} />
-				<Text
-					style={{
-						marginTop: 20,
-						fontSize: 16,
-						fontFamily: 'Manrope',
-						color: colors.primary,
-					}}
-				>
-					Loading restaurants...
-				</Text>
-			</View>
+			<LoadingScreen
+				showLogo={false}
+				message="Loading restaurants..."
+				showProgress={false}
+			/>
 		);
 	}
 
