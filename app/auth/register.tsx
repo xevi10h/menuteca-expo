@@ -2,7 +2,7 @@ import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { Redirect, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
 	ActivityIndicator,
@@ -30,6 +30,7 @@ export default function RegisterScreen() {
 		(state) => state.checkUsernameAvailability,
 	);
 	const isLoading = useUserStore((state) => state.isLoading);
+	const isAuthenticated = useUserStore((state) => state.isAuthenticated);
 	const error = useUserStore((state) => state.error);
 
 	const [email, setEmail] = useState('');
@@ -48,6 +49,11 @@ export default function RegisterScreen() {
 	const [passwordError, setPasswordError] = useState('');
 	const [confirmPasswordError, setConfirmPasswordError] = useState('');
 	const [termsError, setTermsError] = useState('');
+
+	// If already authenticated, redirect to main app
+	if (isAuthenticated) {
+		return <Redirect href="/" />;
+	}
 
 	const validateEmail = (email: string) => {
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -153,7 +159,8 @@ export default function RegisterScreen() {
 			});
 
 			if (success) {
-				// Navigation will be handled by the authentication state change
+				// Navigation will be handled automatically by the authentication state change
+				// The user will be redirected to the main app through the index.tsx redirect
 				router.replace('/');
 			} else {
 				if (error) {

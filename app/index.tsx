@@ -13,7 +13,9 @@ import ScrollHorizontalRestaurant from '@/components/list/ScrollHorizontalRestur
 import { Restaurant } from '@/shared/types';
 import { useFilterStore } from '@/zustand/FilterStore';
 import { useRestaurantStore } from '@/zustand/RestaurantStore';
+import { useUserStore } from '@/zustand/UserStore';
 import * as Location from 'expo-location';
+import { Redirect } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
 	ActivityIndicator,
@@ -28,6 +30,47 @@ import MapViewType, { Camera } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function Index() {
+	// Check authentication status first
+	const isAuthenticated = useUserStore((state) => state.isAuthenticated);
+	const userLoading = useUserStore((state) => state.isLoading);
+
+	// If not authenticated, redirect to auth
+	if (!userLoading && !isAuthenticated) {
+		return <Redirect href="/auth" />;
+	}
+
+	// Show loading while checking authentication
+	if (userLoading) {
+		return (
+			<View
+				style={{
+					flex: 1,
+					backgroundColor: colors.secondary,
+					justifyContent: 'center',
+					alignItems: 'center',
+				}}
+			>
+				<ActivityIndicator size="large" color={colors.primary} />
+				<Text
+					style={{
+						marginTop: 20,
+						fontSize: 16,
+						fontFamily: 'Manrope',
+						color: colors.primary,
+					}}
+				>
+					Loading...
+				</Text>
+			</View>
+		);
+	}
+
+	// If authenticated, show main app content
+	return <MainAppContent />;
+}
+
+// Componente separado para el contenido principal de la app
+function MainAppContent() {
 	const { top } = useSafeAreaInsets();
 	const [statusForegroundPermissions, requestStatusForegroundPermissions] =
 		Location.useForegroundPermissions();

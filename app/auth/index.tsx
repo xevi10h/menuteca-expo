@@ -2,7 +2,7 @@ import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { Redirect, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
 	ActivityIndicator,
@@ -24,7 +24,13 @@ export default function AuthIndexScreen() {
 	const router = useRouter();
 	const googleAuth = useUserStore((state) => state.googleAuth);
 	const isLoading = useUserStore((state) => state.isLoading);
+	const isAuthenticated = useUserStore((state) => state.isAuthenticated);
 	const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
+	// If already authenticated, redirect to main app
+	if (isAuthenticated) {
+		return <Redirect href="/" />;
+	}
 
 	const handleLogin = () => {
 		router.push('/auth/login');
@@ -57,7 +63,8 @@ export default function AuthIndexScreen() {
 			const success = await googleAuth(mockGoogleData);
 
 			if (success) {
-				// Navigation will be handled by the authentication state change
+				// Navigation will be handled automatically by the authentication state change
+				// The user will be redirected to the main app through the index.tsx redirect
 				router.replace('/');
 			} else {
 				Alert.alert(t('auth.googleAuthError'), t('auth.googleAuthFailed'));
@@ -67,11 +74,6 @@ export default function AuthIndexScreen() {
 		} finally {
 			setIsGoogleLoading(false);
 		}
-	};
-
-	const handleGuestMode = () => {
-		// TODO: Implement guest mode if needed
-		Alert.alert(t('auth.guestMode'), t('auth.guestModeMessage'));
 	};
 
 	return (
@@ -86,18 +88,6 @@ export default function AuthIndexScreen() {
 					/>
 					<Text style={styles.appName}>Menuteca</Text>
 					<Text style={styles.tagline}>{t('auth.tagline')}</Text>
-				</View>
-
-				{/* Illustration */}
-				<View style={styles.illustrationContainer}>
-					{/* You can replace this with an actual illustration */}
-					<View style={styles.illustrationPlaceholder}>
-						<Ionicons
-							name="restaurant-outline"
-							size={80}
-							color={colors.primary}
-						/>
-					</View>
 				</View>
 
 				{/* Buttons Section */}
@@ -171,17 +161,6 @@ export default function AuthIndexScreen() {
 					>
 						<Text style={styles.secondaryButtonText}>{t('auth.register')}</Text>
 					</TouchableOpacity>
-
-					{/* Guest Mode */}
-					<TouchableOpacity
-						style={styles.guestButton}
-						onPress={handleGuestMode}
-						disabled={isLoading}
-					>
-						<Text style={styles.guestButtonText}>
-							{t('auth.continueAsGuest')}
-						</Text>
-					</TouchableOpacity>
 				</View>
 
 				{/* Terms and Privacy */}
@@ -245,21 +224,6 @@ const styles = StyleSheet.create({
 		color: colors.primaryLight,
 		textAlign: 'center',
 		paddingHorizontal: 20,
-	},
-	illustrationContainer: {
-		alignItems: 'center',
-		justifyContent: 'center',
-		flex: 1,
-	},
-	illustrationPlaceholder: {
-		width: 160,
-		height: 160,
-		borderRadius: 80,
-		backgroundColor: colors.quaternary,
-		borderWidth: 2,
-		borderColor: colors.primaryLight,
-		justifyContent: 'center',
-		alignItems: 'center',
 	},
 	buttonsSection: {
 		paddingBottom: 20,

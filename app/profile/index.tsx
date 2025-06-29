@@ -1,4 +1,3 @@
-// app/profile/index.tsx (Updated)
 import { RestaurantService, ReviewService } from '@/api/services';
 import { colors } from '@/assets/styles/colors';
 import ChangePasswordPopup from '@/components/profile/ChangePasswordPopup';
@@ -11,7 +10,7 @@ import { Restaurant, Review } from '@/shared/types';
 import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { router } from 'expo-router';
+import { Redirect, router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
 	ActivityIndicator,
@@ -56,6 +55,11 @@ export default function ProfileScreen() {
 			loadUserData();
 		}
 	}, [isAuthenticated]);
+
+	// Redirect to auth if not authenticated
+	if (!userLoading && !isAuthenticated) {
+		return <Redirect href="/auth" />;
+	}
 
 	const loadUserData = async () => {
 		await Promise.all([loadUserRestaurants(), loadUserReviews()]);
@@ -117,7 +121,8 @@ export default function ProfileScreen() {
 				style: 'destructive',
 				onPress: () => {
 					logout();
-					router.replace('/');
+					// Navigation will be handled automatically by the redirect in this component
+					router.replace('/auth');
 				},
 			},
 		]);
@@ -191,16 +196,22 @@ export default function ProfileScreen() {
 		}
 	};
 
-	// Show loading if not authenticated
+	// Show loading if user is still loading
+	if (userLoading) {
+		return (
+			<View style={[styles.container, { paddingTop: insets.top }]}>
+				<View style={styles.loadingContainer}>
+					<ActivityIndicator size="large" color={colors.primary} />
+					<Text style={styles.loadingText}>Loading profile...</Text>
+				</View>
+			</View>
+		);
+	}
+
+	// This should not happen due to the redirect above, but just in case
 	if (!isAuthenticated) {
 		return (
 			<View style={[styles.container, { paddingTop: insets.top }]}>
-				<View style={styles.header}>
-					<TouchableOpacity onPress={handleBack} style={styles.backButton}>
-						<Ionicons name="chevron-back" size={24} color={colors.primary} />
-					</TouchableOpacity>
-					<Text style={styles.headerTitle}>{t('profile.myProfile')}</Text>
-				</View>
 				<View style={styles.notAuthenticatedContainer}>
 					<Text style={styles.notAuthenticatedText}>
 						{t('profile.notAuthenticated')}
@@ -503,6 +514,19 @@ const styles = StyleSheet.create({
 	content: {
 		flex: 1,
 	},
+	loadingContainer: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingVertical: 40,
+	},
+	loadingText: {
+		marginTop: 16,
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primary,
+	},
 	profileSection: {
 		alignItems: 'center',
 		paddingVertical: 30,
@@ -653,10 +677,6 @@ const styles = StyleSheet.create({
 	},
 	reviewsContainer: {
 		gap: 12,
-	},
-	loadingContainer: {
-		padding: 20,
-		alignItems: 'center',
 	},
 	emptyState: {
 		alignItems: 'center',

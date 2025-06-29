@@ -13,6 +13,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import LoadingScreen from '@/components/LoadingScreen';
 import { useAppInitialization } from '@/hooks/useAppInitialization';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { useUserStore } from '@/zustand/UserStore';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -25,6 +26,10 @@ export default function RootLayout() {
 
 	// Use the app initialization hook
 	const { isInitialized, isLoading, error } = useAppInitialization();
+
+	// Authentication state
+	const isAuthenticated = useUserStore((state) => state.isAuthenticated);
+	const userLoading = useUserStore((state) => state.isLoading);
 
 	useEffect(() => {
 		if (loaded) {
@@ -44,12 +49,12 @@ export default function RootLayout() {
 		return null;
 	}
 
-	// Show custom loading screen during app initialization
-	if (showCustomLoading && (!isInitialized || isLoading)) {
+	// Show custom loading screen during app initialization or user loading
+	if (showCustomLoading && (!isInitialized || isLoading || userLoading)) {
 		return (
 			<LoadingScreen
 				onLoadingComplete={handleLoadingComplete}
-				duration={isLoading ? undefined : 2000} // Show until loading completes, or 2s minimum
+				duration={isLoading || userLoading ? undefined : 2000} // Show until loading completes, or 2s minimum
 			/>
 		);
 	}
@@ -60,7 +65,7 @@ export default function RootLayout() {
 		// Still proceed to show the app - most errors aren't critical
 	}
 
-	// Main app
+	// Main app navigation
 	return (
 		<GestureHandlerRootView style={{ flex: 1 }}>
 			<ActionSheetProvider>
@@ -68,7 +73,19 @@ export default function RootLayout() {
 					value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
 				>
 					<Stack screenOptions={{ headerShown: false }}>
+						{/* Index always available - handles auth redirect internally */}
 						<Stack.Screen name="index" />
+
+						{/* Auth stack - always available for login/logout */}
+						<Stack.Screen name="auth" />
+
+						{/* Protected routes - only available when authenticated */}
+						{isAuthenticated && (
+							<>
+								<Stack.Screen name="profile" />
+								<Stack.Screen name="restaurant" />
+							</>
+						)}
 					</Stack>
 				</ThemeProvider>
 			</ActionSheetProvider>

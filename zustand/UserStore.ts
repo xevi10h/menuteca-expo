@@ -11,6 +11,7 @@ interface UserState {
 	isAuthenticated: boolean;
 	isLoading: boolean;
 	error: string | null;
+	isInitialized: boolean; // Nueva propiedad para saber si el store ha sido inicializado
 	setUser: (user: User) => void;
 	updatePhoto: (photo: string) => void;
 	updateUsername: (username: string) => Promise<boolean>;
@@ -39,6 +40,8 @@ interface UserState {
 	}) => Promise<boolean>;
 	checkUsernameAvailability: (username: string) => Promise<boolean>;
 	checkEmailAvailability: (email: string) => Promise<boolean>;
+	initialize: () => Promise<void>;
+	clearError: () => void;
 	persist?: {
 		clearStorage: () => void;
 	};
@@ -64,6 +67,65 @@ export const useUserStore = create<UserState>()(
 			isAuthenticated: false,
 			isLoading: false,
 			error: null,
+			isInitialized: false,
+
+			initialize: async () => {
+				const state = get();
+				if (state.isInitialized) return;
+
+				set({ isLoading: true });
+
+				try {
+					// If we have a token, verify it's still valid
+					if (state.user.token && state.user.id) {
+						try {
+							setAuthToken(state.user.token);
+							const response = await AuthService.getProfile();
+
+							if (response.success) {
+								// Token is still valid, update user data
+								set((state) => ({
+									user: {
+										...state.user,
+										...response.data,
+										created_at:
+											response.data.created_at || state.user.created_at,
+										has_password:
+											response.data.has_password || state.user.has_password,
+										google_id: response.data.google_id || state.user.google_id,
+									},
+									isAuthenticated: true,
+									isLoading: false,
+									isInitialized: true,
+								}));
+							} else {
+								// Token is invalid, reset user
+								get().setDefaultUser();
+								set({ isLoading: false, isInitialized: true });
+							}
+						} catch (error) {
+							console.error('Error validating token:', error);
+							// Token is invalid, reset user
+							get().setDefaultUser();
+							set({ isLoading: false, isInitialized: true });
+						}
+					} else {
+						// No token, user is not authenticated
+						set({
+							isAuthenticated: false,
+							isLoading: false,
+							isInitialized: true,
+						});
+					}
+				} catch (error) {
+					console.error('Error initializing user store:', error);
+					set({
+						isLoading: false,
+						isInitialized: true,
+						error: 'Failed to initialize authentication',
+					});
+				}
+			},
 
 			setUser: (user: User) => {
 				// Actualizar el token en el cliente API
@@ -73,6 +135,7 @@ export const useUserStore = create<UserState>()(
 					user,
 					isAuthenticated: !!user.id && !!user.token,
 					error: null,
+					isInitialized: true,
 				});
 			},
 
@@ -203,6 +266,7 @@ export const useUserStore = create<UserState>()(
 							isAuthenticated: true,
 							isLoading: false,
 							error: null,
+							isInitialized: true,
 						});
 						return true;
 					} else {
@@ -240,6 +304,7 @@ export const useUserStore = create<UserState>()(
 							isAuthenticated: true,
 							isLoading: false,
 							error: null,
+							isInitialized: true,
 						});
 						return true;
 					} else {
@@ -277,6 +342,7 @@ export const useUserStore = create<UserState>()(
 							isAuthenticated: true,
 							isLoading: false,
 							error: null,
+							isInitialized: true,
 						});
 						return true;
 					} else {
@@ -300,6 +366,7 @@ export const useUserStore = create<UserState>()(
 					user: { ...undefinedUser, language: get().user.language },
 					isAuthenticated: false,
 					error: null,
+					isInitialized: true,
 				});
 			},
 
@@ -390,6 +457,10 @@ export const useUserStore = create<UserState>()(
 					return false;
 				}
 			},
+
+			clearError: () => {
+				set({ error: null });
+			},
 		}),
 		{
 			name: 'user-storage',
@@ -398,10 +469,16 @@ export const useUserStore = create<UserState>()(
 				user: state.user,
 				isAuthenticated: state.isAuthenticated,
 			}),
-			onRehydrateStorage: () => (state) => {
-				// Cuando se rehidrata el store, actualizar el token en el cliente API
-				if (state?.user?.token) {
-					setAuthToken(state.user.token);
+			onRehydrateStorage: () => (state, error) => {
+				if (error) {
+					console.error('Error rehydrating user store:', error);
+					return;
+				}
+
+				// After rehydration, initialize the store
+				if (state) {
+					// Don't set isInitialized to true here, let initialize() handle it
+					state.initialize();
 				}
 			},
 		},

@@ -2,7 +2,7 @@ import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { Redirect, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
 	ActivityIndicator,
@@ -24,6 +24,7 @@ export default function LoginScreen() {
 	const router = useRouter();
 	const login = useUserStore((state) => state.login);
 	const isLoading = useUserStore((state) => state.isLoading);
+	const isAuthenticated = useUserStore((state) => state.isAuthenticated);
 	const error = useUserStore((state) => state.error);
 
 	const [email, setEmail] = useState('');
@@ -31,6 +32,11 @@ export default function LoginScreen() {
 	const [showPassword, setShowPassword] = useState(false);
 	const [emailError, setEmailError] = useState('');
 	const [passwordError, setPasswordError] = useState('');
+
+	// If already authenticated, redirect to main app
+	if (isAuthenticated) {
+		return <Redirect href="/" />;
+	}
 
 	const validateEmail = (email: string) => {
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -64,7 +70,8 @@ export default function LoginScreen() {
 			const success = await login(email.trim(), password);
 
 			if (success) {
-				// Navigation will be handled by the authentication state change
+				// Navigation will be handled automatically by the authentication state change
+				// The user will be redirected to the main app through the index.tsx redirect
 				router.replace('/');
 			} else {
 				// Error is handled by the store
@@ -78,12 +85,11 @@ export default function LoginScreen() {
 	};
 
 	const handleForgotPassword = () => {
-		// TODO: Implement forgot password
-		Alert.alert(t('auth.forgotPassword'), t('auth.forgotPasswordMessage'));
+		router.push('/auth/forgot-password');
 	};
 
 	const handleGoToRegister = () => {
-		// router.push('/auth/register');
+		router.push('/auth/register');
 	};
 
 	const handleBack = () => {
