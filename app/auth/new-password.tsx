@@ -1,4 +1,6 @@
+import { AuthService } from '@/api/services';
 import { colors } from '@/assets/styles/colors';
+import ErrorDisplay from '@/components/auth/ErrorDisplay';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -6,7 +8,6 @@ import React, { useEffect, useState } from 'react';
 import {
 	ActivityIndicator,
 	Alert,
-	Image,
 	KeyboardAvoidingView,
 	Platform,
 	ScrollView,
@@ -18,7 +19,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-export default function ResetPasswordScreen() {
+type ResetStatus = 'idle' | 'loading' | 'success' | 'error';
+
+export default function NewPasswordScreen() {
 	const { t } = useTranslation();
 	const router = useRouter();
 	const { token } = useLocalSearchParams();
@@ -27,12 +30,13 @@ export default function ResetPasswordScreen() {
 	const [confirmPassword, setConfirmPassword] = useState('');
 	const [showPassword, setShowPassword] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-	const [isLoading, setIsLoading] = useState(false);
+	const [status, setStatus] = useState<ResetStatus>('idle');
+	const [error, setError] = useState('');
 	const [passwordError, setPasswordError] = useState('');
 	const [confirmPasswordError, setConfirmPasswordError] = useState('');
 
+	// Validate token on mount
 	useEffect(() => {
-		// Validate token on mount
 		if (!token) {
 			Alert.alert(t('auth.invalidToken'), t('auth.invalidTokenMessage'), [
 				{
@@ -43,14 +47,55 @@ export default function ResetPasswordScreen() {
 		}
 	}, [token, t, router]);
 
+	// Reset errors when passwords change
+	useEffect(() => {
+		if (passwordError) setPasswordError('');
+		if (error) setError('');
+	}, [password]);
+
+	useEffect(() => {
+		if (confirmPasswordError) setConfirmPasswordError('');
+		if (error) setError('');
+	}, [confirmPassword]);
+
 	const validatePassword = (password: string) => {
-		return password.length >= 6;
+		const minLength = password.length >= 8;
+		const hasLower = /[a-z]/.test(password);
+		const hasUpper = /[A-Z]/.test(password);
+		const hasNumber = /\d/.test(password);
+
+		return minLength && hasLower && hasUpper && hasNumber;
 	};
+
+	const getPasswordStrength = (password: string) => {
+		if (password.length === 0) return null;
+		if (password.length < 8) return 'weak';
+
+		const hasLower = /[a-z]/.test(password);
+		const hasUpper = /[A-Z]/.test(password);
+		const hasNumber = /\d/.test(password);
+		const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+		const criteriaMet = [hasLower, hasUpper, hasNumber, hasSpecial].filter(
+			Boolean,
+		).length;
+
+		if (criteriaMet < 3) return 'weak';
+		if (criteriaMet === 3) return 'medium';
+		return 'strong';
+	};
+
+	const passwordStrength = getPasswordStrength(password);
+	const isFormValid =
+		validatePassword(password) &&
+		password === confirmPassword &&
+		status !== 'loading';
 
 	const handleResetPassword = async () => {
 		// Reset errors
 		setPasswordError('');
 		setConfirmPasswordError('');
+		setError('');
 
 		let hasErrors = false;
 
@@ -59,7 +104,7 @@ export default function ResetPasswordScreen() {
 			setPasswordError(t('validation.passwordRequired'));
 			hasErrors = true;
 		} else if (!validatePassword(password)) {
-			setPasswordError(t('validation.passwordMinLength'));
+			setPasswordError(t('validation.passwordWeak'));
 			hasErrors = true;
 		}
 
@@ -79,37 +124,61 @@ export default function ResetPasswordScreen() {
 			return;
 		}
 
-		setIsLoading(true);
+		setStatus('loading');
 
 		try {
-			// TODO: Implement reset password API call
-			// const response = await AuthService.resetPassword(token as string, password);
-
-			// Simulate API call
-			await new Promise((resolve) => setTimeout(resolve, 2000));
-
-			Alert.alert(
-				t('auth.passwordResetSuccess'),
-				t('auth.passwordResetSuccessMessage'),
-				[
-					{
-						text: t('general.ok'),
-						onPress: () => router.replace('/auth/login'),
-					},
-				],
+			const response = await AuthService.resetPasswordWithToken(
+				token as string,
+				password,
 			);
+
+			if (response.success) {
+				setStatus('success');
+
+				// Navigate to password changed screen
+				router.replace('/auth/password-changed');
+			} else {
+				throw new Error('Password reset failed');
+			}
 		} catch (error) {
-			Alert.alert(
-				t('auth.resetPasswordError'),
-				t('auth.resetPasswordErrorMessage'),
-			);
-		} finally {
-			setIsLoading(false);
+			console.error('Password reset error:', error);
+			setStatus('error');
+
+			const errorMessage =
+				error instanceof Error ? error.message : t('auth.passwordResetError');
+
+			setError(errorMessage);
 		}
 	};
 
 	const handleBack = () => {
 		router.replace('/auth/login');
+	};
+
+	const getStrengthColor = () => {
+		switch (passwordStrength) {
+			case 'weak':
+				return '#D32F2F';
+			case 'medium':
+				return '#FF9800';
+			case 'strong':
+				return '#4CAF50';
+			default:
+				return colors.primaryLight;
+		}
+	};
+
+	const getStrengthText = () => {
+		switch (passwordStrength) {
+			case 'weak':
+				return t('auth.passwordWeak');
+			case 'medium':
+				return t('auth.passwordMedium');
+			case 'strong':
+				return t('auth.passwordStrong');
+			default:
+				return '';
+		}
 	};
 
 	return (
@@ -118,23 +187,21 @@ export default function ResetPasswordScreen() {
 				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 				style={styles.keyboardView}
 			>
-				<ScrollView contentContainerStyle={styles.scrollContent}>
+				<ScrollView
+					contentContainerStyle={styles.scrollContent}
+					keyboardShouldPersistTaps="handled"
+					showsVerticalScrollIndicator={false}
+				>
 					{/* Header */}
 					<View style={styles.header}>
-						<TouchableOpacity onPress={handleBack} style={styles.backButton}>
+						<Text style={styles.headerTitle}>{t('auth.newPassword')}</Text>
+						<TouchableOpacity
+							onPress={handleBack}
+							style={styles.backButton}
+							disabled={status === 'loading'}
+						>
 							<Ionicons name="chevron-back" size={24} color={colors.primary} />
 						</TouchableOpacity>
-						<Text style={styles.headerTitle}>{t('auth.resetPassword')}</Text>
-					</View>
-
-					{/* Logo */}
-					<View style={styles.logoContainer}>
-						<Image
-							source={require('@/assets/images/logo_large_primary.png')}
-							style={{ width: 100, height: 80, marginBottom: 5 }}
-							resizeMode="contain"
-						/>
-						<Text style={styles.appName}>Menuteca</Text>
 					</View>
 
 					{/* Content */}
@@ -158,6 +225,17 @@ export default function ResetPasswordScreen() {
 							</Text>
 						</View>
 
+						{/* Error Display */}
+						{status === 'error' && error && (
+							<ErrorDisplay
+								message={error}
+								type="network"
+								onRetry={() => setStatus('idle')}
+								variant="inline"
+								animated={true}
+							/>
+						)}
+
 						{/* Form */}
 						<View style={styles.form}>
 							{/* Password Input */}
@@ -170,19 +248,17 @@ export default function ResetPasswordScreen() {
 											passwordError ? styles.inputError : null,
 										]}
 										value={password}
-										onChangeText={(text) => {
-											setPassword(text);
-											if (passwordError) setPasswordError('');
-										}}
+										onChangeText={setPassword}
 										placeholder={t('auth.enterNewPassword')}
 										placeholderTextColor={colors.primaryLight}
 										secureTextEntry={!showPassword}
-										editable={!isLoading}
+										editable={status !== 'loading'}
+										autoComplete="new-password"
 									/>
 									<TouchableOpacity
 										style={styles.eyeButton}
 										onPress={() => setShowPassword(!showPassword)}
-										disabled={isLoading}
+										disabled={status === 'loading'}
 									>
 										<Ionicons
 											name={showPassword ? 'eye-off' : 'eye'}
@@ -191,6 +267,37 @@ export default function ResetPasswordScreen() {
 										/>
 									</TouchableOpacity>
 								</View>
+
+								{/* Password Strength Indicator */}
+								{password.length > 0 && (
+									<View style={styles.strengthContainer}>
+										<View style={styles.strengthBar}>
+											<View
+												style={[
+													styles.strengthFill,
+													{
+														width:
+															passwordStrength === 'weak'
+																? '33%'
+																: passwordStrength === 'medium'
+																? '66%'
+																: '100%',
+														backgroundColor: getStrengthColor(),
+													},
+												]}
+											/>
+										</View>
+										<Text
+											style={[
+												styles.strengthText,
+												{ color: getStrengthColor() },
+											]}
+										>
+											{getStrengthText()}
+										</Text>
+									</View>
+								)}
+
 								{passwordError ? (
 									<Text style={styles.errorText}>{passwordError}</Text>
 								) : null}
@@ -208,19 +315,17 @@ export default function ResetPasswordScreen() {
 											confirmPasswordError ? styles.inputError : null,
 										]}
 										value={confirmPassword}
-										onChangeText={(text) => {
-											setConfirmPassword(text);
-											if (confirmPasswordError) setConfirmPasswordError('');
-										}}
+										onChangeText={setConfirmPassword}
 										placeholder={t('auth.enterConfirmNewPassword')}
 										placeholderTextColor={colors.primaryLight}
 										secureTextEntry={!showConfirmPassword}
-										editable={!isLoading}
+										editable={status !== 'loading'}
+										autoComplete="new-password"
 									/>
 									<TouchableOpacity
 										style={styles.eyeButton}
 										onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-										disabled={isLoading}
+										disabled={status === 'loading'}
 									>
 										<Ionicons
 											name={showConfirmPassword ? 'eye-off' : 'eye'}
@@ -238,15 +343,21 @@ export default function ResetPasswordScreen() {
 							<TouchableOpacity
 								style={[
 									styles.resetButton,
-									isLoading && styles.resetButtonDisabled,
+									!isFormValid && styles.resetButtonDisabled,
 								]}
 								onPress={handleResetPassword}
-								disabled={isLoading}
+								disabled={!isFormValid}
+								activeOpacity={0.8}
 							>
-								{isLoading ? (
+								{status === 'loading' ? (
 									<ActivityIndicator size="small" color={colors.quaternary} />
 								) : (
-									<Text style={styles.resetButtonText}>
+									<Text
+										style={[
+											styles.resetButtonText,
+											!isFormValid && styles.resetButtonTextDisabled,
+										]}
+									>
 										{t('auth.updatePassword')}
 									</Text>
 								)}
@@ -293,6 +404,11 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		paddingVertical: 40,
 	},
+	logo: {
+		width: 100,
+		height: 80,
+		marginBottom: 5,
+	},
 	appName: {
 		fontSize: 32,
 		fontFamily: 'Manrope',
@@ -317,10 +433,18 @@ const styles = StyleSheet.create({
 		borderColor: colors.primaryLight,
 		justifyContent: 'center',
 		alignItems: 'center',
+		shadowColor: '#000',
+		shadowOffset: {
+			width: 0,
+			height: 4,
+		},
+		shadowOpacity: 0.1,
+		shadowRadius: 8,
+		elevation: 4,
 	},
 	textContainer: {
 		alignItems: 'center',
-		marginBottom: 40,
+		marginBottom: 30,
 	},
 	title: {
 		fontSize: 24,
@@ -337,6 +461,7 @@ const styles = StyleSheet.create({
 		color: colors.primaryLight,
 		textAlign: 'center',
 		lineHeight: 22,
+		paddingHorizontal: 20,
 	},
 	form: {
 		flex: 1,
@@ -369,10 +494,29 @@ const styles = StyleSheet.create({
 	},
 	inputError: {
 		borderColor: '#D32F2F',
+		borderWidth: 2,
 	},
 	eyeButton: {
 		paddingHorizontal: 16,
 		paddingVertical: 14,
+	},
+	strengthContainer: {
+		marginTop: 8,
+	},
+	strengthBar: {
+		height: 4,
+		backgroundColor: colors.primaryLight,
+		borderRadius: 2,
+		marginBottom: 4,
+	},
+	strengthFill: {
+		height: '100%',
+		borderRadius: 2,
+	},
+	strengthText: {
+		fontSize: 12,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
 	},
 	errorText: {
 		fontSize: 12,
@@ -387,14 +531,29 @@ const styles = StyleSheet.create({
 		paddingVertical: 16,
 		alignItems: 'center',
 		marginTop: 20,
+		shadowColor: colors.primary,
+		shadowOffset: {
+			width: 0,
+			height: 4,
+		},
+		shadowOpacity: 0.3,
+		shadowRadius: 8,
+		elevation: 8,
+		minHeight: 56,
+		justifyContent: 'center',
 	},
 	resetButtonDisabled: {
-		opacity: 0.6,
+		backgroundColor: colors.primaryLight,
+		shadowOpacity: 0,
+		elevation: 0,
 	},
 	resetButtonText: {
 		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.quaternary,
+	},
+	resetButtonTextDisabled: {
+		opacity: 0.7,
 	},
 });

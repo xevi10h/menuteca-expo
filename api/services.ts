@@ -9,7 +9,6 @@ import {
 } from '@/shared/types';
 import { apiClient } from './client';
 
-// Auth Service
 export class AuthService {
 	static async login(email: string, password: string) {
 		return apiClient.post<{
@@ -50,6 +49,12 @@ export class AuthService {
 		}>('/auth/change-password', { currentPassword, newPassword });
 	}
 
+	static async setPassword(newPassword: string) {
+		return apiClient.post<{
+			success: boolean;
+		}>('/auth/set-password', { newPassword });
+	}
+
 	static async googleAuth(googleData: {
 		google_id: string;
 		email: string;
@@ -64,6 +69,40 @@ export class AuthService {
 				token: string;
 			};
 		}>('/auth/google', googleData);
+	}
+
+	static async refreshToken() {
+		return apiClient.post<{
+			success: boolean;
+			data: {
+				token: string;
+			};
+		}>('/auth/refresh');
+	}
+
+	// Password reset flow methods
+	static async sendPasswordResetCode(email: string) {
+		return apiClient.post<{
+			success: boolean;
+			message: string;
+		}>('/auth/send-reset-code', { email });
+	}
+
+	static async verifyPasswordResetCode(email: string, code: string) {
+		return apiClient.post<{
+			success: boolean;
+			data: {
+				token: string;
+			};
+			message: string;
+		}>('/auth/verify-reset-code', { email, code });
+	}
+
+	static async resetPasswordWithToken(token: string, newPassword: string) {
+		return apiClient.post<{
+			success: boolean;
+			message: string;
+		}>('/auth/reset-password', { token, newPassword });
 	}
 }
 

@@ -44,7 +44,9 @@
 		"delete": "Delete",
 		"ok": "OK",
 		"gallery": "Gallery",
-		"camera": "Camera"
+		"camera": "Camera",
+		"retry": "Retry",
+		"dismiss": "Dismiss"
 	},
 	"restaurant": {
 		"information": "Information",
@@ -456,7 +458,31 @@
 		"passwordResetSuccess": "Password reset",
 		"passwordResetSuccessMessage": "Your password has been reset successfully. You can now log in.",
 		"resetPasswordError": "Reset error",
-		"resetPasswordErrorMessage": "Could not reset password. Please try again."
+		"resetPasswordErrorMessage": "Could not reset password. Please try again.",
+		"passwordRecovery": "Password Recovery",
+		"passwordRecoveryTitle": "Recover Password",
+		"passwordRecoveryText": "Enter your email and we will send you a verification code to reset your password.",
+		"verification": "Verification",
+		"verificationMessage": "We have sent a verification code to",
+		"verificationCode": "Verification Code",
+		"verify": "Verify",
+		"didntReceiveCode": "Didn't receive the code?",
+		"resendCode": "Resend code",
+		"resendIn": "Resend in",
+		"codeResent": "Code resent",
+		"codeResentMessage": "A new code has been sent to your email.",
+		"resendCodeError": "Error resending the code. Please try again.",
+		"verificationError": "Verification error. Invalid or expired code.",
+		"passwordWeak": "Weak",
+		"passwordMedium": "Medium",
+		"passwordStrong": "Strong",
+		"passwordChangedTitle": "Password changed!",
+		"passwordChangedMessage": "Your password has been successfully updated. You can now log in with your new password.",
+		"passwordChangedButton": "Go to login",
+		"passwordResetError": "Error changing the password. Please try again.",
+		"sendResetCode": "Send reset code",
+		"verificationTitle": "Verification",
+		"newPasswordTitle": "New Password"
 	},
 	"changePassword": {
 		"title": "Change password",
@@ -541,7 +567,11 @@
 		"passwordsDontMatch": "Passwords don't match",
 		"acceptTermsRequired": "You must accept the terms and conditions",
 		"emailNotAvailable": "This email is already in use",
-		"usernameNotAvailable": "This username is already in use"
+		"usernameNotAvailable": "This username is already in use",
+		"codeRequired": "The code is required",
+		"codeInvalid": "The code must be 6 digits long",
+		"passwordWeak": "The password must contain at least one lowercase letter, one uppercase letter, and one number",
+		"codeExpired": "The code has expired"
 	},
 	"navigation": {
 		"back": "Back",
@@ -558,5 +588,11 @@
 		"filter": "Filter",
 		"sort": "Sort",
 		"refresh": "Refresh"
+	},
+	"errors": {
+		"network": "Network error",
+		"validation": "Validation error",
+		"auth": "Authentication error",
+		"general": "An error occurred"
 	}
 }

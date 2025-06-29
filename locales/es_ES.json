@@ -44,7 +44,9 @@
 		"delete": "Eliminar",
 		"ok": "OK",
 		"gallery": "Galería",
-		"camera": "Cámara"
+		"camera": "Cámara",
+		"retry": "Intentar de nuevo",
+		"dismiss": "Descartar"
 	},
 	"restaurant": {
 		"information": "Información",
@@ -455,7 +457,31 @@
 		"passwordResetSuccess": "Contraseña restablecida",
 		"passwordResetSuccessMessage": "Tu contraseña ha sido restablecida correctamente. Ya puedes iniciar sesión.",
 		"resetPasswordError": "Error al restablecer",
-		"resetPasswordErrorMessage": "No se pudo restablecer la contraseña. Inténtalo de nuevo."
+		"resetPasswordErrorMessage": "No se pudo restablecer la contraseña. Inténtalo de nuevo.",
+		"passwordRecovery": "Recuperar contraseña",
+		"passwordRecoveryTitle": "Recuperar contraseña",
+		"passwordRecoveryText": "Introduce tu email y te enviaremos un código de verificación para restablecer tu contraseña.",
+		"verification": "Verificación",
+		"verificationMessage": "Hemos enviado un código de verificación a",
+		"verificationCode": "Código de verificación",
+		"verify": "Verificar",
+		"didntReceiveCode": "¿No has recibido el código?",
+		"resendCode": "Reenviar código",
+		"resendIn": "Reenviar en",
+		"codeResent": "Código reenviado",
+		"codeResentMessage": "Se ha enviado un nuevo código a tu email.",
+		"resendCodeError": "Error al reenviar el código. Inténtalo de nuevo.",
+		"verificationError": "Error de verificación. Código inválido o expirado.",
+		"passwordWeak": "Débil",
+		"passwordMedium": "Media",
+		"passwordStrong": "Fuerte",
+		"passwordChangedTitle": "¡Contraseña cambiada!",
+		"passwordChangedMessage": "Tu contraseña ha sido actualizada correctamente. Ya puedes iniciar sesión con tu nueva contraseña.",
+		"passwordChangedButton": "Ir al inicio de sesión",
+		"passwordResetError": "Error al cambiar la contraseña. Inténtalo de nuevo.",
+		"sendResetCode": "Enviar código",
+		"verificationTitle": "Código de verificación",
+		"newPasswordTitle": "Crear nueva contraseña"
 	},
 	"changePassword": {
 		"title": "Cambiar contraseña",
@@ -540,7 +566,11 @@
 		"passwordsDontMatch": "Las contraseñas no coinciden",
 		"acceptTermsRequired": "Debes aceptar los términos y condiciones",
 		"emailNotAvailable": "Este email ya está en uso",
-		"usernameNotAvailable": "Este nombre de usuario ya está en uso"
+		"usernameNotAvailable": "Este nombre de usuario ya está en uso",
+		"codeRequired": "El código es obligatorio",
+		"codeInvalid": "El código debe tener 6 dígitos",
+		"passwordWeak": "La contraseña debe contener al menos una minúscula, una mayúscula y un número",
+		"codeExpired": "El código ha expirado"
 	},
 	"navigation": {
 		"back": "Atrás",
@@ -557,5 +587,11 @@
 		"filter": "Filtrar",
 		"sort": "Ordenar",
 		"refresh": "Actualizar"
+	},
+	"errors": {
+		"network": "Error de red",
+		"validation": "Error de validación",
+		"auth": "Error de autenticación",
+		"general": "Error"
 	}
 }

@@ -44,7 +44,9 @@
 		"delete": "Supprimer",
 		"ok": "OK",
 		"gallery": "Galerie",
-		"camera": "Appareil photo"
+		"camera": "Appareil photo",
+		"retry": "Réessayer",
+		"dismiss": "Fermer"
 	},
 	"restaurant": {
 		"information": "Information",
@@ -456,7 +458,31 @@
 		"passwordResetSuccess": "Mot de passe réinitialisé",
 		"passwordResetSuccessMessage": "Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter.",
 		"resetPasswordError": "Erreur de réinitialisation",
-		"resetPasswordErrorMessage": "Impossible de réinitialiser le mot de passe. Veuillez réessayer."
+		"resetPasswordErrorMessage": "Impossible de réinitialiser le mot de passe. Veuillez réessayer.",
+		"passwordRecovery": "Récupération de mot de passe",
+		"passwordRecoveryTitle": "Récupérer le mot de passe",
+		"passwordRecoveryText": "Saisissez votre e-mail et nous vous enverrons un code de vérification pour réinitialiser votre mot de passe.",
+		"verification": "Vérification",
+		"verificationMessage": "Nous avons envoyé un code de vérification à",
+		"verificationCode": "Code de vérification",
+		"verify": "Vérifier",
+		"didntReceiveCode": "Vous n'avez pas reçu le code ?",
+		"resendCode": "Renvoyer le code",
+		"resendIn": "Renvoyer dans",
+		"codeResent": "Code renvoyé",
+		"codeResentMessage": "Un nouveau code a été envoyé à votre e-mail.",
+		"resendCodeError": "Erreur lors du renvoi du code. Veuillez réessayer.",
+		"verificationError": "Erreur de vérification. Code invalide ou expiré.",
+		"passwordWeak": "Faible",
+		"passwordMedium": "Moyen",
+		"passwordStrong": "Fort",
+		"passwordChangedTitle": "Mot de passe changé !",
+		"passwordChangedMessage": "Votre mot de passe a été mis à jour avec succès. Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.",
+		"passwordChangedButton": "Aller à la connexion",
+		"passwordResetError": "Erreur lors du changement de mot de passe. Veuillez réessayer.",
+		"sendResetCode": "Envoyer le code de réinitialisation",
+		"verificationTitle": "Vérification de l'email",
+		"newPasswordTitle": "Nouveau mot de passe"
 	},
 	"changePassword": {
 		"title": "Changer le mot de passe",
@@ -541,7 +567,11 @@
 		"passwordsDontMatch": "Les mots de passe ne correspondent pas",
 		"acceptTermsRequired": "Vous devez accepter les termes et conditions",
 		"emailNotAvailable": "Cet email est déjà utilisé",
-		"usernameNotAvailable": "Ce nom d'utilisateur est déjà utilisé"
+		"usernameNotAvailable": "Ce nom d'utilisateur est déjà utilisé",
+		"codeRequired": "Le code est requis",
+		"codeInvalid": "Le code doit comporter 6 chiffres",
+		"passwordWeak": "Le mot de passe doit contenir au moins une lettre minuscule, une lettre majuscule et un chiffre",
+		"codeExpired": "Le code a expiré"
 	},
 	"navigation": {
 		"back": "Retour",
@@ -558,5 +588,11 @@
 		"filter": "Filtrer",
 		"sort": "Trier",
 		"refresh": "Actualiser"
+	},
+	"errors": {
+		"network": "Erreur réseau",
+		"validation": "Erreur de validation",
+		"auth": "Erreur d'authentification",
+		"general": "Erreur générale"
 	}
 }

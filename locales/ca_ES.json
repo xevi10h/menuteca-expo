@@ -44,7 +44,9 @@
 		"delete": "Eliminar",
 		"ok": "D'acord",
 		"gallery": "Galeria",
-		"camera": "Càmera"
+		"camera": "Càmera",
+		"retry": "Tornar-ho a intentar",
+		"dismiss": "Descartar"
 	},
 	"restaurant": {
 		"information": "Informació",
@@ -456,7 +458,31 @@
 		"passwordResetSuccess": "Contrasenya restablerta",
 		"passwordResetSuccessMessage": "La teva contrasenya ha estat restablerta correctament. Ja pots iniciar sessió.",
 		"resetPasswordError": "Error en restablir",
-		"resetPasswordErrorMessage": "No s'ha pogut restablir la contrasenya. Torna-ho a intentar."
+		"resetPasswordErrorMessage": "No s'ha pogut restablir la contrasenya. Torna-ho a intentar.",
+		"passwordRecovery": "Recuperar contrasenya",
+		"passwordRecoveryTitle": "Recuperar contrasenya",
+		"passwordRecoveryText": "Introdueix el teu correu electrònic i t'enviarem un codi de verificació per restablir la teva contrasenya.",
+		"verification": "Verificació",
+		"verificationMessage": "Hem enviat un codi de verificació a",
+		"verificationCode": "Codi de verificació",
+		"verify": "Verifica",
+		"didntReceiveCode": "No has rebut el codi?",
+		"resendCode": "Reenvia el codi",
+		"resendIn": "Reenvia en",
+		"codeResent": "Codi reenviat",
+		"codeResentMessage": "S'ha enviat un nou codi al teu correu electrònic.",
+		"resendCodeError": "Error en reenviar el codi. Torna-ho a provar.",
+		"verificationError": "Error de verificació. Codi invàlid o expirat.",
+		"passwordWeak": "Feble",
+		"passwordMedium": "Mitjana",
+		"passwordStrong": "Forta",
+		"passwordChangedTitle": "Contrasenya canviada!",
+		"passwordChangedMessage": "La teva contrasenya s'ha actualitzat correctament. Ja pots iniciar sessió amb la teva nova contrasenya.",
+		"passwordChangedButton": "Ves a l'inici de sessió",
+		"passwordResetError": "Error en canviar la contrasenya. Torna-ho a provar.",
+		"sendResetCode": "Envia codi de restabliment",
+		"verificationTitle": "Verificació de compte",
+		"newPasswordTitle": "Nova contrasenya"
 	},
 	"changePassword": {
 		"title": "Canviar contrasenya",
@@ -541,7 +567,11 @@
 		"passwordsDontMatch": "Les contrasenyes no coincideixen",
 		"acceptTermsRequired": "Has d'acceptar els termes i condicions",
 		"emailNotAvailable": "Aquest email ja està en ús",
-		"usernameNotAvailable": "Aquest nom d'usuari ja està en ús"
+		"usernameNotAvailable": "Aquest nom d'usuari ja està en ús",
+		"codeRequired": "El codi és obligatori",
+		"codeInvalid": "El codi ha de tenir 6 dígits",
+		"passwordWeak": "La contrasenya ha de contenir almenys una minúscula, una majúscula i un número",
+		"codeExpired": "El codi ha caducat"
 	},
 	"navigation": {
 		"back": "Enrere",
@@ -558,5 +588,11 @@
 		"filter": "Filtrar",
 		"sort": "Ordenar",
 		"refresh": "Actualitzar"
+	},
+	"errors": {
+		"network": "Error de xarxa",
+		"validation": "Error de validació",
+		"auth": "Error d'autenticació",
+		"general": "Error"
 	}
 }

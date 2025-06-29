@@ -194,10 +194,10 @@ export default function RegisterScreen() {
 				<ScrollView contentContainerStyle={styles.scrollContent}>
 					{/* Header */}
 					<View style={styles.header}>
+						<Text style={styles.headerTitle}>{t('auth.register')}</Text>
 						<TouchableOpacity onPress={handleBack} style={styles.backButton}>
 							<Ionicons name="chevron-back" size={24} color={colors.primary} />
 						</TouchableOpacity>
-						<Text style={styles.headerTitle}>{t('auth.register')}</Text>
 					</View>
 
 					{/* Logo */}
@@ -450,7 +450,10 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.primary,
-		marginLeft: 10,
+		textAlign: 'center',
+		right: 0,
+		left: 0,
+		position: 'absolute',
 	},
 	logoContainer: {
 		alignItems: 'center',

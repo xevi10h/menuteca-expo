@@ -87,13 +87,13 @@ export default function ErrorDisplay({
 
 		switch (type) {
 			case 'network':
-				return t('errors.network.title') || 'Connection Error';
+				return t('errors.network') || 'Connection Error';
 			case 'validation':
-				return t('errors.validation.title') || 'Validation Error';
+				return t('errors.validation') || 'Validation Error';
 			case 'authentication':
-				return t('errors.auth.title') || 'Authentication Error';
+				return t('errors.auth') || 'Authentication Error';
 			default:
-				return t('errors.general.title') || 'Error';
+				return t('errors.general') || 'Error';
 		}
 	};
 
