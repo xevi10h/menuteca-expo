@@ -99,8 +99,7 @@ export default function UserRestaurantEdit() {
 				console.error('Error loading restaurant data:', error);
 				Alert.alert(
 					t('validation.error'),
-					t('editRestaurant.errorLoadingRestaurant') ||
-						'Error loading restaurant data',
+					t('error.loadingRestaurant') || 'Error loading restaurant data',
 				);
 				router.back();
 			} finally {

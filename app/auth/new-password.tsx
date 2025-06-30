@@ -1,13 +1,13 @@
 import { AuthService } from '@/api/services';
 import { colors } from '@/assets/styles/colors';
-import ErrorDisplay from '@/components/auth/ErrorDisplay';
+import ErrorModal from '@/components/auth/ErrorModal';
+import { useAuthError } from '@/hooks/useAuthError';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
 	ActivityIndicator,
-	Alert,
 	KeyboardAvoidingView,
 	Platform,
 	ScrollView,
@@ -31,31 +31,29 @@ export default function NewPasswordScreen() {
 	const [showPassword, setShowPassword] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 	const [status, setStatus] = useState<ResetStatus>('idle');
-	const [error, setError] = useState('');
 	const [passwordError, setPasswordError] = useState('');
 	const [confirmPasswordError, setConfirmPasswordError] = useState('');
+
+	// Use the auth error hook
+	const { error: authError, showError, hideError } = useAuthError();
 
 	// Validate token on mount
 	useEffect(() => {
 		if (!token) {
-			Alert.alert(t('auth.invalidToken'), t('auth.invalidTokenMessage'), [
-				{
-					text: t('general.ok'),
-					onPress: () => router.replace('/auth/login'),
-				},
-			]);
+			showError(t('auth.invalidTokenMessage'), {
+				title: t('auth.invalidToken'),
+				onRetry: () => router.replace('/auth/login'),
+			});
 		}
-	}, [token, t, router]);
+	}, [token, showError, t, router]);
 
 	// Reset errors when passwords change
 	useEffect(() => {
 		if (passwordError) setPasswordError('');
-		if (error) setError('');
 	}, [password]);
 
 	useEffect(() => {
 		if (confirmPasswordError) setConfirmPasswordError('');
-		if (error) setError('');
 	}, [confirmPassword]);
 
 	const validatePassword = (password: string) => {
@@ -95,7 +93,6 @@ export default function NewPasswordScreen() {
 		// Reset errors
 		setPasswordError('');
 		setConfirmPasswordError('');
-		setError('');
 
 		let hasErrors = false;
 
@@ -120,7 +117,9 @@ export default function NewPasswordScreen() {
 		if (hasErrors) return;
 
 		if (!token) {
-			Alert.alert(t('auth.invalidToken'), t('auth.invalidTokenMessage'));
+			showError(t('auth.invalidTokenMessage'), {
+				title: t('auth.invalidToken'),
+			});
 			return;
 		}
 
@@ -147,7 +146,13 @@ export default function NewPasswordScreen() {
 			const errorMessage =
 				error instanceof Error ? error.message : t('auth.passwordResetError');
 
-			setError(errorMessage);
+			showError(errorMessage, {
+				title: t('auth.newPassword'),
+				onRetry: () => {
+					setStatus('idle');
+					handleResetPassword();
+				},
+			});
 		}
 	};
 
@@ -224,17 +229,6 @@ export default function NewPasswordScreen() {
 								{t('auth.newPasswordMessage')}
 							</Text>
 						</View>
-
-						{/* Error Display */}
-						{status === 'error' && error && (
-							<ErrorDisplay
-								message={error}
-								type="network"
-								onRetry={() => setStatus('idle')}
-								variant="inline"
-								animated={true}
-							/>
-						)}
 
 						{/* Form */}
 						<View style={styles.form}>
@@ -366,6 +360,16 @@ export default function NewPasswordScreen() {
 					</View>
 				</ScrollView>
 			</KeyboardAvoidingView>
+
+			{/* Error Modal */}
+			<ErrorModal
+				visible={authError.isVisible}
+				title={authError.title}
+				message={authError.message}
+				type={authError.type}
+				onClose={hideError}
+				onRetry={authError.onRetry}
+			/>
 		</SafeAreaView>
 	);
 }
@@ -399,22 +403,6 @@ const styles = StyleSheet.create({
 		fontWeight: '600',
 		color: colors.primary,
 		marginLeft: 10,
-	},
-	logoContainer: {
-		alignItems: 'center',
-		paddingVertical: 40,
-	},
-	logo: {
-		width: 100,
-		height: 80,
-		marginBottom: 5,
-	},
-	appName: {
-		fontSize: 32,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
-		color: colors.primary,
-		marginBottom: 10,
 	},
 	content: {
 		flex: 1,

@@ -1,4 +1,6 @@
 import { colors } from '@/assets/styles/colors';
+import ErrorModal from '@/components/auth/ErrorModal';
+import { useAuthError } from '@/hooks/useAuthError';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
@@ -6,7 +8,6 @@ import { Redirect, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
 	ActivityIndicator,
-	Alert,
 	Image,
 	KeyboardAvoidingView,
 	Platform,
@@ -35,12 +36,28 @@ export default function LoginScreen() {
 	const [passwordError, setPasswordError] = useState('');
 	const [isFormValid, setIsFormValid] = useState(false);
 
+	// Use the auth error hook
+	const { error: authError, showError, hideError } = useAuthError();
+
 	// Clear errors when user starts typing
 	useEffect(() => {
 		if (error) {
 			clearError();
 		}
 	}, [email, password]);
+
+	// Show error modal when there's an error from the store
+	useEffect(() => {
+		if (error) {
+			showError(error, {
+				title: t('auth.loginError'),
+				onRetry: () => {
+					clearError();
+					handleLogin();
+				},
+			});
+		}
+	}, [error, showError, clearError, t]);
 
 	// Validate form in real time
 	useEffect(() => {
@@ -101,15 +118,13 @@ export default function LoginScreen() {
 			if (success) {
 				// Navigation will be handled automatically by the authentication state change
 				router.replace('/');
-			} else {
-				// Error is handled by the store
-				if (error) {
-					Alert.alert(t('auth.loginError'), error);
-				}
 			}
+			// Error is now handled by the useEffect that watches the error state
 		} catch (err) {
 			console.error('Login error:', err);
-			Alert.alert(t('auth.loginError'), t('auth.loginFailed'));
+			showError(t('auth.loginFailed'), {
+				title: t('auth.loginError'),
+			});
 		}
 	};
 
@@ -298,6 +313,16 @@ export default function LoginScreen() {
 					</View>
 				</ScrollView>
 			</KeyboardAvoidingView>
+
+			{/* Error Modal */}
+			<ErrorModal
+				visible={authError.isVisible}
+				title={authError.title}
+				message={authError.message}
+				type={authError.type}
+				onClose={hideError}
+				onRetry={authError.onRetry}
+			/>
 		</SafeAreaView>
 	);
 }

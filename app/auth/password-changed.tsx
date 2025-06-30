@@ -3,7 +3,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function PasswordChangedScreen() {
@@ -17,16 +17,6 @@ export default function PasswordChangedScreen() {
 	return (
 		<SafeAreaView style={styles.container}>
 			<View style={styles.content}>
-				{/* Logo */}
-				<View style={styles.logoContainer}>
-					<Image
-						source={require('@/assets/images/logo_large_primary.png')}
-						style={styles.logo}
-						resizeMode="contain"
-					/>
-					<Text style={styles.appName}>Menuteca</Text>
-				</View>
-
 				{/* Success Content */}
 				<View style={styles.successContainer}>
 					{/* Success Icon */}

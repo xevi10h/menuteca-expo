@@ -1,12 +1,13 @@
 import { colors } from '@/assets/styles/colors';
+import ErrorModal from '@/components/auth/ErrorModal';
+import { useAuthError } from '@/hooks/useAuthError';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
 import { Redirect, useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
 	ActivityIndicator,
-	Alert,
 	Dimensions,
 	Image,
 	Platform,
@@ -25,7 +26,25 @@ export default function AuthIndexScreen() {
 	const googleAuth = useUserStore((state) => state.googleAuth);
 	const isLoading = useUserStore((state) => state.isLoading);
 	const isAuthenticated = useUserStore((state) => state.isAuthenticated);
+	const error = useUserStore((state) => state.error);
+	const clearError = useUserStore((state) => state.clearError);
 	const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
+	// Use the auth error hook
+	const { error: authError, showError, hideError } = useAuthError();
+
+	// Show error modal when there's an error from the store
+	useEffect(() => {
+		if (error) {
+			showError(error, {
+				title: t('auth.googleAuthError'),
+				onRetry: () => {
+					clearError();
+					handleGoogleAuth();
+				},
+			});
+		}
+	}, [error, showError, clearError, t]);
 
 	// If already authenticated, redirect to main app
 	if (isAuthenticated) {
@@ -66,14 +85,29 @@ export default function AuthIndexScreen() {
 				// Navigation will be handled automatically by the authentication state change
 				// The user will be redirected to the main app through the index.tsx redirect
 				router.replace('/');
-			} else {
-				Alert.alert(t('auth.googleAuthError'), t('auth.googleAuthFailed'));
 			}
+			// Error handling is now done by the useEffect watching the error state
 		} catch (error) {
-			Alert.alert(t('auth.googleAuthError'), t('auth.googleAuthFailed'));
+			showError(t('auth.googleAuthFailed'), {
+				title: t('auth.googleAuthError'),
+			});
 		} finally {
 			setIsGoogleLoading(false);
 		}
+	};
+
+	const handleTermsPress = () => {
+		showError(t('auth.termsMessage'), {
+			title: t('auth.terms'),
+			type: 'info',
+		});
+	};
+
+	const handlePrivacyPress = () => {
+		showError(t('auth.privacyMessage'), {
+			title: t('auth.privacy'),
+			type: 'info',
+		});
 	};
 
 	return (
@@ -126,7 +160,10 @@ export default function AuthIndexScreen() {
 							style={[styles.appleButton, isLoading && styles.buttonDisabled]}
 							onPress={() => {
 								// TODO: Implement Apple Sign In
-								Alert.alert(t('auth.appleAuth'), t('auth.appleAuthMessage'));
+								showError(t('auth.appleAuthMessage'), {
+									title: t('auth.appleAuth'),
+									type: 'info',
+								});
 							}}
 							disabled={isLoading}
 							activeOpacity={0.8}
@@ -186,28 +223,26 @@ export default function AuthIndexScreen() {
 				<View style={styles.termsContainer}>
 					<Text style={styles.termsText}>
 						{t('auth.byCreatingAccount')}{' '}
-						<Text
-							style={styles.termsLink}
-							onPress={() => {
-								// TODO: Open terms
-								Alert.alert(t('auth.terms'), t('auth.termsMessage'));
-							}}
-						>
+						<Text style={styles.termsLink} onPress={handleTermsPress}>
 							{t('auth.termsOfService')}
 						</Text>{' '}
 						{t('auth.and')}{' '}
-						<Text
-							style={styles.termsLink}
-							onPress={() => {
-								// TODO: Open privacy policy
-								Alert.alert(t('auth.privacy'), t('auth.privacyMessage'));
-							}}
-						>
+						<Text style={styles.termsLink} onPress={handlePrivacyPress}>
 							{t('auth.privacyPolicy')}
 						</Text>
 					</Text>
 				</View>
 			</View>
+
+			{/* Error Modal */}
+			<ErrorModal
+				visible={authError.isVisible}
+				title={authError.title}
+				message={authError.message}
+				type={authError.type}
+				onClose={hideError}
+				onRetry={authError.onRetry}
+			/>
 		</SafeAreaView>
 	);
 }

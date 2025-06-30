@@ -123,6 +123,7 @@ export default function RestaurantDetail() {
 
 			// Fetch restaurant details
 			const restaurant_response = await RestaurantService.getRestaurantById(id);
+			console.log('Restaurant response:', restaurant_response);
 
 			if (!restaurant_response.success) {
 				setLoadingState('not-found');
@@ -134,6 +135,7 @@ export default function RestaurantDetail() {
 			// Fetch restaurant menus
 			try {
 				const menusResponse = await MenuService.getRestaurantMenus(id);
+				console.log('Menus response:', menusResponse);
 				if (menusResponse.success) {
 					setMenus(menusResponse.data);
 				} else {
