@@ -7,8 +7,7 @@ import 'react-native-url-polyfill/auto';
 // Configuración de Supabase
 // Opción 1: Variables de entorno hardcodeadas (para desarrollo rápido)
 const supabaseUrl = 'https://xuoyhbavkonivkplomjy.supabase.co';
-const supabaseAnonKey =
-	'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh1b3loYmF2a29uaXZrcGxvbWp5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU5NzUzNjUsImV4cCI6MjA1MTU1MTM2NX0.PLACEHOLDER'; // Reemplazar con tu clave real
+const supabaseAnonKey = 'sb_publishable_eTEgSE_cZreA0g56apPzZQ_dcXagtXT';
 
 // Opción 2: Usando Constants de Expo (recomendado para producción)
 // import Constants from 'expo-constants';

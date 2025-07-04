@@ -1,4 +1,4 @@
-// zustand/UserStore.ts - Actualizado para Supabase
+// zustand/UserStore.ts - Optimizado para evitar bucles
 import { AuthService, UserService } from '@/api/services';
 import { getDeviceLanguage } from '@/shared/functions/utils';
 import { supabase } from '@/utils/supabase';
@@ -59,25 +59,38 @@ export const undefinedUser: User = {
 	language: getDeviceLanguage(),
 };
 
+// Variable global para evitar múltiples configuraciones del listener
+let authListenerConfigured = false;
+
 // Función separada para configurar el listener de auth
 const setupAuthListener = (set: any, get: any) => {
-	let isSettingUp = false;
+	if (authListenerConfigured) return;
+
+	authListenerConfigured = true;
+	let isProcessing = false;
 
 	supabase.auth.onAuthStateChange(async (event, session) => {
-		console.log('Auth state change:', event, session?.user?.id);
+		console.log('🔐 Auth state change:', event, session?.user?.id);
 
 		// Evitar procesamiento múltiple simultáneo
-		if (isSettingUp) return;
+		if (isProcessing) {
+			console.log('⏸️ Auth change already processing, skipping...');
+			return;
+		}
 
 		const currentState = get();
 
 		// Evitar actualizaciones innecesarias si ya estamos procesando
-		if (currentState.isLoading) return;
+		if (currentState.isLoading) {
+			console.log('⏸️ User store is loading, skipping auth change...');
+			return;
+		}
 
-		isSettingUp = true;
+		isProcessing = true;
 
 		try {
 			if (event === 'SIGNED_OUT' || !session) {
+				console.log('👋 User signed out');
 				set({
 					user: { ...undefinedUser, language: currentState.user.language },
 					isAuthenticated: false,
@@ -92,6 +105,7 @@ const setupAuthListener = (set: any, get: any) => {
 					currentState.user.id !== session.user.id ||
 					!currentState.isAuthenticated
 				) {
+					console.log('👤 Updating user profile after auth change');
 					try {
 						const response = await AuthService.getProfile();
 						if (response.success) {
@@ -115,12 +129,16 @@ const setupAuthListener = (set: any, get: any) => {
 							});
 						}
 					} catch (error) {
-						console.error('Error updating profile after auth change:', error);
+						console.error(
+							'❌ Error updating profile after auth change:',
+							error,
+						);
+						// No cambiar el estado si hay error, mantener el actual
 					}
 				}
 			}
 		} finally {
-			isSettingUp = false;
+			isProcessing = false;
 		}
 	});
 };
@@ -137,9 +155,13 @@ export const useUserStore = create<UserState>()(
 
 			initialize: async () => {
 				const state = get();
-				if (state.isInitialized) return;
+				if (state.isInitialized) {
+					console.log('📱 User store already initialized, skipping...');
+					return;
+				}
 
-				set({ isLoading: true });
+				console.log('🚀 Initializing user store...');
+				set({ isLoading: true, error: null });
 
 				try {
 					// Verificar si hay una sesión activa en Supabase
@@ -149,17 +171,36 @@ export const useUserStore = create<UserState>()(
 					} = await supabase.auth.getSession();
 
 					if (error) {
-						console.error('Error getting session:', error);
+						console.error('❌ Error getting session:', error);
+
+						// Si es error de API key, mantener el error
+						if (
+							error.message.includes('Invalid API key') ||
+							error.message.includes('API key')
+						) {
+							set({
+								user: { ...undefinedUser, language: getDeviceLanguage() },
+								isAuthenticated: false,
+								isLoading: false,
+								isInitialized: true,
+								error:
+									'Invalid API key. Please check your Supabase configuration.',
+							});
+							return;
+						}
+
 						set({
 							user: { ...undefinedUser, language: getDeviceLanguage() },
 							isAuthenticated: false,
 							isLoading: false,
 							isInitialized: true,
+							error: error.message,
 						});
 						return;
 					}
 
 					if (session && session.user) {
+						console.log('✅ Found active session for user:', session.user.id);
 						// Hay una sesión activa, obtener datos del usuario
 						try {
 							const response = await AuthService.getProfile();
@@ -186,6 +227,7 @@ export const useUserStore = create<UserState>()(
 									error: null,
 								});
 							} else {
+								console.log('❌ Error getting profile, signing out...');
 								// Error obteniendo el perfil, limpiar sesión
 								await supabase.auth.signOut();
 								set({
@@ -196,16 +238,18 @@ export const useUserStore = create<UserState>()(
 								});
 							}
 						} catch (error) {
-							console.error('Error fetching profile:', error);
+							console.error('❌ Error fetching profile:', error);
 							await supabase.auth.signOut();
 							set({
 								user: { ...undefinedUser, language: getDeviceLanguage() },
 								isAuthenticated: false,
 								isLoading: false,
 								isInitialized: true,
+								error: error instanceof Error ? error.message : 'Unknown error',
 							});
 						}
 					} else {
+						console.log('🔄 No active session found');
 						// No hay sesión activa
 						set({
 							user: { ...undefinedUser, language: getDeviceLanguage() },
@@ -216,16 +260,19 @@ export const useUserStore = create<UserState>()(
 					}
 
 					// Configurar listener UNA SOLA VEZ
-					if (!state.authListenerConfigured) {
-						setupAuthListener(set, get);
-						set({ authListenerConfigured: true });
-					}
+					setupAuthListener(set, get);
 				} catch (error) {
-					console.error('Error initializing user store:', error);
+					console.error('❌ Error initializing user store:', error);
+					const errorMessage =
+						error instanceof Error
+							? error.message
+							: 'Failed to initialize authentication';
 					set({
+						user: { ...undefinedUser, language: getDeviceLanguage() },
+						isAuthenticated: false,
 						isLoading: false,
 						isInitialized: true,
-						error: 'Failed to initialize authentication',
+						error: errorMessage,
 					});
 				}
 			},
@@ -401,27 +448,10 @@ export const useUserStore = create<UserState>()(
 				set({ isLoading: true, error: null });
 
 				try {
-					const response = await AuthService.googleAuth(googleData);
-
-					// if (response.success) {
-					// 	const userData: User = {
-					// 		...response.data.user,
-					// 		token: response.data.token,
-					// 	};
-
-					// 	set({
-					// 		user: userData,
-					// 		isAuthenticated: true,
-					// 		isLoading: false,
-					// 		error: null,
-					// 		isInitialized: true,
-					// 	});
-					// 	return true;
-					// } else {
-					// 	throw new Error('Google authentication failed');
-					// }
-
-					return true;
+					// Por ahora esto está deshabilitado
+					console.log('Google Auth not implemented yet');
+					set({ isLoading: false, error: 'Google Auth not implemented yet' });
+					return false;
 				} catch (error) {
 					const errorMessage =
 						error instanceof Error
@@ -433,6 +463,7 @@ export const useUserStore = create<UserState>()(
 			},
 
 			logout: async () => {
+				console.log('🚪 Logging out user...');
 				// Cerrar sesión en Supabase
 				await supabase.auth.signOut();
 
@@ -549,7 +580,7 @@ export const useUserStore = create<UserState>()(
 			}),
 			onRehydrateStorage: () => (state, error) => {
 				if (error) {
-					console.error('Error rehydrating user store:', error);
+					console.error('❌ Error rehydrating user store:', error);
 					return;
 				}
 
@@ -557,7 +588,7 @@ export const useUserStore = create<UserState>()(
 				if (state && !state.isInitialized) {
 					setTimeout(() => {
 						state.initialize();
-					}, 0);
+					}, 100); // Pequeño delay para evitar bucles
 				}
 			},
 		},
