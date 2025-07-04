@@ -17,52 +17,58 @@ interface UseAuthErrorReturn {
 	isErrorVisible: boolean;
 }
 
+// Estado inicial constante para evitar recreación
+const INITIAL_ERROR_STATE: AuthErrorState = {
+	isVisible: false,
+	message: '',
+	type: 'error',
+};
+
 export const useAuthError = (): UseAuthErrorReturn => {
-	const [error, setError] = useState<AuthErrorState>({
-		isVisible: false,
-		message: '',
-		type: 'error',
-	});
+	const [error, setError] = useState<AuthErrorState>(INITIAL_ERROR_STATE);
 
 	const showError = useCallback(
 		(message: string, options?: Partial<AuthErrorState>) => {
-			setError({
+			setError((prevError) => ({
+				...prevError,
 				isVisible: true,
 				message,
 				type: 'error',
 				...options,
-			});
+			}));
 		},
 		[],
 	);
 
 	const showWarning = useCallback(
 		(message: string, options?: Partial<AuthErrorState>) => {
-			setError({
+			setError((prevError) => ({
+				...prevError,
 				isVisible: true,
 				message,
 				type: 'warning',
 				...options,
-			});
+			}));
 		},
 		[],
 	);
 
 	const showInfo = useCallback(
 		(message: string, options?: Partial<AuthErrorState>) => {
-			setError({
+			setError((prevError) => ({
+				...prevError,
 				isVisible: true,
 				message,
 				type: 'info',
 				...options,
-			});
+			}));
 		},
 		[],
 	);
 
 	const hideError = useCallback(() => {
-		setError((prev) => ({
-			...prev,
+		setError((prevError) => ({
+			...prevError,
 			isVisible: false,
 		}));
 	}, []);

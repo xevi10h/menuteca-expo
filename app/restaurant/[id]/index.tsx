@@ -136,7 +136,7 @@ export default function RestaurantDetail() {
 			try {
 				const menusResponse = await MenuService.getRestaurantMenus(id);
 				console.log('Menus response:', menusResponse);
-				if (menusResponse.success) {
+				if (menusResponse.success && menusResponse.data) {
 					setMenus(menusResponse.data);
 				} else {
 					// If menus fail, continue with empty array

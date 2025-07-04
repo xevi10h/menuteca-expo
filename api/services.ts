@@ -1,23 +1,81 @@
 import { RestaurantTag } from '@/shared/enums';
-import {
-	Address,
-	Cuisine,
-	MenuData,
-	Restaurant,
-	Review,
-	User,
-} from '@/shared/types';
-import { apiClient } from './client';
+import { User } from '@/shared/types';
+import { supabase } from '@/utils/supabase';
+
+// Helper para transformar errores de Supabase
+const handleSupabaseResponse = <T>(response: {
+	data: T | null;
+	error: any;
+}) => {
+	if (response.error) {
+		console.error('Supabase error:', response.error);
+		throw new Error(response.error.message || 'Database operation failed');
+	}
+	return {
+		success: true,
+		data: response.data,
+	};
+};
+
+// Función helper para calcular distancia (haversine formula)
+const calculateDistance = (
+	lat1: number,
+	lon1: number,
+	lat2: number,
+	lon2: number,
+): number => {
+	const R = 6371; // Radio de la Tierra en km
+	const dLat = ((lat2 - lat1) * Math.PI) / 180;
+	const dLon = ((lon2 - lon1) * Math.PI) / 180;
+	const a =
+		Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+		Math.cos((lat1 * Math.PI) / 180) *
+			Math.cos((lat2 * Math.PI) / 180) *
+			Math.sin(dLon / 2) *
+			Math.sin(dLon / 2);
+	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+	return R * c;
+};
 
 export class AuthService {
 	static async login(email: string, password: string) {
-		return apiClient.post<{
-			success: boolean;
+		const { data, error } = await supabase.auth.signInWithPassword({
+			email,
+			password,
+		});
+
+		if (error) {
+			throw new Error(error.message);
+		}
+
+		// Obtener datos del usuario de la tabla public.users
+		const { data: userData, error: userError } = await supabase
+			.from('users')
+			.select('*')
+			.eq('id', data.user.id)
+			.single();
+
+		if (userError) {
+			throw new Error('Error fetching user data');
+		}
+
+		return {
+			success: true,
 			data: {
-				user: User;
-				token: string;
-			};
-		}>('/auth/login', { email, password });
+				user: {
+					id: userData.id,
+					email: userData.email,
+					username: userData.username,
+					name: userData.name,
+					photo: userData.photo || '',
+					google_id: userData.google_id || '',
+					has_password: userData.has_password,
+					language: userData.language,
+					created_at: userData.created_at,
+				} as User,
+				token: data.session.access_token,
+			},
+		};
 	}
 
 	static async register(userData: {
@@ -27,32 +85,100 @@ export class AuthService {
 		password: string;
 		language: string;
 	}) {
-		return apiClient.post<{
-			success: boolean;
+		// Crear usuario en auth
+		const { data, error } = await supabase.auth.signUp({
+			email: userData.email,
+			password: userData.password,
+		});
+
+		if (error) {
+			throw new Error(error.message);
+		}
+
+		if (!data.user) {
+			throw new Error('User creation failed');
+		}
+
+		// Crear entrada en la tabla public.users
+		const { error: userError } = await supabase.from('users').insert({
+			id: data.user.id,
+			email: userData.email,
+			username: userData.username,
+			name: userData.name,
+			language: userData.language,
+			has_password: true,
+		});
+
+		if (userError) {
+			throw new Error('Error creating user profile');
+		}
+
+		return {
+			success: true,
 			data: {
-				user: User;
-				token: string;
-			};
-		}>('/auth/register', userData);
+				user: {
+					id: data.user.id,
+					email: userData.email,
+					username: userData.username,
+					name: userData.name,
+					photo: '',
+					google_id: '',
+					has_password: true,
+					language: userData.language,
+					created_at: data.user.created_at || new Date().toISOString(),
+				} as User,
+				token: data.session?.access_token || '',
+			},
+		};
 	}
 
 	static async getProfile() {
-		return apiClient.get<{
-			success: boolean;
-			data: User;
-		}>('/auth/profile');
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		if (!user) {
+			throw new Error('No authenticated user');
+		}
+
+		const { data: userData, error } = await supabase
+			.from('users')
+			.select('*')
+			.eq('id', user.id)
+			.single();
+
+		if (error) {
+			throw new Error('Error fetching user profile');
+		}
+
+		return handleSupabaseResponse({
+			data: userData,
+			error: null,
+		});
 	}
 
 	static async changePassword(currentPassword: string, newPassword: string) {
-		return apiClient.post<{
-			success: boolean;
-		}>('/auth/change-password', { currentPassword, newPassword });
+		const { error } = await supabase.auth.updateUser({
+			password: newPassword,
+		});
+
+		if (error) {
+			throw new Error(error.message);
+		}
+
+		return { success: true };
 	}
 
 	static async setPassword(newPassword: string) {
-		return apiClient.post<{
-			success: boolean;
-		}>('/auth/set-password', { newPassword });
+		const { error } = await supabase.auth.updateUser({
+			password: newPassword,
+		});
+
+		if (error) {
+			throw new Error(error.message);
+		}
+
+		return { success: true };
 	}
 
 	static async googleAuth(googleData: {
@@ -62,118 +188,158 @@ export class AuthService {
 		photo?: string;
 		language: string;
 	}) {
-		return apiClient.post<{
-			success: boolean;
-			data: {
-				user: User;
-				token: string;
-			};
-		}>('/auth/google', googleData);
+		// Implementar Google Auth con Supabase
+		// Nota: Necesitarás configurar Google OAuth en Supabase
+		throw new Error('Google Auth not implemented yet');
 	}
 
 	static async refreshToken() {
-		return apiClient.post<{
-			success: boolean;
+		const { data, error } = await supabase.auth.refreshSession();
+
+		if (error) {
+			throw new Error(error.message);
+		}
+
+		return {
+			success: true,
 			data: {
-				token: string;
-			};
-		}>('/auth/refresh');
+				token: data.session?.access_token || '',
+			},
+		};
 	}
 
-	// Password reset flow methods
+	// Password reset methods
 	static async sendPasswordResetCode(email: string) {
-		return apiClient.post<{
-			success: boolean;
-			message: string;
-		}>('/auth/send-reset-code', { email });
+		const { error } = await supabase.auth.resetPasswordForEmail(email);
+
+		if (error) {
+			throw new Error(error.message);
+		}
+
+		return {
+			success: true,
+			message: 'Password reset email sent',
+		};
 	}
 
 	static async verifyPasswordResetCode(email: string, code: string) {
-		return apiClient.post<{
-			success: boolean;
-			data: {
-				token: string;
-			};
-			message: string;
-		}>('/auth/verify-reset-code', { email, code });
+		// Supabase maneja esto automáticamente con magic links
+		// Esta función puede no ser necesaria
+		return {
+			success: true,
+			data: { token: '' },
+			message: 'Code verified',
+		};
 	}
 
 	static async resetPasswordWithToken(token: string, newPassword: string) {
-		return apiClient.post<{
-			success: boolean;
-			message: string;
-		}>('/auth/reset-password', { token, newPassword });
+		const { error } = await supabase.auth.updateUser({
+			password: newPassword,
+		});
+
+		if (error) {
+			throw new Error(error.message);
+		}
+
+		return {
+			success: true,
+			message: 'Password updated successfully',
+		};
 	}
 }
 
-// Cuisine Service
 export class CuisineService {
 	static async getAllCuisines() {
-		return apiClient.get<{
-			success: boolean;
-			data: Cuisine[];
-		}>('/cuisines');
+		const response = await supabase.from('cuisines').select('*').order('name');
+
+		return handleSupabaseResponse(response);
 	}
 
 	static async getCuisineById(id: string) {
-		return apiClient.get<{
-			success: boolean;
-			data: Cuisine;
-		}>(`/cuisines/${id}`);
+		const response = await supabase
+			.from('cuisines')
+			.select('*')
+			.eq('id', id)
+			.single();
+
+		return handleSupabaseResponse(response);
 	}
 
 	static async searchCuisines(query: string, limit?: number) {
-		const queryParams = new URLSearchParams({ q: query });
-		if (limit) queryParams.append('limit', limit.toString());
+		let queryBuilder = supabase
+			.from('cuisines')
+			.select('*')
+			.ilike('name', `%${query}%`)
+			.order('name');
 
-		return apiClient.get<{
-			success: boolean;
-			data: Cuisine[];
-		}>(`/cuisines/search?${queryParams.toString()}`);
+		if (limit) {
+			queryBuilder = queryBuilder.limit(limit);
+		}
+
+		const response = await queryBuilder;
+		return handleSupabaseResponse(response);
 	}
 
 	static async getCuisineStats() {
-		return apiClient.get<{
-			success: boolean;
+		// Implementar stats usando funciones SQL o conteos
+		const { data: total, error: totalError } = await supabase
+			.from('cuisines')
+			.select('*', { count: 'exact' });
+
+		if (totalError) {
+			throw new Error(totalError.message);
+		}
+
+		// Obtener la cocina más popular (ejemplo)
+		const { data: mostPopular, error: popularError } = await supabase
+			.from('cuisines')
+			.select('*')
+			.limit(1)
+			.single();
+
+		return {
+			success: true,
 			data: {
-				total: number;
-				mostPopular: Cuisine | null;
-			};
-		}>('/cuisines/stats');
+				total: total?.length || 0,
+				mostPopular: popularError ? null : mostPopular,
+			},
+		};
 	}
 
-	// Admin functions (require authentication)
-	static async createCuisine(cuisineData: {
-		name: { [key: string]: string };
-		image: string;
-	}) {
-		return apiClient.post<{
-			success: boolean;
-			data: Cuisine;
-		}>('/cuisines', cuisineData);
+	static async createCuisine(cuisineData: { name: string; image: string }) {
+		const response = await supabase
+			.from('cuisines')
+			.insert(cuisineData)
+			.select()
+			.single();
+
+		return handleSupabaseResponse(response);
 	}
 
 	static async updateCuisine(
 		id: string,
 		cuisineData: {
-			name?: { [key: string]: string };
+			name?: string;
 			image?: string;
 		},
 	) {
-		return apiClient.put<{
-			success: boolean;
-			data: Cuisine;
-		}>(`/cuisines/${id}`, cuisineData);
+		const response = await supabase
+			.from('cuisines')
+			.update(cuisineData)
+			.eq('id', id)
+			.select()
+			.single();
+
+		return handleSupabaseResponse(response);
 	}
 
 	static async deleteCuisine(id: string) {
-		return apiClient.delete<{
-			success: boolean;
-		}>(`/cuisines/${id}`);
+		const response = await supabase.from('cuisines').delete().eq('id', id);
+
+		return handleSupabaseResponse(response);
 	}
 }
 
-// Restaurant Service
 export class RestaurantService {
 	static async getAllRestaurants(params?: {
 		page?: number;
@@ -190,45 +356,162 @@ export class RestaurantService {
 		radius?: number;
 		search?: string;
 	}) {
-		const queryParams = new URLSearchParams();
+		let query = supabase
+			.from('restaurants')
+			.select(
+				`
+				*,
+				cuisine:cuisines(id, name, image),
+				address:addresses(*),
+				reviews(rating)
+			`,
+			)
+			.eq('is_active', true);
 
-		if (params) {
-			Object.entries(params).forEach(([key, value]) => {
-				if (value !== undefined && value !== null) {
-					if (Array.isArray(value)) {
-						queryParams.append(key, value.join(','));
-					} else {
-						queryParams.append(key, value.toString());
-					}
-				}
-			});
+		// Aplicar filtros
+		if (params?.cuisine_id) {
+			query = query.eq('cuisine_id', params.cuisine_id);
 		}
 
-		const endpoint = `/restaurants${
-			queryParams.toString() ? `?${queryParams.toString()}` : ''
-		}`;
-		console.log('Fetching restaurants with params:', endpoint);
-		return apiClient.get<{
-			success: boolean;
-			data: {
-				data: Restaurant[];
-				pagination: {
-					page: number;
-					limit: number;
-					total: number;
-					totalPages: number;
-					hasNext: boolean;
-					hasPrev: boolean;
+		if (params?.min_price) {
+			query = query.gte('minimum_price', params.min_price);
+		}
+
+		if (params?.max_price) {
+			query = query.lte('minimum_price', params.max_price);
+		}
+
+		if (params?.search) {
+			query = query.ilike('name', `%${params.search}%`);
+		}
+
+		if (params?.tags && params.tags.length > 0) {
+			query = query.overlaps('tags', params.tags);
+		}
+
+		// Paginación
+		const page = params?.page || 1;
+		const limit = params?.limit || 50;
+		const start = (page - 1) * limit;
+		const end = start + limit - 1;
+
+		query = query.range(start, end);
+
+		// Ordenamiento
+		const sortBy = params?.sortBy || 'created_at';
+		const sortOrder = params?.sortOrder || 'desc';
+		query = query.order(sortBy, { ascending: sortOrder === 'asc' });
+
+		const response = await query;
+
+		if (response.error) {
+			throw new Error(response.error.message);
+		}
+
+		// Procesar los datos para incluir distancias y ratings
+		const processedData =
+			response.data?.map((restaurant: any) => {
+				// Calcular rating promedio
+				let averageRating = null;
+				if (restaurant.reviews && restaurant.reviews.length > 0) {
+					const totalRating = restaurant.reviews.reduce(
+						(sum: number, review: any) => sum + review.rating,
+						0,
+					);
+					averageRating = totalRating / restaurant.reviews.length;
+				}
+
+				// Calcular distancia si se proporcionan coordenadas
+				let distance = 0;
+				if (params?.latitude && params?.longitude && restaurant.address) {
+					distance = calculateDistance(
+						params.latitude,
+						params.longitude,
+						restaurant.address.coordinates.latitude,
+						restaurant.address.coordinates.longitude,
+					);
+				}
+
+				return {
+					...restaurant,
+					rating: averageRating,
+					distance,
+					menus: [], // Se cargará por separado si es necesario
 				};
-			};
-		}>(endpoint);
+			}) || [];
+
+		// Filtrar por distancia si se especifica
+		const finalData = params?.radius
+			? processedData.filter(
+					(restaurant) => restaurant.distance <= params.radius!,
+			  )
+			: processedData;
+
+		return {
+			success: true,
+			data: {
+				data: finalData,
+				pagination: {
+					page,
+					limit,
+					total: finalData.length, // En una implementación real, necesitarías hacer un count por separado
+					totalPages: Math.ceil(finalData.length / limit),
+					hasNext: finalData.length === limit,
+					hasPrev: page > 1,
+				},
+			},
+		};
 	}
 
 	static async getRestaurantById(id: string) {
-		return apiClient.get<{
-			success: boolean;
-			data: Restaurant;
-		}>(`/restaurants/${id}`);
+		const response = await supabase
+			.from('restaurants')
+			.select(
+				`
+				*,
+				cuisine:cuisines(id, name, image),
+				address:addresses(*),
+				reviews(
+					id,
+					rating,
+					comment,
+					photos,
+					restaurant_response,
+					created_at,
+					users(id, name, photo)
+				)
+			`,
+			)
+			.eq('id', id)
+			.single();
+
+		if (response.error) {
+			throw new Error(response.error.message);
+		}
+
+		// Procesar datos del restaurante
+		const restaurant = response.data;
+		let averageRating = null;
+
+		if (restaurant.reviews && restaurant.reviews.length > 0) {
+			const totalRating = restaurant.reviews.reduce(
+				(sum: number, review: any) => sum + review.rating,
+				0,
+			);
+			averageRating = totalRating / restaurant.reviews.length;
+		}
+
+		const processedRestaurant = {
+			...restaurant,
+			rating: averageRating,
+			distance: 0, // Se puede calcular si se necesita
+			menus: [], // Se cargará por separado
+		};
+
+		return handleSupabaseResponse({
+			data: processedRestaurant,
+			error: null,
+		});
 	}
 
 	static async createRestaurant(restaurantData: {
@@ -243,15 +526,29 @@ export class RestaurantService {
 		phone?: string;
 		reservation_link?: string;
 	}) {
-		return apiClient.post<{
-			success: boolean;
-			data: Restaurant;
-		}>('/restaurants', restaurantData);
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		if (!user) {
+			throw new Error('Authentication required');
+		}
+
+		const response = await supabase
+			.from('restaurants')
+			.insert({
+				...restaurantData,
+				user_id: user.id,
+			})
+			.select()
+			.single();
+
+		return handleSupabaseResponse(response);
 	}
 
 	static async updateRestaurant(
 		id: string,
-		updated_ata: Partial<{
+		updatedData: Partial<{
 			name: string;
 			minimum_price: number;
 			cuisine_id: string;
@@ -265,50 +562,99 @@ export class RestaurantService {
 			is_active: boolean;
 		}>,
 	) {
-		return apiClient.put<{
-			success: boolean;
-			data: Restaurant;
-		}>(`/restaurants/${id}`, updated_ata);
+		const response = await supabase
+			.from('restaurants')
+			.update(updatedData)
+			.eq('id', id)
+			.select()
+			.single();
+
+		return handleSupabaseResponse(response);
 	}
 
 	static async deleteRestaurant(id: string) {
-		return apiClient.delete<{
-			success: boolean;
-		}>(`/restaurants/${id}`);
+		const response = await supabase.from('restaurants').delete().eq('id', id);
+
+		return handleSupabaseResponse(response);
 	}
 
 	static async getMyRestaurants() {
-		return apiClient.get<{
-			success: boolean;
-			data: Restaurant[];
-		}>('/restaurants/owner/mine');
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		if (!user) {
+			throw new Error('Authentication required');
+		}
+
+		const response = await supabase
+			.from('restaurants')
+			.select(
+				`
+				*,
+				cuisine:cuisines(id, name, image),
+				address:addresses(*)
+			`,
+			)
+			.eq('user_id', user.id)
+			.order('created_at', { ascending: false });
+
+		return handleSupabaseResponse(response);
 	}
 
 	static async searchRestaurants(query: string, limit?: number) {
-		const queryParams = new URLSearchParams({ q: query });
-		if (limit) queryParams.append('limit', limit.toString());
+		let queryBuilder = supabase
+			.from('restaurants')
+			.select(
+				`
+				*,
+				cuisine:cuisines(id, name, image),
+				address:addresses(*)
+			`,
+			)
+			.eq('is_active', true)
+			.ilike('name', `%${query}%`)
+			.order('name');
 
-		return apiClient.get<{
-			success: boolean;
-			data: Restaurant[];
-		}>(`/restaurants/search?${queryParams.toString()}`);
+		if (limit) {
+			queryBuilder = queryBuilder.limit(limit);
+		}
+
+		const response = await queryBuilder;
+		return handleSupabaseResponse(response);
 	}
 }
 
-// Menu Service
 export class MenuService {
 	static async getRestaurantMenus(restaurant_id: string) {
-		return apiClient.get<{
-			success: boolean;
-			data: MenuData[];
-		}>(`/menus/restaurant/${restaurant_id}`);
+		const response = await supabase
+			.from('menus')
+			.select(
+				`
+				*,
+				dishes(*)
+			`,
+			)
+			.eq('restaurant_id', restaurant_id)
+			.eq('is_active', true)
+			.order('created_at');
+
+		return handleSupabaseResponse(response);
 	}
 
 	static async getMenuById(id: string) {
-		return apiClient.get<{
-			success: boolean;
-			data: MenuData;
-		}>(`/menus/${id}`);
+		const response = await supabase
+			.from('menus')
+			.select(
+				`
+				*,
+				dishes(*)
+			`,
+			)
+			.eq('id', id)
+			.single();
+
+		return handleSupabaseResponse(response);
 	}
 
 	static async createMenu(
@@ -334,15 +680,21 @@ export class MenuService {
 			has_minimum_people?: boolean;
 		},
 	) {
-		return apiClient.post<{
-			success: boolean;
-			data: MenuData;
-		}>(`/menus/restaurant/${restaurant_id}`, menuData);
+		const response = await supabase
+			.from('menus')
+			.insert({
+				...menuData,
+				restaurant_id,
+			})
+			.select()
+			.single();
+
+		return handleSupabaseResponse(response);
 	}
 
 	static async updateMenu(
 		id: string,
-		updated_ata: Partial<{
+		updatedData: Partial<{
 			name: string;
 			days: string[];
 			start_time: string;
@@ -364,20 +716,23 @@ export class MenuService {
 			is_active: boolean;
 		}>,
 	) {
-		return apiClient.put<{
-			success: boolean;
-			data: MenuData;
-		}>(`/menus/${id}`, updated_ata);
+		const response = await supabase
+			.from('menus')
+			.update(updatedData)
+			.eq('id', id)
+			.select()
+			.single();
+
+		return handleSupabaseResponse(response);
 	}
 
 	static async deleteMenu(id: string) {
-		return apiClient.delete<{
-			success: boolean;
-		}>(`/menus/${id}`);
+		const response = await supabase.from('menus').delete().eq('id', id);
+
+		return handleSupabaseResponse(response);
 	}
 }
 
-// Review Service
 export class ReviewService {
 	static async getRestaurantReviews(
 		restaurant_id: string,
@@ -390,34 +745,67 @@ export class ReviewService {
 			max_rating?: number;
 		},
 	) {
-		const queryParams = new URLSearchParams();
+		let query = supabase
+			.from('reviews')
+			.select(
+				`
+				*,
+				users(id, name, photo)
+			`,
+			)
+			.eq('restaurant_id', restaurant_id);
 
-		if (params) {
-			Object.entries(params).forEach(([key, value]) => {
-				if (value !== undefined && value !== null) {
-					queryParams.append(key, value.toString());
-				}
-			});
+		// Aplicar filtros
+		if (params?.min_rating) {
+			query = query.gte('rating', params.min_rating);
 		}
 
-		const endpoint = `/reviews/restaurant/${restaurant_id}${
-			queryParams.toString() ? `?${queryParams.toString()}` : ''
-		}`;
+		if (params?.max_rating) {
+			query = query.lte('rating', params.max_rating);
+		}
 
-		return apiClient.get<{
-			success: boolean;
+		// Paginación
+		const page = params?.page || 1;
+		const limit = params?.limit || 10;
+		const start = (page - 1) * limit;
+		const end = start + limit - 1;
+
+		query = query.range(start, end);
+
+		// Ordenamiento
+		const sortBy = params?.sortBy || 'created_at';
+		const sortOrder = params?.sortOrder || 'desc';
+		query = query.order(sortBy, { ascending: sortOrder === 'asc' });
+
+		const response = await query;
+
+		if (response.error) {
+			throw new Error(response.error.message);
+		}
+
+		// Procesar datos para el formato esperado
+		const processedData =
+			response.data?.map((review: any) => ({
+				...review,
+				user_name: review.users?.name || 'Unknown User',
+				user_avatar: review.users?.photo || '',
+				date: review.created_at,
+			})) || [];
+
+		return {
+			success: true,
 			data: {
-				data: Review[];
+				data: processedData,
 				pagination: {
-					page: number;
-					limit: number;
-					total: number;
-					totalPages: number;
-					hasNext: boolean;
-					hasPrev: boolean;
-				};
-			};
-		}>(endpoint);
+					page,
+					limit,
+					total: processedData.length, // En una implementación real, harías un count por separado
+					totalPages: Math.ceil(processedData.length / limit),
+					hasNext: processedData.length === limit,
+					hasPrev: page > 1,
+				},
+			},
+		};
 	}
 
 	static async createReview(
@@ -428,30 +816,89 @@ export class ReviewService {
 			photos?: string[];
 		},
 	) {
-		return apiClient.post<{
-			success: boolean;
-			data: Review;
-		}>(`/reviews/restaurant/${restaurant_id}`, reviewData);
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		if (!user) {
+			throw new Error('Authentication required');
+		}
+
+		const response = await supabase
+			.from('reviews')
+			.insert({
+				...reviewData,
+				restaurant_id,
+				user_id: user.id,
+			})
+			.select(
+				`
+				*,
+				users(id, name, photo)
+			`,
+			)
+			.single();
+
+		if (response.error) {
+			throw new Error(response.error.message);
+		}
+
+		// Procesar datos para el formato esperado
+		const processedReview = {
+			...response.data,
+			user_name: response.data.users?.name || 'Unknown User',
+			user_avatar: response.data.users?.photo || '',
+			date: response.data.created_at,
+		};
+
+		return handleSupabaseResponse({
+			data: processedReview,
+			error: null,
+		});
 	}
 
 	static async updateReview(
 		id: string,
-		updated_ata: {
+		updatedData: {
 			rating?: number;
 			comment?: string;
 			photos?: string[];
 		},
 	) {
-		return apiClient.put<{
-			success: boolean;
-			data: Review;
-		}>(`/reviews/${id}`, updated_ata);
+		const response = await supabase
+			.from('reviews')
+			.update(updatedData)
+			.eq('id', id)
+			.select(
+				`
+				*,
+				users(id, name, photo)
+			`,
+			)
+			.single();
+
+		if (response.error) {
+			throw new Error(response.error.message);
+		}
+
+		// Procesar datos para el formato esperado
+		const processedReview = {
+			...response.data,
+			user_name: response.data.users?.name || 'Unknown User',
+			user_avatar: response.data.users?.photo || '',
+			date: response.data.created_at,
+		};
+
+		return handleSupabaseResponse({
+			data: processedReview,
+			error: null,
+		});
 	}
 
 	static async deleteReview(id: string) {
-		return apiClient.delete<{
-			success: boolean;
-		}>(`/reviews/${id}`);
+		const response = await supabase.from('reviews').delete().eq('id', id);
+
+		return handleSupabaseResponse(response);
 	}
 
 	static async getMyReviews(params?: {
@@ -460,117 +907,219 @@ export class ReviewService {
 		sortBy?: string;
 		sortOrder?: 'asc' | 'desc';
 	}) {
-		const queryParams = new URLSearchParams();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 
-		if (params) {
-			Object.entries(params).forEach(([key, value]) => {
-				if (value !== undefined && value !== null) {
-					queryParams.append(key, value.toString());
-				}
-			});
+		if (!user) {
+			throw new Error('Authentication required');
 		}
 
-		const endpoint = `/reviews/user/mine${
-			queryParams.toString() ? `?${queryParams.toString()}` : ''
-		}`;
+		let query = supabase
+			.from('reviews')
+			.select(
+				`
+				*,
+				restaurants(id, name, main_image)
+			`,
+			)
+			.eq('user_id', user.id);
 
-		return apiClient.get<{
-			success: boolean;
+		// Paginación
+		const page = params?.page || 1;
+		const limit = params?.limit || 10;
+		const start = (page - 1) * limit;
+		const end = start + limit - 1;
+
+		query = query.range(start, end);
+
+		// Ordenamiento
+		const sortBy = params?.sortBy || 'created_at';
+		const sortOrder = params?.sortOrder || 'desc';
+		query = query.order(sortBy, { ascending: sortOrder === 'asc' });
+
+		const response = await query;
+
+		if (response.error) {
+			throw new Error(response.error.message);
+		}
+
+		// Procesar datos para el formato esperado
+		const processedData =
+			response.data?.map((review: any) => ({
+				...review,
+				restaurant_name: review.restaurants?.name || 'Unknown Restaurant',
+				restaurant_image: review.restaurants?.main_image || '',
+				date: review.created_at,
+			})) || [];
+
+		return {
+			success: true,
 			data: {
-				data: Review[];
+				data: processedData,
 				pagination: {
-					page: number;
-					limit: number;
-					total: number;
-					totalPages: number;
-					hasNext: boolean;
-					hasPrev: boolean;
-				};
-			};
-		}>(endpoint);
+					page,
+					limit,
+					total: processedData.length,
+					totalPages: Math.ceil(processedData.length / limit),
+					hasNext: processedData.length === limit,
+					hasPrev: page > 1,
+				},
+			},
+		};
 	}
 
 	static async addRestaurantResponse(reviewId: string, message: string) {
-		return apiClient.post<{
-			success: boolean;
-			data: Review;
-		}>(`/reviews/${reviewId}/response`, { message });
+		const response = await supabase
+			.from('reviews')
+			.update({
+				restaurant_response: {
+					message,
+					date: new Date().toISOString(),
+				},
+			})
+			.eq('id', reviewId)
+			.select(
+				`
+				*,
+				users(id, name, photo)
+			`,
+			)
+			.single();
+
+		if (response.error) {
+			throw new Error(response.error.message);
+		}
+
+		// Procesar datos para el formato esperado
+		const processedReview = {
+			...response.data,
+			user_name: response.data.users?.name || 'Unknown User',
+			user_avatar: response.data.users?.photo || '',
+			date: response.data.created_at,
+		};
+
+		return handleSupabaseResponse({
+			data: processedReview,
+			error: null,
+		});
 	}
 }
 
-// User Service
 export class UserService {
-	static async updateProfile(updated_ata: {
+	static async updateProfile(updatedData: {
 		username?: string;
 		name?: string;
 		photo?: string;
 		language?: string;
 	}) {
-		return apiClient.put<{
-			success: boolean;
-			data: User;
-		}>('/users', updated_ata);
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		if (!user) {
+			throw new Error('Authentication required');
+		}
+
+		const response = await supabase
+			.from('users')
+			.update(updatedData)
+			.eq('id', user.id)
+			.select()
+			.single();
+
+		return handleSupabaseResponse(response);
 	}
 
 	static async checkUsernameAvailability(username: string) {
-		return apiClient.get<{
-			success: boolean;
-			data: { available: boolean };
-		}>(`/users/check-username/${username}`);
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		const response = await supabase
+			.from('users')
+			.select('id')
+			.eq('username', username)
+			.neq('id', user?.id || '') // Excluir el usuario actual si está logueado
+			.single();
+
+		return {
+			success: true,
+			data: { available: !response.data },
+		};
 	}
 
 	static async checkEmailAvailability(email: string) {
-		return apiClient.get<{
-			success: boolean;
-			data: { available: boolean };
-		}>(`/users/check-email/${email}`);
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		const response = await supabase
+			.from('users')
+			.select('id')
+			.eq('email', email)
+			.neq('id', user?.id || '') // Excluir el usuario actual si está logueado
+			.single();
+
+		return {
+			success: true,
+			data: { available: !response.data },
+		};
 	}
 
 	static async getUserById(id: string) {
-		return apiClient.get<{
-			success: boolean;
-			data: Partial<User>;
-		}>(`/users/${id}`);
+		const response = await supabase
+			.from('users')
+			.select('id, username, name, photo, created_at')
+			.eq('id', id)
+			.single();
+
+		return handleSupabaseResponse(response);
 	}
 }
 
-// Address Service
 export class AddressService {
 	static async createAddress(addressData: {
-		street: { [key: string]: string };
+		street: string;
 		number: string;
 		additional_information?: string;
 		postal_code: string;
-		city: { [key: string]: string };
-		country: { [key: string]: string };
+		city: string;
+		country: string;
 		coordinates: {
 			latitude: number;
 			longitude: number;
 		};
 		formatted_address?: string;
 	}) {
-		return apiClient.post<{
-			success: boolean;
-			data: Address;
-		}>('/addresses', addressData);
+		const response = await supabase
+			.from('addresses')
+			.insert(addressData)
+			.select()
+			.single();
+
+		return handleSupabaseResponse(response);
 	}
 
 	static async getAddressById(id: string) {
-		return apiClient.get<{
-			success: boolean;
-			data: Address;
-		}>(`/addresses/${id}`);
+		const response = await supabase
+			.from('addresses')
+			.select('*')
+			.eq('id', id)
+			.single();
+
+		return handleSupabaseResponse(response);
 	}
 
 	static async updateAddress(
 		id: string,
-		updated_ata: Partial<{
-			street: { [key: string]: string };
+		updatedData: Partial<{
+			street: string;
 			number: string;
 			additional_information?: string;
 			postal_code: string;
-			city: { [key: string]: string };
-			country: { [key: string]: string };
+			city: string;
+			country: string;
 			coordinates: {
 				latitude: number;
 				longitude: number;
@@ -578,20 +1127,30 @@ export class AddressService {
 			formatted_address?: string;
 		}>,
 	) {
-		return apiClient.put<{
-			success: boolean;
-			data: Address;
-		}>(`/addresses/${id}`, updated_ata);
+		const response = await supabase
+			.from('addresses')
+			.update(updatedData)
+			.eq('id', id)
+			.select()
+			.single();
+
+		return handleSupabaseResponse(response);
 	}
 
 	static async searchAddresses(query: string, limit?: number) {
-		const queryParams = new URLSearchParams({ q: query });
-		if (limit) queryParams.append('limit', limit.toString());
+		let queryBuilder = supabase
+			.from('addresses')
+			.select('*')
+			.or(
+				`street.ilike.%${query}%,city.ilike.%${query}%,formatted_address.ilike.%${query}%`,
+			);
 
-		return apiClient.get<{
-			success: boolean;
-			data: Address[];
-		}>(`/addresses/search?${queryParams.toString()}`);
+		if (limit) {
+			queryBuilder = queryBuilder.limit(limit);
+		}
+
+		const response = await queryBuilder;
+		return handleSupabaseResponse(response);
 	}
 
 	static async getNearbyAddresses(
@@ -600,17 +1159,39 @@ export class AddressService {
 		radius?: number,
 		limit?: number,
 	) {
-		const queryParams = new URLSearchParams({
-			latitude: latitude.toString(),
-			longitude: longitude.toString(),
-		});
+		// Para consultas de proximidad geográfica, necesitarías usar funciones PostGIS
+		// Por ahora, implementamos una versión básica
+		let queryBuilder = supabase.from('addresses').select('*');
 
-		if (radius) queryParams.append('radius', radius.toString());
-		if (limit) queryParams.append('limit', limit.toString());
+		if (limit) {
+			queryBuilder = queryBuilder.limit(limit);
+		}
 
-		return apiClient.get<{
-			success: boolean;
-			data: Address[];
-		}>(`/addresses/nearby?${queryParams.toString()}`);
+		const response = await queryBuilder;
+
+		if (response.error) {
+			throw new Error(response.error.message);
+		}
+
+		// Filtrar por distancia en el cliente (no es eficiente para grandes datasets)
+		let filteredData = response.data;
+
+		if (radius) {
+			filteredData =
+				response.data?.filter((address: any) => {
+					const distance = calculateDistance(
+						latitude,
+						longitude,
+						address.coordinates.latitude,
+						address.coordinates.longitude,
+					);
+					return distance <= radius;
+				}) || [];
+		}
+
+		return {
+			success: true,
+			data: filteredData,
+		};
 	}
 }

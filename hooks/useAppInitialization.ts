@@ -1,3 +1,4 @@
+import { supabase } from '@/utils/supabase';
 import { useCuisineStore } from '@/zustand/CuisineStore';
 import { useUserStore } from '@/zustand/UserStore';
 import { useEffect, useState } from 'react';
@@ -31,21 +32,42 @@ export const useAppInitialization = (): AppInitializationState => {
 			try {
 				setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
-				// Initialize user authentication first
+				console.log('Starting app initialization...');
+
+				// Verificar la conexión con Supabase
+				try {
+					const { data, error } = await supabase
+						.from('cuisines')
+						.select('count', { count: 'exact' })
+						.limit(1);
+					if (error) {
+						console.warn('Supabase connection test failed:', error.message);
+					} else {
+						console.log('Supabase connection successful');
+					}
+				} catch (error) {
+					console.warn('Supabase connection test error:', error);
+				}
+
+				// Inicializar autenticación de usuario primero
+				console.log('Initializing user authentication...');
 				await userInitialize();
 
-				// Load cuisines (these are needed regardless of auth status)
+				// Cargar cocinas (necesarias independientemente del estado de autenticación)
+				console.log('Loading cuisines...');
 				try {
 					await fetchCuisines();
+					console.log('Cuisines loaded successfully');
 				} catch (cuisineError) {
 					console.warn(
 						'Failed to load cuisines, but continuing app initialization:',
 						cuisineError,
 					);
-					// Don't fail the entire initialization if cuisines fail to load
+					// No fallar toda la inicialización si las cocinas fallan
 				}
 
-				// App is now initialized
+				// La app ahora está inicializada
+				console.log('App initialization completed successfully');
 				setState({
 					isInitialized: true,
 					isLoading: false,
@@ -67,7 +89,7 @@ export const useAppInitialization = (): AppInitializationState => {
 		initializeApp();
 	}, [userInitialize, fetchCuisines]);
 
-	// Update loading state based on user loading state
+	// Actualizar estado de carga basado en el estado de carga del usuario
 	useEffect(() => {
 		if (userIsInitialized && !cuisineLoading) {
 			setState((prev) => ({
@@ -77,6 +99,27 @@ export const useAppInitialization = (): AppInitializationState => {
 			}));
 		}
 	}, [
+		userIsInitialized,
+		userIsLoading,
+		userError,
+		cuisineLoading,
+		cuisineError,
+	]);
+
+	// Log para debugging
+	useEffect(() => {
+		console.log('App initialization state:', {
+			isInitialized: state.isInitialized,
+			isLoading: state.isLoading,
+			error: state.error,
+			userIsInitialized,
+			userIsLoading,
+			userError,
+			cuisineLoading,
+			cuisineError,
+		});
+	}, [
+		state,
 		userIsInitialized,
 		userIsLoading,
 		userError,

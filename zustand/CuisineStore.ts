@@ -45,7 +45,7 @@ export const useCuisineStore = create<CuisineState>()(
 				try {
 					const response = await CuisineService.getAllCuisines();
 
-					if (response.success) {
+					if (response.success && response.data) {
 						set({
 							cuisines: response.data,
 							isLoading: false,
@@ -72,7 +72,7 @@ export const useCuisineStore = create<CuisineState>()(
 				try {
 					const response = await CuisineService.getAllCuisines();
 
-					if (response.success) {
+					if (response.success && response.data) {
 						const now = Date.now();
 						set({
 							cuisines: response.data,
@@ -98,7 +98,7 @@ export const useCuisineStore = create<CuisineState>()(
 				try {
 					const response = await CuisineService.searchCuisines(query);
 
-					if (response.success) {
+					if (response.success && response.data) {
 						return response.data;
 					} else {
 						throw new Error('Failed to search cuisines');

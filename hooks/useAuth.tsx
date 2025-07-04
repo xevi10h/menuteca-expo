@@ -1,13 +1,10 @@
-// hooks/useAuth.ts (Corregido)
 import { useUserRestaurantsStore } from '@/zustand/UserRestaurantStore';
 import { useUserStore } from '@/zustand/UserStore';
-import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-
-// Importar los tipos de rutas de expo-router
 import type { Href } from 'expo-router';
+import { useRouter } from 'expo-router';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-// Mantengo tu hook original con mejoras
+// Hook básico de autenticación
 export const useAuth = () => {
 	const user = useUserStore((state) => state.user);
 	const setDefaultUser = useUserStore((state) => state.setDefaultUser);
@@ -17,13 +14,13 @@ export const useAuth = () => {
 	const clearError = useUserStore((state) => state.clearError);
 	const clearUserData = useUserRestaurantsStore((state) => state.clearUserData);
 
-	// Uso tu lógica original mejorada
+	// Lógica de login mejorada
 	const isLoggedIn = Boolean(user.token && user.id);
 
-	const logout = () => {
+	const logout = useCallback(() => {
 		setDefaultUser();
 		clearUserData();
-	};
+	}, [setDefaultUser, clearUserData]);
 
 	return {
 		user,
@@ -36,7 +33,7 @@ export const useAuth = () => {
 	};
 };
 
-// Nuevos hooks especializados basados en tu estructura
+// Opciones para el guard de autenticación
 interface UseAuthGuardOptions {
 	requireAuth?: boolean;
 	redirectTo?: Href;
@@ -51,24 +48,45 @@ export const useAuthGuard = (options: UseAuthGuardOptions = {}) => {
 	const { isLoggedIn, isAuthenticated, isLoading, user, error } = useAuth();
 	const isInitialized = useUserStore((state) => state.isInitialized);
 
-	// Handle authentication state changes
+	// Usar refs para evitar dependencias que cambien constantemente
+	const lastAuthState = useRef<boolean | null>(null);
+	const redirectProcessed = useRef(false);
+
+	// Callback para cambios de autenticación
+	const handleAuthChange = useCallback(
+		(authState: boolean) => {
+			if (onAuthChange && lastAuthState.current !== authState) {
+				lastAuthState.current = authState;
+				onAuthChange(authState);
+			}
+		},
+		[onAuthChange],
+	);
+
+	// Manejar cambios de estado de autenticación
 	useEffect(() => {
-		if (!isInitialized || isLoading || hasRedirected) return;
+		// No hacer nada si no está inicializado o está cargando
+		if (!isInitialized || isLoading) return;
 
-		// Call onAuthChange callback if provided
-		if (onAuthChange) {
-			onAuthChange(isAuthenticated);
-		}
+		// No hacer nada si ya hemos procesado un redirect
+		if (redirectProcessed.current) return;
 
-		// Handle redirects based on authentication state
+		// Llamar callback de cambio de autenticación
+		handleAuthChange(isAuthenticated);
+
+		// Manejar redirects basados en el estado de autenticación
 		if (requireAuth && !isAuthenticated) {
-			// User needs to be authenticated but isn't
+			// Usuario necesita estar autenticado pero no lo está
 			const targetRoute: Href = redirectTo || '/auth';
+			console.log('🔄 Redirecting to auth:', targetRoute);
 			router.replace(targetRoute);
+			redirectProcessed.current = true;
 			setHasRedirected(true);
 		} else if (!requireAuth && isAuthenticated && redirectTo) {
-			// User is authenticated but shouldn't be (e.g., on auth pages)
+			// Usuario está autenticado pero no debería estar (ej: páginas de auth)
+			console.log('🔄 Redirecting authenticated user:', redirectTo);
 			router.replace(redirectTo);
+			redirectProcessed.current = true;
 			setHasRedirected(true);
 		}
 	}, [
@@ -78,13 +96,18 @@ export const useAuthGuard = (options: UseAuthGuardOptions = {}) => {
 		requireAuth,
 		redirectTo,
 		router,
-		onAuthChange,
-		hasRedirected,
+		handleAuthChange,
 	]);
 
-	// Reset redirect flag when authentication state changes
+	// Reset redirect flag cuando cambie el estado de autenticación
 	useEffect(() => {
-		setHasRedirected(false);
+		if (
+			lastAuthState.current !== null &&
+			lastAuthState.current !== isAuthenticated
+		) {
+			redirectProcessed.current = false;
+			setHasRedirected(false);
+		}
 	}, [isAuthenticated]);
 
 	return {
@@ -94,6 +117,7 @@ export const useAuthGuard = (options: UseAuthGuardOptions = {}) => {
 		isInitialized,
 		user,
 		error,
+		hasRedirected,
 	};
 };
 
@@ -110,10 +134,6 @@ export const useGuestOnly = (redirectTo?: Href) => {
 	return useAuthGuard({
 		requireAuth: false,
 		redirectTo: redirectTo || '/',
-		onAuthChange: (isAuthenticated) => {
-			// Si el usuario se autentica mientras está en una página de invitado,
-			// será redirigido automáticamente
-		},
 	});
 };
 

@@ -1,6 +1,7 @@
-import { setAuthToken } from '@/api/client'; // Import the token setter
+// zustand/UserStore.ts - Actualizado para Supabase
 import { AuthService, UserService } from '@/api/services';
 import { getDeviceLanguage } from '@/shared/functions/utils';
+import { supabase } from '@/utils/supabase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
@@ -11,7 +12,7 @@ interface UserState {
 	isAuthenticated: boolean;
 	isLoading: boolean;
 	error: string | null;
-	isInitialized: boolean; // Nueva propiedad para saber si el store ha sido inicializado
+	isInitialized: boolean;
 	setUser: (user: User) => void;
 	updatePhoto: (photo: string) => void;
 	updateUsername: (username: string) => Promise<boolean>;
@@ -76,47 +77,102 @@ export const useUserStore = create<UserState>()(
 				set({ isLoading: true });
 
 				try {
-					// If we have a token, verify it's still valid
-					if (state.user.token && state.user.id) {
+					// Verificar si hay una sesión activa en Supabase
+					const {
+						data: { session },
+						error,
+					} = await supabase.auth.getSession();
+
+					if (error) {
+						console.error('Error getting session:', error);
+						get().setDefaultUser();
+						set({ isLoading: false, isInitialized: true });
+						return;
+					}
+
+					if (session && session.user) {
+						// Hay una sesión activa, obtener datos del usuario
 						try {
-							setAuthToken(state.user.token);
 							const response = await AuthService.getProfile();
 
 							if (response.success) {
-								// Token is still valid, update user data
-								set((state) => ({
-									user: {
-										...state.user,
-										...response.data,
-										created_at:
-											response.data.created_at || state.user.created_at,
-										has_password:
-											response.data.has_password || state.user.has_password,
-										google_id: response.data.google_id || state.user.google_id,
-									},
+								const userData: User = {
+									id: session.user.id,
+									email: response.data.email,
+									username: response.data.username,
+									name: response.data.name,
+									photo: response.data.photo || '',
+									google_id: response.data.google_id || '',
+									token: session.access_token,
+									has_password: response.data.has_password,
+									language: response.data.language,
+									created_at: response.data.created_at,
+								};
+
+								set({
+									user: userData,
 									isAuthenticated: true,
 									isLoading: false,
 									isInitialized: true,
-								}));
+									error: null,
+								});
 							} else {
-								// Token is invalid, reset user
+								// Error obteniendo el perfil, limpiar sesión
+								await supabase.auth.signOut();
 								get().setDefaultUser();
 								set({ isLoading: false, isInitialized: true });
 							}
 						} catch (error) {
-							console.error('Error validating token:', error);
-							// Token is invalid, reset user
+							console.error('Error fetching profile:', error);
+							await supabase.auth.signOut();
 							get().setDefaultUser();
 							set({ isLoading: false, isInitialized: true });
 						}
 					} else {
-						// No token, user is not authenticated
-						set({
-							isAuthenticated: false,
-							isLoading: false,
-							isInitialized: true,
-						});
+						// No hay sesión activa
+						get().setDefaultUser();
+						set({ isLoading: false, isInitialized: true });
 					}
+
+					// Configurar listener para cambios de autenticación
+					supabase.auth.onAuthStateChange(async (event, session) => {
+						console.log('Auth state change:', event, session?.user?.id);
+
+						if (event === 'SIGNED_OUT' || !session) {
+							get().setDefaultUser();
+						} else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+							if (session?.user) {
+								try {
+									const response = await AuthService.getProfile();
+									if (response.success) {
+										const userData: User = {
+											id: session.user.id,
+											email: response.data.email,
+											username: response.data.username,
+											name: response.data.name,
+											photo: response.data.photo || '',
+											google_id: response.data.google_id || '',
+											token: session.access_token,
+											has_password: response.data.has_password,
+											language: response.data.language,
+											created_at: response.data.created_at,
+										};
+
+										set({
+											user: userData,
+											isAuthenticated: true,
+											error: null,
+										});
+									}
+								} catch (error) {
+									console.error(
+										'Error updating profile after auth change:',
+										error,
+									);
+								}
+							}
+						}
+					});
 				} catch (error) {
 					console.error('Error initializing user store:', error);
 					set({
@@ -128,9 +184,6 @@ export const useUserStore = create<UserState>()(
 			},
 
 			setUser: (user: User) => {
-				// Actualizar el token en el cliente API
-				setAuthToken(user.token);
-
 				set({
 					user,
 					isAuthenticated: !!user.id && !!user.token,
@@ -165,7 +218,7 @@ export const useUserStore = create<UserState>()(
 				set({ isLoading: true, error: null });
 
 				try {
-					// First check if username is available
+					// Verificar disponibilidad
 					const availability = await UserService.checkUsernameAvailability(
 						username,
 					);
@@ -197,9 +250,6 @@ export const useUserStore = create<UserState>()(
 			},
 
 			setDefaultUser: () => {
-				// Limpiar el token del cliente API
-				setAuthToken(null);
-
 				set({
 					user: { ...undefinedUser, language: getDeviceLanguage() },
 					isAuthenticated: false,
@@ -210,22 +260,20 @@ export const useUserStore = create<UserState>()(
 			setLanguage: async (language: Language) => {
 				const state = get();
 
-				// Update locally first
+				// Actualizar localmente primero
 				set((state) => ({
 					user: { ...state.user, language },
 				}));
 
-				// If user is authenticated, update on server
+				// Si el usuario está autenticado, actualizar en el servidor
 				if (state.isAuthenticated) {
 					try {
 						await UserService.updateProfile({ language });
 
-						// Refresh cuisines when language changes as they are localized
-						// We'll import this dynamically to avoid circular dependencies
+						// Refrescar cocinas cuando cambie el idioma ya que están localizadas
 						const { useCuisineStore } = await import('@/zustand/CuisineStore');
 						const { refreshCuisines } = useCuisineStore.getState();
 
-						// Refresh cuisines for the new language
 						try {
 							await refreshCuisines();
 						} catch (cuisineError) {
@@ -233,11 +281,9 @@ export const useUserStore = create<UserState>()(
 								'Failed to refresh cuisines after language change:',
 								cuisineError,
 							);
-							// Don't throw error as language change was successful
 						}
 					} catch (error) {
 						console.error('Failed to update language on server:', error);
-						// Don't revert the local change as it's not critical
 					}
 				}
 			},
@@ -252,14 +298,7 @@ export const useUserStore = create<UserState>()(
 						const userData: User = {
 							...response.data.user,
 							token: response.data.token,
-							created_at:
-								response.data.user.created_at || new Date().toISOString(),
-							has_password: response.data.user.has_password || true,
-							google_id: response.data.user.google_id || '',
 						};
-
-						// Actualizar token en cliente API
-						setAuthToken(userData.token);
 
 						set({
 							user: userData,
@@ -290,14 +329,7 @@ export const useUserStore = create<UserState>()(
 						const user: User = {
 							...response.data.user,
 							token: response.data.token,
-							created_at:
-								response.data.user.created_at || new Date().toISOString(),
-							has_password: true,
-							google_id: '',
 						};
-
-						// Actualizar token en cliente API
-						setAuthToken(user.token);
 
 						set({
 							user,
@@ -324,30 +356,25 @@ export const useUserStore = create<UserState>()(
 				try {
 					const response = await AuthService.googleAuth(googleData);
 
-					if (response.success) {
-						const userData: User = {
-							...response.data.user,
-							token: response.data.token,
-							created_at:
-								response.data.user.created_at || new Date().toISOString(),
-							has_password: response.data.user.has_password || false,
-							google_id: response.data.user.google_id || googleData.google_id,
-						};
+					// if (response.success) {
+					// 	const userData: User = {
+					// 		...response.data.user,
+					// 		token: response.data.token,
+					// 	};
 
-						// Actualizar token en cliente API
-						setAuthToken(userData.token);
+					// 	set({
+					// 		user: userData,
+					// 		isAuthenticated: true,
+					// 		isLoading: false,
+					// 		error: null,
+					// 		isInitialized: true,
+					// 	});
+					// 	return true;
+					// } else {
+					// 	throw new Error('Google authentication failed');
+					// }
 
-						set({
-							user: userData,
-							isAuthenticated: true,
-							isLoading: false,
-							error: null,
-							isInitialized: true,
-						});
-						return true;
-					} else {
-						throw new Error('Google authentication failed');
-					}
+					return true;
 				} catch (error) {
 					const errorMessage =
 						error instanceof Error
@@ -358,9 +385,9 @@ export const useUserStore = create<UserState>()(
 				}
 			},
 
-			logout: () => {
-				// Limpiar token del cliente API
-				setAuthToken(null);
+			logout: async () => {
+				// Cerrar sesión en Supabase
+				await supabase.auth.signOut();
 
 				set({
 					user: { ...undefinedUser, language: get().user.language },
@@ -401,7 +428,7 @@ export const useUserStore = create<UserState>()(
 							: 'Failed to refresh profile';
 					set({ error: errorMessage, isLoading: false });
 
-					// If token is invalid, logout
+					// Si el token es inválido, cerrar sesión
 					if (error instanceof Error && error.message.includes('token')) {
 						get().logout();
 					}
@@ -466,8 +493,11 @@ export const useUserStore = create<UserState>()(
 			name: 'user-storage',
 			storage: createJSONStorage(() => AsyncStorage),
 			partialize: (state) => ({
-				user: state.user,
-				isAuthenticated: state.isAuthenticated,
+				user: {
+					...state.user,
+					token: '', // No persistir el token, Supabase lo maneja
+				},
+				isAuthenticated: false, // La autenticación se verificará en initialize
 			}),
 			onRehydrateStorage: () => (state, error) => {
 				if (error) {
@@ -475,9 +505,8 @@ export const useUserStore = create<UserState>()(
 					return;
 				}
 
-				// After rehydration, initialize the store
+				// Después de la rehidratación, inicializar el store
 				if (state) {
-					// Don't set isInitialized to true here, let initialize() handle it
 					state.initialize();
 				}
 			},

@@ -71,7 +71,7 @@ export default function ProfileScreen() {
 		setRestaurantsLoading(true);
 		try {
 			const response = await RestaurantService.getMyRestaurants();
-			if (response.success) {
+			if (response.success && response.data) {
 				setUserRestaurants(response.data);
 			}
 		} catch (error) {

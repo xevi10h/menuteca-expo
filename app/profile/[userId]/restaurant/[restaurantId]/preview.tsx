@@ -87,7 +87,7 @@ export default function UserRestaurantPreview() {
 					restaurant_id,
 				);
 
-				if (menusResponse.success) {
+				if (menusResponse.success && Array.isArray(menusResponse.data)) {
 					setMenus(menusResponse.data);
 				}
 			} catch (error) {
