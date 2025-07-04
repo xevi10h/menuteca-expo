@@ -5,7 +5,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
 import { Redirect, useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
 	ActivityIndicator,
 	Dimensions,
@@ -23,43 +23,21 @@ const { height } = Dimensions.get('window');
 export default function AuthIndexScreen() {
 	const { t } = useTranslation();
 	const router = useRouter();
+
+	// Seleccionar estado individualmente para Zustand v5
 	const googleAuth = useUserStore((state) => state.googleAuth);
 	const isLoading = useUserStore((state) => state.isLoading);
 	const isAuthenticated = useUserStore((state) => state.isAuthenticated);
 	const error = useUserStore((state) => state.error);
 	const clearError = useUserStore((state) => state.clearError);
+
 	const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
 	// Use the auth error hook
 	const { error: authError, showError, hideError } = useAuthError();
 
-	// Show error modal when there's an error from the store
-	useEffect(() => {
-		if (error) {
-			showError(error, {
-				title: t('auth.googleAuthError'),
-				onRetry: () => {
-					clearError();
-					handleGoogleAuth();
-				},
-			});
-		}
-	}, [error, showError, clearError, t]);
-
-	// If already authenticated, redirect to main app
-	if (isAuthenticated) {
-		return <Redirect href="/" />;
-	}
-
-	const handleLogin = () => {
-		router.push('/auth/login');
-	};
-
-	const handleRegister = () => {
-		router.push('/auth/register');
-	};
-
-	const handleGoogleAuth = async () => {
+	// Memoizar la función de Google Auth
+	const handleGoogleAuth = useCallback(async () => {
 		setIsGoogleLoading(true);
 
 		try {
@@ -94,6 +72,32 @@ export default function AuthIndexScreen() {
 		} finally {
 			setIsGoogleLoading(false);
 		}
+	}, [googleAuth, router, showError, t]);
+
+	// Memoizar el efecto de error para evitar bucles
+	useEffect(() => {
+		if (error && !authError.isVisible) {
+			showError(error, {
+				title: t('auth.googleAuthError'),
+				onRetry: () => {
+					clearError();
+					handleGoogleAuth();
+				},
+			});
+		}
+	}, [error, showError, clearError, t, authError.isVisible, handleGoogleAuth]);
+
+	// Early return para evitar renders innecesarios
+	if (isAuthenticated) {
+		return <Redirect href="/" />;
+	}
+
+	const handleLogin = () => {
+		router.push('/auth/login');
+	};
+
+	const handleRegister = () => {
+		router.push('/auth/register');
 	};
 
 	const handleTermsPress = () => {

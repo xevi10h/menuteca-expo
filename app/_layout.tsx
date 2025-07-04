@@ -7,7 +7,7 @@ import {
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import LoadingScreen from '@/components/LoadingScreen';
@@ -27,9 +27,14 @@ export default function RootLayout() {
 	// Use the app initialization hook
 	const { isInitialized, isLoading, error } = useAppInitialization();
 
-	// Authentication state
+	// Authentication state - seleccionar individualmente para Zustand v5
 	const isAuthenticated = useUserStore((state) => state.isAuthenticated);
 	const userLoading = useUserStore((state) => state.isLoading);
+
+	// Memoizar la función de completar loading
+	const handleLoadingComplete = useCallback(() => {
+		setShowCustomLoading(false);
+	}, []);
 
 	useEffect(() => {
 		if (loaded) {
@@ -39,10 +44,6 @@ export default function RootLayout() {
 			setShowCustomLoading(true);
 		}
 	}, [loaded]);
-
-	const handleLoadingComplete = () => {
-		setShowCustomLoading(false);
-	};
 
 	// Don't render anything if fonts aren't loaded
 	if (!loaded) {

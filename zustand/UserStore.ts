@@ -13,6 +13,7 @@ interface UserState {
 	isLoading: boolean;
 	error: string | null;
 	isInitialized: boolean;
+	authListenerConfigured: boolean;
 	setUser: (user: User) => void;
 	updatePhoto: (photo: string) => void;
 	updateUsername: (username: string) => Promise<boolean>;
@@ -43,9 +44,6 @@ interface UserState {
 	checkEmailAvailability: (email: string) => Promise<boolean>;
 	initialize: () => Promise<void>;
 	clearError: () => void;
-	persist?: {
-		clearStorage: () => void;
-	};
 }
 
 export const undefinedUser: User = {
@@ -61,6 +59,72 @@ export const undefinedUser: User = {
 	language: getDeviceLanguage(),
 };
 
+// Función separada para configurar el listener de auth
+const setupAuthListener = (set: any, get: any) => {
+	let isSettingUp = false;
+
+	supabase.auth.onAuthStateChange(async (event, session) => {
+		console.log('Auth state change:', event, session?.user?.id);
+
+		// Evitar procesamiento múltiple simultáneo
+		if (isSettingUp) return;
+
+		const currentState = get();
+
+		// Evitar actualizaciones innecesarias si ya estamos procesando
+		if (currentState.isLoading) return;
+
+		isSettingUp = true;
+
+		try {
+			if (event === 'SIGNED_OUT' || !session) {
+				set({
+					user: { ...undefinedUser, language: currentState.user.language },
+					isAuthenticated: false,
+					error: null,
+				});
+			} else if (
+				(event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') &&
+				session?.user
+			) {
+				// Solo actualizar si el usuario cambió
+				if (
+					currentState.user.id !== session.user.id ||
+					!currentState.isAuthenticated
+				) {
+					try {
+						const response = await AuthService.getProfile();
+						if (response.success) {
+							const userData: User = {
+								id: session.user.id,
+								email: response.data.email,
+								username: response.data.username,
+								name: response.data.name,
+								photo: response.data.photo || '',
+								google_id: response.data.google_id || '',
+								token: session.access_token,
+								has_password: response.data.has_password,
+								language: response.data.language,
+								created_at: response.data.created_at,
+							};
+
+							set({
+								user: userData,
+								isAuthenticated: true,
+								error: null,
+							});
+						}
+					} catch (error) {
+						console.error('Error updating profile after auth change:', error);
+					}
+				}
+			}
+		} finally {
+			isSettingUp = false;
+		}
+	});
+};
+
 export const useUserStore = create<UserState>()(
 	persist(
 		(set, get) => ({
@@ -69,6 +133,7 @@ export const useUserStore = create<UserState>()(
 			isLoading: false,
 			error: null,
 			isInitialized: false,
+			authListenerConfigured: false,
 
 			initialize: async () => {
 				const state = get();
@@ -85,8 +150,12 @@ export const useUserStore = create<UserState>()(
 
 					if (error) {
 						console.error('Error getting session:', error);
-						get().setDefaultUser();
-						set({ isLoading: false, isInitialized: true });
+						set({
+							user: { ...undefinedUser, language: getDeviceLanguage() },
+							isAuthenticated: false,
+							isLoading: false,
+							isInitialized: true,
+						});
 						return;
 					}
 
@@ -119,60 +188,38 @@ export const useUserStore = create<UserState>()(
 							} else {
 								// Error obteniendo el perfil, limpiar sesión
 								await supabase.auth.signOut();
-								get().setDefaultUser();
-								set({ isLoading: false, isInitialized: true });
+								set({
+									user: { ...undefinedUser, language: getDeviceLanguage() },
+									isAuthenticated: false,
+									isLoading: false,
+									isInitialized: true,
+								});
 							}
 						} catch (error) {
 							console.error('Error fetching profile:', error);
 							await supabase.auth.signOut();
-							get().setDefaultUser();
-							set({ isLoading: false, isInitialized: true });
+							set({
+								user: { ...undefinedUser, language: getDeviceLanguage() },
+								isAuthenticated: false,
+								isLoading: false,
+								isInitialized: true,
+							});
 						}
 					} else {
 						// No hay sesión activa
-						get().setDefaultUser();
-						set({ isLoading: false, isInitialized: true });
+						set({
+							user: { ...undefinedUser, language: getDeviceLanguage() },
+							isAuthenticated: false,
+							isLoading: false,
+							isInitialized: true,
+						});
 					}
 
-					// Configurar listener para cambios de autenticación
-					supabase.auth.onAuthStateChange(async (event, session) => {
-						console.log('Auth state change:', event, session?.user?.id);
-
-						if (event === 'SIGNED_OUT' || !session) {
-							get().setDefaultUser();
-						} else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-							if (session?.user) {
-								try {
-									const response = await AuthService.getProfile();
-									if (response.success) {
-										const userData: User = {
-											id: session.user.id,
-											email: response.data.email,
-											username: response.data.username,
-											name: response.data.name,
-											photo: response.data.photo || '',
-											google_id: response.data.google_id || '',
-											token: session.access_token,
-											has_password: response.data.has_password,
-											language: response.data.language,
-											created_at: response.data.created_at,
-										};
-
-										set({
-											user: userData,
-											isAuthenticated: true,
-											error: null,
-										});
-									}
-								} catch (error) {
-									console.error(
-										'Error updating profile after auth change:',
-										error,
-									);
-								}
-							}
-						}
-					});
+					// Configurar listener UNA SOLA VEZ
+					if (!state.authListenerConfigured) {
+						setupAuthListener(set, get);
+						set({ authListenerConfigured: true });
+					}
 				} catch (error) {
 					console.error('Error initializing user store:', error);
 					set({
@@ -498,6 +545,7 @@ export const useUserStore = create<UserState>()(
 					token: '', // No persistir el token, Supabase lo maneja
 				},
 				isAuthenticated: false, // La autenticación se verificará en initialize
+				authListenerConfigured: false, // Reset en cada app load
 			}),
 			onRehydrateStorage: () => (state, error) => {
 				if (error) {
@@ -505,9 +553,11 @@ export const useUserStore = create<UserState>()(
 					return;
 				}
 
-				// Después de la rehidratación, inicializar el store
-				if (state) {
-					state.initialize();
+				// Usar setTimeout para evitar bucles de inicialización inmediata
+				if (state && !state.isInitialized) {
+					setTimeout(() => {
+						state.initialize();
+					}, 0);
 				}
 			},
 		},

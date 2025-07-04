@@ -51,19 +51,24 @@ export const useAuthGuard = (options: UseAuthGuardOptions = {}) => {
 	// Usar refs para evitar dependencias que cambien constantemente
 	const lastAuthState = useRef<boolean | null>(null);
 	const redirectProcessed = useRef(false);
+	const onAuthChangeRef = useRef(onAuthChange);
+	const redirectToRef = useRef(redirectTo);
 
-	// Callback para cambios de autenticación
-	const handleAuthChange = useCallback(
-		(authState: boolean) => {
-			if (onAuthChange && lastAuthState.current !== authState) {
-				lastAuthState.current = authState;
-				onAuthChange(authState);
-			}
-		},
-		[onAuthChange],
-	);
+	// Actualizar refs cuando cambien los props
+	useEffect(() => {
+		onAuthChangeRef.current = onAuthChange;
+		redirectToRef.current = redirectTo;
+	});
 
-	// Manejar cambios de estado de autenticación
+	// Memoizar la función de manejo de cambios de auth
+	const handleAuthChange = useCallback((authState: boolean) => {
+		if (onAuthChangeRef.current && lastAuthState.current !== authState) {
+			lastAuthState.current = authState;
+			onAuthChangeRef.current(authState);
+		}
+	}, []); // Sin dependencias porque usa refs
+
+	// Efecto principal con dependencias mínimas
 	useEffect(() => {
 		// No hacer nada si no está inicializado o está cargando
 		if (!isInitialized || isLoading) return;
@@ -77,15 +82,15 @@ export const useAuthGuard = (options: UseAuthGuardOptions = {}) => {
 		// Manejar redirects basados en el estado de autenticación
 		if (requireAuth && !isAuthenticated) {
 			// Usuario necesita estar autenticado pero no lo está
-			const targetRoute: Href = redirectTo || '/auth';
+			const targetRoute: Href = redirectToRef.current || '/auth';
 			console.log('🔄 Redirecting to auth:', targetRoute);
 			router.replace(targetRoute);
 			redirectProcessed.current = true;
 			setHasRedirected(true);
-		} else if (!requireAuth && isAuthenticated && redirectTo) {
+		} else if (!requireAuth && isAuthenticated && redirectToRef.current) {
 			// Usuario está autenticado pero no debería estar (ej: páginas de auth)
-			console.log('🔄 Redirecting authenticated user:', redirectTo);
-			router.replace(redirectTo);
+			console.log('🔄 Redirecting authenticated user:', redirectToRef.current);
+			router.replace(redirectToRef.current);
 			redirectProcessed.current = true;
 			setHasRedirected(true);
 		}
@@ -94,7 +99,6 @@ export const useAuthGuard = (options: UseAuthGuardOptions = {}) => {
 		isLoading,
 		isInitialized,
 		requireAuth,
-		redirectTo,
 		router,
 		handleAuthChange,
 	]);

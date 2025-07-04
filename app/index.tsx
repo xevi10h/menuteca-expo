@@ -18,7 +18,7 @@ import { Restaurant } from '@/shared/types';
 import { useFilterStore } from '@/zustand/FilterStore';
 import { useRestaurantStore } from '@/zustand/RestaurantStore';
 import * as Location from 'expo-location';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Image, Platform, ScrollView, Text, View } from 'react-native';
 import MapViewType, { Camera } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -81,25 +81,28 @@ function MainAppContent() {
 	// Get filter state to determine view mode
 	const filters = useFilterStore((state) => state.main);
 
-	// Use restaurant store for caching
-	const {
-		fetchRestaurants,
-		isLoading: storeLoading,
-		error: storeError,
-		isRateLimited,
-		clearError,
-	} = useRestaurantStore();
+	// Use restaurant store for caching - seleccionar individualmente para Zustand v5
+	const fetchRestaurants = useRestaurantStore(
+		(state) => state.fetchRestaurants,
+	);
+	const storeLoading = useRestaurantStore((state) => state.isLoading);
+	const storeError = useRestaurantStore((state) => state.error);
+	const isRateLimited = useRestaurantStore((state) => state.isRateLimited);
+	const clearError = useRestaurantStore((state) => state.clearError);
 
 	// Check if any non-persistent filters are active (excludes sort and cuisines)
-	const hasActiveFilters =
-		filters.textSearch.trim() !== '' ||
-		filters.priceRange.min > 0 ||
-		filters.priceRange.max < 1000 ||
-		filters.ratingRange.min > 0 ||
-		(filters.tags && filters.tags.length > 0) ||
-		filters.timeRange !== null ||
-		filters.distance !== null ||
-		(filters.cuisines && filters.cuisines.length > 0);
+	const hasActiveFilters = useMemo(() => {
+		return (
+			filters.textSearch.trim() !== '' ||
+			filters.priceRange.min > 0 ||
+			filters.priceRange.max < 1000 ||
+			filters.ratingRange.min > 0 ||
+			(filters.tags && filters.tags.length > 0) ||
+			filters.timeRange !== null ||
+			filters.distance !== null ||
+			(filters.cuisines && filters.cuisines.length > 0)
+		);
+	}, [filters]);
 
 	// Función para aplicar filtros localmente
 	const applyLocalFilters = useCallback(
@@ -321,7 +324,7 @@ function MainAppContent() {
 		}
 	}, [hasActiveFilters, hasMore, loadingMore, loading, page, loadRestaurants]);
 
-	// Reset page when filters change
+	// Reset page when filters change - usando useEffect con dependencias específicas
 	useEffect(() => {
 		if (hasActiveFilters) {
 			setPage(1);
@@ -330,70 +333,73 @@ function MainAppContent() {
 		}
 	}, [
 		filters.textSearch,
-		filters.priceRange,
-		filters.ratingRange,
+		filters.priceRange.min,
+		filters.priceRange.max,
+		filters.ratingRange.min,
 		filters.tags,
 		filters.cuisines,
 		filters.distance,
 		filters.timeRange,
 		filters.orderBy,
 		filters.orderDirection,
-		hasActiveFilters,
+		// No incluir hasActiveFilters aquí para evitar bucles
 	]);
 
 	// Initial load effect - only runs once
 	useEffect(() => {
-		if (!hasInitialLoad && restaurants.length === 0) {
+		if (!hasInitialLoad && restaurants.length === 0 && !loading) {
 			loadRestaurants();
 		}
-	}, [hasInitialLoad]);
+	}, [hasInitialLoad, restaurants.length, loading, loadRestaurants]);
 
-	// Handle store errors
+	// Handle store errors - simplificar el useEffect
 	useEffect(() => {
-		if (storeError && !loading) {
-			if (!loadingError || loadingError !== storeError) {
-				setLoadingError(storeError);
+		if (storeError && !loading && storeError !== loadingError) {
+			setLoadingError(storeError);
 
-				if (!storeError.includes('Rate limited')) {
-					setTimeout(() => {
-						Alert.alert(
-							t('errors.loadingRestaurants'),
-							storeError,
-							[
-								{
-									text: 'Retry',
-									onPress: () => {
-										clearError();
-										loadRestaurants();
-									},
+			if (!storeError.includes('Rate limited')) {
+				const timeoutId = setTimeout(() => {
+					Alert.alert(
+						t('errors.loadingRestaurants'),
+						storeError,
+						[
+							{
+								text: 'Retry',
+								onPress: () => {
+									clearError();
+									loadRestaurants();
 								},
-								{ text: 'OK', style: 'cancel' },
-							],
-							{ cancelable: true },
-						);
-					}, 500);
-				}
+							},
+							{ text: 'OK', style: 'cancel' },
+						],
+						{ cancelable: true },
+					);
+				}, 500);
+
+				return () => clearTimeout(timeoutId);
 			}
 		}
-	}, [storeError, loading, loadingError, clearError, loadRestaurants]);
+	}, [storeError, loading, loadingError, clearError, loadRestaurants, t]);
 
 	// Procesar restaurantes según si hay filtros o no
-	const processedRestaurants = hasActiveFilters
-		? applySorting(applyLocalFilters(restaurants))
-		: restaurants;
+	const processedRestaurants = useMemo(() => {
+		return hasActiveFilters
+			? applySorting(applyLocalFilters(restaurants))
+			: restaurants;
+	}, [hasActiveFilters, applySorting, applyLocalFilters, restaurants]);
 
-	const handleMarkerPress = async (restaurant: Restaurant) => {
+	const handleMarkerPress = useCallback(async (restaurant: Restaurant) => {
 		await centerCoordinatesMarker(restaurant);
 		setSelectedRestaurant(restaurant);
 		setModalVisible(true);
-	};
+	}, []);
 
-	const handleModalClose = () => {
+	const handleModalClose = useCallback(() => {
 		setModalVisible(false);
 		setSelectedRestaurant(null);
-	};
+	}, []);
 
-	const centerCoordinatesButtonAction = async () => {
+	const centerCoordinatesButtonAction = useCallback(async () => {
 		try {
 			if (!statusForegroundPermissions?.granted) {
 				const newPermissions = await requestStatusForegroundPermissions();
@@ -420,28 +426,43 @@ function MainAppContent() {
 		} catch (error) {
 			console.error('Error getting location:', error);
 		}
-	};
+	}, [statusForegroundPermissions, requestStatusForegroundPermissions]);
 
-	const centerCoordinatesMarker = async (restaurant: Restaurant) => {
-		try {
-			const { longitude, latitude } = restaurant.address.coordinates;
-			if (longitude && latitude && mapViewRef.current) {
-				const newCamera: Camera = {
-					center: {
-						latitude,
-						longitude,
-					},
-					zoom: 16,
-					heading: 0,
-					pitch: 0,
-					altitude: 1000,
-				};
-				mapViewRef.current?.animateCamera(newCamera, { duration: 1000 });
+	const centerCoordinatesMarker = useCallback(
+		async (restaurant: Restaurant) => {
+			try {
+				const { longitude, latitude } = restaurant.address.coordinates;
+				if (longitude && latitude && mapViewRef.current) {
+					const newCamera: Camera = {
+						center: {
+							latitude,
+							longitude,
+						},
+						zoom: 16,
+						heading: 0,
+						pitch: 0,
+						altitude: 1000,
+					};
+					mapViewRef.current?.animateCamera(newCamera, { duration: 1000 });
+				}
+			} catch (error) {
+				console.error('Error centering on restaurant:', error);
 			}
-		} catch (error) {
-			console.error('Error centering on restaurant:', error);
-		}
-	};
+		},
+		[],
+	);
+
+	// Memoizar los datos de categorías para evitar recálculos innecesarios
+	const categoryData = useMemo(
+		() => ({
+			recommended: getRestaurantsByCategory('recommended', restaurants),
+			bestRating: getRestaurantsByCategory('bestRating', restaurants),
+			closest: getRestaurantsByCategory('closest', restaurants),
+			mostPopular: getRestaurantsByCategory('mostPopular', restaurants),
+			newest: getRestaurantsByCategory('newest', restaurants),
+		}),
+		[restaurants, getRestaurantsByCategory],
+	);
 
 	// Show loading indicator for initial load
 	if (!hasInitialLoad && loading) {
@@ -568,27 +589,27 @@ function MainAppContent() {
 						<ScrollHorizontalRestaurant
 							title="recommended"
 							sortBy="recommended"
-							restaurants={getRestaurantsByCategory('recommended', restaurants)}
+							restaurants={categoryData.recommended}
 						/>
 						<ScrollHorizontalRestaurant
 							title="bestRating"
 							sortBy="rating"
-							restaurants={getRestaurantsByCategory('bestRating', restaurants)}
+							restaurants={categoryData.bestRating}
 						/>
 						<ScrollHorizontalRestaurant
 							title="closest"
 							sortBy="distance"
-							restaurants={getRestaurantsByCategory('closest', restaurants)}
+							restaurants={categoryData.closest}
 						/>
 						<ScrollHorizontalRestaurant
 							title="mostPopular"
 							sortBy="popular"
-							restaurants={getRestaurantsByCategory('mostPopular', restaurants)}
+							restaurants={categoryData.mostPopular}
 						/>
 						<ScrollHorizontalRestaurant
 							title="newest"
 							sortBy="created_at"
-							restaurants={getRestaurantsByCategory('newest', restaurants)}
+							restaurants={categoryData.newest}
 						/>
 
 						<View style={{ height: 100 }} />
@@ -678,7 +699,7 @@ function MainAppContent() {
 			{/* Map Controls */}
 			{view === 'map' && (
 				<CenterLocationMapButton
-					onPress={async () => await centerCoordinatesButtonAction()}
+					onPress={centerCoordinatesButtonAction}
 					additionalBottom={140}
 				/>
 			)}
