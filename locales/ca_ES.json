@@ -46,8 +46,7 @@
 		"gallery": "Galeria",
 		"camera": "Càmera",
 		"retry": "Tornar-ho a intentar",
-		"dismiss": "Descartar",
-		"loadingRestaurants": "Carregant restaurants..."
+		"dismiss": "Descartar"
 	},
 	"restaurant": {
 		"information": "Informació",
@@ -71,8 +70,7 @@
 		"writeReview": "Toca per escriure una opinió",
 		"beFirstToReview": "Sigues el primer a opinar",
 		"noResults": "No s'han trobat resultats",
-		"noResultsSubtitle": "Prova amb una cerca més específica o canvia els filtres",
-		"noMenuAvailableDescription": "Aquest restaurant no té cap menú disponible en aquest moment"
+		"noResultsSubtitle": "Prova amb una cerca més específica o canvia els filtres"
 	},
 	"notFound": {
 		"restaurant": {
@@ -595,8 +593,6 @@
 		"network": "Error de xarxa",
 		"validation": "Error de validació",
 		"auth": "Error d'autenticació",
-		"general": "Error",
-		"loadingRestaurants": "Error carregant restaurants",
-		"loadingRestaurant": "Error carregant el restaurant"
+		"general": "Error"
 	}
 }

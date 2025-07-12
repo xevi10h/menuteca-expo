@@ -1,13 +1,13 @@
 import { AuthService } from '@/api/services';
 import { colors } from '@/assets/styles/colors';
-import ErrorModal from '@/components/auth/ErrorModal';
-import { useAuthError } from '@/hooks/useAuthError';
+import ErrorDisplay from '@/components/auth/ErrorDisplay';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
 	ActivityIndicator,
+	Alert,
 	KeyboardAvoidingView,
 	Platform,
 	ScrollView,
@@ -28,15 +28,13 @@ export default function CodeVerificationScreen() {
 
 	const [code, setCode] = useState('');
 	const [status, setStatus] = useState<VerificationStatus>('idle');
+	const [error, setError] = useState('');
 	const [codeError, setCodeError] = useState('');
 	const [counter, setCounter] = useState(0);
 	const [isResendDisabled, setIsResendDisabled] = useState(false);
 
 	// Refs for code inputs
 	const inputRefs = useRef<TextInput[]>([]);
-
-	// Use the auth error hook
-	const { error: authError, showError, showInfo, hideError } = useAuthError();
 
 	// Auto-focus first input on mount
 	useEffect(() => {
@@ -48,6 +46,7 @@ export default function CodeVerificationScreen() {
 	// Reset errors when code changes
 	useEffect(() => {
 		if (codeError) setCodeError('');
+		if (error) setError('');
 	}, [code]);
 
 	// Counter for resend button
@@ -107,6 +106,7 @@ export default function CodeVerificationScreen() {
 	const handleVerifyCode = async () => {
 		// Reset errors
 		setCodeError('');
+		setError('');
 
 		// Validate code
 		if (code.length !== 6) {
@@ -144,30 +144,23 @@ export default function CodeVerificationScreen() {
 			console.error('Code verification error:', error);
 			setStatus('error');
 
-			showError(t('auth.verificationError'), {
-				title: t('auth.verification'),
-				onRetry: () => {
-					setStatus('idle');
-					handleVerifyCode();
-				},
-			});
+			setError(t('auth.verificationError'));
 		}
 	};
 
 	const handleResendCode = async () => {
 		startCounter();
+		setError('');
 
 		try {
 			await AuthService.sendPasswordResetCode(email as string);
 
-			showInfo(t('auth.codeResentMessage'), {
-				title: t('auth.codeResent'),
-			});
+			Alert.alert(t('auth.codeResent'), t('auth.codeResentMessage'), [
+				{ text: t('general.ok') },
+			]);
 		} catch (error) {
 			console.error('Resend code error:', error);
-			showError(t('auth.resendCodeError'), {
-				title: t('auth.resendCode'),
-			});
+			setError(t('auth.resendCodeError'));
 		}
 	};
 
@@ -307,18 +300,27 @@ export default function CodeVerificationScreen() {
 							</TouchableOpacity>
 						</View>
 					</View>
+					{/* Error Display */}
+					{status === 'error' && error && (
+						<View
+							style={{
+								position: 'absolute',
+								alignItems: 'center',
+								justifyContent: 'center',
+								flex: 1,
+							}}
+						>
+							<ErrorDisplay
+								message={error}
+								type="validation"
+								onRetry={() => setStatus('idle')}
+								variant="inline"
+								animated={true}
+							/>
+						</View>
+					)}
 				</ScrollView>
 			</KeyboardAvoidingView>
-
-			{/* Error Modal */}
-			<ErrorModal
-				visible={authError.isVisible}
-				title={authError.title}
-				message={authError.message}
-				type={authError.type}
-				onClose={hideError}
-				onRetry={authError.onRetry}
-			/>
 		</SafeAreaView>
 	);
 }
@@ -356,6 +358,22 @@ const styles = StyleSheet.create({
 		right: 0,
 		left: 0,
 		position: 'absolute',
+	},
+	logoContainer: {
+		alignItems: 'center',
+		paddingVertical: 40,
+	},
+	logo: {
+		width: 100,
+		height: 80,
+		marginBottom: 5,
+	},
+	appName: {
+		fontSize: 32,
+		fontFamily: 'Manrope',
+		fontWeight: '700',
+		color: colors.primary,
+		marginBottom: 10,
 	},
 	content: {
 		flex: 1,

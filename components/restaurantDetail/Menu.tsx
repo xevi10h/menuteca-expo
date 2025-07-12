@@ -34,23 +34,6 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 	const { t } = useTranslation();
 	const [currentMenuIndex, setCurrentMenuIndex] = useState(0);
 
-	// Check if there are no menus available
-	if (!menus || menus.length === 0) {
-		return (
-			<View style={styles.emptyContainer}>
-				<Ionicons
-					name="restaurant-outline"
-					size={64}
-					color={colors.primaryLight}
-				/>
-				<Text style={styles.emptyText}>{t('restaurant.noMenuAvailable')}</Text>
-				<Text style={styles.emptySubtext}>
-					{t('restaurant.noMenuAvailableDescription')}
-				</Text>
-			</View>
-		);
-	}
-
 	const currentMenu = menus[currentMenuIndex];
 	const canGoLeft = currentMenuIndex > 0;
 	const canGoRight = currentMenuIndex < menus.length - 1;
@@ -308,19 +291,10 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 		</View>
 	);
 
-	// Additional check for currentMenu being falsy (fallback)
 	if (!currentMenu) {
 		return (
 			<View style={styles.emptyContainer}>
-				<Ionicons
-					name="restaurant-outline"
-					size={64}
-					color={colors.primaryLight}
-				/>
 				<Text style={styles.emptyText}>{t('restaurant.noMenuAvailable')}</Text>
-				<Text style={styles.emptySubtext}>
-					{t('restaurant.noMenuAvailableDescription')}
-				</Text>
 			</View>
 		);
 	}
@@ -722,31 +696,18 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		minWidth: 60,
 	},
-	// Updated empty state styles
 	emptyContainer: {
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingHorizontal: 40,
-		paddingVertical: 60,
+		padding: 40,
 	},
 	emptyText: {
-		fontSize: 18,
+		fontSize: 16,
 		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontWeight: '500',
 		color: colors.primary,
 		textAlign: 'center',
-		marginTop: 20,
-		marginBottom: 8,
-	},
-	emptySubtext: {
-		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
-		color: colors.primaryLight,
-		textAlign: 'center',
-		lineHeight: 20,
-		paddingHorizontal: 20,
 	},
 });
 

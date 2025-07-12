@@ -46,8 +46,7 @@
 		"gallery": "Galerie",
 		"camera": "Appareil photo",
 		"retry": "Réessayer",
-		"dismiss": "Fermer",
-		"loadingRestaurants": "Chargement des restaurants..."
+		"dismiss": "Fermer"
 	},
 	"restaurant": {
 		"information": "Information",
@@ -71,8 +70,7 @@
 		"writeReview": "Appuyez pour laisser un avis",
 		"beFirstToReview": "Soyez le premier à donner votre avis",
 		"noResults": "Aucun résultat trouvé",
-		"noResultsSubtitle": "Essayez de modifier vos filtres ou de rechercher un autre restaurant",
-		"noMenuAvailableDescription": "Ce restaurant n'a aucun menu disponible pour le moment"
+		"noResultsSubtitle": "Essayez de modifier vos filtres ou de rechercher un autre restaurant"
 	},
 	"notFound": {
 		"restaurant": {
@@ -595,8 +593,6 @@
 		"network": "Erreur réseau",
 		"validation": "Erreur de validation",
 		"auth": "Erreur d'authentification",
-		"general": "Erreur générale",
-		"loadingRestaurants": "Erreur lors du chargement des restaurants",
-		"loadingRestaurant": "Erreur lors du chargement du restaurant"
+		"general": "Erreur générale"
 	}
 }

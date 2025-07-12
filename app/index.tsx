@@ -13,7 +13,6 @@ import RestaurantList from '@/components/list/RestaurantList';
 import ScrollHorizontalRestaurant from '@/components/list/ScrollHorizontalResturant';
 import { useAppInitialization } from '@/hooks/useAppInitialization';
 import { useRequireAuth } from '@/hooks/useAuth';
-import { useTranslation } from '@/hooks/useTranslation';
 import { Restaurant } from '@/shared/types';
 import { useFilterStore } from '@/zustand/FilterStore';
 import { useRestaurantStore } from '@/zustand/RestaurantStore';
@@ -59,7 +58,6 @@ export default function Index() {
 
 // Componente separado para el contenido principal de la app
 function MainAppContent() {
-	const { t } = useTranslation();
 	const { top } = useSafeAreaInsets();
 	const [statusForegroundPermissions, requestStatusForegroundPermissions] =
 		Location.useForegroundPermissions();
@@ -357,7 +355,7 @@ function MainAppContent() {
 				if (!storeError.includes('Rate limited')) {
 					setTimeout(() => {
 						Alert.alert(
-							t('errors.loadingRestaurants'),
+							'Error loading restaurants',
 							storeError,
 							[
 								{
@@ -448,7 +446,7 @@ function MainAppContent() {
 		return (
 			<LoadingScreen
 				showLogo={false}
-				message={t('general.loadingRestaurants')}
+				message="Loading restaurants..."
 				showProgress={false}
 			/>
 		);

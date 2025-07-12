@@ -1,7 +1,6 @@
 import { AuthService } from '@/api/services';
 import { colors } from '@/assets/styles/colors';
-import ErrorModal from '@/components/auth/ErrorModal';
-import { useAuthError } from '@/hooks/useAuthError';
+import ErrorDisplay from '@/components/auth/ErrorDisplay';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -27,14 +26,13 @@ export default function PasswordRecoveryScreen() {
 
 	const [email, setEmail] = useState('');
 	const [status, setStatus] = useState<RequestStatus>('idle');
+	const [error, setError] = useState('');
 	const [emailError, setEmailError] = useState('');
-
-	// Use the auth error hook
-	const { error: authError, showError, showInfo, hideError } = useAuthError();
 
 	// Reset errors when email changes
 	useEffect(() => {
 		if (emailError) setEmailError('');
+		if (error) setError('');
 	}, [email]);
 
 	const validateEmail = (email: string) => {
@@ -48,6 +46,7 @@ export default function PasswordRecoveryScreen() {
 	const handleSendResetCode = async () => {
 		// Reset errors
 		setEmailError('');
+		setError('');
 
 		// Validate email
 		if (!email.trim()) {
@@ -70,19 +69,11 @@ export default function PasswordRecoveryScreen() {
 			if (response.success) {
 				setStatus('success');
 
-				// Show success info and navigate
-				showInfo(t('auth.codeResentMessage'), {
-					title: t('auth.codeResent'),
+				// Navigate to code verification with email
+				router.push({
+					pathname: '/auth/code-verification',
+					params: { email: email.trim().toLowerCase() },
 				});
-
-				// Navigate to code verification with email after a short delay
-				setTimeout(() => {
-					hideError();
-					router.push({
-						pathname: '/auth/code-verification',
-						params: { email: email.trim().toLowerCase() },
-					});
-				}, 2000);
 			} else {
 				throw new Error('Failed to send reset code');
 			}
@@ -95,14 +86,13 @@ export default function PasswordRecoveryScreen() {
 					? error.message
 					: t('auth.resetEmailErrorMessage');
 
-			showError(errorMessage, {
-				title: t('auth.resetEmailError'),
-				onRetry: () => {
-					setStatus('idle');
-					handleSendResetCode();
-				},
-			});
+			setError(errorMessage);
 		}
+	};
+
+	const handleRetry = () => {
+		setStatus('idle');
+		setError('');
 	};
 
 	const handleBack = () => {
@@ -154,6 +144,17 @@ export default function PasswordRecoveryScreen() {
 								{t('auth.passwordRecoveryText')}
 							</Text>
 						</View>
+
+						{/* Error Display */}
+						{status === 'error' && error && (
+							<ErrorDisplay
+								message={error}
+								type="network"
+								onRetry={handleRetry}
+								variant="inline"
+								animated={true}
+							/>
+						)}
 
 						{/* Form */}
 						<View style={styles.form}>
@@ -249,16 +250,6 @@ export default function PasswordRecoveryScreen() {
 					</View>
 				</ScrollView>
 			</KeyboardAvoidingView>
-
-			{/* Error Modal */}
-			<ErrorModal
-				visible={authError.isVisible}
-				title={authError.title}
-				message={authError.message}
-				type={authError.type}
-				onClose={hideError}
-				onRetry={authError.onRetry}
-			/>
 		</SafeAreaView>
 	);
 }
@@ -296,6 +287,22 @@ const styles = StyleSheet.create({
 		right: 0,
 		left: 0,
 		position: 'absolute',
+	},
+	logoContainer: {
+		alignItems: 'center',
+		paddingVertical: 40,
+	},
+	logo: {
+		width: 100,
+		height: 80,
+		marginBottom: 5,
+	},
+	appName: {
+		fontSize: 32,
+		fontFamily: 'Manrope',
+		fontWeight: '700',
+		color: colors.primary,
+		marginBottom: 10,
 	},
 	content: {
 		flex: 1,

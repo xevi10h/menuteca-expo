@@ -1,13 +1,12 @@
 import { colors } from '@/assets/styles/colors';
-import ErrorModal from '@/components/auth/ErrorModal';
-import { useAuthError } from '@/hooks/useAuthError';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
 import { Redirect, useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
 	ActivityIndicator,
+	Alert,
 	Image,
 	KeyboardAvoidingView,
 	Platform,
@@ -33,7 +32,6 @@ export default function RegisterScreen() {
 	const isLoading = useUserStore((state) => state.isLoading);
 	const isAuthenticated = useUserStore((state) => state.isAuthenticated);
 	const error = useUserStore((state) => state.error);
-	const clearError = useUserStore((state) => state.clearError);
 
 	const [email, setEmail] = useState('');
 	const [username, setUsername] = useState('');
@@ -51,29 +49,6 @@ export default function RegisterScreen() {
 	const [passwordError, setPasswordError] = useState('');
 	const [confirmPasswordError, setConfirmPasswordError] = useState('');
 	const [termsError, setTermsError] = useState('');
-
-	// Use the auth error hook
-	const { error: authError, showError, hideError } = useAuthError();
-
-	// Clear errors when user starts typing
-	useEffect(() => {
-		if (error) {
-			clearError();
-		}
-	}, [email, username, name, password, confirmPassword]);
-
-	// Show error modal when there's an error from the store
-	useEffect(() => {
-		if (error) {
-			showError(error, {
-				title: t('auth.registerError'),
-				onRetry: () => {
-					clearError();
-					handleRegister();
-				},
-			});
-		}
-	}, [error, showError, clearError, t]);
 
 	// If already authenticated, redirect to main app
 	if (isAuthenticated) {
@@ -187,13 +162,13 @@ export default function RegisterScreen() {
 				// Navigation will be handled automatically by the authentication state change
 				// The user will be redirected to the main app through the index.tsx redirect
 				router.replace('/');
+			} else {
+				if (error) {
+					Alert.alert(t('auth.registerError'), error);
+				}
 			}
-			// Error is now handled by the useEffect that watches the error state
 		} catch (err) {
-			console.error('Register error:', err);
-			showError(t('auth.registerFailed'), {
-				title: t('auth.registerError'),
-			});
+			Alert.alert(t('auth.registerError'), t('auth.registerFailed'));
 		}
 	};
 
@@ -207,10 +182,7 @@ export default function RegisterScreen() {
 
 	const handleTermsPress = () => {
 		// TODO: Open terms and conditions
-		showError(t('auth.termsMessage'), {
-			title: t('auth.terms'),
-			type: 'info',
-		});
+		Alert.alert(t('auth.terms'), t('auth.termsMessage'));
 	};
 
 	return (
@@ -446,16 +418,6 @@ export default function RegisterScreen() {
 					</View>
 				</ScrollView>
 			</KeyboardAvoidingView>
-
-			{/* Error Modal */}
-			<ErrorModal
-				visible={authError.isVisible}
-				title={authError.title}
-				message={authError.message}
-				type={authError.type}
-				onClose={hideError}
-				onRetry={authError.onRetry}
-			/>
 		</SafeAreaView>
 	);
 }

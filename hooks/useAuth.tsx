@@ -1,11 +1,8 @@
-// hooks/useAuth.ts (Corregido)
+// hooks/useAuth.ts (Mejorado basado en tu hook existente)
 import { useUserRestaurantsStore } from '@/zustand/UserRestaurantStore';
 import { useUserStore } from '@/zustand/UserStore';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-
-// Importar los tipos de rutas de expo-router
-import type { Href } from 'expo-router';
 
 // Mantengo tu hook original con mejoras
 export const useAuth = () => {
@@ -39,7 +36,7 @@ export const useAuth = () => {
 // Nuevos hooks especializados basados en tu estructura
 interface UseAuthGuardOptions {
 	requireAuth?: boolean;
-	redirectTo?: Href;
+	redirectTo?: string;
 	onAuthChange?: (isAuthenticated: boolean) => void;
 }
 
@@ -63,7 +60,7 @@ export const useAuthGuard = (options: UseAuthGuardOptions = {}) => {
 		// Handle redirects based on authentication state
 		if (requireAuth && !isAuthenticated) {
 			// User needs to be authenticated but isn't
-			const targetRoute: Href = redirectTo || '/auth';
+			const targetRoute = redirectTo || '/auth';
 			router.replace(targetRoute);
 			setHasRedirected(true);
 		} else if (!requireAuth && isAuthenticated && redirectTo) {
@@ -98,7 +95,7 @@ export const useAuthGuard = (options: UseAuthGuardOptions = {}) => {
 };
 
 // Hook especializado para páginas que requieren autenticación
-export const useRequireAuth = (redirectTo?: Href) => {
+export const useRequireAuth = (redirectTo?: string) => {
 	return useAuthGuard({
 		requireAuth: true,
 		redirectTo: redirectTo || '/auth',
@@ -106,7 +103,7 @@ export const useRequireAuth = (redirectTo?: Href) => {
 };
 
 // Hook especializado para páginas solo para invitados (login, register, etc.)
-export const useGuestOnly = (redirectTo?: Href) => {
+export const useGuestOnly = (redirectTo?: string) => {
 	return useAuthGuard({
 		requireAuth: false,
 		redirectTo: redirectTo || '/',
