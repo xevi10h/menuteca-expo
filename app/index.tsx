@@ -276,6 +276,7 @@ function MainAppContent() {
 				setLoadingError(null);
 
 				const { coords } = await Location.getCurrentPositionAsync();
+
 				const { longitude, latitude } = coords;
 
 				// Use store's fetchRestaurants which handles caching

@@ -16,8 +16,8 @@ interface CuisineState {
 	refreshCuisines: () => Promise<void>;
 }
 
-// Cache duration: 24 hours
-const CACHE_DURATION = 24 * 60 * 60 * 1000;
+// Cache duration: 1 hour (las traducciones no cambian frecuentemente)
+const CACHE_DURATION = 60 * 60 * 1000;
 
 export const useCuisineStore = create<CuisineState>()(
 	persist(
@@ -46,6 +46,8 @@ export const useCuisineStore = create<CuisineState>()(
 					const response = await CuisineService.getAllCuisines();
 
 					if (response.success) {
+						// FIXED: Los datos ya vienen traducidos del backend según el token del usuario
+						// No necesitamos procesar traducciones aquí
 						set({
 							cuisines: response.data,
 							isLoading: false,
@@ -67,7 +69,9 @@ export const useCuisineStore = create<CuisineState>()(
 			},
 
 			refreshCuisines: async () => {
-				set({ isLoading: true, error: null });
+				// IMPORTANT: Clear cache and force refresh
+				// Esto es útil cuando cambia el idioma del usuario
+				set({ isLoading: true, error: null, lastFetched: null });
 
 				try {
 					const response = await CuisineService.getAllCuisines();
@@ -134,6 +138,8 @@ export const useCuisineStore = create<CuisineState>()(
 				cuisines: state.cuisines,
 				lastFetched: state.lastFetched,
 			}),
+			// FIXED: Versioning para limpiar cache cuando cambien las traducciones
+			version: 1,
 		},
 	),
 );

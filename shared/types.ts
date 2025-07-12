@@ -94,6 +94,7 @@ export type Restaurant = {
 	updated_at: string;
 };
 
+// FIXED: Cuisine ahora viene traducido del backend según el token del usuario
 export type Cuisine = {
 	id: string;
 	name: string;

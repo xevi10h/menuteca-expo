@@ -72,6 +72,7 @@ export default function RootLayout() {
 				<ThemeProvider
 					value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
 				>
+					{/* FIXED: Solo Stack.Screen components como hijos directos del Stack */}
 					<Stack screenOptions={{ headerShown: false }}>
 						{/* Index always available - handles auth redirect internally */}
 						<Stack.Screen name="index" />
@@ -79,13 +80,11 @@ export default function RootLayout() {
 						{/* Auth stack - always available for login/logout */}
 						<Stack.Screen name="auth" />
 
-						{/* Protected routes - only available when authenticated */}
-						{isAuthenticated && (
-							<>
-								<Stack.Screen name="profile" />
-								<Stack.Screen name="restaurant" />
-							</>
-						)}
+						{/* Profile stack - available for authenticated users */}
+						<Stack.Screen name="profile" />
+
+						{/* Restaurant stack - available for all users */}
+						<Stack.Screen name="restaurant" />
 					</Stack>
 				</ThemeProvider>
 			</ActionSheetProvider>

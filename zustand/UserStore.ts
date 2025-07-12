@@ -11,7 +11,7 @@ interface UserState {
 	isAuthenticated: boolean;
 	isLoading: boolean;
 	error: string | null;
-	isInitialized: boolean; // Nueva propiedad para saber si el store ha sido inicializado
+	isInitialized: boolean;
 	setUser: (user: User) => void;
 	updatePhoto: (photo: string) => void;
 	updateUsername: (username: string) => Promise<boolean>;
@@ -220,20 +220,43 @@ export const useUserStore = create<UserState>()(
 					try {
 						await UserService.updateProfile({ language });
 
-						// Refresh cuisines when language changes as they are localized
-						// We'll import this dynamically to avoid circular dependencies
-						const { useCuisineStore } = await import('@/zustand/CuisineStore');
-						const { refreshCuisines } = useCuisineStore.getState();
-
-						// Refresh cuisines for the new language
+						// FIXED: Después de cambiar idioma, refrescar datos que vienen traducidos del backend
+						// Limpiar cache de cocinas para que se refresque con el nuevo idioma
 						try {
-							await refreshCuisines();
+							const { useCuisineStore } = await import(
+								'@/zustand/CuisineStore'
+							);
+							const cuisineStore = useCuisineStore.getState();
+
+							// Limpiar cache y refrescar
+							cuisineStore.clearCuisines();
+							await cuisineStore.fetchCuisines();
+
+							console.log('Cuisines refreshed for new language:', language);
 						} catch (cuisineError) {
 							console.error(
 								'Failed to refresh cuisines after language change:',
 								cuisineError,
 							);
 							// Don't throw error as language change was successful
+						}
+
+						// También limpiar cache de restaurantes ya que pueden tener datos traducidos
+						try {
+							const { useRestaurantStore } = await import(
+								'@/zustand/RestaurantStore'
+							);
+							const restaurantStore = useRestaurantStore.getState();
+							restaurantStore.clearCache();
+							console.log(
+								'Restaurant cache cleared for new language:',
+								language,
+							);
+						} catch (restaurantError) {
+							console.error(
+								'Failed to clear restaurant cache after language change:',
+								restaurantError,
+							);
 						}
 					} catch (error) {
 						console.error('Failed to update language on server:', error);
@@ -268,6 +291,20 @@ export const useUserStore = create<UserState>()(
 							error: null,
 							isInitialized: true,
 						});
+
+						// FIXED: Después del login, refrescar datos que vienen del backend
+						// para obtenerlos en el idioma del usuario
+						try {
+							const { useCuisineStore } = await import(
+								'@/zustand/CuisineStore'
+							);
+							const cuisineStore = useCuisineStore.getState();
+							cuisineStore.clearCuisines();
+							await cuisineStore.fetchCuisines();
+						} catch (error) {
+							console.error('Failed to refresh cuisines after login:', error);
+						}
+
 						return true;
 					} else {
 						throw new Error('Login failed');
@@ -306,6 +343,22 @@ export const useUserStore = create<UserState>()(
 							error: null,
 							isInitialized: true,
 						});
+
+						// FIXED: Después del registro, refrescar datos que vienen del backend
+						try {
+							const { useCuisineStore } = await import(
+								'@/zustand/CuisineStore'
+							);
+							const cuisineStore = useCuisineStore.getState();
+							cuisineStore.clearCuisines();
+							await cuisineStore.fetchCuisines();
+						} catch (error) {
+							console.error(
+								'Failed to refresh cuisines after register:',
+								error,
+							);
+						}
+
 						return true;
 					} else {
 						throw new Error('Registration failed');
@@ -344,6 +397,22 @@ export const useUserStore = create<UserState>()(
 							error: null,
 							isInitialized: true,
 						});
+
+						// FIXED: Después del Google auth, refrescar datos que vienen del backend
+						try {
+							const { useCuisineStore } = await import(
+								'@/zustand/CuisineStore'
+							);
+							const cuisineStore = useCuisineStore.getState();
+							cuisineStore.clearCuisines();
+							await cuisineStore.fetchCuisines();
+						} catch (error) {
+							console.error(
+								'Failed to refresh cuisines after Google auth:',
+								error,
+							);
+						}
+
 						return true;
 					} else {
 						throw new Error('Google authentication failed');
@@ -368,6 +437,22 @@ export const useUserStore = create<UserState>()(
 					error: null,
 					isInitialized: true,
 				});
+
+				// FIXED: Al hacer logout, limpiar caches que dependen del usuario
+				try {
+					const clearCaches = async () => {
+						const { useCuisineStore } = await import('@/zustand/CuisineStore');
+						const { useRestaurantStore } = await import(
+							'@/zustand/RestaurantStore'
+						);
+
+						useCuisineStore.getState().clearCuisines();
+						useRestaurantStore.getState().clearCache();
+					};
+					clearCaches();
+				} catch (error) {
+					console.error('Failed to clear caches after logout:', error);
+				}
 			},
 
 			refreshProfile: async () => {
@@ -481,6 +566,8 @@ export const useUserStore = create<UserState>()(
 					state.initialize();
 				}
 			},
+			// FIXED: Versioning para limpiar storage cuando cambien estructuras críticas
+			version: 1,
 		},
 	),
 );

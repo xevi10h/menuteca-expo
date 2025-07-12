@@ -1,6 +1,7 @@
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Restaurant } from '@/shared/types';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -10,78 +11,145 @@ interface RestaurantCardProps {
 }
 
 export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
-	const { t } = useTranslation();
+	const { t, locale } = useTranslation();
 	const router = useRouter();
+
+	// Helper function to get translated name
+	const getTranslatedName = (
+		nameObj: string | { [key: string]: string },
+	): string => {
+		if (typeof nameObj === 'string') {
+			return nameObj;
+		}
+
+		if (typeof nameObj === 'object' && nameObj !== null) {
+			// Try current locale first
+			if (nameObj[locale]) {
+				return nameObj[locale];
+			}
+
+			// Fallback to Spanish
+			if (nameObj['es_ES']) {
+				return nameObj['es_ES'];
+			}
+
+			// Fallback to English
+			if (nameObj['en_US']) {
+				return nameObj['en_US'];
+			}
+
+			// Fallback to any available language
+			const availableKeys = Object.keys(nameObj);
+			if (availableKeys.length > 0) {
+				return nameObj[availableKeys[0]];
+			}
+		}
+
+		return 'Unknown';
+	};
 
 	const handlePress = () => {
 		router.push(`/restaurant/${restaurant.id}`);
 	};
 
+	const formatDistance = (distance: number): string => {
+		if (distance < 1) {
+			return `${Math.round(distance * 1000)}m`;
+		}
+		return `${distance.toFixed(1)}km`;
+	};
+
+	const renderStars = (rating: number) => {
+		const stars = [];
+		const fullStars = Math.floor(rating);
+		const hasHalfStar = rating % 1 !== 0;
+
+		for (let i = 0; i < fullStars; i++) {
+			stars.push(<Ionicons key={i} name="star" size={12} color="#FFD700" />);
+		}
+
+		if (hasHalfStar) {
+			stars.push(
+				<Ionicons key="half" name="star-half" size={12} color="#FFD700" />,
+			);
+		}
+
+		const emptyStars = 5 - Math.ceil(rating);
+		for (let i = 0; i < emptyStars; i++) {
+			stars.push(
+				<Ionicons
+					key={`empty-${i}`}
+					name="star-outline"
+					size={12}
+					color="#FFD700"
+				/>,
+			);
+		}
+
+		return stars;
+	};
+
 	return (
-		<TouchableOpacity
-			style={styles.card}
-			onPress={handlePress}
-			activeOpacity={0.8}
-		>
-			<Image
-				source={{ uri: restaurant.main_image }}
-				style={styles.image}
-				resizeMode="cover"
-			/>
-
-			{/* Rating badge */}
-			{restaurant.rating && (
-				<View style={styles.ratingBadge}>
-					<Text style={styles.ratingText}>{restaurant.rating} ★</Text>
-				</View>
-			)}
-
-			<View style={styles.content}>
-				<View style={styles.header}>
-					<Text style={styles.name} numberOfLines={1}>
-						{restaurant.name}
-					</Text>
-					<Text style={styles.price}>
-						{t('general.from')} {restaurant.minimum_price}€
-					</Text>
-				</View>
-
-				<View style={styles.details}>
-					{restaurant.cuisine.name && (
-						<Text style={styles.cuisine} numberOfLines={1}>
-							{restaurant.cuisine.name}
+		<TouchableOpacity style={styles.container} onPress={handlePress}>
+			{/* Restaurant Image */}
+			<View style={styles.imageContainer}>
+				<Image
+					source={{ uri: restaurant.main_image }}
+					style={styles.image}
+					resizeMode="cover"
+				/>
+				{/* Distance Badge */}
+				{restaurant.distance > 0 && (
+					<View style={styles.distanceBadge}>
+						<Text style={styles.distanceText}>
+							{formatDistance(restaurant.distance)}
 						</Text>
-					)}
-					<Text style={styles.distance}>{restaurant.distance} km</Text>
-				</View>
-
-				{/* Tags preview (show first 2-3 tags) */}
-				{restaurant.tags && restaurant.tags.length > 0 && (
-					<View style={styles.tagsContainer}>
-						{restaurant.tags.slice(0, 3).map((tag) => (
-							<View key={tag} style={styles.tag}>
-								<Text style={styles.tagText}>{t(`restaurantTags.${tag}`)}</Text>
-							</View>
-						))}
-						{restaurant.tags.length > 3 && (
-							<View style={styles.tag}>
-								<Text style={styles.tagText}>
-									+{restaurant.tags.length - 3}
-								</Text>
-							</View>
-						)}
 					</View>
 				)}
+			</View>
+
+			{/* Restaurant Info */}
+			<View style={styles.infoContainer}>
+				<Text style={styles.name} numberOfLines={1}>
+					{restaurant.name}
+				</Text>
+
+				{restaurant.cuisine && (
+					<Text style={styles.cuisine} numberOfLines={1}>
+						{getTranslatedName(restaurant.cuisine.name)}
+					</Text>
+				)}
+
+				{/* Rating and Price Row */}
+				<View style={styles.bottomRow}>
+					{restaurant.rating && restaurant.rating > 0 ? (
+						<View style={styles.ratingContainer}>
+							<View style={styles.starsContainer}>
+								{renderStars(restaurant.rating)}
+							</View>
+							<Text style={styles.ratingText}>
+								{restaurant.rating.toFixed(1)}
+							</Text>
+						</View>
+					) : (
+						<Text style={styles.noRatingText}>{t('restaurant.noRating')}</Text>
+					)}
+
+					<View style={styles.priceContainer}>
+						<Text style={styles.priceText}>
+							{t('restaurant.from')} {restaurant.minimum_price}€
+						</Text>
+					</View>
+				</View>
 			</View>
 		</TouchableOpacity>
 	);
 }
 
 const styles = StyleSheet.create({
-	card: {
+	container: {
 		backgroundColor: colors.quaternary,
 		borderRadius: 16,
-		overflow: 'hidden',
 		shadowColor: '#000',
 		shadowOffset: {
 			width: 0,
@@ -89,101 +157,86 @@ const styles = StyleSheet.create({
 		},
 		shadowOpacity: 0.1,
 		shadowRadius: 8,
-		elevation: 4,
+		elevation: 3,
 		marginBottom: 16,
+		overflow: 'hidden',
+	},
+	imageContainer: {
+		position: 'relative',
+		height: 160,
 	},
 	image: {
 		width: '100%',
-		height: 140,
-		backgroundColor: colors.secondary,
+		height: '100%',
 	},
-	ratingBadge: {
+	distanceBadge: {
 		position: 'absolute',
 		top: 12,
 		right: 12,
-		backgroundColor: colors.primary,
-		borderRadius: 8,
+		backgroundColor: 'rgba(0, 0, 0, 0.7)',
+		borderRadius: 12,
 		paddingHorizontal: 8,
 		paddingVertical: 4,
-		shadowColor: '#000',
-		shadowOffset: {
-			width: 0,
-			height: 1,
-		},
-		shadowOpacity: 0.2,
-		shadowRadius: 2,
-		elevation: 2,
-		borderWidth: 1,
-		borderColor: colors.quaternary,
 	},
-	ratingText: {
-		fontSize: 12,
+	distanceText: {
+		color: colors.quaternary,
+		fontSize: 10,
 		fontFamily: 'Manrope',
 		fontWeight: '600',
-		color: colors.quaternary,
 	},
-	content: {
+	infoContainer: {
 		padding: 16,
-	},
-	header: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'flex-start',
-		marginBottom: 8,
 	},
 	name: {
 		fontSize: 18,
 		fontFamily: 'Manrope',
-		fontWeight: '700',
-		color: colors.primary,
-		flex: 1,
-		marginRight: 12,
-	},
-	price: {
-		fontSize: 16,
-		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.primary,
-		flexShrink: 0,
-	},
-	details: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		marginBottom: 12,
+		marginBottom: 4,
 	},
 	cuisine: {
 		fontSize: 14,
 		fontFamily: 'Manrope',
 		fontWeight: '500',
 		color: colors.primaryLight,
-		flex: 1,
-		marginRight: 12,
+		marginBottom: 12,
 	},
-	distance: {
-		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
-		color: colors.primaryLight,
-		flexShrink: 0,
-	},
-	tagsContainer: {
+	bottomRow: {
 		flexDirection: 'row',
-		flexWrap: 'wrap',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+	},
+	ratingContainer: {
+		flexDirection: 'row',
+		alignItems: 'center',
 		gap: 6,
 	},
-	tag: {
-		backgroundColor: colors.secondary,
-		borderRadius: 12,
+	starsContainer: {
+		flexDirection: 'row',
+		gap: 1,
+	},
+	ratingText: {
+		fontSize: 12,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.primary,
+	},
+	noRatingText: {
+		fontSize: 12,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primaryLight,
+	},
+	priceContainer: {
+		backgroundColor: colors.primary,
+		borderRadius: 8,
 		paddingHorizontal: 8,
 		paddingVertical: 4,
-		borderWidth: 1,
-		borderColor: colors.primaryLight,
 	},
-	tagText: {
-		fontSize: 10,
+	priceText: {
+		fontSize: 12,
 		fontFamily: 'Manrope',
-		fontWeight: '500',
-		color: colors.primary,
+		fontWeight: '600',
+		color: colors.quaternary,
 	},
 });
