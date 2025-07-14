@@ -1,6 +1,3 @@
-// polyfills/structuredClone.ts
-// Crear este archivo en la carpeta raíz de tu proyecto
-
 /**
  * Polyfill para structuredClone en React Native
  * Debe importarse ANTES de cualquier código de Supabase

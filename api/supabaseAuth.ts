@@ -18,13 +18,7 @@ export class SupabaseAuthService {
 		try {
 			// 1. Check email availability first
 			const emailCheck = await this.checkEmailAvailability(userData.email);
-			if (!emailCheck.success) {
-				return {
-					success: false,
-					error: emailCheck.error,
-				};
-			}
-			if (!emailCheck.data?.available) {
+			if (!emailCheck.success || !emailCheck.data?.available) {
 				return {
 					success: false,
 					error: 'Email is already registered',
@@ -35,20 +29,14 @@ export class SupabaseAuthService {
 			const usernameCheck = await this.checkUsernameAvailability(
 				userData.username,
 			);
-			if (!usernameCheck.success) {
-				return {
-					success: false,
-					error: usernameCheck.error,
-				};
-			}
-			if (!usernameCheck.data?.available) {
+			if (!usernameCheck.success || !usernameCheck.data?.available) {
 				return {
 					success: false,
 					error: 'Username is already taken',
 				};
 			}
 
-			// 3. Create auth user
+			// 3. Create auth user with metadata
 			const { data: authData, error: authError } = await supabase.auth.signUp({
 				email: userData.email,
 				password: userData.password,
@@ -67,20 +55,43 @@ export class SupabaseAuthService {
 				throw new Error('User creation failed');
 			}
 
-			// 4. Create profile in public schema
+			// 4. El trigger automáticamente creará el perfil en public.profiles
+			// Esperamos un poco para que se ejecute el trigger
+			await new Promise((resolve) => setTimeout(resolve, 100));
+
+			// 5. Obtener el perfil creado
 			const { data: profile, error: profileError } = await supabase
 				.from('profiles')
-				.insert({
-					id: authData.user.id,
-					email: userData.email,
-					username: userData.username,
-					name: userData.name,
-					language: userData.language,
-				})
-				.select()
+				.select('*')
+				.eq('id', authData.user.id)
 				.single();
 
-			if (profileError) throw profileError;
+			if (profileError) {
+				console.error('Profile creation error:', profileError);
+				// Si el trigger falló, crear manualmente
+				const { data: manualProfile, error: manualError } = await supabase
+					.from('profiles')
+					.insert({
+						id: authData.user.id,
+						email: userData.email,
+						username: userData.username,
+						name: userData.name,
+						language: userData.language,
+						has_password: true,
+					})
+					.select()
+					.single();
+
+				if (manualError) throw manualError;
+
+				return {
+					success: true,
+					data: {
+						user: manualProfile,
+						session: authData.session,
+					},
+				};
+			}
 
 			return {
 				success: true,
@@ -102,24 +113,18 @@ export class SupabaseAuthService {
 	 */
 	static async login(email: string, password: string) {
 		try {
-			console.log('Attempting login with email:', email);
 			const { data, error } = await supabase.auth.signInWithPassword({
 				email,
 				password,
 			});
 
-			console.error('Login data:', data);
-
 			if (error) throw error;
 
-			// Get user profile
 			const { data: profile, error: profileError } = await supabase
 				.from('profiles')
 				.select('*')
 				.eq('id', data.user.id)
 				.single();
-
-			console.error('Profile data:', profile);
 
 			if (profileError) throw profileError;
 
@@ -180,7 +185,7 @@ export class SupabaseAuthService {
 				return { success: false, data: null };
 			}
 
-			// Get user profile
+			// Get user profile from public.profiles
 			const { data: profile, error: profileError } = await supabase
 				.from('profiles')
 				.select('*')
@@ -237,6 +242,7 @@ export class SupabaseAuthService {
 
 			if (!user) throw new Error('Not authenticated');
 
+			// Update in public.profiles table
 			const { data, error } = await supabase
 				.from('profiles')
 				.update({
@@ -321,22 +327,18 @@ export class SupabaseAuthService {
 				.from('profiles')
 				.select('id')
 				.eq('username', username)
-				.maybeSingle(); // Use maybeSingle to avoid error when no results
+				.maybeSingle();
 
 			if (error) {
-				console.error('Error checking username availability:', error);
 				return {
 					success: false,
 					error: error.message,
 				};
 			}
 
-			// If data exists, username is taken
-			const isAvailable = !data;
-
 			return {
 				success: true,
-				data: { available: isAvailable },
+				data: { available: !data },
 			};
 		} catch (error) {
 			return {
@@ -356,22 +358,18 @@ export class SupabaseAuthService {
 				.from('profiles')
 				.select('id')
 				.eq('email', email)
-				.maybeSingle(); // Use maybeSingle to avoid error when no results
+				.maybeSingle();
 
 			if (error) {
-				console.error('Error checking email availability:', error);
 				return {
 					success: false,
 					error: error.message,
 				};
 			}
 
-			// If data exists, email is taken
-			const isAvailable = !data;
-
 			return {
 				success: true,
-				data: { available: isAvailable },
+				data: { available: !data },
 			};
 		} catch (error) {
 			return {

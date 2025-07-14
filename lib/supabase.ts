@@ -34,22 +34,25 @@ export type Database = {
 		Tables: {
 			profiles: {
 				Row: {
-					id: string;
+					id: string; // UUID que coincide con auth.users.id
 					email: string;
 					username: string;
 					name: string;
 					photo: string | null;
 					language: string;
+					has_password: boolean;
 					created_at: string;
 					updated_at: string;
+					deleted_at: string | null;
 				};
 				Insert: {
-					id: string;
+					id: string; // Debe ser el UUID de auth.users
 					email: string;
 					username: string;
 					name: string;
 					photo?: string | null;
 					language: string;
+					has_password?: boolean;
 				};
 				Update: {
 					username?: string;
@@ -59,6 +62,7 @@ export type Database = {
 					updated_at?: string;
 				};
 			};
+			// ... resto de tus tablas
 		};
 	};
 };
