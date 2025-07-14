@@ -1,4 +1,4 @@
-import { MenuService, RestaurantService } from '@/api/services';
+import { MenuService, RestaurantService } from '@/api/hybridServices';
 import { colors } from '@/assets/styles/colors';
 import LoadingScreen from '@/components/LoadingScreen';
 import RestaurantBasicInformation from '@/components/RestaurantBasicInformation';

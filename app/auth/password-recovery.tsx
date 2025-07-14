@@ -1,4 +1,4 @@
-import { AuthService } from '@/api/services';
+import { AuthService } from '@/api/hybridServices';
 import { colors } from '@/assets/styles/colors';
 import ErrorDisplay from '@/components/auth/ErrorDisplay';
 import { useTranslation } from '@/hooks/useTranslation';

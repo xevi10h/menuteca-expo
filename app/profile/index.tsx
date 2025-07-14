@@ -1,4 +1,4 @@
-import { RestaurantService, ReviewService } from '@/api/services';
+import { RestaurantService, ReviewService } from '@/api/hybridServices';
 import { colors } from '@/assets/styles/colors';
 import ChangePasswordPopup from '@/components/profile/ChangePasswordPopup';
 import ChangeUsernamePopup from '@/components/profile/ChangeUsernamePopup';

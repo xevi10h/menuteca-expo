@@ -1,4 +1,4 @@
-import { CuisineService } from '@/api/services';
+import { CuisineService } from '@/api/hybridServices';
 import { Cuisine } from '@/shared/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';

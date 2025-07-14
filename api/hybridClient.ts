@@ -1,37 +1,38 @@
-// api/client.ts - Fixed to avoid circular dependency
+// api/hybridClient.ts
+import { supabase } from '@/lib/supabase';
+
 const API_BASE_URL = __DEV__
 	? 'http://localhost:3000/api'
 	: 'https://your-production-api.com/api';
 
-// Token storage - evitamos el ciclo usando una referencia directa
-let authToken: string | null = null;
-
-// Función para actualizar el token desde el store
-export const setAuthToken = (token: string | null) => {
-	authToken = token;
-};
-
-// Función para obtener el token actual
-export const getAuthToken = (): string | null => {
-	return authToken;
-};
-
-class ApiClient {
+/**
+ * Cliente híbrido que combina Supabase Auth con tu API actual
+ */
+class HybridApiClient {
 	private baseURL: string;
 
 	constructor(baseURL: string) {
 		this.baseURL = baseURL;
 	}
 
-	private getAuthToken(): string | null {
-		return authToken;
+	/**
+	 * Obtiene el token de Supabase para autenticar con tu API
+	 */
+	private async getSupabaseToken(): Promise<string | null> {
+		const {
+			data: { session },
+		} = await supabase.auth.getSession();
+		return session?.access_token || null;
 	}
 
+	/**
+	 * Realiza requests a tu API actual usando token de Supabase
+	 */
 	private async request<T>(
 		endpoint: string,
 		options: RequestInit = {},
 	): Promise<T> {
-		const token = this.getAuthToken();
+		const token = await this.getSupabaseToken();
 
 		const config: RequestInit = {
 			...options,
@@ -57,19 +58,16 @@ class ApiClient {
 			const data = await response.json();
 			return data;
 		} catch (error) {
-			// Si es un error de red/conectividad
 			if (error instanceof TypeError && error.message.includes('fetch')) {
 				throw new ApiError('Network error: Could not connect to server', 0, {
 					network: 'Connection failed',
 				});
 			}
 
-			// Re-lanzar ApiError
 			if (error instanceof ApiError) {
 				throw error;
 			}
 
-			// Error desconocido
 			throw new ApiError('Unknown error occurred', 500, {
 				unknown: error instanceof Error ? error.message : 'Unknown error',
 			});
@@ -110,4 +108,4 @@ export class ApiError extends Error {
 	}
 }
 
-export const apiClient = new ApiClient(API_BASE_URL);
+export const hybridApiClient = new HybridApiClient(API_BASE_URL);

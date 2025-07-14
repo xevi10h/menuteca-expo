@@ -1,5 +1,5 @@
-import { setAuthToken } from '@/api/client'; // Import the token setter
-import { AuthService, UserService } from '@/api/services';
+// zustand/UserStore.ts - Versión actualizada con Supabase
+import { SupabaseAuthService } from '@/api/supabaseAuth';
 import { getDeviceLanguage } from '@/shared/functions/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
@@ -27,24 +27,13 @@ interface UserState {
 	}) => Promise<boolean>;
 	logout: () => void;
 	refreshProfile: () => Promise<void>;
-	changePassword: (
-		currentPassword: string,
-		newPassword: string,
-	) => Promise<boolean>;
-	googleAuth: (googleData: {
-		google_id: string;
-		email: string;
-		name: string;
-		photo?: string;
-		language: string;
-	}) => Promise<boolean>;
+	changePassword: (newPassword: string) => Promise<boolean>;
+	googleAuth: () => Promise<boolean>;
+	resetPassword: (email: string) => Promise<boolean>;
 	checkUsernameAvailability: (username: string) => Promise<boolean>;
 	checkEmailAvailability: (email: string) => Promise<boolean>;
 	initialize: () => Promise<void>;
 	clearError: () => void;
-	persist?: {
-		clearStorage: () => void;
-	};
 }
 
 export const undefinedUser: User = {
@@ -55,7 +44,7 @@ export const undefinedUser: User = {
 	name: '',
 	photo: '',
 	google_id: '',
-	token: '',
+	token: '', // Este será el access_token de Supabase
 	has_password: false,
 	language: getDeviceLanguage(),
 };
@@ -76,41 +65,42 @@ export const useUserStore = create<UserState>()(
 				set({ isLoading: true });
 
 				try {
-					// If we have a token, verify it's still valid
-					if (state.user.token && state.user.id) {
-						try {
-							setAuthToken(state.user.token);
-							const response = await AuthService.getProfile();
+					// Check for existing session
+					const sessionResult = await SupabaseAuthService.getSession();
 
-							if (response.success) {
-								// Token is still valid, update user data
+					if (sessionResult.success && sessionResult.data) {
+						const { user: profile, session } = sessionResult.data;
+
+						set({
+							user: {
+								...profile,
+								token: session.access_token,
+								has_password: true, // Los usuarios de Supabase siempre tienen password o OAuth
+								google_id:
+									session.user.app_metadata.provider === 'google'
+										? session.user.user_metadata.sub
+										: '',
+							},
+							isAuthenticated: true,
+							isLoading: false,
+							isInitialized: true,
+						});
+
+						// Setup auth state listener
+						SupabaseAuthService.onAuthStateChange((event, session) => {
+							if (event === 'SIGNED_OUT') {
+								get().setDefaultUser();
+							} else if (event === 'TOKEN_REFRESHED' && session) {
+								// Update token
 								set((state) => ({
 									user: {
 										...state.user,
-										...response.data,
-										created_at:
-											response.data.created_at || state.user.created_at,
-										has_password:
-											response.data.has_password || state.user.has_password,
-										google_id: response.data.google_id || state.user.google_id,
+										token: session.access_token,
 									},
-									isAuthenticated: true,
-									isLoading: false,
-									isInitialized: true,
 								}));
-							} else {
-								// Token is invalid, reset user
-								get().setDefaultUser();
-								set({ isLoading: false, isInitialized: true });
 							}
-						} catch (error) {
-							console.error('Error validating token:', error);
-							// Token is invalid, reset user
-							get().setDefaultUser();
-							set({ isLoading: false, isInitialized: true });
-						}
+						});
 					} else {
-						// No token, user is not authenticated
 						set({
 							isAuthenticated: false,
 							isLoading: false,
@@ -128,9 +118,6 @@ export const useUserStore = create<UserState>()(
 			},
 
 			setUser: (user: User) => {
-				// Actualizar el token en el cliente API
-				setAuthToken(user.token);
-
 				set({
 					user,
 					isAuthenticated: !!user.id && !!user.token,
@@ -143,15 +130,15 @@ export const useUserStore = create<UserState>()(
 				set({ isLoading: true, error: null });
 
 				try {
-					const response = await UserService.updateProfile({ photo });
+					const result = await SupabaseAuthService.updateProfile({ photo });
 
-					if (response.success) {
+					if (result.success) {
 						set((state) => ({
 							user: { ...state.user, photo },
 							isLoading: false,
 						}));
 					} else {
-						throw new Error('Failed to update photo');
+						throw new Error(result.error);
 					}
 				} catch (error) {
 					const errorMessage =
@@ -165,26 +152,37 @@ export const useUserStore = create<UserState>()(
 				set({ isLoading: true, error: null });
 
 				try {
-					// First check if username is available
-					const availability = await UserService.checkUsernameAvailability(
-						username,
-					);
+					const state = get();
 
-					if (!availability.data.available) {
-						set({ error: 'Username is not available', isLoading: false });
+					// Verificar disponibilidad excluyendo al usuario actual
+					const availabilityResult =
+						await SupabaseAuthService.checkUsernameAvailabilityForUpdate(
+							username,
+							state.user.id,
+						);
+
+					if (!availabilityResult.success) {
+						set({ error: availabilityResult.error, isLoading: false });
 						return false;
 					}
 
-					const response = await UserService.updateProfile({ username });
+					if (!availabilityResult.data?.available) {
+						set({ error: 'Username is already taken', isLoading: false });
+						return false;
+					}
 
-					if (response.success) {
+					// Si está disponible, proceder con la actualización
+					const result = await SupabaseAuthService.updateProfile({ username });
+
+					if (result.success) {
 						set((state) => ({
 							user: { ...state.user, username },
 							isLoading: false,
 						}));
 						return true;
 					} else {
-						throw new Error('Failed to update username');
+						set({ error: result.error, isLoading: false });
+						return false;
 					}
 				} catch (error) {
 					const errorMessage =
@@ -197,9 +195,6 @@ export const useUserStore = create<UserState>()(
 			},
 
 			setDefaultUser: () => {
-				// Limpiar el token del cliente API
-				setAuthToken(null);
-
 				set({
 					user: { ...undefinedUser, language: getDeviceLanguage() },
 					isAuthenticated: false,
@@ -218,49 +213,22 @@ export const useUserStore = create<UserState>()(
 				// If user is authenticated, update on server
 				if (state.isAuthenticated) {
 					try {
-						await UserService.updateProfile({ language });
+						await SupabaseAuthService.updateProfile({ language });
 
-						// FIXED: Después de cambiar idioma, refrescar datos que vienen traducidos del backend
-						// Limpiar cache de cocinas para que se refresque con el nuevo idioma
+						// Refresh cuisines for the new language
+						const { useCuisineStore } = await import('@/zustand/CuisineStore');
+						const { refreshCuisines } = useCuisineStore.getState();
+
 						try {
-							const { useCuisineStore } = await import(
-								'@/zustand/CuisineStore'
-							);
-							const cuisineStore = useCuisineStore.getState();
-
-							// Limpiar cache y refrescar
-							cuisineStore.clearCuisines();
-							await cuisineStore.fetchCuisines();
-
-							console.log('Cuisines refreshed for new language:', language);
+							await refreshCuisines();
 						} catch (cuisineError) {
 							console.error(
 								'Failed to refresh cuisines after language change:',
 								cuisineError,
 							);
-							// Don't throw error as language change was successful
-						}
-
-						// También limpiar cache de restaurantes ya que pueden tener datos traducidos
-						try {
-							const { useRestaurantStore } = await import(
-								'@/zustand/RestaurantStore'
-							);
-							const restaurantStore = useRestaurantStore.getState();
-							restaurantStore.clearCache();
-							console.log(
-								'Restaurant cache cleared for new language:',
-								language,
-							);
-						} catch (restaurantError) {
-							console.error(
-								'Failed to clear restaurant cache after language change:',
-								restaurantError,
-							);
 						}
 					} catch (error) {
 						console.error('Failed to update language on server:', error);
-						// Don't revert the local change as it's not critical
 					}
 				}
 			},
@@ -269,45 +237,31 @@ export const useUserStore = create<UserState>()(
 				set({ isLoading: true, error: null });
 
 				try {
-					const response = await AuthService.login(email, password);
+					const result = await SupabaseAuthService.login(email, password);
+					console.log('Login result:', result);
 
-					if (response.success) {
-						const userData: User = {
-							...response.data.user,
-							token: response.data.token,
-							created_at:
-								response.data.user.created_at || new Date().toISOString(),
-							has_password: response.data.user.has_password || true,
-							google_id: response.data.user.google_id || '',
-						};
-
-						// Actualizar token en cliente API
-						setAuthToken(userData.token);
+					if (result.success && result.data) {
+						const { user: profile, session } = result.data;
 
 						set({
-							user: userData,
+							user: {
+								...profile,
+								token: session.access_token,
+								has_password: true,
+								google_id:
+									session.user.app_metadata.provider === 'google'
+										? session.user.user_metadata.sub
+										: '',
+							},
 							isAuthenticated: true,
 							isLoading: false,
 							error: null,
 							isInitialized: true,
 						});
-
-						// FIXED: Después del login, refrescar datos que vienen del backend
-						// para obtenerlos en el idioma del usuario
-						try {
-							const { useCuisineStore } = await import(
-								'@/zustand/CuisineStore'
-							);
-							const cuisineStore = useCuisineStore.getState();
-							cuisineStore.clearCuisines();
-							await cuisineStore.fetchCuisines();
-						} catch (error) {
-							console.error('Failed to refresh cuisines after login:', error);
-						}
-
 						return true;
 					} else {
-						throw new Error('Login failed');
+						set({ error: result.error, isLoading: false });
+						return false;
 					}
 				} catch (error) {
 					const errorMessage =
@@ -321,47 +275,27 @@ export const useUserStore = create<UserState>()(
 				set({ isLoading: true, error: null });
 
 				try {
-					const response = await AuthService.register(userData);
+					const result = await SupabaseAuthService.register(userData);
 
-					if (response.success) {
-						const user: User = {
-							...response.data.user,
-							token: response.data.token,
-							created_at:
-								response.data.user.created_at || new Date().toISOString(),
-							has_password: true,
-							google_id: '',
-						};
-
-						// Actualizar token en cliente API
-						setAuthToken(user.token);
+					if (result.success && result.data) {
+						const { user: profile, session } = result.data;
 
 						set({
-							user,
-							isAuthenticated: true,
+							user: {
+								...profile,
+								token: session?.access_token || '',
+								has_password: true,
+								google_id: '',
+							},
+							isAuthenticated: !!session,
 							isLoading: false,
 							error: null,
 							isInitialized: true,
 						});
-
-						// FIXED: Después del registro, refrescar datos que vienen del backend
-						try {
-							const { useCuisineStore } = await import(
-								'@/zustand/CuisineStore'
-							);
-							const cuisineStore = useCuisineStore.getState();
-							cuisineStore.clearCuisines();
-							await cuisineStore.fetchCuisines();
-						} catch (error) {
-							console.error(
-								'Failed to refresh cuisines after register:',
-								error,
-							);
-						}
-
 						return true;
 					} else {
-						throw new Error('Registration failed');
+						set({ error: result.error, isLoading: false });
+						return false;
 					}
 				} catch (error) {
 					const errorMessage =
@@ -371,51 +305,20 @@ export const useUserStore = create<UserState>()(
 				}
 			},
 
-			googleAuth: async (googleData): Promise<boolean> => {
+			googleAuth: async (): Promise<boolean> => {
 				set({ isLoading: true, error: null });
 
 				try {
-					const response = await AuthService.googleAuth(googleData);
+					const result = await SupabaseAuthService.googleAuth();
+					console.log('Login result:', result);
 
-					if (response.success) {
-						const userData: User = {
-							...response.data.user,
-							token: response.data.token,
-							created_at:
-								response.data.user.created_at || new Date().toISOString(),
-							has_password: response.data.user.has_password || false,
-							google_id: response.data.user.google_id || googleData.google_id,
-						};
-
-						// Actualizar token en cliente API
-						setAuthToken(userData.token);
-
-						set({
-							user: userData,
-							isAuthenticated: true,
-							isLoading: false,
-							error: null,
-							isInitialized: true,
-						});
-
-						// FIXED: Después del Google auth, refrescar datos que vienen del backend
-						try {
-							const { useCuisineStore } = await import(
-								'@/zustand/CuisineStore'
-							);
-							const cuisineStore = useCuisineStore.getState();
-							cuisineStore.clearCuisines();
-							await cuisineStore.fetchCuisines();
-						} catch (error) {
-							console.error(
-								'Failed to refresh cuisines after Google auth:',
-								error,
-							);
-						}
-
+					if (result.success) {
+						set({ isLoading: false });
+						// El auth state change listener manejará la actualización del usuario
 						return true;
 					} else {
-						throw new Error('Google authentication failed');
+						set({ error: result.error, isLoading: false });
+						return false;
 					}
 				} catch (error) {
 					const errorMessage =
@@ -427,32 +330,14 @@ export const useUserStore = create<UserState>()(
 				}
 			},
 
-			logout: () => {
-				// Limpiar token del cliente API
-				setAuthToken(null);
-
+			logout: async () => {
+				await SupabaseAuthService.logout();
 				set({
 					user: { ...undefinedUser, language: get().user.language },
 					isAuthenticated: false,
 					error: null,
 					isInitialized: true,
 				});
-
-				// FIXED: Al hacer logout, limpiar caches que dependen del usuario
-				try {
-					const clearCaches = async () => {
-						const { useCuisineStore } = await import('@/zustand/CuisineStore');
-						const { useRestaurantStore } = await import(
-							'@/zustand/RestaurantStore'
-						);
-
-						useCuisineStore.getState().clearCuisines();
-						useRestaurantStore.getState().clearCache();
-					};
-					clearCaches();
-				} catch (error) {
-					console.error('Failed to clear caches after logout:', error);
-				}
 			},
 
 			refreshProfile: async () => {
@@ -462,17 +347,20 @@ export const useUserStore = create<UserState>()(
 				set({ isLoading: true, error: null });
 
 				try {
-					const response = await AuthService.getProfile();
+					const result = await SupabaseAuthService.getSession();
 
-					if (response.success) {
+					if (result.success && result.data) {
+						const { user: profile, session } = result.data;
+
 						set((state) => ({
 							user: {
-								...state.user,
-								...response.data,
-								created_at: response.data.created_at || state.user.created_at,
-								has_password:
-									response.data.has_password || state.user.has_password,
-								google_id: response.data.google_id || state.user.google_id,
+								...profile,
+								token: session.access_token,
+								has_password: true,
+								google_id:
+									session.user.app_metadata.provider === 'google'
+										? session.user.user_metadata.sub
+										: '',
 							},
 							isLoading: false,
 						}));
@@ -486,30 +374,23 @@ export const useUserStore = create<UserState>()(
 							: 'Failed to refresh profile';
 					set({ error: errorMessage, isLoading: false });
 
-					// If token is invalid, logout
-					if (error instanceof Error && error.message.includes('token')) {
-						get().logout();
-					}
+					// If session is invalid, logout
+					get().logout();
 				}
 			},
 
-			changePassword: async (
-				currentPassword: string,
-				newPassword: string,
-			): Promise<boolean> => {
+			changePassword: async (newPassword: string): Promise<boolean> => {
 				set({ isLoading: true, error: null });
 
 				try {
-					const response = await AuthService.changePassword(
-						currentPassword,
-						newPassword,
-					);
+					const result = await SupabaseAuthService.updatePassword(newPassword);
 
-					if (response.success) {
+					if (result.success) {
 						set({ isLoading: false });
 						return true;
 					} else {
-						throw new Error('Failed to change password');
+						set({ error: result.error, isLoading: false });
+						return false;
 					}
 				} catch (error) {
 					const errorMessage =
@@ -521,24 +402,62 @@ export const useUserStore = create<UserState>()(
 				}
 			},
 
+			resetPassword: async (email: string): Promise<boolean> => {
+				set({ isLoading: true, error: null });
+
+				try {
+					const result = await SupabaseAuthService.resetPassword(email);
+
+					if (result.success) {
+						set({ isLoading: false });
+						return true;
+					} else {
+						set({ error: result.error, isLoading: false });
+						return false;
+					}
+				} catch (error) {
+					const errorMessage =
+						error instanceof Error ? error.message : 'Reset failed';
+					set({ error: errorMessage, isLoading: false });
+					return false;
+				}
+			},
+
 			checkUsernameAvailability: async (username: string): Promise<boolean> => {
 				try {
-					const response = await UserService.checkUsernameAvailability(
+					const result = await SupabaseAuthService.checkUsernameAvailability(
 						username,
 					);
-					return response.data.available;
+
+					if (result.success && result.data) {
+						return result.data.available;
+					} else {
+						console.error(
+							'Error checking username availability:',
+							result.error,
+						);
+						return false;
+					}
 				} catch (error) {
-					console.error('Failed to check username availability:', error);
+					console.error('Error checking username availability:', error);
 					return false;
 				}
 			},
 
 			checkEmailAvailability: async (email: string): Promise<boolean> => {
 				try {
-					const response = await UserService.checkEmailAvailability(email);
-					return response.data.available;
+					const result = await SupabaseAuthService.checkEmailAvailability(
+						email,
+					);
+
+					if (result.success && result.data) {
+						return result.data.available;
+					} else {
+						console.error('Error checking email availability:', result.error);
+						return false;
+					}
 				} catch (error) {
-					console.error('Failed to check email availability:', error);
+					console.error('Error checking email availability:', error);
 					return false;
 				}
 			},
@@ -560,14 +479,10 @@ export const useUserStore = create<UserState>()(
 					return;
 				}
 
-				// After rehydration, initialize the store
 				if (state) {
-					// Don't set isInitialized to true here, let initialize() handle it
 					state.initialize();
 				}
 			},
-			// FIXED: Versioning para limpiar storage cuando cambien estructuras críticas
-			version: 1,
 		},
 	),
 );

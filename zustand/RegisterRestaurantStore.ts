@@ -23,6 +23,14 @@ export const defaultRegisterRestaurant: Restaurant = {
 	distance: 0,
 	phone: '',
 	reservation_link: '',
+	is_active: true,
+	cuisine: {
+		id: '',
+		name: '',
+		image: '',
+	},
+	created_at: '',
+	updated_at: '',
 };
 
 interface RegisterRestaurantValidation {

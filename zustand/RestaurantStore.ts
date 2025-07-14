@@ -1,4 +1,4 @@
-import { RestaurantService } from '@/api/services';
+import { RestaurantService } from '@/api/hybridServices';
 import { Restaurant } from '@/shared/types';
 import { create } from 'zustand';
 

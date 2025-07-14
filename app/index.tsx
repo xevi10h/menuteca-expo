@@ -22,6 +22,12 @@ import { Alert, Image, Platform, ScrollView, Text, View } from 'react-native';
 import MapViewType, { Camera } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+// Default location (Barcelona, Spain) if location permission is denied
+const DEFAULT_LOCATION = {
+	latitude: 41.3851,
+	longitude: 2.1734,
+};
+
 export default function Index() {
 	// Use require auth hook
 	const { isLoading: authLoading } = useRequireAuth();
@@ -69,6 +75,9 @@ function MainAppContent() {
 	const [loading, setLoading] = useState(false);
 	const [loadingError, setLoadingError] = useState<string | null>(null);
 	const [hasInitialLoad, setHasInitialLoad] = useState(false);
+	const [currentLocation, setCurrentLocation] = useState(DEFAULT_LOCATION);
+	const [locationPermissionDenied, setLocationPermissionDenied] =
+		useState(false);
 	const mapViewRef = useRef<MapViewType>(null);
 
 	// Estado para paginación cuando hay filtros activos
@@ -87,6 +96,50 @@ function MainAppContent() {
 		isRateLimited,
 		clearError,
 	} = useRestaurantStore();
+
+	// Request location permissions and get current location
+	const requestLocationAndLoad = useCallback(async () => {
+		try {
+			// Check if we already have permission
+			if (statusForegroundPermissions?.granted) {
+				const { coords } = await Location.getCurrentPositionAsync({
+					accuracy: Location.Accuracy.Balanced,
+				});
+				setCurrentLocation({
+					latitude: coords.latitude,
+					longitude: coords.longitude,
+				});
+				return { latitude: coords.latitude, longitude: coords.longitude };
+			}
+
+			// Request permission if we don't have it
+			const permission = await requestStatusForegroundPermissions();
+
+			if (permission.granted) {
+				const { coords } = await Location.getCurrentPositionAsync({
+					accuracy: Location.Accuracy.Balanced,
+				});
+				setCurrentLocation({
+					latitude: coords.latitude,
+					longitude: coords.longitude,
+				});
+				setLocationPermissionDenied(false);
+				return { latitude: coords.latitude, longitude: coords.longitude };
+			} else {
+				// Permission denied, use default location
+				console.log('Location permission denied, using default location');
+				setLocationPermissionDenied(true);
+				setCurrentLocation(DEFAULT_LOCATION);
+				return DEFAULT_LOCATION;
+			}
+		} catch (error) {
+			console.error('Error getting location:', error);
+			// Fallback to default location
+			setLocationPermissionDenied(true);
+			setCurrentLocation(DEFAULT_LOCATION);
+			return DEFAULT_LOCATION;
+		}
+	}, [statusForegroundPermissions, requestStatusForegroundPermissions]);
 
 	// Check if any non-persistent filters are active (excludes sort and cuisines)
 	const hasActiveFilters =
@@ -275,16 +328,15 @@ function MainAppContent() {
 				}
 				setLoadingError(null);
 
-				const { coords } = await Location.getCurrentPositionAsync();
-
-				const { longitude, latitude } = coords;
+				// Get current location (with permission handling)
+				const location = await requestLocationAndLoad();
 
 				// Use store's fetchRestaurants which handles caching
 				const restaurantData = await fetchRestaurants({
 					page: pageNumber,
 					limit: 50, // Usar 50 como límite base
-					latitude,
-					longitude,
+					latitude: location.latitude,
+					longitude: location.longitude,
 				});
 
 				if (append && pageNumber > 1) {
@@ -310,7 +362,14 @@ function MainAppContent() {
 				setLoadingMore(false);
 			}
 		},
-		[storeLoading, loading, isRateLimited, fetchRestaurants, clearError],
+		[
+			storeLoading,
+			loading,
+			isRateLimited,
+			fetchRestaurants,
+			clearError,
+			requestLocationAndLoad,
+		],
 	);
 
 	// Función para cargar más restaurantes (paginación)
@@ -394,20 +453,13 @@ function MainAppContent() {
 
 	const centerCoordinatesButtonAction = async () => {
 		try {
-			if (!statusForegroundPermissions?.granted) {
-				const newPermissions = await requestStatusForegroundPermissions();
-				if (!newPermissions.granted) {
-					return;
-				}
-			}
+			const location = await requestLocationAndLoad();
 
-			const { coords } = await Location.getCurrentPositionAsync();
-			const { longitude, latitude } = coords;
-			if (longitude && latitude && mapViewRef.current) {
+			if (mapViewRef.current) {
 				const newCamera: Camera = {
 					center: {
-						latitude,
-						longitude,
+						latitude: location.latitude,
+						longitude: location.longitude,
 					},
 					zoom: 16,
 					heading: 0,
@@ -542,6 +594,36 @@ function MainAppContent() {
 				</View>
 			</View>
 
+			{/* Location Permission Banner */}
+			{locationPermissionDenied && (
+				<View
+					style={{
+						backgroundColor: '#FFF3CD',
+						borderLeftWidth: 4,
+						borderLeftColor: '#FFC107',
+						paddingHorizontal: 16,
+						paddingVertical: 8,
+						marginHorizontal: 10,
+						marginVertical: 5,
+						borderRadius: 4,
+						width: '95%',
+					}}
+				>
+					<Text
+						style={{
+							fontSize: 12,
+							fontFamily: 'Manrope',
+							fontWeight: '500',
+							color: '#856404',
+							textAlign: 'center',
+						}}
+					>
+						Using default location. Enable location permissions for better
+						results.
+					</Text>
+				</View>
+			)}
+
 			{/* Cuisine Filter */}
 			<CuisineFilter />
 
@@ -611,7 +693,7 @@ function MainAppContent() {
 						style={{
 							flex: 1,
 						}}
-						showsUserLocation
+						showsUserLocation={!locationPermissionDenied}
 						showsMyLocationButton={false}
 						showsCompass={false}
 						showsBuildings={false}
@@ -620,8 +702,8 @@ function MainAppContent() {
 						showsTraffic={false}
 						showsIndoorLevelPicker={false}
 						initialRegion={{
-							latitude: 41.3851,
-							longitude: 2.1734,
+							latitude: currentLocation.latitude,
+							longitude: currentLocation.longitude,
 							latitudeDelta: 0.0922,
 							longitudeDelta: 0.0421,
 						}}

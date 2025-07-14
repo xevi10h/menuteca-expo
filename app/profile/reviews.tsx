@@ -1,4 +1,4 @@
-import { ReviewService } from '@/api/services';
+import { ReviewService } from '@/api/hybridServices';
 import { colors } from '@/assets/styles/colors';
 import LoadingScreen from '@/components/LoadingScreen';
 import SortButton from '@/components/reviews/SortButton';

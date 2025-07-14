@@ -1,4 +1,4 @@
-import { MenuService } from '@/api/services';
+import { MenuService } from '@/api/hybridServices';
 import { MenuData } from '@/shared/types';
 import { create } from 'zustand';
 
