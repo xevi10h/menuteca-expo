@@ -9,14 +9,16 @@
 		"userInterfaceStyle": "automatic",
 		"newArchEnabled": true,
 		"ios": {
-			"supportsTablet": true
+			"supportsTablet": true,
+			"bundleIdentifier": "com.menutecaapp.mobile"
 		},
 		"android": {
 			"adaptiveIcon": {
 				"foregroundImage": "./assets/images/icon_white_splash_screen.png",
 				"backgroundColor": "#48280E"
 			},
-			"edgeToEdgeEnabled": true
+			"edgeToEdgeEnabled": true,
+			"package": "com.menutecaapp.mobile"
 		},
 		"web": {
 			"bundler": "metro",
@@ -42,13 +44,14 @@
 					}
 				}
 			],
+			"expo-localization",
+			"expo-web-browser",
 			[
-				"expo-font",
+				"@react-native-google-signin/google-signin",
 				{
-					"fonts": ["./assets/fonts/Manrope-VariableFont_wght"]
+					"iosUrlScheme": "com.googleusercontent.apps.786950108695-1ij1p3412fgbvsl6c5jk6ql42evpstaa"
 				}
-			],
-			"expo-localization"
+			]
 		],
 		"experiments": {
 			"typedRoutes": true
@@ -56,8 +59,9 @@
 		"extra": {
 			"router": {},
 			"eas": {
-				"projectId": "0e63dd55-f93e-4d03-80e4-c56bb2c9e671"
+				"projectId": "823c5540-56c9-4294-95f8-f382ed5b49c4"
 			}
-		}
+		},
+		"owner": "monum"
 	}
 }
