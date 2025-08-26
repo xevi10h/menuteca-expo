@@ -28,7 +28,6 @@ interface UserState {
 	logout: () => void;
 	refreshProfile: () => Promise<void>;
 	changePassword: (newPassword: string) => Promise<boolean>;
-	googleAuth: () => Promise<boolean>;
 	resetPassword: (email: string) => Promise<boolean>;
 	checkUsernameAvailability: (username: string) => Promise<boolean>;
 	checkEmailAvailability: (email: string) => Promise<boolean>;
@@ -300,31 +299,6 @@ export const useUserStore = create<UserState>()(
 				} catch (error) {
 					const errorMessage =
 						error instanceof Error ? error.message : 'Registration failed';
-					set({ error: errorMessage, isLoading: false });
-					return false;
-				}
-			},
-
-			googleAuth: async (): Promise<boolean> => {
-				set({ isLoading: true, error: null });
-
-				try {
-					const result = await SupabaseAuthService.googleAuth();
-					console.log('Login result:', result);
-
-					if (result.success) {
-						set({ isLoading: false });
-						// El auth state change listener manejará la actualización del usuario
-						return true;
-					} else {
-						set({ error: result.error, isLoading: false });
-						return false;
-					}
-				} catch (error) {
-					const errorMessage =
-						error instanceof Error
-							? error.message
-							: 'Google authentication failed';
 					set({ error: errorMessage, isLoading: false });
 					return false;
 				}

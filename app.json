@@ -10,7 +10,19 @@
 		"newArchEnabled": true,
 		"ios": {
 			"supportsTablet": true,
-			"bundleIdentifier": "com.menutecaapp.mobile"
+			"usesAppleSignIn": true,
+			"bundleIdentifier": "com.menutecaapp.mobile",
+			"entitlements": {
+				"com.apple.developer.applesignin": ["Default", "Default"],
+				"com.apple.developer.associated-domains": ["applinks:menutecaapp.com"],
+				"com.apple.developer.in-app-payments": [
+					"merchant.com.menutecaapp.mobile"
+				]
+			},
+			"infoPlist": {
+				"ITSAppUsesNonExemptEncryption": false
+			},
+			"appleTeamId": "4WWBHK245Y"
 		},
 		"android": {
 			"adaptiveIcon": {
@@ -49,9 +61,11 @@
 			[
 				"@react-native-google-signin/google-signin",
 				{
-					"iosUrlScheme": "com.googleusercontent.apps.786950108695-1ij1p3412fgbvsl6c5jk6ql42evpstaa"
+					"iosUrlScheme": "com.googleusercontent.apps.819002686810-cavil4i7jhrrr8bbj50klvp1o9gpmnni",
+					"iosClientId": "819002686810-cavil4i7jhrrr8bbj50klvp1o9gpmnni.apps.googleusercontent.com"
 				}
-			]
+			],
+			"expo-apple-authentication"
 		],
 		"experiments": {
 			"typedRoutes": true

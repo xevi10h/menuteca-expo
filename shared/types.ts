@@ -101,6 +101,22 @@ export type Cuisine = {
 	image: string;
 };
 
+// Cuisine database row with translations
+export type CuisineRow = {
+	id: string;
+	name: { [key: string]: string }; // Translations object
+	image: string;
+	created_at: string;
+	updated_at: string;
+};
+
+// Localized cuisine
+export type LocalizedCuisine = {
+	id: string;
+	name: string;
+	image: string;
+};
+
 export type Days =
 	| 'monday'
 	| 'tuesday'
@@ -339,3 +355,9 @@ export const formatDrinksDisplay = (drinks?: DrinkInclusion): string => {
 	const selectedDrinks = getSelectedDrinks(drinks);
 	return selectedDrinks.join(', ');
 };
+
+export interface AuthResponse<T = any> {
+	success: boolean;
+	data?: T;
+	error?: string;
+}

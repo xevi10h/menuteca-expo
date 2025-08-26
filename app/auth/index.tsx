@@ -1,3 +1,4 @@
+import { SupabaseAuthService } from '@/api/supabaseAuth';
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useUserStore } from '@/zustand/UserStore';
@@ -22,7 +23,7 @@ const { height } = Dimensions.get('window');
 export default function AuthIndexScreen() {
 	const { t } = useTranslation();
 	const router = useRouter();
-	const googleAuth = useUserStore((state) => state.googleAuth);
+	const setUser = useUserStore((state) => state.setUser);
 	const isLoading = useUserStore((state) => state.isLoading);
 	const isAuthenticated = useUserStore((state) => state.isAuthenticated);
 	const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -44,27 +45,13 @@ export default function AuthIndexScreen() {
 		setIsGoogleLoading(true);
 
 		try {
-			// TODO: Implement Google Auth with proper Google Sign-In
-			// This is a placeholder - in real implementation you would use
-			// @react-native-google-signin/google-signin or similar
+			console.log('Starting Google sign in...');
+			const result = await SupabaseAuthService.signInWithGoogle();
 
-			// Simulate Google auth flow
-			await new Promise((resolve) => setTimeout(resolve, 2000));
+			console.log('Google sign in result:', result);
 
-			// Mock Google user data
-			const mockGoogleData = {
-				google_id: 'mock_google_id_' + Date.now(),
-				email: 'user@gmail.com',
-				name: 'John Doe',
-				photo: 'https://via.placeholder.com/150',
-				language: 'es_ES',
-			};
-
-			const success = await googleAuth(mockGoogleData);
-
-			if (success) {
-				// Navigation will be handled automatically by the authentication state change
-				// The user will be redirected to the main app through the index.tsx redirect
+			if (result.success && result.data) {
+				setUser(result.data);
 				router.replace('/');
 			} else {
 				Alert.alert(t('auth.googleAuthError'), t('auth.googleAuthFailed'));

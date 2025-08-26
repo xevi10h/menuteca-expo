@@ -1,10 +1,36 @@
 // api/supabaseAuth.ts
 import type { Database } from '@/lib/supabase';
 import { supabase } from '@/lib/supabase';
+import { getDeviceLanguage } from '@/shared/functions/utils';
+import { AuthResponse, User } from '@/shared/types';
+import {
+	GoogleSignin,
+	statusCodes,
+} from '@react-native-google-signin/google-signin';
+import * as AppleAuthentication from 'expo-apple-authentication';
+import { jwtDecode } from 'jwt-decode';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
 export class SupabaseAuthService {
+	/**
+	 * Initialize Google Sign-In configuration
+	 * Call this in your app's initialization (App.tsx or index.tsx)
+	 */
+	static initializeGoogleSignIn() {
+		GoogleSignin.configure({
+			// You'll get these from your Google Cloud Console
+			// webClientId should be your Supabase project's Google OAuth client ID
+			webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+			iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+
+			// Include any additional scopes you need
+			scopes: ['email', 'profile'],
+			// Ensure offline access to get refresh tokens
+			offlineAccess: true,
+		});
+	}
+
 	/**
 	 * Register a new user
 	 */
@@ -144,29 +170,275 @@ export class SupabaseAuthService {
 	}
 
 	/**
-	 * Google OAuth login
+	 * Sign in with Google usando native GoogleSignin con manejo correcto del nonce
 	 */
-	static async googleAuth() {
+	static async signInWithGoogle(): Promise<AuthResponse<User>> {
 		try {
-			const { data, error } = await supabase.auth.signInWithOAuth({
+			// Check if device supports Google Play Services
+			await GoogleSignin.hasPlayServices();
+			console.log('Google Play Services are available');
+
+			console.log('Google Play Services are available');
+
+			// Get user info and id token
+			const userInfo = await GoogleSignin.signIn();
+
+			console.log('Google user info:', userInfo);
+
+			if (!userInfo.data?.idToken) {
+				return {
+					success: false,
+					error: 'No ID token received from Google',
+				};
+			}
+
+			// NUEVO: Extraer el nonce del ID token
+			const decodedToken = jwtDecode<any>(userInfo.data.idToken);
+			const nonce = decodedToken.nonce;
+
+			console.log('Decoded token nonce:', nonce);
+
+			// Sign in to Supabase with the ID token AND nonce
+			const { data, error } = await supabase.auth.signInWithIdToken({
 				provider: 'google',
-				options: {
-					redirectTo: 'your-app://auth/callback', // Configure this in your app.json
-				},
+				token: userInfo.data?.idToken,
+				// Pasar el nonce extraído del token
+				...(nonce && { nonce }),
 			});
 
-			if (error) throw error;
+			if (error) {
+				return {
+					success: false,
+					error: error.message,
+				};
+			}
+
+			if (!data.user) {
+				return {
+					success: false,
+					error: 'No user data received from Supabase',
+				};
+			}
+
+			// Check if user has a profile, create one if not
+			let { data: profile, error: profileError } = await supabase
+				.from('profiles')
+				.select('*')
+				.eq('id', data.user.id)
+				.single();
+
+			if (profileError && profileError.code === 'PGRST116') {
+				// Profile doesn't exist, create one
+				const username = this.generateUsernameFromEmail(data.user.email || '');
+				const { data: newProfile, error: createError } = await supabase
+					.from('profiles')
+					.insert({
+						id: data.user.id,
+						email: data.user.email || '', // Campo requerido
+						username,
+						name: data.user.user_metadata?.full_name || username, // Usar 'name' no 'display_name'
+						photo: data.user.user_metadata?.avatar_url, // Usar 'photo' no 'avatar_url'
+						language: getDeviceLanguage(),
+						has_password: false, // Es OAuth, no tiene password
+					})
+					.select()
+					.single();
+
+				if (createError) {
+					return {
+						success: false,
+						error: 'Failed to create user profile',
+					};
+				}
+
+				profile = newProfile;
+			} else if (profileError) {
+				return {
+					success: false,
+					error: 'Failed to fetch user profile',
+				};
+			}
+
+			const user: User = {
+				...profile!,
+				email: data.user.email!,
+				access_token: data.session?.access_token,
+				language: profile!.language || getDeviceLanguage(),
+			};
 
 			return {
 				success: true,
-				data,
+				data: user,
 			};
-		} catch (error) {
+		} catch (error: any) {
+			let errorMessage = 'auth.errors.googleSignInFailed';
+
+			console.error('Google sign in error:', error, error.message);
+
+			if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+				errorMessage = 'auth.errors.googleSignInCancelled';
+			} else if (error.code === statusCodes.IN_PROGRESS) {
+				errorMessage = 'Google sign in is already in progress';
+			} else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+				errorMessage = 'Google Play Services not available';
+			} else if (
+				error.message &&
+				(error.message.includes('invalid_audience') ||
+					error.message.includes('client ID') ||
+					error.message.includes('invalid_client') ||
+					error.message.includes('unauthorized_client'))
+			) {
+				console.error('Google Sign-In Configuration Error Details:', {
+					errorMessage: error.message,
+					webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+					iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+					androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
+				});
+				errorMessage = 'auth.errors.googleSignInConfigError';
+			}
+
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Google auth failed',
+				error: errorMessage,
 			};
 		}
+	}
+
+	/**
+	 * Sign in with Apple (iOS only)
+	 */
+	static async signInWithApple(): Promise<AuthResponse<User>> {
+		try {
+			// Check if Apple Sign In is available
+			const isAvailable = await AppleAuthentication.isAvailableAsync();
+			if (!isAvailable) {
+				return {
+					success: false,
+					error: 'Apple Sign In is not available on this device',
+				};
+			}
+
+			// Request Apple authentication
+			const credential = await AppleAuthentication.signInAsync({
+				requestedScopes: [
+					AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+					AppleAuthentication.AppleAuthenticationScope.EMAIL,
+				],
+			});
+
+			if (!credential.identityToken) {
+				return {
+					success: false,
+					error: 'No identity token received from Apple',
+				};
+			}
+
+			// Sign in to Supabase with the identity token
+			const { data, error } = await supabase.auth.signInWithIdToken({
+				provider: 'apple',
+				token: credential.identityToken,
+			});
+
+			if (error) {
+				return {
+					success: false,
+					error: error.message,
+				};
+			}
+
+			if (!data.user) {
+				return {
+					success: false,
+					error: 'No user data received from Supabase',
+				};
+			}
+
+			// Check if user has a profile, create one if not
+			let { data: profile, error: profileError } = await supabase
+				.from('profiles')
+				.select('*')
+				.eq('id', data.user.id)
+				.single();
+
+			if (profileError && profileError.code === 'PGRST116') {
+				// Profile doesn't exist, create one
+				let displayName = data.user.user_metadata?.full_name;
+
+				// Apple provides full name only on first sign in
+				if (!displayName && credential.fullName) {
+					displayName = `${credential.fullName.givenName || ''} ${
+						credential.fullName.familyName || ''
+					}`.trim();
+				}
+
+				const username = this.generateUsernameFromEmail(
+					data.user.email || credential.email || '',
+				);
+
+				const { data: newProfile, error: createError } = await supabase
+					.from('profiles')
+					.insert({
+						id: data.user.id,
+						username,
+						display_name: displayName || username,
+					})
+					.select()
+					.single();
+
+				if (createError) {
+					return {
+						success: false,
+						error: 'Failed to create user profile',
+					};
+				}
+
+				profile = newProfile;
+			} else if (profileError) {
+				return {
+					success: false,
+					error: 'Failed to fetch user profile',
+				};
+			}
+
+			const user: User = {
+				...profile!,
+				email: data.user.email || credential.email || '',
+				access_token: data.session?.access_token,
+				language: profile!.language || getDeviceLanguage(),
+			};
+
+			return {
+				success: true,
+				data: user,
+			};
+		} catch (error: any) {
+			if (error.code === 'ERR_REQUEST_CANCELED') {
+				return {
+					success: false,
+					error: 'auth.errors.appleSignInCancelled',
+				};
+			}
+
+			return {
+				success: false,
+				error:
+					error instanceof Error
+						? error.message
+						: 'auth.errors.appleSignInFailed',
+			};
+		}
+	}
+
+	/**
+	 * Helper method to generate username from email
+	 */
+	private static generateUsernameFromEmail(email: string): string {
+		const baseUsername = email.split('@')[0].toLowerCase();
+		// Remove any non-alphanumeric characters except underscore
+		const cleanUsername = baseUsername.replace(/[^a-z0-9_]/g, '');
+		// Add random suffix to avoid conflicts
+		const randomSuffix = Math.floor(Math.random() * 1000);
+		return `${cleanUsername}${randomSuffix}`;
 	}
 
 	/**

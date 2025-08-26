@@ -32,3 +32,24 @@ export function secondsToMinutes(seconds: number) {
 	const paddedSeconds = String(remainingSeconds.toFixed(0)).padStart(2, '0');
 	return `${paddedMinutes}.${paddedSeconds}`;
 }
+
+/**
+ * Get localized text from a translations object
+ */
+export function getLocalizedText(
+	translations: { [key: string]: string },
+	language: Language,
+	fallbackLanguage: Language = 'es_ES',
+): string {
+	if (translations[language]) {
+		return translations[language];
+	}
+	
+	if (translations[fallbackLanguage]) {
+		return translations[fallbackLanguage];
+	}
+	
+	// Return first available translation as last resort
+	const firstKey = Object.keys(translations)[0];
+	return translations[firstKey] || '';
+}
