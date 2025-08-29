@@ -43,7 +43,7 @@ export const undefinedUser: User = {
 	name: '',
 	photo: '',
 	google_id: '',
-	token: '', // Este será el access_token de Supabase
+	access_token: '', // Este será el access_token de Supabase
 	has_password: false,
 	language: getDeviceLanguage(),
 };
@@ -74,7 +74,7 @@ export const useUserStore = create<UserState>()(
 						set({
 							user: {
 								...profile,
-								token: session.access_token,
+								access_token: session.access_token,
 								has_password: true, // Los usuarios de Supabase siempre tienen password o OAuth
 								google_id:
 									session.user.app_metadata.provider === 'google'
@@ -95,7 +95,7 @@ export const useUserStore = create<UserState>()(
 								set((state) => ({
 									user: {
 										...state.user,
-										token: session.access_token,
+										access_token: session.access_token,
 									},
 								}));
 							}
@@ -120,11 +120,11 @@ export const useUserStore = create<UserState>()(
 			setUser: (user: User) => {
 				const userWithToken = {
 					...user,
-					token: user.access_token || user.token || '',
+					access_token: user.access_token || '',
 				};
 				set({
 					user: userWithToken,
-					isAuthenticated: !!userWithToken.id && !!userWithToken.token,
+					isAuthenticated: !!userWithToken.id && !!userWithToken.access_token,
 					error: null,
 					isInitialized: true,
 				});
@@ -250,7 +250,7 @@ export const useUserStore = create<UserState>()(
 						set({
 							user: {
 								...profile,
-								token: session.access_token,
+								access_token: session.access_token,
 								has_password: true,
 								google_id:
 									session.user.app_metadata.provider === 'google'
@@ -287,7 +287,7 @@ export const useUserStore = create<UserState>()(
 						set({
 							user: {
 								...profile,
-								token: session?.access_token || '',
+								access_token: session?.access_token || '',
 								has_password: true,
 								google_id: '',
 							},
@@ -334,7 +334,7 @@ export const useUserStore = create<UserState>()(
 						set((state) => ({
 							user: {
 								...profile,
-								token: session.access_token,
+								access_token: session.access_token,
 								has_password: true,
 								google_id:
 									session.user.app_metadata.provider === 'google'

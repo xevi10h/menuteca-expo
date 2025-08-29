@@ -10,7 +10,7 @@ export type User = {
 	name: string;
 	photo: string;
 	google_id: string;
-	token: string;
+	access_token: string;
 	has_password: boolean;
 	language: Language;
 };
