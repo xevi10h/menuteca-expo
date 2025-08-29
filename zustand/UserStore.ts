@@ -64,6 +64,7 @@ export const useUserStore = create<UserState>()(
 				set({ isLoading: true });
 
 				try {
+					SupabaseAuthService.initializeGoogleSignIn();
 					// Check for existing session
 					const sessionResult = await SupabaseAuthService.getSession();
 

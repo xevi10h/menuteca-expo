@@ -3,10 +3,7 @@ import type { Database } from '@/lib/supabase';
 import { supabase } from '@/lib/supabase';
 import { getDeviceLanguage } from '@/shared/functions/utils';
 import { AuthResponse, User } from '@/shared/types';
-import {
-	GoogleSignin,
-	statusCodes,
-} from '@react-native-google-signin/google-signin';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { jwtDecode } from 'jwt-decode';
 
@@ -170,138 +167,141 @@ export class SupabaseAuthService {
 	}
 
 	/**
-	 * Sign in with Google usando native GoogleSignin con manejo correcto del nonce
+	 * Versión de debug que evita problemas con el trigger
 	 */
 	static async signInWithGoogle(): Promise<AuthResponse<User>> {
 		try {
-			// Check if device supports Google Play Services
+			console.log('🔍 Iniciando Google Sign-In...');
+
+			// Check Google Play Services
 			await GoogleSignin.hasPlayServices();
-			console.log('Google Play Services are available');
+			console.log('✅ Google Play Services disponibles');
 
-			console.log('Google Play Services are available');
-
-			// Get user info and id token
-			const userInfo = await GoogleSignin.signIn();
-
-			console.log('Google user info:', userInfo);
-
-			if (!userInfo.data?.idToken) {
-				return {
-					success: false,
-					error: 'No ID token received from Google',
-				};
+			// Sign out first to ensure fresh login
+			try {
+				await GoogleSignin.signOut();
+			} catch (e) {
+				// Ignorar errores de signOut
 			}
 
-			// NUEVO: Extraer el nonce del ID token
-			const decodedToken = jwtDecode<any>(userInfo.data.idToken);
-			const nonce = decodedToken.nonce;
+			// Get user info from Google
+			const userInfo = await GoogleSignin.signIn();
+			console.log('📝 Google user info:', {
+				email: userInfo.data?.user.email,
+				hasIdToken: !!userInfo.data?.idToken,
+			});
 
-			console.log('Decoded token nonce:', nonce);
+			if (!userInfo.data?.idToken) {
+				throw new Error('No ID token received from Google');
+			}
 
-			// Sign in to Supabase with the ID token AND nonce
+			// Sign in to Supabase with Google ID token
 			const { data, error } = await supabase.auth.signInWithIdToken({
 				provider: 'google',
-				token: userInfo.data?.idToken,
-				// Pasar el nonce extraído del token
-				...(nonce && { nonce }),
+				token: userInfo.data.idToken,
+			});
+
+			console.log('📊 Supabase response:', {
+				hasUser: !!data?.user,
+				hasSession: !!data?.session,
+				errorCode: error?.status,
+				errorMessage: error?.message,
 			});
 
 			if (error) {
-				return {
-					success: false,
-					error: error.message,
-				};
+				console.error('❌ Supabase auth error:', error);
+				throw new Error(`Supabase auth failed: ${error.message}`);
 			}
 
 			if (!data.user) {
-				return {
-					success: false,
-					error: 'No user data received from Supabase',
-				};
+				throw new Error('No user data received from Supabase');
 			}
 
-			// Check if user has a profile, create one if not
-			let { data: profile, error: profileError } = await supabase
-				.from('profiles')
-				.select('*')
-				.eq('id', data.user.id)
-				.single();
-
-			if (profileError && profileError.code === 'PGRST116') {
-				// Profile doesn't exist, create one
-				const username = this.generateUsernameFromEmail(data.user.email || '');
-				const { data: newProfile, error: createError } = await supabase
-					.from('profiles')
-					.insert({
-						id: data.user.id,
-						email: data.user.email || '', // Campo requerido
-						username,
-						name: data.user.user_metadata?.full_name || username, // Usar 'name' no 'display_name'
-						photo: data.user.user_metadata?.avatar_url, // Usar 'photo' no 'avatar_url'
-						language: getDeviceLanguage(),
-						has_password: false, // Es OAuth, no tiene password
-					})
-					.select()
-					.single();
-
-				if (createError) {
-					return {
-						success: false,
-						error: 'Failed to create user profile',
-					};
-				}
-
-				profile = newProfile;
-			} else if (profileError) {
-				return {
-					success: false,
-					error: 'Failed to fetch user profile',
-				};
-			}
-
-			const user: User = {
-				...profile!,
-				email: data.user.email!,
-				access_token: data.session?.access_token,
-				language: profile!.language || getDeviceLanguage(),
-			};
-
-			return {
-				success: true,
-				data: user,
-			};
+			// Handle user profile creation/retrieval
+			return await this.handleUserAfterAuth(data, userInfo.data.user);
 		} catch (error: any) {
-			let errorMessage = 'auth.errors.googleSignInFailed';
-
-			console.error('Google sign in error:', error, error.message);
-
-			if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-				errorMessage = 'auth.errors.googleSignInCancelled';
-			} else if (error.code === statusCodes.IN_PROGRESS) {
-				errorMessage = 'Google sign in is already in progress';
-			} else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-				errorMessage = 'Google Play Services not available';
-			} else if (
-				error.message &&
-				(error.message.includes('invalid_audience') ||
-					error.message.includes('client ID') ||
-					error.message.includes('invalid_client') ||
-					error.message.includes('unauthorized_client'))
-			) {
-				console.error('Google Sign-In Configuration Error Details:', {
-					errorMessage: error.message,
-					webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-					iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
-					androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
-				});
-				errorMessage = 'auth.errors.googleSignInConfigError';
-			}
-
+			console.error('💥 Google Sign-In error:', error);
 			return {
 				success: false,
-				error: errorMessage,
+				error: error.message || 'Google Sign-In failed',
 			};
 		}
+	}
+
+	/**
+	 * Maneja la creación del perfil después de la autenticación exitosa
+	 */
+	private static async handleUserAfterAuth(
+		authData: any,
+		googleUser: any,
+	): Promise<AuthResponse<User>> {
+		console.log('👤 Usuario autenticado:', {
+			id: authData.user.id,
+			email: authData.user.email,
+		});
+
+		// Intentar obtener perfil existente
+		console.log('🔍 Buscando perfil existente...');
+		let { data: profile, error: profileError } = await supabase
+			.from('profiles')
+			.select('*')
+			.eq('id', authData.user.id)
+			.maybeSingle();
+
+		if (profileError) {
+			console.error('❌ Error buscando perfil:', profileError);
+			// No fallar aquí, intentar crear el perfil
+		}
+
+		// Si no existe perfil, crear uno
+		if (!profile) {
+			console.log('🆕 Creando perfil...');
+
+			const username = this.generateUsernameFromEmail(googleUser.email);
+
+			const profileData = {
+				id: authData.user.id,
+				email: googleUser.email,
+				username,
+				name: googleUser.name || username,
+				photo: googleUser.photo,
+				language: getDeviceLanguage(),
+				has_password: false,
+			};
+
+			console.log('📝 Datos del perfil:', profileData);
+
+			const { data: newProfile, error: createError } = await supabase
+				.from('profiles')
+				.insert(profileData)
+				.select()
+				.single();
+
+			if (createError) {
+				console.error('❌ Error creando perfil:', createError);
+				throw new Error(`Failed to create profile: ${createError.message}`);
+			}
+
+			profile = newProfile;
+			console.log('✅ Perfil creado exitosamente');
+		} else {
+			console.log('✅ Perfil encontrado');
+		}
+
+		// Crear objeto User
+		const user: User = {
+			...profile,
+			email: authData.user.email!,
+			access_token: authData.session?.access_token,
+			language: profile.language || getDeviceLanguage(),
+		};
+
+		console.log('🎉 Autenticación completada exitosamente');
+
+		return {
+			success: true,
+			data: user,
+		};
 	}
 
 	/**

@@ -5,9 +5,10 @@
 		"version": "1.0.0",
 		"orientation": "portrait",
 		"icon": "./assets/images/icon_white_splash_screen.png",
-		"scheme": "menutecaexpo",
+		"scheme": "menutecaapp",
 		"userInterfaceStyle": "automatic",
 		"newArchEnabled": true,
+		"associatedDomains": ["applinks:menutecaapp.com"],
 		"ios": {
 			"supportsTablet": true,
 			"usesAppleSignIn": true,
@@ -30,7 +31,20 @@
 				"backgroundColor": "#48280E"
 			},
 			"edgeToEdgeEnabled": true,
-			"package": "com.menutecaapp.mobile"
+			"package": "com.menutecaapp.mobile",
+			"intentFilters": [
+				{
+					"action": "VIEW",
+					"autoVerify": true,
+					"data": [
+						{
+							"scheme": "https",
+							"host": "redbeeapp.com"
+						}
+					],
+					"category": ["BROWSABLE", "DEFAULT"]
+				}
+			]
 		},
 		"web": {
 			"bundler": "metro",
@@ -61,8 +75,7 @@
 			[
 				"@react-native-google-signin/google-signin",
 				{
-					"iosUrlScheme": "com.googleusercontent.apps.819002686810-cavil4i7jhrrr8bbj50klvp1o9gpmnni",
-					"iosClientId": "819002686810-cavil4i7jhrrr8bbj50klvp1o9gpmnni.apps.googleusercontent.com"
+					"iosUrlScheme": "com.googleusercontent.apps.786950108695-jrj6enqmrqv6mdmqm9kieflsjfoaksdh"
 				}
 			],
 			"expo-apple-authentication"

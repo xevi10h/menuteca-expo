@@ -29,14 +29,14 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>menutecaexpo</string>
+          <string>menutecaapp</string>
           <string>com.menutecaapp.mobile</string>
         </array>
       </dict>
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>com.googleusercontent.apps.819002686810-cavil4i7jhrrr8bbj50klvp1o9gpmnni</string>
+          <string>com.googleusercontent.apps.786950108695-jrj6enqmrqv6mdmqm9kieflsjfoaksdh</string>
         </array>
       </dict>
     </array>

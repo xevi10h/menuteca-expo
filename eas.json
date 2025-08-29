@@ -8,15 +8,15 @@
 			"developmentClient": true,
 			"distribution": "internal",
 			"env": {
-				"EXPO_PUBLIC_SUPABASE_URL": "https://xuoyhbavkonivkplomjy.supabase.co",
-				"EXPO_PUBLIC_SUPABASE_KEY": "sb_publishable_eTEgSE_cZreA0g56apPzZQ_dcXagtXT",
+				"EXPO_PUBLIC_SUPABASE_URL": "https://dcgdapywyjuqakmqwuyq.supabase.co",
+				"EXPO_PUBLIC_SUPABASE_KEY": "sb_publishable_kI1h79tGZvrucrHhTtScdw_bLtV5jpo",
 				"EXPO_PUBLIC_APP_NAME": "Menuteca",
 				"EXPO_PUBLIC_APP_VERSION": "1.0.0",
 				"EXPO_PUBLIC_API_BASE_URL": "http://localhost:3000/api",
 				"EXPO_PUBLIC_ENVIRONMENT": "development",
-				"EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID": "819002686810-jf8hqlc1u3b5ie2uajaboov9n1umi5vi.apps.googleusercontent.com",
-				"EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID": "819002686810-cavil4i7jhrrr8bbj50klvp1o9gpmnni.apps.googleusercontent.com",
-				"EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID": "819002686810-re4jemrrqedu0i0f2rf7gd2h507b21u9.apps.googleusercontent.com"
+				"EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID": "786950108695-613stdgla257vjenioso0qqu6u83h2a4.apps.googleusercontent.com",
+				"EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID": "786950108695-jrj6enqmrqv6mdmqm9kieflsjfoaksdh.apps.googleusercontent.com",
+				"EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID": "786950108695-rr1voe7mlcvqrlugvt3aoeq14mkvvrcc.apps.googleusercontent.com"
 			}
 		},
 		"development-simulator": {
@@ -26,43 +26,43 @@
 				"simulator": true
 			},
 			"env": {
-				"EXPO_PUBLIC_SUPABASE_URL": "https://xuoyhbavkonivkplomjy.supabase.co",
-				"EXPO_PUBLIC_SUPABASE_KEY": "sb_publishable_eTEgSE_cZreA0g56apPzZQ_dcXagtXT",
+				"EXPO_PUBLIC_SUPABASE_URL": "https://dcgdapywyjuqakmqwuyq.supabase.co",
+				"EXPO_PUBLIC_SUPABASE_KEY": "sb_publishable_kI1h79tGZvrucrHhTtScdw_bLtV5jpo",
 				"EXPO_PUBLIC_APP_NAME": "Menuteca",
 				"EXPO_PUBLIC_APP_VERSION": "1.0.0",
 				"EXPO_PUBLIC_API_BASE_URL": "http://localhost:3000/api",
 				"EXPO_PUBLIC_ENVIRONMENT": "development",
-				"EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID": "819002686810-jf8hqlc1u3b5ie2uajaboov9n1umi5vi.apps.googleusercontent.com",
-				"EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID": "819002686810-cavil4i7jhrrr8bbj50klvp1o9gpmnni.apps.googleusercontent.com",
-				"EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID": "819002686810-re4jemrrqedu0i0f2rf7gd2h507b21u9.apps.googleusercontent.com"
+				"EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID": "786950108695-613stdgla257vjenioso0qqu6u83h2a4.apps.googleusercontent.com",
+				"EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID": "786950108695-jrj6enqmrqv6mdmqm9kieflsjfoaksdh.apps.googleusercontent.com",
+				"EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID": "786950108695-rr1voe7mlcvqrlugvt3aoeq14mkvvrcc.apps.googleusercontent.com"
 			}
 		},
 		"preview": {
 			"distribution": "internal",
 			"env": {
-				"EXPO_PUBLIC_SUPABASE_URL": "https://xuoyhbavkonivkplomjy.supabase.co",
-				"EXPO_PUBLIC_SUPABASE_KEY": "sb_publishable_eTEgSE_cZreA0g56apPzZQ_dcXagtXT",
+				"EXPO_PUBLIC_SUPABASE_URL": "https://dcgdapywyjuqakmqwuyq.supabase.co",
+				"EXPO_PUBLIC_SUPABASE_KEY": "sb_publishable_kI1h79tGZvrucrHhTtScdw_bLtV5jpo",
 				"EXPO_PUBLIC_APP_NAME": "Menuteca",
 				"EXPO_PUBLIC_APP_VERSION": "1.0.0",
 				"EXPO_PUBLIC_API_BASE_URL": "http://localhost:3000/api",
 				"EXPO_PUBLIC_ENVIRONMENT": "development",
-				"EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID": "819002686810-jf8hqlc1u3b5ie2uajaboov9n1umi5vi.apps.googleusercontent.com",
-				"EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID": "819002686810-cavil4i7jhrrr8bbj50klvp1o9gpmnni.apps.googleusercontent.com",
-				"EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID": "819002686810-re4jemrrqedu0i0f2rf7gd2h507b21u9.apps.googleusercontent.com"
+				"EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID": "786950108695-613stdgla257vjenioso0qqu6u83h2a4.apps.googleusercontent.com",
+				"EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID": "786950108695-jrj6enqmrqv6mdmqm9kieflsjfoaksdh.apps.googleusercontent.com",
+				"EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID": "786950108695-rr1voe7mlcvqrlugvt3aoeq14mkvvrcc.apps.googleusercontent.com"
 			}
 		},
 		"production": {
 			"autoIncrement": true,
 			"env": {
-				"EXPO_PUBLIC_SUPABASE_URL": "https://xuoyhbavkonivkplomjy.supabase.co",
-				"EXPO_PUBLIC_SUPABASE_KEY": "sb_publishable_eTEgSE_cZreA0g56apPzZQ_dcXagtXT",
+				"EXPO_PUBLIC_SUPABASE_URL": "https://dcgdapywyjuqakmqwuyq.supabase.co",
+				"EXPO_PUBLIC_SUPABASE_KEY": "sb_publishable_kI1h79tGZvrucrHhTtScdw_bLtV5jpo",
 				"EXPO_PUBLIC_APP_NAME": "Menuteca",
 				"EXPO_PUBLIC_APP_VERSION": "1.0.0",
 				"EXPO_PUBLIC_API_BASE_URL": "http://localhost:3000/api",
 				"EXPO_PUBLIC_ENVIRONMENT": "development",
-				"EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID": "819002686810-jf8hqlc1u3b5ie2uajaboov9n1umi5vi.apps.googleusercontent.com",
-				"EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID": "819002686810-cavil4i7jhrrr8bbj50klvp1o9gpmnni.apps.googleusercontent.com",
-				"EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID": "819002686810-re4jemrrqedu0i0f2rf7gd2h507b21u9.apps.googleusercontent.com"
+				"EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID": "786950108695-613stdgla257vjenioso0qqu6u83h2a4.apps.googleusercontent.com",
+				"EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID": "786950108695-jrj6enqmrqv6mdmqm9kieflsjfoaksdh.apps.googleusercontent.com",
+				"EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID": "786950108695-rr1voe7mlcvqrlugvt3aoeq14mkvvrcc.apps.googleusercontent.com"
 			}
 		}
 	},
