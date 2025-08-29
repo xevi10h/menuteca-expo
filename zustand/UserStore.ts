@@ -118,9 +118,13 @@ export const useUserStore = create<UserState>()(
 			},
 
 			setUser: (user: User) => {
+				const userWithToken = {
+					...user,
+					token: user.access_token || user.token || '',
+				};
 				set({
-					user,
-					isAuthenticated: !!user.id && !!user.token,
+					user: userWithToken,
+					isAuthenticated: !!userWithToken.id && !!userWithToken.token,
 					error: null,
 					isInitialized: true,
 				});
