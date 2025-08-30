@@ -1,4 +1,4 @@
-import { RestaurantService } from '@/api/hybridServices';
+import { RestaurantService } from '@/api/index';
 import { Restaurant } from '@/shared/types';
 import { create } from 'zustand';
 
@@ -138,7 +138,7 @@ export const useRestaurantStore = create<RestaurantState>((set, get) => ({
 			console.log('RestaurantStore: Fetching from API...');
 			const response = await RestaurantService.getAllRestaurants(filters);
 
-			if (response.success) {
+			if (response.success && response.data) {
 				console.log(
 					'RestaurantStore: API success, got',
 					response.data.data.length,

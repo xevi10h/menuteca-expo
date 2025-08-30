@@ -1,4 +1,4 @@
-import { MenuService, RestaurantService } from '@/api/hybridServices';
+import { MenuService, RestaurantService } from '@/api/index';
 import { colors } from '@/assets/styles/colors';
 import LoadingScreen from '@/components/LoadingScreen';
 import RestaurantBasicInformation from '@/components/RestaurantBasicInformation';
@@ -77,7 +77,7 @@ export default function UserRestaurantPreview() {
 					restaurant_id,
 				);
 
-				if (restaurantResponse.success) {
+				if (restaurantResponse.success && restaurantResponse.data) {
 					setRestaurant(restaurantResponse.data);
 					setStatus({ isActive: restaurantResponse.data.is_active || false });
 				}
@@ -87,7 +87,7 @@ export default function UserRestaurantPreview() {
 					restaurant_id,
 				);
 
-				if (menusResponse.success) {
+				if (menusResponse.success && menusResponse.data) {
 					setMenus(menusResponse.data);
 				}
 			} catch (error) {

@@ -1,4 +1,4 @@
-import { ReviewService } from '@/api/hybridServices';
+import { ReviewService } from '@/api/index';
 import { colors } from '@/assets/styles/colors';
 import LoadingScreen from '@/components/LoadingScreen';
 import SortButton from '@/components/reviews/SortButton';
@@ -66,7 +66,7 @@ export default function UserReviewsScreen() {
 				sortOrder: getSortOrder(currentSort),
 			});
 
-			if (response.success) {
+			if (response.success && response.data) {
 				const newReviews = response.data.data;
 
 				if (pageNumber === 1 || isRefresh) {

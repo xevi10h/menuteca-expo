@@ -1,4 +1,4 @@
-import { MenuService, RestaurantService } from '@/api/hybridServices';
+import { MenuService, RestaurantService } from '@/api/index';
 import { colors } from '@/assets/styles/colors';
 import LoadingScreen from '@/components/LoadingScreen';
 import MenuCreationModal from '@/components/MenuCreationModal';
@@ -72,7 +72,7 @@ export default function UserRestaurantEdit() {
 					restaurant_id,
 				);
 
-				if (restaurantResponse.success) {
+				if (restaurantResponse.success && restaurantResponse.data) {
 					const restaurantData = restaurantResponse.data;
 
 					// Load restaurant menus
@@ -83,7 +83,10 @@ export default function UserRestaurantEdit() {
 					// Combine restaurant data with menus
 					const completeRestaurant: Restaurant = {
 						...restaurantData,
-						menus: menusResponse.success ? menusResponse.data : [],
+						menus:
+							menusResponse.success && menusResponse.data
+								? menusResponse.data
+								: [],
 					};
 
 					setRestaurant(completeRestaurant);
@@ -185,7 +188,7 @@ export default function UserRestaurantEdit() {
 				const menuToUpdate = restaurant.menus[editingMenuIndex];
 				const response = await MenuService.updateMenu(menuToUpdate.id, menu);
 
-				if (response.success) {
+				if (response.success && response.data) {
 					const updatedMenus = [...restaurant.menus];
 					updatedMenus[editingMenuIndex] = response.data;
 					setRestaurant({
@@ -197,7 +200,7 @@ export default function UserRestaurantEdit() {
 				// Create new menu
 				const response = await MenuService.createMenu(restaurant_id, menu);
 
-				if (response.success) {
+				if (response.success && response.data) {
 					setRestaurant({
 						...restaurant,
 						menus: [...restaurant.menus, response.data],
@@ -259,7 +262,7 @@ export default function UserRestaurantEdit() {
 					menuDataWithoutId,
 				);
 
-				if (response.success) {
+				if (response.success && response.data) {
 					setRestaurant({
 						...restaurant,
 						menus: [...restaurant.menus, response.data],

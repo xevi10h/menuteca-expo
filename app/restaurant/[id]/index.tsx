@@ -1,5 +1,4 @@
-// app/restaurant/[id]/index.tsx (Updated)
-import { MenuService, RestaurantService } from '@/api/hybridServices';
+import { MenuService, RestaurantService } from '@/api/index';
 import { colors } from '@/assets/styles/colors';
 import LoadingScreen from '@/components/LoadingScreen';
 import NotFoundRestaurant from '@/components/NotFoundRestaurant';
@@ -124,7 +123,7 @@ export default function RestaurantDetail() {
 			// Fetch restaurant details
 			const restaurant_response = await RestaurantService.getRestaurantById(id);
 
-			if (!restaurant_response.success) {
+			if (!restaurant_response.success || !restaurant_response.data) {
 				setLoadingState('not-found');
 				return;
 			}
@@ -134,7 +133,7 @@ export default function RestaurantDetail() {
 			// Fetch restaurant menus
 			try {
 				const menusResponse = await MenuService.getRestaurantMenus(id);
-				if (menusResponse.success) {
+				if (menusResponse.success && menusResponse.data) {
 					setMenus(menusResponse.data);
 				} else {
 					// If menus fail, continue with empty array

@@ -1,4 +1,4 @@
-import { MenuService } from '@/api/hybridServices';
+import { MenuService } from '@/api/index';
 import { MenuData } from '@/shared/types';
 import { create } from 'zustand';
 
@@ -50,7 +50,7 @@ export const useMenuStore = create<MenuState>((set, get) => ({
 		try {
 			const response = await MenuService.getRestaurantMenus(restaurant_id);
 
-			if (response.success) {
+			if (response.success && response.data) {
 				const newCachedData: CachedMenuData = {
 					menus: response.data,
 					lastFetched: now,

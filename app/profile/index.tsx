@@ -1,4 +1,4 @@
-import { RestaurantService, ReviewService } from '@/api/hybridServices';
+import { RestaurantService, ReviewService } from '@/api/index';
 import { colors } from '@/assets/styles/colors';
 import ChangePasswordPopup from '@/components/profile/ChangePasswordPopup';
 import ChangeUsernamePopup from '@/components/profile/ChangeUsernamePopup';
@@ -71,7 +71,7 @@ export default function ProfileScreen() {
 		setRestaurantsLoading(true);
 		try {
 			const response = await RestaurantService.getMyRestaurants();
-			if (response.success) {
+			if (response.success && response.data) {
 				setUserRestaurants(response.data);
 			}
 		} catch (error) {
@@ -87,7 +87,7 @@ export default function ProfileScreen() {
 		setReviewsLoading(true);
 		try {
 			const response = await ReviewService.getMyReviews({ limit: 2 });
-			if (response.success) {
+			if (response.success && response.data) {
 				setUserReviews(response.data.data);
 			}
 		} catch (error) {
