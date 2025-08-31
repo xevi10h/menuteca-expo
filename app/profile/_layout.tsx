@@ -12,6 +12,7 @@ export default function ProfileLayout() {
 					animation: 'slide_from_right',
 				}}
 			/>
+			<Stack.Screen name="[userId]/restaurant/[restaurantId]" />
 			<Stack.Screen
 				name="register-restaurant/index"
 				options={{
@@ -54,23 +55,6 @@ export default function ProfileLayout() {
 			/>
 			<Stack.Screen
 				name="register-restaurant/setup"
-				options={{
-					presentation: 'card',
-					gestureEnabled: true,
-					animation: 'slide_from_right',
-				}}
-			/>
-			{/* User Restaurant Routes */}
-			<Stack.Screen
-				name="[userId]/restaurant/[restaurantId]/preview"
-				options={{
-					presentation: 'card',
-					gestureEnabled: true,
-					animation: 'slide_from_right',
-				}}
-			/>
-			<Stack.Screen
-				name="[userId]/restaurant/[restaurantId]/edit"
 				options={{
 					presentation: 'card',
 					gestureEnabled: true,
