@@ -76,8 +76,6 @@ function MainAppContent() {
 	const [loadingError, setLoadingError] = useState<string | null>(null);
 	const [hasInitialLoad, setHasInitialLoad] = useState(false);
 	const [currentLocation, setCurrentLocation] = useState(DEFAULT_LOCATION);
-	const [locationPermissionDenied, setLocationPermissionDenied] =
-		useState(false);
 	const mapViewRef = useRef<MapViewType>(null);
 
 	// Estado para paginación cuando hay filtros activos
@@ -114,6 +112,7 @@ function MainAppContent() {
 
 			// Request permission if we don't have it
 			const permission = await requestStatusForegroundPermissions();
+			console.log('Location permission status:', permission);
 
 			if (permission.granted) {
 				const { coords } = await Location.getCurrentPositionAsync({
@@ -123,19 +122,19 @@ function MainAppContent() {
 					latitude: coords.latitude,
 					longitude: coords.longitude,
 				});
-				setLocationPermissionDenied(false);
+
 				return { latitude: coords.latitude, longitude: coords.longitude };
 			} else {
 				// Permission denied, use default location
 				console.log('Location permission denied, using default location');
-				setLocationPermissionDenied(true);
+
 				setCurrentLocation(DEFAULT_LOCATION);
 				return DEFAULT_LOCATION;
 			}
 		} catch (error) {
 			console.error('Error getting location:', error);
 			// Fallback to default location
-			setLocationPermissionDenied(true);
+
 			setCurrentLocation(DEFAULT_LOCATION);
 			return DEFAULT_LOCATION;
 		}
@@ -594,36 +593,6 @@ function MainAppContent() {
 				</View>
 			</View>
 
-			{/* Location Permission Banner */}
-			{locationPermissionDenied && (
-				<View
-					style={{
-						backgroundColor: '#FFF3CD',
-						borderLeftWidth: 4,
-						borderLeftColor: '#FFC107',
-						paddingHorizontal: 16,
-						paddingVertical: 8,
-						marginHorizontal: 10,
-						marginVertical: 5,
-						borderRadius: 4,
-						width: '95%',
-					}}
-				>
-					<Text
-						style={{
-							fontSize: 12,
-							fontFamily: 'Manrope',
-							fontWeight: '500',
-							color: '#856404',
-							textAlign: 'center',
-						}}
-					>
-						Using default location. Enable location permissions for better
-						results.
-					</Text>
-				</View>
-			)}
-
 			{/* Cuisine Filter */}
 			<CuisineFilter />
 
@@ -693,7 +662,7 @@ function MainAppContent() {
 						style={{
 							flex: 1,
 						}}
-						showsUserLocation={!locationPermissionDenied}
+						showsUserLocation={true}
 						showsMyLocationButton={false}
 						showsCompass={false}
 						showsBuildings={false}

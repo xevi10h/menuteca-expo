@@ -100,157 +100,188 @@ export default function PasswordRecoveryScreen() {
 	};
 
 	return (
-		<SafeAreaView style={styles.container}>
-			<KeyboardAvoidingView
-				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-				style={styles.keyboardView}
-			>
-				<ScrollView
-					contentContainerStyle={styles.scrollContent}
-					keyboardShouldPersistTaps="handled"
-					showsVerticalScrollIndicator={false}
+		<>
+			<SafeAreaView style={styles.container}>
+				<KeyboardAvoidingView
+					behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+					style={styles.keyboardView}
 				>
-					{/* Header */}
-					<View style={styles.header}>
-						<Text style={styles.headerTitle}>{t('auth.passwordRecovery')}</Text>
-						<TouchableOpacity
-							onPress={handleBack}
-							style={styles.backButton}
-							disabled={status === 'loading'}
-						>
-							<Ionicons name="chevron-back" size={24} color={colors.primary} />
-						</TouchableOpacity>
-					</View>
-
-					{/* Content */}
-					<View style={styles.content}>
-						{/* Icon */}
-						<View style={styles.iconContainer}>
-							<View style={styles.iconCircle}>
-								<Ionicons
-									name="mail-outline"
-									size={48}
-									color={colors.primary}
-								/>
-							</View>
-						</View>
-
-						{/* Text */}
-						<View style={styles.textContainer}>
-							<Text style={styles.title}>
-								{t('auth.passwordRecoveryTitle')}
+					<ScrollView
+						contentContainerStyle={styles.scrollContent}
+						keyboardShouldPersistTaps="handled"
+						showsVerticalScrollIndicator={false}
+					>
+						{/* Header */}
+						<View style={styles.header}>
+							<Text style={styles.headerTitle}>
+								{t('auth.passwordRecovery')}
 							</Text>
-							<Text style={styles.subtitle}>
-								{t('auth.passwordRecoveryText')}
-							</Text>
-						</View>
-
-						{/* Error Display */}
-						{status === 'error' && error && (
-							<ErrorDisplay
-								message={error}
-								type="network"
-								onRetry={handleRetry}
-								variant="inline"
-								animated={true}
-							/>
-						)}
-
-						{/* Form */}
-						<View style={styles.form}>
-							{/* Email Input */}
-							<View style={styles.inputContainer}>
-								<Text style={styles.inputLabel}>{t('auth.email')}</Text>
-								<View style={styles.inputWrapper}>
-									<Ionicons
-										name="mail-outline"
-										size={20}
-										color={colors.primaryLight}
-										style={styles.inputIcon}
-									/>
-									<TextInput
-										style={[
-											styles.input,
-											emailError ? styles.inputError : null,
-											!validateEmail(email) && email.length > 0
-												? styles.inputWarning
-												: null,
-										]}
-										value={email}
-										onChangeText={setEmail}
-										placeholder={t('auth.enterEmail')}
-										placeholderTextColor={colors.primaryLight}
-										keyboardType="email-address"
-										autoCapitalize="none"
-										autoCorrect={false}
-										editable={status !== 'loading'}
-										autoComplete="email"
-										autoFocus
-									/>
-									{validateEmail(email) && (
-										<Ionicons
-											name="checkmark-circle"
-											size={20}
-											color="#10B981"
-											style={styles.validationIcon}
-										/>
-									)}
-								</View>
-								{emailError ? (
-									<Text style={styles.errorText}>{emailError}</Text>
-								) : null}
-							</View>
-
-							{/* Send Reset Code Button */}
 							<TouchableOpacity
-								style={[
-									styles.sendButton,
-									!isFormValid && styles.sendButtonDisabled,
-								]}
-								onPress={handleSendResetCode}
-								disabled={!isFormValid}
-								activeOpacity={0.8}
-							>
-								{status === 'loading' ? (
-									<ActivityIndicator size="small" color={colors.quaternary} />
-								) : (
-									<Text
-										style={[
-											styles.sendButtonText,
-											!isFormValid && styles.sendButtonTextDisabled,
-										]}
-									>
-										{t('auth.resetPassword')}
-									</Text>
-								)}
-							</TouchableOpacity>
-
-							{/* Back to Login */}
-							<TouchableOpacity
-								style={styles.backToLoginButton}
-								onPress={() => router.push('/auth/login')}
+								onPress={handleBack}
+								style={styles.backButton}
 								disabled={status === 'loading'}
 							>
 								<Ionicons
-									name="arrow-back"
-									size={16}
+									name="chevron-back"
+									size={24}
 									color={colors.primary}
-									style={styles.backIcon}
 								/>
-								<Text
-									style={[
-										styles.backToLoginText,
-										status === 'loading' && styles.textDisabled,
-									]}
-								>
-									{t('auth.backToLogin')}
-								</Text>
 							</TouchableOpacity>
 						</View>
+
+						{/* Content */}
+						<View style={styles.content}>
+							{/* Icon */}
+							<View style={styles.iconContainer}>
+								<View style={styles.iconCircle}>
+									<Ionicons
+										name="mail-outline"
+										size={48}
+										color={colors.primary}
+									/>
+								</View>
+							</View>
+
+							{/* Text */}
+							<View style={styles.textContainer}>
+								<Text style={styles.title}>
+									{t('auth.passwordRecoveryTitle')}
+								</Text>
+								<Text style={styles.subtitle}>
+									{t('auth.passwordRecoveryText')}
+								</Text>
+							</View>
+
+							{/* Form */}
+							<View style={styles.form}>
+								{/* Email Input */}
+								<View style={styles.inputContainer}>
+									<Text style={styles.inputLabel}>{t('auth.email')}</Text>
+									<View style={styles.inputWrapper}>
+										<Ionicons
+											name="mail-outline"
+											size={20}
+											color={colors.primaryLight}
+											style={styles.inputIcon}
+										/>
+										<TextInput
+											style={[
+												styles.input,
+												emailError ? styles.inputError : null,
+												!validateEmail(email) && email.length > 0
+													? styles.inputWarning
+													: null,
+											]}
+											value={email}
+											onChangeText={setEmail}
+											placeholder={t('auth.enterEmail')}
+											placeholderTextColor={colors.primaryLight}
+											keyboardType="email-address"
+											autoCapitalize="none"
+											autoCorrect={false}
+											editable={status !== 'loading'}
+											autoComplete="email"
+											autoFocus
+										/>
+										{validateEmail(email) && (
+											<Ionicons
+												name="checkmark-circle"
+												size={20}
+												color="#10B981"
+												style={styles.validationIcon}
+											/>
+										)}
+									</View>
+									{emailError ? (
+										<Text style={styles.errorText}>{emailError}</Text>
+									) : null}
+								</View>
+
+								{/* Send Reset Code Button */}
+								<TouchableOpacity
+									style={[
+										styles.sendButton,
+										!isFormValid && styles.sendButtonDisabled,
+									]}
+									onPress={handleSendResetCode}
+									disabled={!isFormValid}
+									activeOpacity={0.8}
+								>
+									{status === 'loading' ? (
+										<ActivityIndicator size="small" color={colors.quaternary} />
+									) : (
+										<Text
+											style={[
+												styles.sendButtonText,
+												!isFormValid && styles.sendButtonTextDisabled,
+											]}
+										>
+											{t('auth.resetPassword')}
+										</Text>
+									)}
+								</TouchableOpacity>
+
+								{/* Back to Login */}
+								<TouchableOpacity
+									style={styles.backToLoginButton}
+									onPress={() => router.push('/auth/login')}
+									disabled={status === 'loading'}
+								>
+									<Ionicons
+										name="arrow-back"
+										size={16}
+										color={colors.primary}
+										style={styles.backIcon}
+									/>
+									<Text
+										style={[
+											styles.backToLoginText,
+											status === 'loading' && styles.textDisabled,
+										]}
+									>
+										{t('auth.backToLogin')}
+									</Text>
+								</TouchableOpacity>
+							</View>
+						</View>
+					</ScrollView>
+				</KeyboardAvoidingView>
+			</SafeAreaView>
+			{/* Error Display */}
+			{status === 'error' && error && (
+				<View
+					style={{
+						position: 'absolute',
+						top: 0,
+						left: 0,
+						right: 0,
+						bottom: 0,
+						justifyContent: 'center',
+						alignItems: 'center',
+						backgroundColor: 'rgba(0, 0, 0, 0.3)',
+					}}
+				>
+					<View
+						style={{
+							position: 'absolute',
+							top: '45%',
+							left: 20,
+							right: 20,
+							transform: [{ translateY: -100 }],
+							zIndex: 1000,
+						}}
+					>
+						<ErrorDisplay
+							message={error}
+							type="validation"
+							onRetry={() => setStatus('idle')}
+							variant="inline"
+							animated={true}
+						/>
 					</View>
-				</ScrollView>
-			</KeyboardAvoidingView>
-		</SafeAreaView>
+				</View>
+			)}
+		</>
 	);
 }
 

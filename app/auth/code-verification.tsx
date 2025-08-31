@@ -169,159 +169,180 @@ export default function CodeVerificationScreen() {
 	};
 
 	return (
-		<SafeAreaView style={styles.container}>
-			<KeyboardAvoidingView
-				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-				style={styles.keyboardView}
-			>
-				<ScrollView
-					contentContainerStyle={styles.scrollContent}
-					keyboardShouldPersistTaps="handled"
-					showsVerticalScrollIndicator={false}
+		<>
+			<SafeAreaView style={styles.container}>
+				<KeyboardAvoidingView
+					behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+					style={styles.keyboardView}
 				>
-					{/* Header */}
-					<View style={styles.header}>
-						<Text style={styles.headerTitle}>{t('auth.verification')}</Text>
-						<TouchableOpacity
-							onPress={handleBack}
-							style={styles.backButton}
-							disabled={status === 'loading'}
-						>
-							<Ionicons name="chevron-back" size={24} color={colors.primary} />
-						</TouchableOpacity>
-					</View>
-
-					{/* Content */}
-					<View style={styles.content}>
-						{/* Icon */}
-						<View style={styles.iconContainer}>
-							<View style={styles.iconCircle}>
+					<ScrollView
+						contentContainerStyle={styles.scrollContent}
+						keyboardShouldPersistTaps="handled"
+						showsVerticalScrollIndicator={false}
+					>
+						{/* Header */}
+						<View style={styles.header}>
+							<Text style={styles.headerTitle}>{t('auth.verification')}</Text>
+							<TouchableOpacity
+								onPress={handleBack}
+								style={styles.backButton}
+								disabled={status === 'loading'}
+							>
 								<Ionicons
-									name="mail-outline"
-									size={48}
+									name="chevron-back"
+									size={24}
 									color={colors.primary}
 								/>
-							</View>
-						</View>
-
-						{/* Text */}
-						<View style={styles.textContainer}>
-							<Text style={styles.title}>{t('auth.verification')}</Text>
-							<Text style={styles.subtitle}>
-								{t('auth.verificationMessage')}{' '}
-								<Text style={styles.emailText}>{email}</Text>
-							</Text>
-						</View>
-
-						{/* Form */}
-						<View style={styles.form}>
-							{/* Code Input */}
-							<View style={styles.inputContainer}>
-								<Text style={styles.inputLabel}>
-									{t('auth.verificationCode')}
-								</Text>
-								<View style={styles.codeInputContainer}>
-									{getCodeArray().map((digit, index) => (
-										<TextInput
-											key={index}
-											ref={(ref) => {
-												if (ref) {
-													inputRefs.current[index] = ref;
-												}
-											}}
-											style={[
-												styles.codeInput,
-												codeError ? styles.codeInputError : null,
-												digit ? styles.codeInputFilled : null,
-											]}
-											value={digit}
-											onChangeText={(value) => handleCodeChange(value, index)}
-											onKeyPress={({ nativeEvent }) =>
-												handleKeyPress(index, nativeEvent.key)
-											}
-											keyboardType="numeric"
-											maxLength={1}
-											editable={status !== 'loading'}
-											selectTextOnFocus
-										/>
-									))}
-								</View>
-								{codeError ? (
-									<Text style={styles.errorText}>{codeError}</Text>
-								) : null}
-							</View>
-
-							{/* Resend Code */}
-							<View style={styles.resendContainer}>
-								<Text style={styles.resendText}>
-									{t('auth.didntReceiveCode')}
-								</Text>
-								<TouchableOpacity
-									style={styles.resendButton}
-									onPress={handleResendCode}
-									disabled={isResendDisabled || status === 'loading'}
-								>
-									<Text
-										style={[
-											styles.resendButtonText,
-											(isResendDisabled || status === 'loading') &&
-												styles.textDisabled,
-										]}
-									>
-										{isResendDisabled
-											? `${t('auth.resendIn')} ${counter}s`
-											: t('auth.resendCode')}
-									</Text>
-								</TouchableOpacity>
-							</View>
-
-							{/* Verify Button */}
-							<TouchableOpacity
-								style={[
-									styles.verifyButton,
-									!isFormValid && styles.verifyButtonDisabled,
-								]}
-								onPress={handleVerifyCode}
-								disabled={!isFormValid}
-								activeOpacity={0.8}
-							>
-								{status === 'loading' ? (
-									<ActivityIndicator size="small" color={colors.quaternary} />
-								) : (
-									<Text
-										style={[
-											styles.verifyButtonText,
-											!isFormValid && styles.verifyButtonTextDisabled,
-										]}
-									>
-										{t('auth.verify')}
-									</Text>
-								)}
 							</TouchableOpacity>
 						</View>
-					</View>
-					{/* Error Display */}
-					{status === 'error' && error && (
-						<View
-							style={{
-								position: 'absolute',
-								alignItems: 'center',
-								justifyContent: 'center',
-								flex: 1,
-							}}
-						>
-							<ErrorDisplay
-								message={error}
-								type="validation"
-								onRetry={() => setStatus('idle')}
-								variant="inline"
-								animated={true}
-							/>
+
+						{/* Content */}
+						<View style={styles.content}>
+							{/* Icon */}
+							<View style={styles.iconContainer}>
+								<View style={styles.iconCircle}>
+									<Ionicons
+										name="mail-outline"
+										size={48}
+										color={colors.primary}
+									/>
+								</View>
+							</View>
+
+							{/* Text */}
+							<View style={styles.textContainer}>
+								<Text style={styles.title}>{t('auth.verification')}</Text>
+								<Text style={styles.subtitle}>
+									{t('auth.verificationMessage')}{' '}
+									<Text style={styles.emailText}>{email}</Text>
+								</Text>
+							</View>
+
+							{/* Form */}
+							<View style={styles.form}>
+								{/* Code Input */}
+								<View style={styles.inputContainer}>
+									<Text style={styles.inputLabel}>
+										{t('auth.verificationCode')}
+									</Text>
+									<View style={styles.codeInputContainer}>
+										{getCodeArray().map((digit, index) => (
+											<TextInput
+												key={index}
+												ref={(ref) => {
+													if (ref) {
+														inputRefs.current[index] = ref;
+													}
+												}}
+												style={[
+													styles.codeInput,
+													codeError ? styles.codeInputError : null,
+													digit ? styles.codeInputFilled : null,
+												]}
+												value={digit}
+												onChangeText={(value) => handleCodeChange(value, index)}
+												onKeyPress={({ nativeEvent }) =>
+													handleKeyPress(index, nativeEvent.key)
+												}
+												keyboardType="numeric"
+												maxLength={1}
+												editable={status !== 'loading'}
+												selectTextOnFocus
+											/>
+										))}
+									</View>
+									{codeError ? (
+										<Text style={styles.errorText}>{codeError}</Text>
+									) : null}
+								</View>
+
+								{/* Resend Code */}
+								<View style={styles.resendContainer}>
+									<Text style={styles.resendText}>
+										{t('auth.didntReceiveCode')}
+									</Text>
+									<TouchableOpacity
+										style={styles.resendButton}
+										onPress={handleResendCode}
+										disabled={isResendDisabled || status === 'loading'}
+									>
+										<Text
+											style={[
+												styles.resendButtonText,
+												(isResendDisabled || status === 'loading') &&
+													styles.textDisabled,
+											]}
+										>
+											{isResendDisabled
+												? `${t('auth.resendIn')} ${counter}s`
+												: t('auth.resendCode')}
+										</Text>
+									</TouchableOpacity>
+								</View>
+
+								{/* Verify Button */}
+								<TouchableOpacity
+									style={[
+										styles.verifyButton,
+										!isFormValid && styles.verifyButtonDisabled,
+									]}
+									onPress={handleVerifyCode}
+									disabled={!isFormValid}
+									activeOpacity={0.8}
+								>
+									{status === 'loading' ? (
+										<ActivityIndicator size="small" color={colors.quaternary} />
+									) : (
+										<Text
+											style={[
+												styles.verifyButtonText,
+												!isFormValid && styles.verifyButtonTextDisabled,
+											]}
+										>
+											{t('auth.verify')}
+										</Text>
+									)}
+								</TouchableOpacity>
+							</View>
 						</View>
-					)}
-				</ScrollView>
-			</KeyboardAvoidingView>
-		</SafeAreaView>
+					</ScrollView>
+				</KeyboardAvoidingView>
+			</SafeAreaView>
+			{/* Error Display */}
+			{status === 'error' && error && (
+				<View
+					style={{
+						position: 'absolute',
+						top: 0,
+						left: 0,
+						right: 0,
+						bottom: 0,
+						justifyContent: 'center',
+						alignItems: 'center',
+						backgroundColor: 'rgba(0, 0, 0, 0.3)',
+					}}
+				>
+					<View
+						style={{
+							position: 'absolute',
+							top: '45%',
+							left: 20,
+							right: 20,
+							transform: [{ translateY: -100 }],
+							zIndex: 1000,
+						}}
+					>
+						<ErrorDisplay
+							message={error}
+							type="validation"
+							onRetry={() => setStatus('idle')}
+							variant="inline"
+							animated={true}
+						/>
+					</View>
+				</View>
+			)}
+		</>
 	);
 }
 

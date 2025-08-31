@@ -5,7 +5,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function ProfilePhotoButton() {
 	const user = useUserStore((state) => state.user);
-	const isLoggedIn = Boolean(user.token && user.id);
+	const isLoggedIn = Boolean(user.access_token && user.id);
 
 	const handlePress = () => {
 		if (isLoggedIn) {

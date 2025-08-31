@@ -1,0 +1,2 @@
+[functions.password-reset]
+verify_jwt = false

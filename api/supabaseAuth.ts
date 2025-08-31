@@ -1,11 +1,9 @@
-// api/supabaseAuth.ts
 import type { Database } from '@/lib/supabase';
 import { supabase } from '@/lib/supabase';
 import { getDeviceLanguage } from '@/shared/functions/utils';
 import { AuthResponse, User } from '@/shared/types';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import * as AppleAuthentication from 'expo-apple-authentication';
-import { jwtDecode } from 'jwt-decode';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
@@ -686,6 +684,115 @@ export class SupabaseAuthService {
 				success: false,
 				error:
 					error instanceof Error ? error.message : 'Failed to check username',
+			};
+		}
+	}
+
+	/**
+	 * Send password reset code
+	 */
+	static async sendPasswordResetCode(email: string) {
+		try {
+			// Create a new client without user session for public function
+			const { createClient } = await import('@supabase/supabase-js');
+			const publicClient = createClient(
+				process.env.EXPO_PUBLIC_SUPABASE_URL!,
+				process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!,
+			);
+
+			const { data, error } = await publicClient.functions.invoke(
+				'password-reset',
+				{
+					body: {
+						action: 'send-reset-code',
+						email: email.toLowerCase(),
+					},
+				},
+			);
+
+			if (error) {
+				throw error;
+			}
+
+			return data;
+		} catch (error) {
+			return {
+				success: false,
+				error:
+					error instanceof Error ? error.message : 'Failed to send reset code',
+			};
+		}
+	}
+
+	/**
+	 * Verify password reset code
+	 */
+	static async verifyPasswordResetCode(email: string, code: string) {
+		try {
+			// Create a new client without user session for public function
+			const { createClient } = await import('@supabase/supabase-js');
+			const publicClient = createClient(
+				process.env.EXPO_PUBLIC_SUPABASE_URL!,
+				process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!,
+			);
+
+			const { data, error } = await publicClient.functions.invoke(
+				'password-reset',
+				{
+					body: {
+						action: 'verify-reset-code',
+						email: email.toLowerCase(),
+						code,
+					},
+				},
+			);
+
+			if (error) {
+				throw error;
+			}
+
+			return data;
+		} catch (error) {
+			return {
+				success: false,
+				error: error instanceof Error ? error.message : 'Failed to verify code',
+			};
+		}
+	}
+
+	/**
+	 * Reset password with token
+	 */
+	static async resetPasswordWithToken(token: string, newPassword: string) {
+		try {
+			// Create a new client without user session for public function
+			const { createClient } = await import('@supabase/supabase-js');
+			const publicClient = createClient(
+				process.env.EXPO_PUBLIC_SUPABASE_URL!,
+				process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!,
+			);
+
+			const { data, error } = await publicClient.functions.invoke(
+				'password-reset',
+				{
+					body: {
+						action: 'reset-password',
+						token,
+						newPassword,
+					},
+				},
+			);
+
+			if (error) {
+				throw error;
+			}
+
+			return data;
+		} catch (error) {
+			return {
+				success: false,
+				error:
+					error instanceof Error ? error.message : 'Failed to reset password',
 			};
 		}
 	}

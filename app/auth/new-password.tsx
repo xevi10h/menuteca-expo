@@ -182,191 +182,222 @@ export default function NewPasswordScreen() {
 	};
 
 	return (
-		<SafeAreaView style={styles.container}>
-			<KeyboardAvoidingView
-				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-				style={styles.keyboardView}
-			>
-				<ScrollView
-					contentContainerStyle={styles.scrollContent}
-					keyboardShouldPersistTaps="handled"
-					showsVerticalScrollIndicator={false}
+		<>
+			<SafeAreaView style={styles.container}>
+				<KeyboardAvoidingView
+					behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+					style={styles.keyboardView}
 				>
-					{/* Header */}
-					<View style={styles.header}>
-						<Text style={styles.headerTitle}>{t('auth.newPassword')}</Text>
-						<TouchableOpacity
-							onPress={handleBack}
-							style={styles.backButton}
-							disabled={status === 'loading'}
-						>
-							<Ionicons name="chevron-back" size={24} color={colors.primary} />
-						</TouchableOpacity>
-					</View>
-
-					{/* Content */}
-					<View style={styles.content}>
-						{/* Icon */}
-						<View style={styles.iconContainer}>
-							<View style={styles.iconCircle}>
+					<ScrollView
+						contentContainerStyle={styles.scrollContent}
+						keyboardShouldPersistTaps="handled"
+						showsVerticalScrollIndicator={false}
+					>
+						{/* Header */}
+						<View style={styles.header}>
+							<TouchableOpacity
+								onPress={handleBack}
+								style={styles.backButton}
+								disabled={status === 'loading'}
+							>
 								<Ionicons
-									name="lock-closed-outline"
-									size={48}
+									name="chevron-back"
+									size={24}
 									color={colors.primary}
 								/>
-							</View>
+							</TouchableOpacity>
+							<Text style={styles.headerTitle}>{t('auth.newPassword')}</Text>
 						</View>
 
-						{/* Text */}
-						<View style={styles.textContainer}>
-							<Text style={styles.title}>{t('auth.newPassword')}</Text>
-							<Text style={styles.subtitle}>
-								{t('auth.newPasswordMessage')}
-							</Text>
-						</View>
-
-						{/* Error Display */}
-						{status === 'error' && error && (
-							<ErrorDisplay
-								message={error}
-								type="network"
-								onRetry={() => setStatus('idle')}
-								variant="inline"
-								animated={true}
-							/>
-						)}
-
-						{/* Form */}
-						<View style={styles.form}>
-							{/* Password Input */}
-							<View style={styles.inputContainer}>
-								<Text style={styles.inputLabel}>{t('auth.newPassword')}</Text>
-								<View style={styles.passwordContainer}>
-									<TextInput
-										style={[
-											styles.passwordInput,
-											passwordError ? styles.inputError : null,
-										]}
-										value={password}
-										onChangeText={setPassword}
-										placeholder={t('auth.enterNewPassword')}
-										placeholderTextColor={colors.primaryLight}
-										secureTextEntry={!showPassword}
-										editable={status !== 'loading'}
-										autoComplete="new-password"
+						{/* Content */}
+						<View style={styles.content}>
+							{/* Icon */}
+							<View style={styles.iconContainer}>
+								<View style={styles.iconCircle}>
+									<Ionicons
+										name="lock-closed-outline"
+										size={48}
+										color={colors.primary}
 									/>
-									<TouchableOpacity
-										style={styles.eyeButton}
-										onPress={() => setShowPassword(!showPassword)}
-										disabled={status === 'loading'}
-									>
-										<Ionicons
-											name={showPassword ? 'eye-off' : 'eye'}
-											size={20}
-											color={colors.primaryLight}
+								</View>
+							</View>
+
+							{/* Text */}
+							<View style={styles.textContainer}>
+								<Text style={styles.title}>{t('auth.newPassword')}</Text>
+								<Text style={styles.subtitle}>
+									{t('auth.newPasswordMessage')}
+								</Text>
+							</View>
+
+							{/* Form */}
+							<View style={styles.form}>
+								{/* Password Input */}
+								<View style={styles.inputContainer}>
+									<Text style={styles.inputLabel}>{t('auth.newPassword')}</Text>
+									<View style={styles.passwordContainer}>
+										<TextInput
+											style={[
+												styles.passwordInput,
+												passwordError ? styles.inputError : null,
+											]}
+											value={password}
+											onChangeText={setPassword}
+											placeholder={t('auth.enterNewPassword')}
+											placeholderTextColor={colors.primaryLight}
+											secureTextEntry={!showPassword}
+											editable={status !== 'loading'}
+											autoComplete="new-password"
 										/>
-									</TouchableOpacity>
+										<TouchableOpacity
+											style={styles.eyeButton}
+											onPress={() => setShowPassword(!showPassword)}
+											disabled={status === 'loading'}
+										>
+											<Ionicons
+												name={showPassword ? 'eye-off' : 'eye'}
+												size={20}
+												color={colors.primaryLight}
+											/>
+										</TouchableOpacity>
+									</View>
+
+									{/* Password Strength Indicator */}
+									{password.length > 0 && (
+										<View style={styles.strengthContainer}>
+											<View style={styles.strengthBar}>
+												<View
+													style={[
+														styles.strengthFill,
+														{
+															width:
+																passwordStrength === 'weak'
+																	? '33%'
+																	: passwordStrength === 'medium'
+																	? '66%'
+																	: '100%',
+															backgroundColor: getStrengthColor(),
+														},
+													]}
+												/>
+											</View>
+											<Text
+												style={[
+													styles.strengthText,
+													{ color: getStrengthColor() },
+												]}
+											>
+												{getStrengthText()}
+											</Text>
+										</View>
+									)}
+
+									{passwordError ? (
+										<Text style={styles.errorText}>{passwordError}</Text>
+									) : null}
 								</View>
 
-								{/* Password Strength Indicator */}
-								{password.length > 0 && (
-									<View style={styles.strengthContainer}>
-										<View style={styles.strengthBar}>
-											<View
-												style={[
-													styles.strengthFill,
-													{
-														width:
-															passwordStrength === 'weak'
-																? '33%'
-																: passwordStrength === 'medium'
-																? '66%'
-																: '100%',
-														backgroundColor: getStrengthColor(),
-													},
-												]}
+								{/* Confirm Password Input */}
+								<View style={styles.inputContainer}>
+									<Text style={styles.inputLabel}>
+										{t('auth.confirmNewPassword')}
+									</Text>
+									<View style={styles.passwordContainer}>
+										<TextInput
+											style={[
+												styles.passwordInput,
+												confirmPasswordError ? styles.inputError : null,
+											]}
+											value={confirmPassword}
+											onChangeText={setConfirmPassword}
+											placeholder={t('auth.enterConfirmNewPassword')}
+											placeholderTextColor={colors.primaryLight}
+											secureTextEntry={!showConfirmPassword}
+											editable={status !== 'loading'}
+											autoComplete="new-password"
+										/>
+										<TouchableOpacity
+											style={styles.eyeButton}
+											onPress={() =>
+												setShowConfirmPassword(!showConfirmPassword)
+											}
+											disabled={status === 'loading'}
+										>
+											<Ionicons
+												name={showConfirmPassword ? 'eye-off' : 'eye'}
+												size={20}
+												color={colors.primaryLight}
 											/>
-										</View>
+										</TouchableOpacity>
+									</View>
+									{confirmPasswordError ? (
+										<Text style={styles.errorText}>{confirmPasswordError}</Text>
+									) : null}
+								</View>
+
+								{/* Reset Password Button */}
+								<TouchableOpacity
+									style={[
+										styles.resetButton,
+										!isFormValid && styles.resetButtonDisabled,
+									]}
+									onPress={handleResetPassword}
+									disabled={!isFormValid}
+									activeOpacity={0.8}
+								>
+									{status === 'loading' ? (
+										<ActivityIndicator size="small" color={colors.quaternary} />
+									) : (
 										<Text
 											style={[
-												styles.strengthText,
-												{ color: getStrengthColor() },
+												styles.resetButtonText,
+												!isFormValid && styles.resetButtonTextDisabled,
 											]}
 										>
-											{getStrengthText()}
+											{t('auth.updatePassword')}
 										</Text>
-									</View>
-								)}
-
-								{passwordError ? (
-									<Text style={styles.errorText}>{passwordError}</Text>
-								) : null}
+									)}
+								</TouchableOpacity>
 							</View>
-
-							{/* Confirm Password Input */}
-							<View style={styles.inputContainer}>
-								<Text style={styles.inputLabel}>
-									{t('auth.confirmNewPassword')}
-								</Text>
-								<View style={styles.passwordContainer}>
-									<TextInput
-										style={[
-											styles.passwordInput,
-											confirmPasswordError ? styles.inputError : null,
-										]}
-										value={confirmPassword}
-										onChangeText={setConfirmPassword}
-										placeholder={t('auth.enterConfirmNewPassword')}
-										placeholderTextColor={colors.primaryLight}
-										secureTextEntry={!showConfirmPassword}
-										editable={status !== 'loading'}
-										autoComplete="new-password"
-									/>
-									<TouchableOpacity
-										style={styles.eyeButton}
-										onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-										disabled={status === 'loading'}
-									>
-										<Ionicons
-											name={showConfirmPassword ? 'eye-off' : 'eye'}
-											size={20}
-											color={colors.primaryLight}
-										/>
-									</TouchableOpacity>
-								</View>
-								{confirmPasswordError ? (
-									<Text style={styles.errorText}>{confirmPasswordError}</Text>
-								) : null}
-							</View>
-
-							{/* Reset Password Button */}
-							<TouchableOpacity
-								style={[
-									styles.resetButton,
-									!isFormValid && styles.resetButtonDisabled,
-								]}
-								onPress={handleResetPassword}
-								disabled={!isFormValid}
-								activeOpacity={0.8}
-							>
-								{status === 'loading' ? (
-									<ActivityIndicator size="small" color={colors.quaternary} />
-								) : (
-									<Text
-										style={[
-											styles.resetButtonText,
-											!isFormValid && styles.resetButtonTextDisabled,
-										]}
-									>
-										{t('auth.updatePassword')}
-									</Text>
-								)}
-							</TouchableOpacity>
 						</View>
+					</ScrollView>
+				</KeyboardAvoidingView>
+			</SafeAreaView>
+			{/* Error Display */}
+			{status === 'error' && error && (
+				<View
+					style={{
+						position: 'absolute',
+						top: 0,
+						left: 0,
+						right: 0,
+						bottom: 0,
+						justifyContent: 'center',
+						alignItems: 'center',
+						backgroundColor: 'rgba(0, 0, 0, 0.3)',
+					}}
+				>
+					<View
+						style={{
+							position: 'absolute',
+							top: '45%',
+							left: 20,
+							right: 20,
+							transform: [{ translateY: -100 }],
+							zIndex: 1000,
+						}}
+					>
+						<ErrorDisplay
+							message={error}
+							type="validation"
+							onRetry={() => setStatus('idle')}
+							variant="inline"
+							animated={true}
+						/>
 					</View>
-				</ScrollView>
-			</KeyboardAvoidingView>
-		</SafeAreaView>
+				</View>
+			)}
+		</>
 	);
 }
 
