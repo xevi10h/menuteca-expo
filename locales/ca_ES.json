@@ -60,6 +60,7 @@
 		"callRestaurant": "Trucar al restaurant",
 		"makeReservation": "Fer reserva",
 		"loading": "Carregant restaurant...",
+		"loadingMany": "Carregant restaurants...",
 		"error": {
 			"title": "Error de connexió",
 			"description": "No hem pogut carregar la informació del restaurant. Verifica la teva connexió a internet i torna-ho a intentar.",

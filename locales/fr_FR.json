@@ -60,6 +60,7 @@
 		"callRestaurant": "Appeler le restaurant",
 		"makeReservation": "Faire une réservation",
 		"loading": "Chargement du restaurant...",
+		"loadingMany": "Chargement des restaurants...",
 		"error": {
 			"title": "Erreur de connexion",
 			"description": "Nous n'avons pas pu charger les informations du restaurant. Vérifiez votre connexion internet et réessayez.",

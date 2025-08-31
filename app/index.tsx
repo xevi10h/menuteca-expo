@@ -13,6 +13,7 @@ import RestaurantList from '@/components/list/RestaurantList';
 import ScrollHorizontalRestaurant from '@/components/list/ScrollHorizontalResturant';
 import { useAppInitialization } from '@/hooks/useAppInitialization';
 import { useRequireAuth } from '@/hooks/useAuth';
+import { useTranslation } from '@/hooks/useTranslation';
 import { Restaurant } from '@/shared/types';
 import { useFilterStore } from '@/zustand/FilterStore';
 import { useRestaurantStore } from '@/zustand/RestaurantStore';
@@ -65,6 +66,7 @@ export default function Index() {
 // Componente separado para el contenido principal de la app
 function MainAppContent() {
 	const { top } = useSafeAreaInsets();
+	const { t } = useTranslation();
 	const [statusForegroundPermissions, requestStatusForegroundPermissions] =
 		Location.useForegroundPermissions();
 	const [view, setView] = useState<'list' | 'map'>('list');
@@ -498,7 +500,7 @@ function MainAppContent() {
 		return (
 			<LoadingScreen
 				showLogo={false}
-				message="Loading restaurants..."
+				message={t('restaurant.loadingMany')}
 				showProgress={false}
 			/>
 		);

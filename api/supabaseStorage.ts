@@ -386,7 +386,7 @@ export class SupabaseStorageService {
 
 			// Pick image
 			const pickerResult = await ImagePicker.launchImageLibraryAsync({
-				mediaTypes: ImagePicker.MediaTypeOptions.Images,
+				mediaTypes: ['images'],
 				allowsEditing: !allowsMultipleSelection,
 				aspect: allowsMultipleSelection ? undefined : [4, 3],
 				quality: 0.8,
@@ -432,7 +432,7 @@ export class SupabaseStorageService {
 
 			// Take photo
 			const pickerResult = await ImagePicker.launchCameraAsync({
-				mediaTypes: ImagePicker.MediaTypeOptions.Images,
+				mediaTypes: ['images'],
 				allowsEditing: true,
 				aspect: [4, 3],
 				quality: 0.8,

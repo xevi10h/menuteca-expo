@@ -66,6 +66,7 @@ export default function PreviewTab() {
 			<Information
 				restaurant={registerRestaurant}
 				onMapPress={handleMapPress}
+				dontShowReviews={true}
 			/>
 		),
 		[registerRestaurant],

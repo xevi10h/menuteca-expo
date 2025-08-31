@@ -25,14 +25,13 @@ const width = Dimensions.get('window').width;
 interface InformationProps {
 	restaurant: Restaurant;
 	onMapPress: () => void;
+	dontShowReviews?: boolean;
 }
-
-// Mock data para simular el número de reviews - en tu app real esto vendría del backend
-const MOCK_REVIEWS_COUNT = 23;
 
 const Information: React.FC<InformationProps> = ({
 	restaurant,
 	onMapPress,
+	dontShowReviews,
 }) => {
 	const { t } = useTranslation();
 	const router = useRouter();
@@ -210,45 +209,57 @@ const Information: React.FC<InformationProps> = ({
 			</View>
 
 			{/* Reviews Section */}
-			<View>
-				<Text style={styles.sectionTitle}>{t('restaurant.reviews')}</Text>
-				<TouchableOpacity
-					style={styles.ratingContainer}
-					onPress={handleViewReviews}
-				>
-					<View style={styles.ratingInfo}>
-						{restaurant.rating ? (
-							<>
-								<Text style={styles.ratingText}>{restaurant.rating} / 5</Text>
-								<Ionicons name="star" size={20} color={colors.primary} />
-							</>
-						) : (
-							<Text style={styles.ratingText}>{t('restaurant.noRating')}</Text>
-						)}
-					</View>
-					<View style={styles.viewReviewsButton}>
-						<Text style={styles.viewReviewsText}>
-							{t('restaurantDetail.viewAllReviews')}
-						</Text>
-						{/* Mostrar número de opiniones */}
-						<Text style={styles.reviewsCount}>
-							({restaurant?.reviews?.length})
-						</Text>
-						<Ionicons name="chevron-forward" size={16} color={colors.primary} />
-					</View>
-				</TouchableOpacity>
+			{!dontShowReviews && (
+				<View>
+					<Text style={styles.sectionTitle}>{t('restaurant.reviews')}</Text>
+					<TouchableOpacity
+						style={styles.ratingContainer}
+						onPress={handleViewReviews}
+					>
+						<View style={styles.ratingInfo}>
+							{restaurant.rating ? (
+								<>
+									<Text style={styles.ratingText}>{restaurant.rating} / 5</Text>
+									<Ionicons name="star" size={20} color={colors.primary} />
+								</>
+							) : (
+								<Text style={styles.ratingText}>
+									{t('restaurant.noRating')}
+								</Text>
+							)}
+						</View>
+						<View style={styles.viewReviewsButton}>
+							<Text style={styles.viewReviewsText}>
+								{t('restaurantDetail.viewAllReviews')}
+							</Text>
+							{/* Mostrar número de opiniones */}
+							<Text style={styles.reviewsCount}>
+								({restaurant?.reviews?.length})
+							</Text>
+							<Ionicons
+								name="chevron-forward"
+								size={16}
+								color={colors.primary}
+							/>
+						</View>
+					</TouchableOpacity>
 
-				{/* Write Review Button */}
-				<TouchableOpacity
-					style={styles.writeReviewButton}
-					onPress={() => setShowAddReviewModal(true)}
-				>
-					<Ionicons name="create-outline" size={16} color={colors.quaternary} />
-					<Text style={styles.writeReviewButtonText}>
-						{t('restaurantDetail.writeReview')}
-					</Text>
-				</TouchableOpacity>
-			</View>
+					{/* Write Review Button */}
+					<TouchableOpacity
+						style={styles.writeReviewButton}
+						onPress={() => setShowAddReviewModal(true)}
+					>
+						<Ionicons
+							name="create-outline"
+							size={16}
+							color={colors.quaternary}
+						/>
+						<Text style={styles.writeReviewButtonText}>
+							{t('restaurantDetail.writeReview')}
+						</Text>
+					</TouchableOpacity>
+				</View>
+			)}
 
 			{/* Add Review Modal */}
 			<AddReviewModal
