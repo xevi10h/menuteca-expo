@@ -121,8 +121,6 @@ export default function SetupLayout(): React.JSX.Element {
 
 	// Custom Tab Bar Component
 	const renderTabBar = () => {
-		const tabIndex = currentTab === 'edit' ? 0 : 1;
-
 		return (
 			<View style={styles.tabContainer}>
 				<View style={styles.tabBackground}>
@@ -153,7 +151,10 @@ export default function SetupLayout(): React.JSX.Element {
 						<Animated.Text
 							style={[
 								styles.tabText,
-								{ fontWeight: currentTab === 'edit' ? '500' : '300' },
+								{
+									color:
+										currentTab === 'edit' ? colors.quaternary : colors.primary,
+								},
 							]}
 						>
 							{t('general.edit') || 'Editor'}
@@ -169,7 +170,13 @@ export default function SetupLayout(): React.JSX.Element {
 						<Animated.Text
 							style={[
 								styles.tabText,
-								{ fontWeight: currentTab === 'preview' ? '500' : '300' },
+
+								{
+									color:
+										currentTab === 'preview'
+											? colors.quaternary
+											: colors.primary,
+								},
 							]}
 						>
 							{t('general.preview') || 'Visualizar'}
@@ -241,7 +248,7 @@ const styles = StyleSheet.create({
 		left: 4,
 		bottom: 4,
 		width: TAB_BUTTON_WIDTH,
-		backgroundColor: colors.secondary,
+		backgroundColor: colors.primary,
 		borderRadius: 6,
 		elevation: 2,
 		shadowColor: '#000',
@@ -262,8 +269,9 @@ const styles = StyleSheet.create({
 	tabText: {
 		fontSize: 14,
 		fontFamily: 'Manrope',
-		color: colors.primary,
+		color: colors.quaternary,
 		textAlign: 'center',
+		fontWeight: '500',
 	},
 	contentContainer: {
 		flex: 1,

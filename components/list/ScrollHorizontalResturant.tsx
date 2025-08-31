@@ -147,7 +147,9 @@ export default function ScrollHorizontalRestaurant({
 										color: colors.primary,
 									}}
 								>
-									{restaurant.distance ? `${restaurant.distance} km` : ''}
+									{restaurant.distance
+										? `${restaurant.distance.toFixed(2)} km`
+										: ''}
 								</Text>
 							</View>
 						</TouchableOpacity>

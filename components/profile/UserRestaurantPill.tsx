@@ -92,7 +92,7 @@ export default function UserRestaurantPill({
 						</Text>
 					)}
 					<Text style={styles.priceText}>
-						{t('general.from')} {restaurant.minimum_price}€
+						{t('general.from')} {restaurant.minimum_price.toFixed(2)}€
 					</Text>
 				</View>
 
