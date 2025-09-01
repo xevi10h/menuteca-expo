@@ -152,6 +152,10 @@
 			"tooManyTagsMessage": "Només pots seleccionar un màxim de {{max}} categories",
 			"tooManyTagsError": "Has seleccionat massa categories (màxim 5)"
 		},
+		"success": {
+			"title": "Restaurant creat!",
+			"message": "El teu restaurant s'ha creat correctament i ja està disponible a l'aplicació."
+		},
 		"editAddress": "Editar adreça",
 		"searchMode": "Cerca",
 		"manualMode": "Manual",

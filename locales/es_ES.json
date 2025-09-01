@@ -152,6 +152,10 @@
 			"tooManyTagsMessage": "Solo puedes seleccionar un máximo de {{max}} categorías",
 			"tooManyTagsError": "Has seleccionado demasiadas categorías (máximo 5)"
 		},
+		"success": {
+			"title": "¡Restaurante creado!",
+			"message": "Tu restaurante se ha creado correctamente y ya está disponible en la aplicación."
+		},
 		"editAddress": "Editar dirección",
 		"searchMode": "Búsqueda",
 		"manualMode": "Manual",

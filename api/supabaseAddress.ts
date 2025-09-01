@@ -1,7 +1,6 @@
 // api/supabaseAddress.ts
 import { supabase } from '@/lib/supabase';
 import { Address, Language } from '@/shared/types';
-import { getLocalizedText } from '@/shared/functions/utils';
 
 // Database types
 interface AddressRow {
@@ -169,8 +168,11 @@ export class SupabaseAddressService {
 	/**
 	 * Convert LocalizedAddress to Address (frontend type)
 	 */
-	private static convertToAddress(localizedAddress: LocalizedAddress): Address {
+	private static convertToAddress(
+		localizedAddress: LocalizedAddress,
+	): Address & { id: string } {
 		return {
+			id: localizedAddress.id,
 			street: localizedAddress.street,
 			number: localizedAddress.number,
 			additional_information: localizedAddress.additional_information || '',
@@ -205,13 +207,22 @@ export class SupabaseAddressService {
 				.select()
 				.single();
 
+			console.log('Insert result:', { data, error });
+
 			if (error) {
 				throw error;
 			}
 
 			const userLanguage = this.getCurrentLanguage();
-			const localizedAddress = this.localizeAddress(data as AddressRow, userLanguage);
+			const localizedAddress = this.localizeAddress(
+				data as AddressRow,
+				userLanguage,
+			);
+			console.log('Localized address:', localizedAddress);
 			const address = this.convertToAddress(localizedAddress);
+			console.log('Converted address:', address);
+
+			console.log('Created address:', address);
 
 			return {
 				success: true,
@@ -220,7 +231,8 @@ export class SupabaseAddressService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to create address',
+				error:
+					error instanceof Error ? error.message : 'Failed to create address',
 			};
 		}
 	}
@@ -254,7 +266,10 @@ export class SupabaseAddressService {
 			}
 
 			const userLanguage = this.getCurrentLanguage();
-			const localizedAddress = this.localizeAddress(data as AddressRow, userLanguage);
+			const localizedAddress = this.localizeAddress(
+				data as AddressRow,
+				userLanguage,
+			);
 			const address = this.convertToAddress(localizedAddress);
 
 			return {
@@ -264,7 +279,8 @@ export class SupabaseAddressService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to fetch address',
+				error:
+					error instanceof Error ? error.message : 'Failed to fetch address',
 			};
 		}
 	}
@@ -317,7 +333,10 @@ export class SupabaseAddressService {
 			}
 
 			const userLanguage = this.getCurrentLanguage();
-			const localizedAddress = this.localizeAddress(data as AddressRow, userLanguage);
+			const localizedAddress = this.localizeAddress(
+				data as AddressRow,
+				userLanguage,
+			);
 			const address = this.convertToAddress(localizedAddress);
 
 			return {
@@ -327,7 +346,8 @@ export class SupabaseAddressService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to update address',
+				error:
+					error instanceof Error ? error.message : 'Failed to update address',
 			};
 		}
 	}
@@ -362,10 +382,7 @@ export class SupabaseAddressService {
 				};
 			}
 
-			const { error } = await supabase
-				.from('addresses')
-				.delete()
-				.eq('id', id);
+			const { error } = await supabase.from('addresses').delete().eq('id', id);
 
 			if (error) {
 				throw error;
@@ -377,7 +394,8 @@ export class SupabaseAddressService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to delete address',
+				error:
+					error instanceof Error ? error.message : 'Failed to delete address',
 			};
 		}
 	}
@@ -453,7 +471,8 @@ export class SupabaseAddressService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to search addresses',
+				error:
+					error instanceof Error ? error.message : 'Failed to search addresses',
 			};
 		}
 	}
@@ -502,12 +521,15 @@ export class SupabaseAddressService {
 			const userLanguage = this.getCurrentLanguage();
 
 			// Try using PostGIS function first (if available)
-			const { data, error } = await supabase.rpc('get_addresses_within_radius', {
-				center_lat: latitude,
-				center_lng: longitude,
-				radius_km: searchRadius,
-				max_results: searchLimit,
-			});
+			const { data, error } = await supabase.rpc(
+				'get_addresses_within_radius',
+				{
+					center_lat: latitude,
+					center_lng: longitude,
+					radius_km: searchRadius,
+					max_results: searchLimit,
+				},
+			);
 
 			if (!error && data) {
 				const addresses = data.map((address: AddressRow) => {
@@ -545,10 +567,10 @@ export class SupabaseAddressService {
 						distance,
 					};
 				})
-				.filter(item => item.distance <= searchRadius)
+				.filter((item) => item.distance <= searchRadius)
 				.sort((a, b) => a.distance - b.distance)
 				.slice(0, searchLimit)
-				.map(item => item.address);
+				.map((item) => item.address);
 
 			return {
 				success: true,
@@ -557,7 +579,10 @@ export class SupabaseAddressService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to fetch nearby addresses',
+				error:
+					error instanceof Error
+						? error.message
+						: 'Failed to fetch nearby addresses',
 			};
 		}
 	}
@@ -566,27 +591,30 @@ export class SupabaseAddressService {
 	 * Format address for display
 	 */
 	static formatAddressDisplay(id: string) {
-		return this.getAddressById(id).then(result => {
-			if (!result.success || !result.data) {
+		return this.getAddressById(id)
+			.then((result) => {
+				if (!result.success || !result.data) {
+					return {
+						success: false,
+						error: 'Address not found',
+					};
+				}
+
+				const userLanguage = this.getCurrentLanguage();
+				const addressRow = result.data as any; // Cast to access raw data
+				const localizedAddress = this.localizeAddress(addressRow, userLanguage);
+				const formattedAddress = this.formatAddress(localizedAddress);
+
 				return {
-					success: false,
-					error: 'Address not found',
+					success: true,
+					data: { formattedAddress },
 				};
-			}
-
-			const userLanguage = this.getCurrentLanguage();
-			const addressRow = result.data as any; // Cast to access raw data
-			const localizedAddress = this.localizeAddress(addressRow, userLanguage);
-			const formattedAddress = this.formatAddress(localizedAddress);
-
-			return {
-				success: true,
-				data: { formattedAddress },
-			};
-		}).catch(error => ({
-			success: false,
-			error: error instanceof Error ? error.message : 'Failed to format address',
-		}));
+			})
+			.catch((error) => ({
+				success: false,
+				error:
+					error instanceof Error ? error.message : 'Failed to format address',
+			}));
 	}
 
 	/**
@@ -645,10 +673,19 @@ export class SupabaseAddressService {
 				};
 			}
 
-			const localizedAddress1 = this.localizeAddress(address1Raw as AddressRow, userLanguage);
-			const localizedAddress2 = this.localizeAddress(address2Raw as AddressRow, userLanguage);
+			const localizedAddress1 = this.localizeAddress(
+				address1Raw as AddressRow,
+				userLanguage,
+			);
+			const localizedAddress2 = this.localizeAddress(
+				address2Raw as AddressRow,
+				userLanguage,
+			);
 
-			const distance = this.calculateDistance(localizedAddress1, localizedAddress2);
+			const distance = this.calculateDistance(
+				localizedAddress1,
+				localizedAddress2,
+			);
 
 			return {
 				success: true,
@@ -657,7 +694,10 @@ export class SupabaseAddressService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to calculate distance',
+				error:
+					error instanceof Error
+						? error.message
+						: 'Failed to calculate distance',
 			};
 		}
 	}

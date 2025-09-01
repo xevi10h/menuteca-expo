@@ -10,8 +10,8 @@ import { Restaurant, Review } from '@/shared/types';
 import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { Redirect, router } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { Redirect, router, useFocusEffect } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
 	ActivityIndicator,
 	Alert,
@@ -55,6 +55,15 @@ export default function ProfileScreen() {
 			loadUserData();
 		}
 	}, [isAuthenticated]);
+
+	// Refresh restaurants when screen comes into focus
+	useFocusEffect(
+		useCallback(() => {
+			if (isAuthenticated) {
+				loadUserRestaurants();
+			}
+		}, [isAuthenticated]),
+	);
 
 	// Redirect to auth if not authenticated
 	if (!userLoading && !isAuthenticated) {
@@ -226,6 +235,11 @@ export default function ProfileScreen() {
 			</View>
 		);
 	}
+
+	console.log(
+		'userRestaurants',
+		userRestaurants.map((r) => r.id),
+	);
 
 	return (
 		<View style={[styles.container, { paddingTop: insets.top }]}>
