@@ -166,6 +166,7 @@ export default function EditTab() {
 				<ProfilePhotoSection
 					profile_image={registerRestaurant.profile_image}
 					onImageSelected={setRegisterRestaurantprofile_image}
+					required={true}
 				/>
 				<View style={styles.sectionContainer}>
 					<View style={styles.labelContainer}>

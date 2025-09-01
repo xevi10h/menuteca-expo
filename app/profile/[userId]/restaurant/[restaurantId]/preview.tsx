@@ -36,9 +36,9 @@ interface TabMeasurements {
 export default function UserRestaurantPreview() {
 	const { t } = useTranslation();
 	const router = useRouter();
-	const { user_id, restaurant_id } = useLocalSearchParams<{
-		user_id: string;
-		restaurant_id: string;
+	const { userId, restaurantId } = useLocalSearchParams<{
+		userId: string;
+		restaurantId: string;
 	}>();
 	const insets = useSafeAreaInsets();
 
@@ -68,13 +68,13 @@ export default function UserRestaurantPreview() {
 
 	useEffect(() => {
 		const loadRestaurantData = async () => {
-			if (!restaurant_id) return;
+			if (!restaurantId) return;
 
 			setLoading(true);
 			try {
 				// Load restaurant data
 				const restaurantResponse = await RestaurantService.getRestaurantById(
-					restaurant_id,
+					restaurantId,
 				);
 
 				if (restaurantResponse.success && restaurantResponse.data) {
@@ -84,7 +84,7 @@ export default function UserRestaurantPreview() {
 
 				// Load restaurant menus
 				const menusResponse = await MenuService.getRestaurantMenus(
-					restaurant_id,
+					restaurantId,
 				);
 
 				if (menusResponse.success && menusResponse.data) {
@@ -98,14 +98,14 @@ export default function UserRestaurantPreview() {
 		};
 
 		loadRestaurantData();
-	}, [restaurant_id]);
+	}, [restaurantId]);
 
 	const handleBack = () => {
 		router.back();
 	};
 
 	const handleEdit = () => {
-		router.push(`/profile/${user_id}/restaurant/${restaurant_id}/edit`);
+		router.push(`/profile/${userId}/restaurant/${restaurantId}/edit`);
 	};
 
 	const handleMapPress = () => {

@@ -34,9 +34,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 export default function UserRestaurantEdit() {
 	const { t } = useTranslation();
 	const router = useRouter();
-	const { restaurant_id } = useLocalSearchParams<{
-		user_id: string;
-		restaurant_id: string;
+	const { restaurantId } = useLocalSearchParams<{
+		userId: string;
+		restaurantId: string;
 	}>();
 	const insets = useSafeAreaInsets();
 
@@ -60,7 +60,7 @@ export default function UserRestaurantEdit() {
 
 	useEffect(() => {
 		const loadRestaurantData = async () => {
-			if (!restaurant_id) {
+			if (!restaurantId) {
 				setLoading(false);
 				return;
 			}
@@ -69,7 +69,7 @@ export default function UserRestaurantEdit() {
 			try {
 				// Load restaurant data
 				const restaurantResponse = await RestaurantService.getRestaurantById(
-					restaurant_id,
+					restaurantId,
 				);
 
 				if (restaurantResponse.success && restaurantResponse.data) {
@@ -77,7 +77,7 @@ export default function UserRestaurantEdit() {
 
 					// Load restaurant menus
 					const menusResponse = await MenuService.getRestaurantMenus(
-						restaurant_id,
+						restaurantId,
 					);
 
 					// Combine restaurant data with menus
@@ -112,14 +112,14 @@ export default function UserRestaurantEdit() {
 		};
 
 		loadRestaurantData();
-	}, [restaurant_id]);
+	}, [restaurantId]);
 
 	const handleBack = () => {
 		router.back();
 	};
 
 	const handleSave = async () => {
-		if (!restaurant || !restaurant_id) return;
+		if (!restaurant || !restaurantId) return;
 
 		setSaving(true);
 		try {
@@ -134,7 +134,7 @@ export default function UserRestaurantEdit() {
 			};
 
 			const response = await RestaurantService.updateRestaurant(
-				restaurant_id,
+				restaurantId,
 				updateData,
 			);
 
@@ -180,7 +180,7 @@ export default function UserRestaurantEdit() {
 	};
 
 	const handleAddMenu = async (menu: MenuData) => {
-		if (!restaurant || !restaurant_id) return;
+		if (!restaurant || !restaurantId) return;
 
 		try {
 			if (editingMenuIndex !== null) {
@@ -198,7 +198,7 @@ export default function UserRestaurantEdit() {
 				}
 			} else {
 				// Create new menu
-				const response = await MenuService.createMenu(restaurant_id, menu);
+				const response = await MenuService.createMenu(restaurantId, menu);
 
 				if (response.success && response.data) {
 					setRestaurant({
@@ -242,7 +242,7 @@ export default function UserRestaurantEdit() {
 			!restaurant ||
 			copyingMenuIndex === null ||
 			!newMenuName.trim() ||
-			!restaurant_id
+			!restaurantId
 		)
 			return;
 
@@ -258,7 +258,7 @@ export default function UserRestaurantEdit() {
 				const { id, ...menuDataWithoutId } = copiedMenuData;
 
 				const response = await MenuService.createMenu(
-					restaurant_id,
+					restaurantId,
 					menuDataWithoutId,
 				);
 

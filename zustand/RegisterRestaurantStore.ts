@@ -36,6 +36,7 @@ export const defaultRegisterRestaurant: Restaurant = {
 interface RegisterRestaurantValidation {
 	isValid: boolean;
 	errors: {
+		hasProfileImage: boolean;
 		hasPhotos: boolean;
 		hasMenus: boolean;
 		hasCuisine: boolean;
@@ -67,6 +68,7 @@ const validateRestaurant = (
 	restaurant: Restaurant,
 ): RegisterRestaurantValidation => {
 	// Convertir explícitamente a boolean para evitar errores de tipo
+	const hasProfileImage = Boolean(restaurant.profile_image);
 	const hasPhotos = Boolean(restaurant.images && restaurant.images.length > 0);
 	const hasMenus = Boolean(restaurant.menus && restaurant.menus.length > 0);
 	const hasCuisine = Boolean(
@@ -93,6 +95,7 @@ const validateRestaurant = (
 	);
 
 	const errors = {
+		hasProfileImage: !hasProfileImage,
 		hasPhotos: !hasPhotos,
 		hasMenus: !hasMenus,
 		hasCuisine: !hasCuisine,
@@ -102,7 +105,8 @@ const validateRestaurant = (
 
 	// DIRECCIÓN AHORA ES REQUERIDA PARA VALIDACIÓN COMPLETA
 	const isValid = Boolean(
-		hasPhotos &&
+		hasProfileImage &&
+			hasPhotos &&
 			hasMenus &&
 			hasCuisine &&
 			hasValidAddress && // AÑADIDO A LA VALIDACIÓN

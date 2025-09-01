@@ -50,6 +50,9 @@ export default function SetupLayout(): React.JSX.Element {
 			// Show validation errors
 			const errors: string[] = [];
 
+			if (validation.errors.hasProfileImage) {
+				errors.push(t('registerRestaurant.validation.needProfilePhoto'));
+			}
 			if (validation.errors.hasPhotos) {
 				errors.push(t('registerRestaurant.validation.needPhotos'));
 			}
@@ -137,9 +140,9 @@ export default function SetupLayout(): React.JSX.Element {
 				minimum_price: provisionalRegisterRestaurant.minimum_price,
 				cuisine_id: provisionalRegisterRestaurant.cuisineId,
 				address_id: addressId,
-				main_image: provisionalRegisterRestaurant.main_image,
 				profile_image: provisionalRegisterRestaurant.profile_image,
 				images: provisionalRegisterRestaurant.images,
+				main_image: provisionalRegisterRestaurant.images[0] || '',
 				tags: provisionalRegisterRestaurant.tags,
 				phone: provisionalRegisterRestaurant.phone,
 				reservation_link: provisionalRegisterRestaurant.reservation_link,
@@ -210,6 +213,9 @@ export default function SetupLayout(): React.JSX.Element {
 	const showValidationAlert = () => {
 		const errors: string[] = [];
 
+		if (validation.errors.hasProfileImage) {
+			errors.push(t('registerRestaurant.validation.needProfilePhoto'));
+		}
 		if (validation.errors.hasPhotos) {
 			errors.push(t('registerRestaurant.validation.needPhotos'));
 		}

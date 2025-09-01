@@ -132,6 +132,7 @@
 		"tagsSelected": "{{count}}/{{max}} categorías seleccionadas",
 		"validation": {
 			"incomplete": "Información incompleta",
+			"needProfilePhoto": "• Debes añadir una foto de perfil",
 			"needPhotos": "• Debes añadir al menos una foto",
 			"needMenus": "• Debes crear al menos un menú",
 			"needCuisine": "• Debes seleccionar un tipo de cocina",

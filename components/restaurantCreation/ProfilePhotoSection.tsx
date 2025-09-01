@@ -15,11 +15,13 @@ import {
 interface ProfilePhotoSectionProps {
 	profile_image?: string;
 	onImageSelected: (imageUri: string) => void;
+	required?: boolean;
 }
 
 export default function ProfilePhotoSection({
 	profile_image,
 	onImageSelected,
+	required,
 }: ProfilePhotoSectionProps) {
 	const { t } = useTranslation();
 
@@ -49,6 +51,7 @@ export default function ProfilePhotoSection({
 		<View style={styles.photoSection}>
 			<Text style={styles.photoLabel}>
 				{t('registerRestaurant.selectPhoto')}
+				{required && <Text style={styles.requiredAsterisk}> *</Text>}
 			</Text>
 			<TouchableOpacity
 				style={styles.photoPlaceholder}
@@ -73,6 +76,12 @@ const styles = StyleSheet.create({
 		paddingVertical: 20,
 		alignItems: 'center',
 	},
+	requiredAsterisk: {
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: '#D32F2F',
+	},
 	photoLabel: {
 		fontSize: 14,
 		fontFamily: 'Manrope',
@@ -80,6 +89,9 @@ const styles = StyleSheet.create({
 		color: colors.primary,
 		textAlign: 'center',
 		marginBottom: 20,
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: 2,
 	},
 	photoPlaceholder: {
 		width: 100,
