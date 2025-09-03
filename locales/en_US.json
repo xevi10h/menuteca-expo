@@ -385,7 +385,15 @@
 		"permissionsRequired": "Permissions required",
 		"photoAccessMessage": "We need access to your gallery to change the profile photo",
 		"notAuthenticated": "You need to log in to access your profile",
-		"photoUpdateError": "Error updating profile photo"
+		"photoUpdateError": "Error updating profile photo",
+		"takePhoto": "Take Photo",
+		"chooseFromGallery": "Choose from Gallery",
+		"removePhoto": "Remove Photo",
+		"changePhoto": "Change Photo",
+		"choosePhotoOption": "Choose an option to change your profile photo",
+		"cameraAccessMessage": "We need camera access to take photos",
+		"confirmRemovePhoto": "Are you sure you want to remove your profile photo?",
+		"photoDeleteError": "Error deleting profile photo"
 	},
 	"languages": {
 		"es_ES": "Spanish",

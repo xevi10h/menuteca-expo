@@ -28,6 +28,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 export default function ProfileScreen() {
 	const user = useUserStore((state) => state.user);
 	const updatePhoto = useUserStore((state) => state.updatePhoto);
+	const deletePhoto = useUserStore((state) => state.deletePhoto);
 	const logout = useUserStore((state) => state.logout);
 	const isAuthenticated = useUserStore((state) => state.isAuthenticated);
 	const userLoading = useUserStore((state) => state.isLoading);
@@ -137,30 +138,117 @@ export default function ProfileScreen() {
 		]);
 	};
 
-	const handleChangePhoto = async () => {
-		const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-		if (status !== 'granted') {
-			Alert.alert(
-				t('profile.permissionsRequired'),
-				t('profile.photoAccessMessage'),
-			);
-			return;
+	const showPhotoOptions = () => {
+		const options: {
+			text: string;
+			onPress?: () => void;
+			style?: 'default' | 'cancel' | 'destructive';
+		}[] = [
+			{
+				text: t('profile.takePhoto'),
+				onPress: () => handleTakePhoto(),
+			},
+			{
+				text: t('profile.chooseFromGallery'),
+				onPress: () => handleChooseFromGallery(),
+			},
+		];
+
+		// Add delete option if user has a photo
+		if (user.photo) {
+			options.push({
+				text: t('profile.removePhoto'),
+				onPress: () => handleDeletePhoto(),
+				style: 'destructive' as const,
+			});
 		}
 
-		const result = await ImagePicker.launchImageLibraryAsync({
-			mediaTypes: ['images'],
-			allowsEditing: true,
-			aspect: [1, 1],
-			quality: 0.8,
+		options.push({
+			text: t('general.cancel'),
+			style: 'cancel' as const,
 		});
 
-		if (!result.canceled && result.assets[0]) {
-			try {
-				await updatePhoto(result.assets[0].uri);
-			} catch (error) {
-				Alert.alert(t('validation.error'), t('profile.photoUpdateError'));
+		Alert.alert(
+			t('profile.changePhoto'),
+			t('profile.choosePhotoOption'),
+			options as any,
+		);
+	};
+
+	const handleTakePhoto = async () => {
+		try {
+			const { status } = await ImagePicker.requestCameraPermissionsAsync();
+			if (status !== 'granted') {
+				Alert.alert(
+					t('profile.permissionsRequired'),
+					t('profile.cameraAccessMessage'),
+				);
+				return;
 			}
+
+			const result = await ImagePicker.launchCameraAsync({
+				mediaTypes: ['images'],
+				allowsEditing: true,
+				aspect: [1, 1],
+				quality: 0.8,
+			});
+
+			if (!result.canceled && result.assets[0]) {
+				const success = await updatePhoto(result.assets[0]);
+				if (!success) {
+					Alert.alert(t('validation.error'), t('profile.photoUpdateError'));
+				}
+			}
+		} catch (error) {
+			Alert.alert(t('validation.error'), t('profile.photoUpdateError'));
 		}
+	};
+
+	const handleChooseFromGallery = async () => {
+		try {
+			const { status } =
+				await ImagePicker.requestMediaLibraryPermissionsAsync();
+			if (status !== 'granted') {
+				Alert.alert(
+					t('profile.permissionsRequired'),
+					t('profile.photoAccessMessage'),
+				);
+				return;
+			}
+
+			const result = await ImagePicker.launchImageLibraryAsync({
+				mediaTypes: ['images'],
+				allowsEditing: true,
+				aspect: [1, 1],
+				quality: 0.8,
+				base64: true,
+			});
+
+			if (!result.canceled && result.assets[0]) {
+				const success = await updatePhoto(result.assets[0]);
+				if (!success) {
+					Alert.alert(t('validation.error'), t('profile.photoUpdateError'));
+				}
+			}
+		} catch (error) {
+			Alert.alert(t('validation.error'), t('profile.photoUpdateError'));
+		}
+	};
+
+	const handleDeletePhoto = () => {
+		Alert.alert(t('profile.removePhoto'), t('profile.confirmRemovePhoto'), [
+			{ text: t('general.cancel'), style: 'cancel' },
+			{
+				text: t('profile.removePhoto'),
+				style: 'destructive',
+				onPress: async () => {
+					const success = await deletePhoto();
+					if (!success) {
+						Alert.alert(t('validation.error'), t('profile.photoDeleteError'));
+					}
+				},
+			},
+		]);
 	};
 
 	const handleAddRestaurant = () => {
@@ -236,11 +324,6 @@ export default function ProfileScreen() {
 		);
 	}
 
-	console.log(
-		'userRestaurants',
-		userRestaurants.map((r) => r.id),
-	);
-
 	return (
 		<View style={[styles.container, { paddingTop: insets.top }]}>
 			{/* Header */}
@@ -269,7 +352,7 @@ export default function ProfileScreen() {
 				{/* Profile Info Section */}
 				<View style={styles.profileSection}>
 					<TouchableOpacity
-						onPress={handleChangePhoto}
+						onPress={showPhotoOptions}
 						style={styles.profile_imageContainer}
 						disabled={userLoading}
 					>

@@ -1,7 +1,9 @@
-// zustand/UserStore.ts - Versión actualizada con Supabase
+// zustand/UserStore.ts - Versión actualizada con Supabase Storage
 import { SupabaseAuthService } from '@/api/supabaseAuth';
+import { SupabaseStorageService } from '@/api/supabaseStorage';
 import { getDeviceLanguage } from '@/shared/functions/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ImagePicker from 'expo-image-picker';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { Language, User } from '../shared/types';
@@ -13,7 +15,8 @@ interface UserState {
 	error: string | null;
 	isInitialized: boolean;
 	setUser: (user: User) => void;
-	updatePhoto: (photo: string) => void;
+	updatePhoto: (photoAsset: ImagePicker.ImagePickerAsset) => Promise<boolean>;
+	deletePhoto: () => Promise<boolean>;
 	updateUsername: (username: string) => Promise<boolean>;
 	setDefaultUser: () => void;
 	setLanguage: (language: Language) => Promise<void>;
@@ -130,25 +133,100 @@ export const useUserStore = create<UserState>()(
 				});
 			},
 
-			updatePhoto: async (photo: string) => {
+			updatePhoto: async (
+				photoAsset: ImagePicker.ImagePickerAsset,
+			): Promise<boolean> => {
 				set({ isLoading: true, error: null });
 
 				try {
-					const result = await SupabaseAuthService.updateProfile({ photo });
+					const state = get();
 
-					if (result.success) {
+					if (!state.isAuthenticated || !state.user.id) {
+						throw new Error('User not authenticated');
+					}
+
+					console.log('Uploading photo asset:', photoAsset);
+
+					// Upload to Supabase Storage
+					const uploadResult =
+						await SupabaseStorageService.uploadUserProfilePhoto(
+							state.user.id,
+							photoAsset,
+						);
+
+					console.log('Upload result:', uploadResult);
+
+					if (!uploadResult.success) {
+						throw new Error(uploadResult.error);
+					}
+
+					// Update profile in database with the new photo URL
+					const updateResult = await SupabaseAuthService.updateProfile({
+						photo: uploadResult.data!.publicUrl,
+					});
+
+					if (updateResult.success) {
 						set((state) => ({
-							user: { ...state.user, photo },
+							user: {
+								...state.user,
+								photo: uploadResult.data!.publicUrl,
+							},
 							isLoading: false,
 						}));
+						return true;
 					} else {
-						throw new Error(result.error);
+						// If database update fails, we should ideally clean up the uploaded file
+						// but for now, we'll just throw the error
+						throw new Error(updateResult.error);
 					}
 				} catch (error) {
 					const errorMessage =
 						error instanceof Error ? error.message : 'Failed to update photo';
 					set({ error: errorMessage, isLoading: false });
-					throw error;
+					return false;
+				}
+			},
+
+			deletePhoto: async (): Promise<boolean> => {
+				set({ isLoading: true, error: null });
+
+				try {
+					const state = get();
+
+					if (!state.isAuthenticated || !state.user.id) {
+						throw new Error('User not authenticated');
+					}
+
+					// Delete from Supabase Storage
+					const deleteResult =
+						await SupabaseStorageService.deleteUserProfilePhoto(state.user.id);
+
+					if (!deleteResult.success) {
+						throw new Error(deleteResult.error);
+					}
+
+					// Update profile in database to remove photo URL
+					const updateResult = await SupabaseAuthService.updateProfile({
+						photo: '',
+					});
+
+					if (updateResult.success) {
+						set((state) => ({
+							user: {
+								...state.user,
+								photo: '',
+							},
+							isLoading: false,
+						}));
+						return true;
+					} else {
+						throw new Error(updateResult.error);
+					}
+				} catch (error) {
+					const errorMessage =
+						error instanceof Error ? error.message : 'Failed to delete photo';
+					set({ error: errorMessage, isLoading: false });
+					return false;
 				}
 			},
 

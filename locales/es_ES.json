@@ -384,7 +384,15 @@
 		"permissionsRequired": "Permisos requeridos",
 		"photoAccessMessage": "Necesitamos acceso a tu galería para cambiar la foto de perfil",
 		"notAuthenticated": "Necesitas iniciar sesión para acceder a tu perfil",
-		"photoUpdateError": "Error al actualizar la foto de perfil"
+		"photoUpdateError": "Error al actualizar la foto de perfil",
+		"takePhoto": "Tomar foto",
+		"chooseFromGallery": "Elegir de la galería",
+		"removePhoto": "Eliminar foto",
+		"changePhoto": "Cambiar foto",
+		"choosePhotoOption": "Elige una opción para cambiar tu foto de perfil",
+		"cameraAccessMessage": "Necesitamos acceso a la cámara para tomar fotos",
+		"confirmRemovePhoto": "¿Estás seguro de que quieres eliminar tu foto de perfil?",
+		"photoDeleteError": "Error al eliminar la foto de perfil"
 	},
 	"languages": {
 		"es_ES": "Español",

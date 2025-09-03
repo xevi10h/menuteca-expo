@@ -1,5 +1,7 @@
 // api/supabaseStorage.ts
 import { supabase } from '@/lib/supabase';
+import { decode } from 'base64-arraybuffer';
+import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
 
 export class SupabaseStorageService {
@@ -18,6 +20,7 @@ export class SupabaseStorageService {
 		file: ImagePicker.ImagePickerAsset,
 		folder?: string,
 		fileName?: string,
+		upsert: boolean = false,
 	) {
 		try {
 			const {
@@ -29,23 +32,35 @@ export class SupabaseStorageService {
 			}
 
 			// Generate unique filename if not provided
-			const fileExt = file.uri.split('.').pop()?.toLowerCase();
+			const fileExt = file.uri.split('.').pop()?.toLowerCase() || 'jpg';
 			const finalFileName = fileName || `${Date.now()}.${fileExt}`;
 
 			// Create file path
 			const folderPath = folder ? `${folder}/` : '';
 			const filePath = `${folderPath}${finalFileName}`;
 
-			// Convert to blob for upload
-			const response = await fetch(file.uri);
-			const blob = await response.blob();
+			// Convert file to base64 using FileSystem (more reliable than fetch for local URIs)
+			const base64 = await FileSystem.readAsStringAsync(file.uri, {
+				encoding: FileSystem.EncodingType.Base64,
+			});
+
+			// Convert base64 to blob
+			const byteCharacters = atob(base64);
+			const byteNumbers = new Array(byteCharacters.length);
+			for (let i = 0; i < byteCharacters.length; i++) {
+				byteNumbers[i] = byteCharacters.charCodeAt(i);
+			}
+			const byteArray = new Uint8Array(byteNumbers);
+			const blob = new Blob([byteArray], {
+				type: file.mimeType || `image/${fileExt}`,
+			});
 
 			// Upload to Supabase
 			const { data, error } = await supabase.storage
 				.from(SupabaseStorageService.BUCKETS[bucket])
 				.upload(filePath, blob, {
-					contentType: file.type || `image/${fileExt}`,
-					upsert: false, // Don't overwrite existing files
+					contentType: file.mimeType || `image/${fileExt}`,
+					upsert,
 				});
 
 			if (error) throw error;
@@ -66,9 +81,155 @@ export class SupabaseStorageService {
 				},
 			};
 		} catch (error) {
+			console.error('Upload error:', error);
 			return {
 				success: false,
 				error: error instanceof Error ? error.message : 'Upload failed',
+			};
+		}
+	}
+
+	/**
+	 * Upload user profile photo with specific structure: /<userid>/main
+	 * This allows overwriting and ensures proper folder structure
+	 */
+	static async uploadUserProfilePhoto(
+		userId: string,
+		file: ImagePicker.ImagePickerAsset,
+	) {
+		try {
+			const {
+				data: { user },
+			} = await supabase.auth.getUser();
+
+			if (!user) {
+				throw new Error('User not authenticated');
+			}
+
+			// Verify that the user can only upload their own photo
+			if (user.id !== userId) {
+				throw new Error(
+					'Unauthorized: You can only update your own profile photo',
+				);
+			}
+
+			// Verify that the file has base64 data
+			if (!file.base64) {
+				throw new Error(
+					'Base64 data is required for file upload. Make sure to set base64: true in ImagePicker options.',
+				);
+			}
+
+			const fileExt = file.uri.split('.').pop()?.toLowerCase() || 'jpg';
+			const folder = userId;
+			const fileName = `main.${fileExt}`;
+			const filePath = `${folder}/${fileName}`;
+
+			const arrayBuffer = decode(file.base64);
+
+			// Upload to Supabase Storage with upsert to overwrite existing file
+			const { data, error } = await supabase.storage
+				.from(SupabaseStorageService.BUCKETS.PROFILES)
+				.upload(filePath, arrayBuffer, {
+					contentType: file.mimeType || `image/${fileExt}`,
+					upsert: true,
+				});
+
+			if (error) throw error;
+
+			// Get public URL
+			const {
+				data: { publicUrl },
+			} = supabase.storage
+				.from(SupabaseStorageService.BUCKETS.PROFILES)
+				.getPublicUrl(data.path);
+
+			console.log('Upload result:', {
+				success: true,
+				data: {
+					path: data.path,
+					fullPath: data.fullPath,
+					publicUrl,
+				},
+			});
+
+			return {
+				success: true,
+				data: {
+					path: data.path,
+					fullPath: data.fullPath,
+					publicUrl,
+				},
+			};
+		} catch (error) {
+			console.error('Profile photo upload error:', error);
+			return {
+				success: false,
+				error:
+					error instanceof Error
+						? error.message
+						: 'Profile photo upload failed',
+			};
+		}
+	}
+
+	/**
+	 * Delete user profile photo
+	 */
+	static async deleteUserProfilePhoto(userId: string) {
+		try {
+			const {
+				data: { user },
+			} = await supabase.auth.getUser();
+
+			if (!user) {
+				throw new Error('User not authenticated');
+			}
+
+			// Verify that the user can only delete their own photo
+			if (user.id !== userId) {
+				throw new Error(
+					'Unauthorized: You can only delete your own profile photo',
+				);
+			}
+
+			// List files in user's profile folder to find the main image
+			const { data: files, error: listError } = await supabase.storage
+				.from(SupabaseStorageService.BUCKETS.PROFILES)
+				.list(userId, {
+					limit: 10,
+					sortBy: { column: 'name', order: 'asc' },
+				});
+
+			if (listError) throw listError;
+
+			// Find main profile image (could be main.jpg, main.png, etc.)
+			const mainFile = files?.find((file) => file.name.startsWith('main.'));
+
+			if (!mainFile) {
+				return {
+					success: false,
+					error: 'No profile photo found to delete',
+				};
+			}
+
+			const filePath = `${userId}/${mainFile.name}`;
+
+			// Delete the file
+			const { error: deleteError } = await supabase.storage
+				.from(SupabaseStorageService.BUCKETS.PROFILES)
+				.remove([filePath]);
+
+			if (deleteError) throw deleteError;
+
+			return { success: true };
+		} catch (error) {
+			return {
+				success: false,
+				error:
+					error instanceof Error
+						? error.message
+						: 'Failed to delete profile photo',
 			};
 		}
 	}
@@ -137,16 +298,14 @@ export class SupabaseStorageService {
 	}
 
 	/**
-	 * Upload user profile photo
+	 * Upload user profile photo (DEPRECATED - use uploadUserProfilePhoto instead)
+	 * Keeping this for backward compatibility
 	 */
 	static async uploadProfilePhoto(
 		userId: string,
 		file: ImagePicker.ImagePickerAsset,
 	) {
-		const folder = `profiles/${userId}`;
-		const fileName = `avatar_${Date.now()}`;
-
-		return this.uploadImage('PROFILES', file, folder, fileName);
+		return this.uploadUserProfilePhoto(userId, file);
 	}
 
 	/**

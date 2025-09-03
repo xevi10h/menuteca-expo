@@ -121,7 +121,7 @@ export default function SetupLayout(): React.JSX.Element {
 			};
 
 			const addressResult = await AddressService.createAddress(addressData);
-			if (!addressResult.success) {
+			if (!addressResult.success || !addressResult.data) {
 				Alert.alert(t('validation.error'), addressResult.error);
 				return;
 			}

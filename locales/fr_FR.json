@@ -385,7 +385,15 @@
 		"permissionsRequired": "Autorisations requises",
 		"photoAccessMessage": "Nous avons besoin d'accéder à votre galerie pour changer la photo de profil",
 		"notAuthenticated": "Vous devez vous connecter pour accéder à votre profil",
-		"photoUpdateError": "Erreur lors de la mise à jour de la photo de profil"
+		"photoUpdateError": "Erreur lors de la mise à jour de la photo de profil",
+		"takePhoto": "Prendre une photo",
+		"chooseFromGallery": "Choisir dans la galerie",
+		"removePhoto": "Supprimer la photo",
+		"changePhoto": "Changer la photo",
+		"choosePhotoOption": "Choisissez une option pour changer votre photo de profil",
+		"cameraAccessMessage": "Nous avons besoin d'accéder à l'appareil photo pour prendre des photos",
+		"confirmRemovePhoto": "Êtes-vous sûr de vouloir supprimer votre photo de profil ?",
+		"photoDeleteError": "Erreur lors de la suppression de la photo de profil"
 	},
 	"languages": {
 		"en_US": "Anglais",

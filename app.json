@@ -1,10 +1,10 @@
 {
 	"expo": {
-		"name": "menuteca-expo",
+		"name": "Menuteca",
 		"slug": "menuteca-expo",
 		"version": "1.0.0",
 		"orientation": "portrait",
-		"icon": "./assets/images/icon_white_splash_screen.png",
+		"icon": "./assets/images/icon-store.png",
 		"scheme": "menutecaapp",
 		"userInterfaceStyle": "automatic",
 		"newArchEnabled": true,
@@ -27,8 +27,7 @@
 		},
 		"android": {
 			"adaptiveIcon": {
-				"foregroundImage": "./assets/images/icon_white_splash_screen.png",
-				"backgroundColor": "#48280E"
+				"foregroundImage": "./assets/images/icon-store.png"
 			},
 			"edgeToEdgeEnabled": true,
 			"package": "com.menutecaapp.mobile",
@@ -49,7 +48,7 @@
 		"web": {
 			"bundler": "metro",
 			"output": "static",
-			"favicon": "./assets/images/icon_white_splash_screen.png"
+			"favicon": "./assets/images/icon-store.png"
 		},
 		"plugins": [
 			"expo-router",
