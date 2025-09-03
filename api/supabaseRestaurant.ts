@@ -1,8 +1,6 @@
-// api/supabaseRestaurant.ts
 import { supabase } from '@/lib/supabase';
-import { Restaurant, Language, Address, Cuisine, Review, MenuData } from '@/shared/types';
 import { RestaurantTag } from '@/shared/enums';
-import { getLocalizedText } from '@/shared/functions/utils';
+import { Address, Cuisine, Language, Restaurant, Review } from '@/shared/types';
 import { SupabaseStorageService } from './supabaseStorage';
 
 // Types matching backend interface
@@ -63,7 +61,9 @@ export class SupabaseRestaurantService {
 	 */
 	private static async getCurrentUserId(): Promise<string | null> {
 		try {
-			const { data: { user } } = await supabase.auth.getUser();
+			const {
+				data: { user },
+			} = await supabase.auth.getUser();
 			return user?.id || null;
 		} catch (error) {
 			return null;
@@ -111,9 +111,9 @@ export class SupabaseRestaurantService {
 		const a =
 			Math.sin(dLat / 2) * Math.sin(dLat / 2) +
 			Math.cos(coord1.latitude * (Math.PI / 180)) *
-			Math.cos(coord2.latitude * (Math.PI / 180)) *
-			Math.sin(dLon / 2) *
-			Math.sin(dLon / 2);
+				Math.cos(coord2.latitude * (Math.PI / 180)) *
+				Math.sin(dLon / 2) *
+				Math.sin(dLon / 2);
 		const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 		return R * c;
 	}
@@ -135,12 +135,18 @@ export class SupabaseRestaurantService {
 
 		// Convert address
 		const address: Address = {
-			street: this.getLocalizedText(restaurantRow.addresses.street, userLanguage),
+			street: this.getLocalizedText(
+				restaurantRow.addresses.street,
+				userLanguage,
+			),
 			number: restaurantRow.addresses.number,
 			additional_information: restaurantRow.addresses.additional_information,
 			postal_code: restaurantRow.addresses.postal_code,
 			city: this.getLocalizedText(restaurantRow.addresses.city, userLanguage),
-			country: this.getLocalizedText(restaurantRow.addresses.country, userLanguage),
+			country: this.getLocalizedText(
+				restaurantRow.addresses.country,
+				userLanguage,
+			),
 			coordinates: restaurantRow.addresses.coordinates,
 			formatted_address: restaurantRow.addresses.formatted_address,
 		};
@@ -291,16 +297,21 @@ export class SupabaseRestaurantService {
 			const userLanguage = this.getCurrentLanguage();
 			const { data: fullRestaurant } = await supabase
 				.from('restaurants')
-				.select(`
+				.select(
+					`
 					*,
 					cuisines!inner(id, name, image),
 					addresses!inner(id, street, number, additional_information, postal_code, city, country, coordinates, formatted_address)
-				`)
+				`,
+				)
 				.eq('id', data.id)
 				.single();
 
 			if (fullRestaurant) {
-				const restaurant = await this.convertToRestaurant(fullRestaurant, userLanguage);
+				const restaurant = await this.convertToRestaurant(
+					fullRestaurant,
+					userLanguage,
+				);
 				return {
 					success: true,
 					data: restaurant,
@@ -314,7 +325,10 @@ export class SupabaseRestaurantService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to create restaurant',
+				error:
+					error instanceof Error
+						? error.message
+						: 'Failed to create restaurant',
 			};
 		}
 	}
@@ -382,8 +396,12 @@ export class SupabaseRestaurantService {
 
 			// Apply sorting
 			const validSortFields = ['created_at', 'rating', 'minimum_price', 'name'];
-			const sortField = validSortFields.includes(params?.sortBy || '') ? params?.sortBy : 'created_at';
-			query = query.order(sortField!, { ascending: params?.sortOrder === 'asc' });
+			const sortField = validSortFields.includes(params?.sortBy || '')
+				? params?.sortBy
+				: 'created_at';
+			query = query.order(sortField!, {
+				ascending: params?.sortOrder === 'asc',
+			});
 
 			// Apply pagination
 			const offset = (page - 1) * limit;
@@ -396,20 +414,21 @@ export class SupabaseRestaurantService {
 			}
 
 			// Convert to Restaurant type with distance calculation
-			const userCoords = params?.latitude && params?.longitude 
-				? { latitude: params.latitude, longitude: params.longitude }
-				: undefined;
+			const userCoords =
+				params?.latitude && params?.longitude
+					? { latitude: params.latitude, longitude: params.longitude }
+					: undefined;
 
 			let restaurants = await Promise.all(
-				(data || []).map((restaurant: any) => 
-					this.convertToRestaurant(restaurant, userLanguage, userCoords)
-				)
+				(data || []).map((restaurant: any) =>
+					this.convertToRestaurant(restaurant, userLanguage, userCoords),
+				),
 			);
 
 			// Filter by distance if radius provided
 			if (params?.radius && userCoords) {
 				restaurants = restaurants.filter(
-					(restaurant) => restaurant.distance <= params.radius!
+					(restaurant) => restaurant.distance <= params.radius!,
 				);
 			}
 
@@ -432,7 +451,10 @@ export class SupabaseRestaurantService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to fetch restaurants',
+				error:
+					error instanceof Error
+						? error.message
+						: 'Failed to fetch restaurants',
 			};
 		}
 	}
@@ -447,11 +469,13 @@ export class SupabaseRestaurantService {
 			// Get restaurant with related data
 			const { data, error } = await supabase
 				.from('restaurants')
-				.select(`
+				.select(
+					`
 					*,
 					cuisines!inner(id, name, image),
 					addresses!inner(id, street, number, additional_information, postal_code, city, country, coordinates, formatted_address)
-				`)
+				`,
+				)
 				.eq('id', id)
 				.is('deleted_at', null)
 				.single();
@@ -469,10 +493,12 @@ export class SupabaseRestaurantService {
 			// Get recent reviews (first 5)
 			const { data: reviewsData, error: reviewsError } = await supabase
 				.from('reviews')
-				.select(`
+				.select(
+					`
 					*,
 					users:user_id (id, username, name, photo)
-				`)
+				`,
+				)
 				.eq('restaurant_id', id)
 				.is('deleted_at', null)
 				.order('created_at', { ascending: false })
@@ -520,7 +546,8 @@ export class SupabaseRestaurantService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to fetch restaurant',
+				error:
+					error instanceof Error ? error.message : 'Failed to fetch restaurant',
 			};
 		}
 	}
@@ -607,7 +634,10 @@ export class SupabaseRestaurantService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to update restaurant',
+				error:
+					error instanceof Error
+						? error.message
+						: 'Failed to update restaurant',
 			};
 		}
 	}
@@ -683,7 +713,10 @@ export class SupabaseRestaurantService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to delete restaurant',
+				error:
+					error instanceof Error
+						? error.message
+						: 'Failed to delete restaurant',
 			};
 		}
 	}
@@ -748,7 +781,10 @@ export class SupabaseRestaurantService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to delete restaurant',
+				error:
+					error instanceof Error
+						? error.message
+						: 'Failed to delete restaurant',
 			};
 		}
 	}
@@ -770,11 +806,13 @@ export class SupabaseRestaurantService {
 
 			const { data, error } = await supabase
 				.from('restaurants')
-				.select(`
+				.select(
+					`
 					*,
 					cuisines!inner(id, name, image),
 					addresses!inner(id, street, number, additional_information, postal_code, city, country, coordinates, formatted_address)
-				`)
+				`,
+				)
 				.eq('owner_id', userId)
 				.is('deleted_at', null)
 				.order('created_at', { ascending: false });
@@ -785,11 +823,14 @@ export class SupabaseRestaurantService {
 
 			const restaurants = await Promise.all(
 				(data || []).map(async (restaurant: any) => {
-					const convertedRestaurant = await this.convertToRestaurant(restaurant, userLanguage);
+					const convertedRestaurant = await this.convertToRestaurant(
+						restaurant,
+						userLanguage,
+					);
 					// TODO: Load menus when MenuService is migrated
 					convertedRestaurant.menus = [];
 					return convertedRestaurant;
-				})
+				}),
 			);
 
 			return {
@@ -799,7 +840,10 @@ export class SupabaseRestaurantService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to fetch user restaurants',
+				error:
+					error instanceof Error
+						? error.message
+						: 'Failed to fetch user restaurants',
 			};
 		}
 	}
@@ -821,11 +865,13 @@ export class SupabaseRestaurantService {
 
 			const { data, error } = await supabase
 				.from('restaurants')
-				.select(`
+				.select(
+					`
 					*,
 					cuisines!inner(id, name, image),
 					addresses!inner(id, street, number, additional_information, postal_code, city, country, coordinates, formatted_address)
-				`)
+				`,
+				)
 				.eq('is_active', true)
 				.is('deleted_at', null)
 				.or(`name.ilike.%${query}%, cuisines.name->>es_ES.ilike.%${query}%`)
@@ -837,8 +883,8 @@ export class SupabaseRestaurantService {
 
 			const restaurants = await Promise.all(
 				(data || []).map((restaurant: any) =>
-					this.convertToRestaurant(restaurant, userLanguage)
-				)
+					this.convertToRestaurant(restaurant, userLanguage),
+				),
 			);
 
 			return {
@@ -848,7 +894,10 @@ export class SupabaseRestaurantService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to search restaurants',
+				error:
+					error instanceof Error
+						? error.message
+						: 'Failed to search restaurants',
 			};
 		}
 	}
@@ -870,7 +919,10 @@ export class SupabaseRestaurantService {
 
 			let averageRating = null;
 			if (data && data.length > 0) {
-				const totalRating = data.reduce((sum, review) => sum + review.rating, 0);
+				const totalRating = data.reduce(
+					(sum, review) => sum + review.rating,
+					0,
+				);
 				averageRating = Math.round((totalRating / data.length) * 10) / 10;
 			}
 
@@ -889,7 +941,10 @@ export class SupabaseRestaurantService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to update restaurant rating',
+				error:
+					error instanceof Error
+						? error.message
+						: 'Failed to update restaurant rating',
 			};
 		}
 	}

@@ -59,7 +59,17 @@ export default function CuisineTypesScreen() {
 		<View style={[styles.container, { paddingTop: insets.top }]}>
 			<View style={styles.header}>
 				<TouchableOpacity onPress={handleBack} style={styles.backButton}>
-					<Ionicons name="chevron-back" size={24} color={colors.secondary} />
+					<Ionicons name="chevron-back" size={20} color={colors.secondary} />
+				</TouchableOpacity>
+				<TouchableOpacity
+					onPress={handleNext}
+					disabled={isNextDisabled}
+					style={[styles.nextButton, { opacity: isNextDisabled ? 0.5 : 1 }]}
+				>
+					<Text style={styles.nextButtonText}>
+						{t('registerRestaurant.stepIndicator.finish')}
+					</Text>
+					<Ionicons name="chevron-forward" size={20} color={colors.secondary} />
 				</TouchableOpacity>
 			</View>
 
@@ -129,19 +139,6 @@ export default function CuisineTypesScreen() {
 					</Text>
 				</TouchableOpacity>
 			</View>
-
-			<TouchableOpacity
-				style={[
-					styles.nextButton,
-					{ bottom: insets.bottom + 40, opacity: isNextDisabled ? 0.5 : 1 },
-				]}
-				onPress={handleNext}
-				disabled={isNextDisabled}
-			>
-				<Text style={styles.nextButtonText}>
-					{t('registerRestaurant.stepIndicator.finish')}
-				</Text>
-			</TouchableOpacity>
 		</View>
 	);
 }
@@ -153,14 +150,28 @@ const styles = StyleSheet.create({
 	},
 	header: {
 		height: 60,
-		justifyContent: 'center',
 		paddingHorizontal: 20,
+		flexDirection: 'row',
+		justifyContent: 'space-between',
 	},
 	backButton: {
 		width: 40,
 		height: 40,
 		justifyContent: 'center',
 		alignItems: 'center',
+	},
+	nextButton: {
+		height: 40,
+		justifyContent: 'center',
+		alignItems: 'center',
+		flexDirection: 'row',
+	},
+	nextButtonText: {
+		color: colors.secondary,
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		textAlign: 'center',
 	},
 	content: {
 		flex: 1,
@@ -250,18 +261,7 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '500',
 	},
-	nextButton: {
-		position: 'absolute',
-		right: 40,
-	},
-	nextButtonText: {
-		color: colors.secondary,
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
-		textAlign: 'center',
-	},
-	// Error styles
+
 	errorContainer: {
 		flex: 1,
 		justifyContent: 'center',

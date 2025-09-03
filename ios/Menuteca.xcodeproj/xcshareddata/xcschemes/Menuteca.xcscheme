@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "menutecaexpo.app"
-               BlueprintName = "menutecaexpo"
-               ReferencedContainer = "container:menutecaexpo.xcodeproj">
+               BuildableName = "Menuteca.app"
+               BlueprintName = "Menuteca"
+               ReferencedContainer = "container:Menuteca.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "menutecaexpoTests.xctest"
-               BlueprintName = "menutecaexpoTests"
-               ReferencedContainer = "container:menutecaexpo.xcodeproj">
+               BuildableName = "MenutecaTests.xctest"
+               BlueprintName = "MenutecaTests"
+               ReferencedContainer = "container:Menuteca.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "menutecaexpo.app"
-            BlueprintName = "menutecaexpo"
-            ReferencedContainer = "container:menutecaexpo.xcodeproj">
+            BuildableName = "Menuteca.app"
+            BlueprintName = "Menuteca"
+            ReferencedContainer = "container:Menuteca.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "menutecaexpo.app"
-            BlueprintName = "menutecaexpo"
-            ReferencedContainer = "container:menutecaexpo.xcodeproj">
+            BuildableName = "Menuteca.app"
+            BlueprintName = "Menuteca"
+            ReferencedContainer = "container:Menuteca.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

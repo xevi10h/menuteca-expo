@@ -1,7 +1,9 @@
 import { AddressService, MenuService, RestaurantService } from '@/api/index';
+import { SupabaseStorageService } from '@/api/supabaseStorage';
 import { colors } from '@/assets/styles/colors';
 import HeaderModal from '@/components/restaurantCreation/HeaderModal';
 import { useTranslation } from '@/hooks/useTranslation';
+import { supabase } from '@/lib/supabase';
 import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -134,21 +136,24 @@ export default function SetupLayout(): React.JSX.Element {
 				return;
 			}
 
-			// Create restaurant with file upload support
-			const restaurantData = {
+			// PASO 1: Create restaurant WITHOUT images first
+			const restaurantDataWithoutImages = {
 				name: provisionalRegisterRestaurant.name,
 				minimum_price: provisionalRegisterRestaurant.minimum_price,
 				cuisine_id: provisionalRegisterRestaurant.cuisineId,
 				address_id: addressId,
-				profile_image: provisionalRegisterRestaurant.profile_image,
-				images: provisionalRegisterRestaurant.images,
-				main_image: provisionalRegisterRestaurant.images[0] || '',
 				tags: provisionalRegisterRestaurant.tags,
 				phone: provisionalRegisterRestaurant.phone,
 				reservation_link: provisionalRegisterRestaurant.reservation_link,
+				// No incluimos imágenes en este paso
+				main_image: '',
+				profile_image: '',
+				images: [],
 			};
 
-			const result = await RestaurantService.createRestaurant(restaurantData);
+			const result = await RestaurantService.createRestaurant(
+				restaurantDataWithoutImages,
+			);
 
 			if (!result.success || !result.data) {
 				Alert.alert(
@@ -161,7 +166,114 @@ export default function SetupLayout(): React.JSX.Element {
 			const createdRestaurant = result.data;
 			const restaurantId = createdRestaurant.id;
 
-			// Create menus for the restaurant
+			console.log('Restaurant created with ID:', restaurantId);
+
+			// PASO 2: Upload images with the correct folder structure
+			let main_image = '';
+			let profile_image = '';
+			let images: string[] = [];
+
+			// Get current user ID
+			const {
+				data: { user },
+			} = await supabase.auth.getUser();
+			const userId = user?.id;
+
+			if (!userId) {
+				Alert.alert(t('validation.error'), 'User not authenticated');
+				return;
+			}
+
+			// Upload main image (if it's a file object)
+			if (provisionalRegisterRestaurant.main_image_file) {
+				const uploadResult = await SupabaseStorageService.uploadImage(
+					'RESTAURANTS',
+					provisionalRegisterRestaurant.main_image_file,
+					`${userId}/restaurants/${restaurantId}`, // Correct folder structure
+					'main_image',
+				);
+
+				if (uploadResult.success) {
+					main_image = uploadResult.data?.publicUrl || '';
+				} else {
+					console.warn('Failed to upload main image:', uploadResult.error);
+				}
+			} else if (provisionalRegisterRestaurant.main_image) {
+				// If it's already a URL, use it directly
+				main_image = provisionalRegisterRestaurant.main_image;
+			}
+
+			// Upload profile image (if it's a file object)
+			if (provisionalRegisterRestaurant.profile_image_file) {
+				const uploadResult = await SupabaseStorageService.uploadImage(
+					'RESTAURANTS',
+					provisionalRegisterRestaurant.profile_image_file,
+					`${userId}/restaurants/${restaurantId}`, // Correct folder structure
+					'profile_image',
+				);
+
+				if (uploadResult.success) {
+					profile_image = uploadResult.data?.publicUrl || '';
+				} else {
+					console.warn('Failed to upload profile image:', uploadResult.error);
+				}
+			} else if (provisionalRegisterRestaurant.profile_image) {
+				// If it's already a URL, use it directly
+				profile_image = provisionalRegisterRestaurant.profile_image;
+			}
+
+			// Upload gallery images (if they are file objects)
+			if (
+				provisionalRegisterRestaurant.image_files &&
+				provisionalRegisterRestaurant.image_files.length > 0
+			) {
+				const uploadResult = await SupabaseStorageService.uploadMultipleImages(
+					'RESTAURANTS',
+					provisionalRegisterRestaurant.image_files,
+					`${userId}/restaurants/${restaurantId}`, // Correct folder structure
+				);
+
+				if (uploadResult.success) {
+					images =
+						uploadResult.data?.successful.map((img: any) => img.publicUrl) ||
+						[];
+				} else {
+					console.warn('Failed to upload gallery images:', uploadResult.error);
+				}
+			} else if (
+				provisionalRegisterRestaurant.images &&
+				provisionalRegisterRestaurant.images.length > 0
+			) {
+				// If they're already URLs, use them directly
+				images = provisionalRegisterRestaurant.images;
+			}
+
+			// If main_image is empty but we have gallery images, use the first one
+			if (!main_image && images.length > 0) {
+				main_image = images[0];
+			}
+
+			// PASO 3: Update restaurant with image URLs
+			const updateResult = await RestaurantService.updateRestaurant(
+				restaurantId,
+				{
+					main_image,
+					profile_image,
+					images,
+				},
+			);
+
+			if (!updateResult.success) {
+				console.warn(
+					'Failed to update restaurant with images:',
+					updateResult.error,
+				);
+				// Not a critical error, continue with the process
+			}
+
+			console.log('Restaurant updated with images successfully');
+
+			// PASO 4: Create menus for the restaurant
 			const menusToCreate = provisionalRegisterRestaurant.menus || [];
 			for (const menu of menusToCreate) {
 				const menuData = {

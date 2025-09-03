@@ -48,7 +48,28 @@ export default function RestaurantNameScreen() {
 		<View style={[styles.container, { paddingTop: insets.top }]}>
 			<View style={styles.header}>
 				<TouchableOpacity onPress={handleBack} style={styles.backButton}>
-					<Ionicons name="chevron-back" size={24} color={colors.secondary} />
+					<Ionicons name="chevron-back" size={20} color={colors.secondary} />
+				</TouchableOpacity>
+				<TouchableOpacity
+					onPress={handleNext}
+					style={styles.nextButton}
+					disabled={isNextDisabled}
+				>
+					<Text
+						disabled={isNextDisabled}
+						style={[
+							styles.nextButtonText,
+							{ opacity: isNextDisabled ? 0.5 : 1 },
+						]}
+					>
+						{t('registerRestaurant.stepIndicator.next1')}
+					</Text>
+					<Ionicons
+						name="chevron-forward"
+						size={20}
+						color={colors.secondary}
+						style={{ opacity: isNextDisabled ? 0.5 : 1 }}
+					/>
 				</TouchableOpacity>
 			</View>
 
@@ -85,18 +106,6 @@ export default function RestaurantNameScreen() {
 					onChangeText={setRestaurantName}
 				/>
 			</View>
-			<TouchableOpacity
-				style={[
-					styles.button,
-					{ bottom: insets.bottom + 40, opacity: isNextDisabled ? 0.5 : 1 },
-				]}
-				onPress={handleNext}
-				disabled={isNextDisabled}
-			>
-				<Text style={styles.buttonText}>
-					{t('registerRestaurant.stepIndicator.next1')}
-				</Text>
-			</TouchableOpacity>
 		</View>
 	);
 }
@@ -108,14 +117,28 @@ const styles = StyleSheet.create({
 	},
 	header: {
 		height: 60,
-		justifyContent: 'center',
 		paddingHorizontal: 20,
+		flexDirection: 'row',
+		justifyContent: 'space-between',
 	},
 	backButton: {
 		width: 40,
 		height: 40,
 		justifyContent: 'center',
 		alignItems: 'center',
+	},
+	nextButton: {
+		height: 40,
+		justifyContent: 'center',
+		alignItems: 'center',
+		flexDirection: 'row',
+	},
+	nextButtonText: {
+		color: colors.secondary,
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		textAlign: 'center',
 	},
 	content: {
 		flex: 1,
@@ -175,16 +198,5 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.3,
 		shadowRadius: 4,
 		elevation: 5,
-	},
-	button: {
-		position: 'absolute',
-		right: 40,
-	},
-	buttonText: {
-		color: colors.secondary,
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
-		textAlign: 'center',
 	},
 });

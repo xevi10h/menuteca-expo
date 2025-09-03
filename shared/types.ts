@@ -1,3 +1,4 @@
+import { ImagePickerAsset } from 'expo-image-picker';
 import { DishCategory, DrinkType, RestaurantTag } from './enums';
 
 export type Language = 'en_US' | 'es_ES' | 'ca_ES' | 'fr_FR';
@@ -78,9 +79,6 @@ export type Restaurant = {
 	minimum_price: number;
 	cuisineId: string;
 	rating?: number;
-	main_image: string;
-	profile_image?: string;
-	images: string[];
 	distance: number;
 	address: Address;
 	tags?: RestaurantTag[];
@@ -92,6 +90,13 @@ export type Restaurant = {
 	reviews?: Review[];
 	created_at: string;
 	updated_at: string;
+	profile_image?: string;
+	images: string[];
+	main_image?: string;
+
+	profile_image_file?: ImagePickerAsset;
+	main_image_file?: ImagePickerAsset;
+	image_files?: ImagePickerAsset[];
 };
 
 // FIXED: Cuisine ahora viene traducido del backend según el token del usuario
