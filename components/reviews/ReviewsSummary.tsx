@@ -14,7 +14,7 @@ import Animated, {
 interface ReviewsSummaryProps {
 	reviews: Review[];
 	averageRating: number;
-	onWriteReview: () => void;
+	onWriteReview: () => void | undefined;
 	scrollY: Animated.SharedValue<number>;
 	isCompact?: boolean;
 }

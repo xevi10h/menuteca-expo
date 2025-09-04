@@ -32,7 +32,13 @@ type SortOption = 'newest' | 'oldest' | 'highest' | 'lowest';
 export default function ReviewsScreen() {
 	const { t } = useTranslation();
 	const router = useRouter();
-	const { id } = useLocalSearchParams<{ id: string }>();
+	const { id, isOwnRestaurant } = useLocalSearchParams<{
+		id: string;
+		isOwnRestaurant?: string;
+	}>();
+
+	const isOwn = isOwnRestaurant === 'true';
+
 	const insets = useSafeAreaInsets();
 
 	const [reviews, setReviews] = useState<Review[]>([]);
@@ -75,7 +81,7 @@ export default function ReviewsScreen() {
 				sortOrder: getSortOrder(currentSort),
 			});
 
-			if (response.success) {
+			if (response.success && response.data) {
 				const newReviews = response.data.data;
 
 				if (pageNumber === 1 || isRefresh) {
@@ -194,7 +200,7 @@ export default function ReviewsScreen() {
 				photos: newReview.photos,
 			});
 
-			if (response.success) {
+			if (response.success && response.data) {
 				// Add new review to the beginning of the list
 				setReviews((prev) => [response.data, ...prev]);
 				setShowAddReviewModal(false);
@@ -259,7 +265,7 @@ export default function ReviewsScreen() {
 			<ReviewsSummary
 				reviews={reviews}
 				averageRating={averageRating}
-				onWriteReview={handleWriteReview}
+				onWriteReview={!isOwn ? handleWriteReview : () => {}}
 				scrollY={scrollY}
 			/>
 
@@ -267,7 +273,7 @@ export default function ReviewsScreen() {
 			<ReviewsSummary
 				reviews={reviews}
 				averageRating={averageRating}
-				onWriteReview={handleWriteReview}
+				onWriteReview={!isOwn ? handleWriteReview : () => {}}
 				scrollY={scrollY}
 				isCompact={true}
 			/>
@@ -303,15 +309,17 @@ export default function ReviewsScreen() {
 			/>
 			<Text style={styles.emptyStateTitle}>{t('reviews.noReviews')}</Text>
 			<Text style={styles.emptyStateSubtitle}>{t('reviews.beFirst')}</Text>
-			<TouchableOpacity
-				style={styles.firstReviewButton}
-				onPress={() => setShowAddReviewModal(true)}
-			>
-				<Ionicons name="create-outline" size={16} color={colors.quaternary} />
-				<Text style={styles.firstReviewButtonText}>
-					{t('reviews.writeReview')}
-				</Text>
-			</TouchableOpacity>
+			{!isOwn && (
+				<TouchableOpacity
+					style={styles.firstReviewButton}
+					onPress={() => setShowAddReviewModal(true)}
+				>
+					<Ionicons name="create-outline" size={16} color={colors.quaternary} />
+					<Text style={styles.firstReviewButtonText}>
+						{t('reviews.writeReview')}
+					</Text>
+				</TouchableOpacity>
+			)}
 		</View>
 	);
 
@@ -328,12 +336,14 @@ export default function ReviewsScreen() {
 					<Ionicons name="chevron-back" size={24} color={colors.primary} />
 				</TouchableOpacity>
 				<Text style={styles.headerTitle}>{t('reviews.title')}</Text>
-				<TouchableOpacity
-					onPress={() => setShowAddReviewModal(true)}
-					style={styles.addReviewButton}
-				>
-					<Ionicons name="add" size={24} color={colors.primary} />
-				</TouchableOpacity>
+				{!isOwn && (
+					<TouchableOpacity
+						onPress={() => setShowAddReviewModal(true)}
+						style={styles.addReviewButton}
+					>
+						<Ionicons name="add" size={24} color={colors.primary} />
+					</TouchableOpacity>
+				)}
 			</View>
 
 			{/* Reviews List */}
@@ -410,6 +420,10 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.primary,
+		position: 'absolute',
+		left: 0,
+		right: 0,
+		textAlign: 'center',
 	},
 	addReviewButton: {
 		width: 40,

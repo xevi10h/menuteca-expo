@@ -587,8 +587,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		paddingHorizontal: 20,
 		paddingVertical: 15,
-		borderBottomWidth: 1,
-		borderBottomColor: colors.primaryLight,
 	},
 	backButton: {
 		width: 40,
@@ -628,8 +626,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		paddingVertical: 30,
 		paddingHorizontal: 20,
-		borderBottomWidth: 1,
-		borderBottomColor: colors.primaryLight,
 	},
 	profile_imageContainer: {
 		position: 'relative',
@@ -706,8 +702,6 @@ const styles = StyleSheet.create({
 	section: {
 		paddingHorizontal: 20,
 		paddingVertical: 20,
-		borderBottomWidth: 1,
-		borderBottomColor: colors.primaryLight,
 	},
 	sectionHeader: {
 		flexDirection: 'row',

@@ -115,7 +115,13 @@ export default function UserRestaurantPreview() {
 
 	const informationComponent = useMemo(() => {
 		if (!restaurant) return null;
-		return <Information restaurant={restaurant} onMapPress={handleMapPress} />;
+		return (
+			<Information
+				restaurant={restaurant}
+				onMapPress={handleMapPress}
+				isOwnRestaurant={true}
+			/>
+		);
 	}, [restaurant]);
 
 	const menuComponent = useMemo(() => {

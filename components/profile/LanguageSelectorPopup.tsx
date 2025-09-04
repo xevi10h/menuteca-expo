@@ -112,10 +112,6 @@ export default function LanguageSelectorPopup({
 
 					{/* Content */}
 					<View style={styles.content}>
-						<Text style={styles.subtitle}>
-							{t('changeLanguage.selectPreferred')}
-						</Text>
-
 						<View style={styles.languagesList}>
 							{availableLanguages.map((language) => (
 								<TouchableOpacity
@@ -216,8 +212,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		paddingHorizontal: 20,
 		paddingVertical: 16,
-		borderBottomWidth: 1,
-		borderBottomColor: colors.primaryLight,
 	},
 	title: {
 		fontSize: 18,
@@ -282,8 +276,6 @@ const styles = StyleSheet.create({
 		gap: 12,
 		paddingHorizontal: 20,
 		paddingVertical: 16,
-		borderTopWidth: 1,
-		borderTopColor: colors.primaryLight,
 	},
 	cancelButton: {
 		flex: 1,

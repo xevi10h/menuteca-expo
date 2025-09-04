@@ -26,12 +26,14 @@ interface InformationProps {
 	restaurant: Restaurant;
 	onMapPress: () => void;
 	dontShowReviews?: boolean;
+	isOwnRestaurant?: boolean;
 }
 
 const Information: React.FC<InformationProps> = ({
 	restaurant,
 	onMapPress,
 	dontShowReviews,
+	isOwnRestaurant = false,
 }) => {
 	const { t } = useTranslation();
 	const router = useRouter();
@@ -53,7 +55,9 @@ const Information: React.FC<InformationProps> = ({
 	};
 
 	const handleViewReviews = () => {
-		router.push(`/restaurant/${restaurant.id}/reviews`);
+		router.push(
+			`/restaurant/${restaurant.id}/reviews?isOwnRestaurant=${isOwnRestaurant}`,
+		);
 	};
 
 	const handleAddReview = (newReview: Omit<Review, 'id' | 'date'>) => {
@@ -244,20 +248,23 @@ const Information: React.FC<InformationProps> = ({
 						</View>
 					</TouchableOpacity>
 
-					{/* Write Review Button */}
-					<TouchableOpacity
-						style={styles.writeReviewButton}
-						onPress={() => setShowAddReviewModal(true)}
-					>
-						<Ionicons
-							name="create-outline"
-							size={16}
-							color={colors.quaternary}
-						/>
-						<Text style={styles.writeReviewButtonText}>
-							{t('restaurantDetail.writeReview')}
-						</Text>
-					</TouchableOpacity>
+					{/* Si es el restaurante del usuario, no mostrar botón para escribir reseña */}
+
+					{!isOwnRestaurant && (
+						<TouchableOpacity
+							style={styles.writeReviewButton}
+							onPress={() => setShowAddReviewModal(true)}
+						>
+							<Ionicons
+								name="create-outline"
+								size={16}
+								color={colors.quaternary}
+							/>
+							<Text style={styles.writeReviewButtonText}>
+								{t('restaurantDetail.writeReview')}
+							</Text>
+						</TouchableOpacity>
+					)}
 				</View>
 			)}
 

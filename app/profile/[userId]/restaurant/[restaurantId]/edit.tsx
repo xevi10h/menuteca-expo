@@ -705,7 +705,9 @@ const styles = StyleSheet.create({
 		color: colors.primary,
 		flex: 1,
 		textAlign: 'center',
-		marginHorizontal: 10,
+		position: 'absolute',
+		left: 0,
+		right: 0,
 	},
 	saveButton: {
 		backgroundColor: colors.primary,
