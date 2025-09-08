@@ -608,5 +608,19 @@
 		"validation": "Erreur de validation",
 		"auth": "Erreur d'authentification",
 		"general": "Erreur générale"
+	},
+	"menuManagement": {
+		"title": "Gestion des Menus",
+		"totalMenus": "{{count}} menus",
+		"menuCount": "{{count}} menus",
+		"dishCount": "{{count}} plats",
+		"everyday": "Tous les jours",
+		"noDays": "Aucun jour",
+		"restaurantInactive": "Inactif",
+		"noMenusTitle": "Aucun menu créé",
+		"noMenusText": "Créez votre premier menu depuis l'un de vos restaurants pour commencer à gérer votre offre gastronomique.",
+		"addFirstMenu": "Aller à mes restaurants",
+		"errorLoadingData": "Erreur lors du chargement des données. Veuillez réessayer.",
+		"manageMenus": "Gérer les Menus"
 	}
 }

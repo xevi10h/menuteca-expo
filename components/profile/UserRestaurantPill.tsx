@@ -111,16 +111,16 @@ export default function UserRestaurantPill({
 			<View style={styles.actionsContainer}>
 				<TouchableOpacity
 					style={[styles.actionButton, styles.previewButton]}
-					onPress={handlePreview}
+					onPress={handleEdit}
 				>
-					<Ionicons name="eye-outline" size={16} color={colors.primary} />
+					<Ionicons name="pencil-outline" size={16} color={colors.quaternary} />
 				</TouchableOpacity>
 
 				<TouchableOpacity
 					style={[styles.actionButton, styles.editButton]}
 					onPress={handleEdit}
 				>
-					<Ionicons name="pencil-outline" size={16} color={colors.quaternary} />
+					<Ionicons name="trash-outline" size={16} color={colors.primary} />
 				</TouchableOpacity>
 			</View>
 		</TouchableOpacity>
@@ -249,11 +249,11 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	previewButton: {
+		backgroundColor: colors.primary,
+	},
+	editButton: {
 		backgroundColor: colors.secondary,
 		borderWidth: 1,
 		borderColor: colors.primary,
-	},
-	editButton: {
-		backgroundColor: colors.primary,
 	},
 });

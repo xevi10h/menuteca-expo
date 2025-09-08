@@ -12,6 +12,14 @@ export default function ProfileLayout() {
 					animation: 'slide_from_right',
 				}}
 			/>
+			<Stack.Screen
+				name="menu-management"
+				options={{
+					presentation: 'card',
+					gestureEnabled: true,
+					animation: 'slide_from_right',
+				}}
+			/>
 			<Stack.Screen name="[userId]/restaurant/[restaurantId]" />
 			<Stack.Screen
 				name="register-restaurant/index"

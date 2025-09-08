@@ -608,5 +608,19 @@
 		"validation": "Validation error",
 		"auth": "Authentication error",
 		"general": "An error occurred"
+	},
+	"menuManagement": {
+		"title": "Menu Management",
+		"totalMenus": "{{count}} menus",
+		"menuCount": "{{count}} menus",
+		"dishCount": "{{count}} dishes",
+		"everyday": "Every day",
+		"noDays": "No days",
+		"restaurantInactive": "Inactive",
+		"noMenusTitle": "No menus created",
+		"noMenusText": "Create your first menu from one of your restaurants to start managing your gastronomic offer.",
+		"addFirstMenu": "Go to my restaurants",
+		"errorLoadingData": "Error loading data. Please try again.",
+		"manageMenus": "Manage Menus"
 	}
 }

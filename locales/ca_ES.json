@@ -608,5 +608,19 @@
 		"validation": "Error de validació",
 		"auth": "Error d'autenticació",
 		"general": "Error"
+	},
+	"menuManagement": {
+		"title": "Gestió de Menús",
+		"totalMenus": "{{count}} menús",
+		"menuCount": "{{count}} menús",
+		"dishCount": "{{count}} plats",
+		"everyday": "Tots els dies",
+		"noDays": "Sense dies",
+		"restaurantInactive": "Inactiu",
+		"noMenusTitle": "No tens menús creats",
+		"noMenusText": "Crea el teu primer menú des d'algun dels teus restaurants per començar a gestionar la teva oferta gastronòmica.",
+		"addFirstMenu": "Anar als meus restaurants",
+		"errorLoadingData": "Error en carregar les dades. Si us plau, torna-ho a intentar.",
+		"manageMenus": "Gestionar Menús"
 	}
 }

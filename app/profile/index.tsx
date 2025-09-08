@@ -123,6 +123,10 @@ export default function ProfileScreen() {
 		router.back();
 	};
 
+	const handleManageMenus = () => {
+		router.push('/profile/menu-management');
+	};
+
 	const handleLogout = () => {
 		Alert.alert(t('profile.logout'), t('profile.confirmLogout'), [
 			{ text: t('general.cancel'), style: 'cancel' },
@@ -464,12 +468,31 @@ export default function ProfileScreen() {
 						<Text style={styles.sectionTitle}>
 							{t('profile.myRestaurants')} ({userRestaurants.length}/10)
 						</Text>
-						<TouchableOpacity
-							onPress={handleAddRestaurant}
-							style={styles.addButton}
-						>
-							<Ionicons name="add" size={20} color={colors.quaternary} />
-						</TouchableOpacity>
+						<View style={styles.restaurantActions}>
+							{/* Botón de gestión de menús */}
+							{userRestaurants.length > 0 && (
+								<TouchableOpacity
+									onPress={handleManageMenus}
+									style={styles.manageMenusButton}
+								>
+									<Image
+										source={require('@/assets/images/logo_loading_4_bars.png')}
+										style={{
+											width: 16,
+											height: 16,
+										}}
+									/>
+								</TouchableOpacity>
+							)}
+
+							{/* Botón de añadir restaurante */}
+							<TouchableOpacity
+								onPress={handleAddRestaurant}
+								style={styles.addButton}
+							>
+								<Ionicons name="add" size={20} color={colors.primary} />
+							</TouchableOpacity>
+						</View>
 					</View>
 
 					{restaurantsLoading ? (
@@ -726,13 +749,44 @@ const styles = StyleSheet.create({
 		fontWeight: '500',
 		color: colors.primary,
 	},
+	restaurantActions: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: 8,
+	},
+	manageMenusButton: {
+		width: 32,
+		height: 32,
+		borderRadius: 16,
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: colors.primary,
+		shadowColor: '#000',
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.4,
+		shadowRadius: 4,
+		elevation: 3,
+	},
 	addButton: {
 		width: 32,
 		height: 32,
 		borderRadius: 16,
-		backgroundColor: colors.primary,
+		backgroundColor: colors.quaternary,
 		justifyContent: 'center',
 		alignItems: 'center',
+		borderWidth: 1,
+		borderColor: colors.primary,
+		shadowColor: '#000',
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.2,
+		shadowRadius: 4,
+		elevation: 3,
 	},
 	actionItem: {
 		flexDirection: 'row',
