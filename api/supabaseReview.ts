@@ -8,7 +8,7 @@ import { SupabaseRestaurantService } from './supabaseRestaurant';
 // Database types
 interface ReviewRow {
 	id: string;
-	user_id: string;
+	profile_id: string; // Using profile_id as per database schema
 	restaurant_id: string;
 	rating: number;
 	comment: { [key: string]: string };
@@ -107,9 +107,9 @@ export class SupabaseReviewService {
 	): Promise<Review> {
 		return {
 			id: reviewRow.id,
-			user_id: reviewRow.user_id,
-			user_name: reviewRow.users?.name || 'Unknown User',
-			user_avatar: reviewRow.users?.photo || '',
+			user_id: reviewRow.profile_id, // Map profile_id to user_id for type compatibility
+			user_name: reviewRow.profiles?.name || 'Unknown User',
+			user_avatar: reviewRow.profiles?.photo || '',
 			restaurant_id: reviewRow.restaurant_id,
 			restaurant_name: reviewRow.restaurants?.name || 'Unknown Restaurant',
 			restaurant_image: reviewRow.restaurants?.main_image || '',
@@ -152,6 +152,8 @@ export class SupabaseReviewService {
 				};
 			}
 
+			console.log('Creating review for restaurant:', restaurant_id, 'by user:', userId);
+
 			// Check if restaurant exists
 			const restaurantCheck = await SupabaseRestaurantService.getRestaurantById(restaurant_id);
 			if (!restaurantCheck.success) {
@@ -165,7 +167,7 @@ export class SupabaseReviewService {
 			const { data: existingReview } = await supabase
 				.from('reviews')
 				.select('id')
-				.eq('user_id', userId)
+				.eq('profile_id', userId) // Note: using profile_id not user_id
 				.eq('restaurant_id', restaurant_id)
 				.is('deleted_at', null)
 				.maybeSingle();
@@ -178,42 +180,54 @@ export class SupabaseReviewService {
 			}
 
 			let finalData = { ...reviewData };
+			let uploadedPhotos: string[] = [];
 
-			// Handle photo uploads
+			// Handle photo uploads with proper folder structure
 			if (reviewData.photo_files?.length) {
-				const uploadResult = await SupabaseStorageService.uploadMultipleImages(
-					'REVIEWS',
+				console.log('Uploading review photos:', reviewData.photo_files.length);
+				
+				const uploadResult = await SupabaseStorageService.uploadReviewPhotos(
+					userId,
+					restaurant_id,
 					reviewData.photo_files,
-					'temp',
 				);
 
-				if (uploadResult.success) {
-					finalData.photos = uploadResult.data?.successful.map(
-						(img) => img.publicUrl,
+				console.log('Photo upload result:', uploadResult);
+
+				if (uploadResult.success && uploadResult.data?.successful?.length) {
+					uploadedPhotos = uploadResult.data.successful.map(
+						(img: any) => img.publicUrl,
 					);
+					console.log('Successfully uploaded photos:', uploadedPhotos.length);
+				} else {
+					console.warn('Failed to upload some photos:', uploadResult);
+					// Continue with empty photos array - don't fail the review creation
 				}
 			}
 
 			const userLanguage = this.getCurrentLanguage();
 			const commentTranslated = this.createUserTranslatedText(finalData.comment, userLanguage);
 
+			console.log('Inserting review into database with photos:', uploadedPhotos);
+
 			const { data, error } = await supabase
 				.from('reviews')
 				.insert({
-					user_id: userId,
+					profile_id: userId, // Note: using profile_id not user_id
 					restaurant_id,
 					rating: finalData.rating,
 					comment: commentTranslated,
-					photos: finalData.photos || [],
+					photos: uploadedPhotos,
 				})
 				.select(`
 					*,
-					users:user_id (id, username, name, photo),
+					profiles:profile_id (id, username, name, photo),
 					restaurants:restaurant_id (id, name, main_image)
 				`)
 				.single();
 
 			if (error) {
+				console.error('Database insert error:', error);
 				if (error.code === '23503') {
 					if (error.message.includes('restaurant_id')) {
 						return {
@@ -221,7 +235,7 @@ export class SupabaseReviewService {
 							error: 'Invalid restaurant ID',
 						};
 					}
-					if (error.message.includes('user_id')) {
+					if (error.message.includes('profile_id')) {
 						return {
 							success: false,
 							error: 'Invalid user ID',
@@ -237,6 +251,8 @@ export class SupabaseReviewService {
 				throw error;
 			}
 
+			console.log('Review created successfully:', data.id);
+
 			// Update restaurant rating
 			await SupabaseRestaurantService.updateRestaurantRating(restaurant_id);
 
@@ -247,6 +263,7 @@ export class SupabaseReviewService {
 				data: review,
 			};
 		} catch (error) {
+			console.error('Create review error:', error);
 			return {
 				success: false,
 				error: error instanceof Error ? error.message : 'Failed to create review',
@@ -278,7 +295,7 @@ export class SupabaseReviewService {
 				.select(
 					`
 					*,
-					users:user_id (id, username, name, photo),
+					profiles:profile_id (id, username, name, photo),
 					restaurants:restaurant_id (id, name, main_image)
 				`,
 					{ count: 'exact' },
@@ -367,12 +384,12 @@ export class SupabaseReviewService {
 				.select(
 					`
 					*,
-					users:user_id (id, username, name, photo),
+					profiles:profile_id (id, username, name, photo),
 					restaurants:restaurant_id (id, name, main_image)
 				`,
 					{ count: 'exact' },
 				)
-				.eq('user_id', userId)
+				.eq('profile_id', userId)
 				.is('deleted_at', null);
 
 			// Apply sorting
@@ -443,7 +460,7 @@ export class SupabaseReviewService {
 			// Check ownership
 			const { data: reviewCheck, error: reviewError } = await supabase
 				.from('reviews')
-				.select('user_id, restaurant_id')
+				.select('profile_id, restaurant_id')
 				.eq('id', id)
 				.is('deleted_at', null)
 				.single();
@@ -455,7 +472,7 @@ export class SupabaseReviewService {
 				};
 			}
 
-			if (reviewCheck.user_id !== userId) {
+			if (reviewCheck.profile_id !== userId) {
 				return {
 					success: false,
 					error: 'Not authorized to update this review',
@@ -496,7 +513,7 @@ export class SupabaseReviewService {
 				.eq('id', id)
 				.select(`
 					*,
-					users:user_id (id, username, name, photo),
+					profiles:profile_id (id, username, name, photo),
 					restaurants:restaurant_id (id, name, main_image)
 				`)
 				.single();
@@ -546,7 +563,7 @@ export class SupabaseReviewService {
 			// Check ownership and get restaurant_id for rating update
 			const { data: reviewCheck, error: reviewError } = await supabase
 				.from('reviews')
-				.select('user_id, restaurant_id')
+				.select('profile_id, restaurant_id')
 				.eq('id', id)
 				.is('deleted_at', null)
 				.single();
@@ -558,7 +575,7 @@ export class SupabaseReviewService {
 				};
 			}
 
-			if (reviewCheck.user_id !== userId) {
+			if (reviewCheck.profile_id !== userId) {
 				return {
 					success: false,
 					error: 'Not authorized to delete this review',
@@ -604,7 +621,7 @@ export class SupabaseReviewService {
 			// Check ownership and get restaurant_id for rating update
 			const { data: reviewCheck, error: reviewError } = await supabase
 				.from('reviews')
-				.select('user_id, restaurant_id')
+				.select('profile_id, restaurant_id')
 				.eq('id', id)
 				.is('deleted_at', null)
 				.single();
@@ -616,7 +633,7 @@ export class SupabaseReviewService {
 				};
 			}
 
-			if (reviewCheck.user_id !== userId) {
+			if (reviewCheck.profile_id !== userId) {
 				return {
 					success: false,
 					error: 'Not authorized to delete this review',
@@ -697,7 +714,7 @@ export class SupabaseReviewService {
 				.eq('id', reviewId)
 				.select(`
 					*,
-					users:user_id (id, username, name, photo),
+					profiles:profile_id (id, username, name, photo),
 					restaurants:restaurant_id (id, name, main_image)
 				`)
 				.single();
@@ -773,7 +790,7 @@ export class SupabaseReviewService {
 				.eq('id', reviewId)
 				.select(`
 					*,
-					users:user_id (id, username, name, photo),
+					profiles:profile_id (id, username, name, photo),
 					restaurants:restaurant_id (id, name, main_image)
 				`)
 				.single();
@@ -814,7 +831,7 @@ export class SupabaseReviewService {
 				.from('reviews')
 				.select(`
 					*,
-					users:user_id (id, username, name, photo),
+					profiles:profile_id (id, username, name, photo),
 					restaurants:restaurant_id (id, name, main_image)
 				`)
 				.eq('id', id)
@@ -948,7 +965,7 @@ export class SupabaseReviewService {
 
 			let dbQuery = supabase.from('reviews').select(`
 				*,
-				users:user_id (id, username, name, photo),
+				profiles:profile_id (id, username, name, photo),
 				restaurants:restaurant_id (id, name, main_image)
 			`).is('deleted_at', null);
 
@@ -1024,7 +1041,7 @@ export class SupabaseReviewService {
 				.from('reviews')
 				.select(`
 					*,
-					users:user_id (id, username, name, photo),
+					profiles:profile_id (id, username, name, photo),
 					restaurants:restaurant_id (id, name, main_image)
 				`)
 				.is('deleted_at', null)
@@ -1075,7 +1092,7 @@ export class SupabaseReviewService {
 				.from('reviews')
 				.select(`
 					*,
-					users:user_id (id, username, name, photo),
+					profiles:profile_id (id, username, name, photo),
 					restaurants:restaurant_id (id, name, main_image)
 				`)
 				.is('deleted_at', null)
@@ -1124,7 +1141,7 @@ export class SupabaseReviewService {
 			const { data, error } = await supabase
 				.from('reviews')
 				.select('*')
-				.eq('user_id', userId)
+				.eq('profile_id', userId)
 				.eq('restaurant_id', restaurant_id)
 				.is('deleted_at', null)
 				.maybeSingle();

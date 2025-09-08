@@ -403,14 +403,14 @@ export default function UserRestaurantEdit() {
 		<View style={[styles.container, { paddingTop: insets.top }]}>
 			{/* Header */}
 			<View style={styles.header}>
-				<TouchableOpacity onPress={handleBack} style={styles.backButton}>
-					<Ionicons name="chevron-back" size={24} color={colors.primary} />
-				</TouchableOpacity>
 				<Text style={styles.headerTitle}>
 					{t('editRestaurant.editTitle', {
 						name: restaurant.name,
 					})}
 				</Text>
+				<TouchableOpacity onPress={handleBack} style={styles.backButton}>
+					<Ionicons name="chevron-back" size={24} color={colors.primary} />
+				</TouchableOpacity>
 				<TouchableOpacity
 					onPress={handleSave}
 					style={[styles.saveButton, saving && styles.saveButtonDisabled]}
@@ -689,8 +689,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		paddingHorizontal: 20,
 		paddingVertical: 15,
-		borderBottomWidth: 1,
-		borderBottomColor: colors.primaryLight,
 	},
 	backButton: {
 		width: 40,

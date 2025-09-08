@@ -44,21 +44,13 @@ export class SupabaseStorageService {
 				encoding: FileSystem.EncodingType.Base64,
 			});
 
-			// Convert base64 to blob
-			const byteCharacters = atob(base64);
-			const byteNumbers = new Array(byteCharacters.length);
-			for (let i = 0; i < byteCharacters.length; i++) {
-				byteNumbers[i] = byteCharacters.charCodeAt(i);
-			}
-			const byteArray = new Uint8Array(byteNumbers);
-			const blob = new Blob([byteArray], {
-				type: file.mimeType || `image/${fileExt}`,
-			});
+			// Convert base64 to ArrayBuffer (better React Native support)
+			const arrayBuffer = decode(base64);
 
 			// Upload to Supabase
 			const { data, error } = await supabase.storage
 				.from(SupabaseStorageService.BUCKETS[bucket])
-				.upload(filePath, blob, {
+				.upload(filePath, arrayBuffer, {
 					contentType: file.mimeType || `image/${fileExt}`,
 					upsert,
 				});
@@ -309,15 +301,28 @@ export class SupabaseStorageService {
 	}
 
 	/**
-	 * Upload review photos
+	 * Upload review photos with proper folder structure: userId/reviews/restaurantId
 	 */
 	static async uploadReviewPhotos(
-		reviewId: string,
+		userId: string,
+		restaurantId: string,
 		files: ImagePicker.ImagePickerAsset[],
 	) {
-		const folder = `reviews/${reviewId}`;
-
-		return this.uploadMultipleImages('REVIEWS', files, folder);
+		try {
+			const folder = `${userId}/reviews/${restaurantId}`;
+			console.log('Uploading review photos to folder:', folder);
+			
+			const uploadResult = await this.uploadMultipleImages('REVIEWS', files, folder);
+			
+			console.log('Review photos upload result:', uploadResult);
+			return uploadResult;
+		} catch (error) {
+			console.error('Review photos upload error:', error);
+			return {
+				success: false,
+				error: error instanceof Error ? error.message : 'Failed to upload review photos',
+			};
+		}
 	}
 
 	/**

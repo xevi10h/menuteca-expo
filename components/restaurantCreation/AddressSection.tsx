@@ -27,7 +27,7 @@ export default function AddressSection({
 			{address &&
 			address.coordinates.latitude &&
 			address.coordinates.longitude ? (
-				<>
+				<TouchableOpacity onPress={onEditPress}>
 					<MapView
 						style={styles.miniMap}
 						initialRegion={{
@@ -49,7 +49,7 @@ export default function AddressSection({
 						/>
 					</MapView>
 					<Text style={styles.addressText}>{displayAddress}</Text>
-				</>
+				</TouchableOpacity>
 			) : (
 				<TouchableOpacity
 					style={styles.emptyAddressContainer}

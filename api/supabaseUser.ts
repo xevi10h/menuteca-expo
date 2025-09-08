@@ -1,6 +1,6 @@
 // api/supabaseUser.ts
 import { supabase } from '@/lib/supabase';
-import { User, Language } from '@/shared/types';
+import { Language, User } from '@/shared/types';
 
 // Database types
 interface UserRow {
@@ -23,7 +23,9 @@ export class SupabaseUserService {
 	 */
 	private static async getCurrentUserId(): Promise<string | null> {
 		try {
-			const { data: { user } } = await supabase.auth.getUser();
+			const {
+				data: { user },
+			} = await supabase.auth.getUser();
 			return user?.id || null;
 		} catch (error) {
 			return null;
@@ -71,7 +73,6 @@ export class SupabaseUserService {
 				has_password: data.has_password,
 				language: data.language,
 				created_at: data.created_at,
-				updated_at: data.updated_at,
 			};
 
 			return {
@@ -81,7 +82,8 @@ export class SupabaseUserService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to fetch profile',
+				error:
+					error instanceof Error ? error.message : 'Failed to fetch profile',
 			};
 		}
 	}
@@ -113,7 +115,9 @@ export class SupabaseUserService {
 					.single();
 
 				if (existingUser && existingUser.username !== updateData.username) {
-					const usernameCheck = await this.checkUsernameAvailability(updateData.username);
+					const usernameCheck = await this.checkUsernameAvailability(
+						updateData.username,
+					);
 					if (!usernameCheck.success || !usernameCheck.data?.available) {
 						return {
 							success: false,
@@ -163,7 +167,6 @@ export class SupabaseUserService {
 				has_password: data.has_password,
 				language: data.language,
 				created_at: data.created_at,
-				updated_at: data.updated_at,
 			};
 
 			return {
@@ -173,7 +176,8 @@ export class SupabaseUserService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to update profile',
+				error:
+					error instanceof Error ? error.message : 'Failed to update profile',
 			};
 		}
 	}
@@ -204,7 +208,8 @@ export class SupabaseUserService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to delete account',
+				error:
+					error instanceof Error ? error.message : 'Failed to delete account',
 			};
 		}
 	}
@@ -255,7 +260,8 @@ export class SupabaseUserService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to delete account',
+				error:
+					error instanceof Error ? error.message : 'Failed to delete account',
 			};
 		}
 	}
@@ -332,7 +338,8 @@ export class SupabaseUserService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to check username',
+				error:
+					error instanceof Error ? error.message : 'Failed to check username',
 			};
 		}
 	}
@@ -374,10 +381,7 @@ export class SupabaseUserService {
 	/**
 	 * Get all users (admin function)
 	 */
-	static async getAllUsers(params?: {
-		page?: number;
-		limit?: number;
-	}) {
+	static async getAllUsers(params?: { page?: number; limit?: number }) {
 		try {
 			const page = params?.page || 1;
 			const limit = params?.limit || 20;
@@ -490,7 +494,8 @@ export class SupabaseUserService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to search users',
+				error:
+					error instanceof Error ? error.message : 'Failed to search users',
 			};
 		}
 	}

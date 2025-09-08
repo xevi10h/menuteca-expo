@@ -57,7 +57,7 @@ export default function UserRestaurantPill({
 	};
 
 	return (
-		<View style={styles.container}>
+		<TouchableOpacity style={styles.container} onPress={handlePreview}>
 			{/* Restaurant Image */}
 			<View style={styles.imageContainer}>{renderRestaurantImage()}</View>
 
@@ -123,7 +123,7 @@ export default function UserRestaurantPill({
 					<Ionicons name="pencil-outline" size={16} color={colors.quaternary} />
 				</TouchableOpacity>
 			</View>
-		</View>
+		</TouchableOpacity>
 	);
 }
 

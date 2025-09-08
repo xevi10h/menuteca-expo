@@ -1,5 +1,6 @@
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useReviewSubmit } from '@/hooks/useReviewSubmit';
 import { Review } from '@/shared/types';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -24,7 +25,7 @@ const { width: screenWidth } = Dimensions.get('window');
 interface AddReviewModalProps {
 	visible: boolean;
 	onClose: () => void;
-	onSubmit: (review: Omit<Review, 'id' | 'date'>) => void;
+	onSubmit?: (review: Review) => void; // Now optional, handled by hook
 	restaurant_id: string;
 	restaurant_name: string;
 }
@@ -93,17 +94,18 @@ export default function AddReviewModal({
 }: AddReviewModalProps) {
 	const { t } = useTranslation();
 	const insets = useSafeAreaInsets();
+	const { handleSubmit: submitReview, isSubmitting } = useReviewSubmit();
 
 	const [rating, setRating] = useState(0);
 	const [comment, setComment] = useState('');
-	const [photos, setPhotos] = useState<string[]>([]);
-	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [photos, setPhotos] = useState<ImagePicker.ImagePickerAsset[]>([]);
+	const [photoUris, setPhotoUris] = useState<string[]>([]);
 
 	const resetForm = () => {
 		setRating(0);
 		setComment('');
 		setPhotos([]);
-		setIsSubmitting(false);
+		setPhotoUris([]);
 	};
 
 	const handleClose = () => {
@@ -125,58 +127,41 @@ export default function AddReviewModal({
 			mediaTypes: ['images'],
 			allowsMultipleSelection: true,
 			quality: 0.8,
+			base64: false, // We'll read base64 in the storage service if needed
 			selectionLimit: 5 - photos.length,
 		});
 
 		if (!result.canceled) {
-			const newPhotos = result.assets.map((asset) => asset.uri);
-			setPhotos((prev) => [...prev, ...newPhotos].slice(0, 5));
+			const newPhotos = result.assets.slice(0, 5 - photos.length);
+			const newPhotoUris = newPhotos.map((asset) => asset.uri);
+			
+			setPhotos((prev) => [...prev, ...newPhotos]);
+			setPhotoUris((prev) => [...prev, ...newPhotoUris]);
 		}
 	};
 
 	const handleRemovePhoto = (index: number) => {
 		setPhotos((prev) => prev.filter((_, i) => i !== index));
+		setPhotoUris((prev) => prev.filter((_, i) => i !== index));
 	};
 
 	const handleSubmit = async () => {
-		if (rating === 0) {
-			Alert.alert(t('reviews.error'), t('reviews.ratingRequired'), [
-				{ text: t('general.ok'), style: 'default' },
-			]);
-			return;
+		const result = await submitReview({
+			restaurant_id,
+			rating,
+			comment: comment.trim(),
+			photos, // ImagePickerAsset[]
+			photoUris, // string[] for UI display
+		});
+
+		if (result.success) {
+			// Call parent onSubmit if provided for UI updates
+			if (onSubmit && result.data) {
+				onSubmit(result.data);
+			}
+			handleClose();
 		}
-
-		// Los comentarios ahora son opcionales - no validamos que estén llenos
-
-		setIsSubmitting(true);
-
-		try {
-			await new Promise((resolve) => setTimeout(resolve, 1500));
-
-			const newReview: Omit<Review, 'id' | 'date'> = {
-				user_id: 'current_user',
-				user_name: 'Tu Usuario',
-				user_avatar: 'https://randomuser.me/api/portraits/men/10.jpg',
-				rating,
-				comment: comment.trim() || '', // Permitir comentarios vacíos
-				photos,
-				restaurant_id,
-				restaurant_name,
-				restaurant_image: 'https://example.com/restaurant.jpg',
-			};
-
-			onSubmit(newReview);
-
-			Alert.alert(t('addReview.reviewSent'), t('addReview.thankYouMessage'), [
-				{ text: t('general.ok'), onPress: handleClose },
-			]);
-		} catch (error) {
-			Alert.alert(t('reviews.error'), t('addReview.couldNotSend'), [
-				{ text: t('general.ok'), style: 'default' },
-			]);
-		} finally {
-			setIsSubmitting(false);
-		}
+		// Error handling is done in the hook
 	};
 
 	// Solo validamos que tenga rating - comentario es opcional
@@ -257,20 +242,20 @@ export default function AddReviewModal({
 						<View style={styles.photosHeader}>
 							<Text style={styles.sectionTitle}>{t('reviews.addPhotos')}</Text>
 							<View style={styles.photosBadge}>
-								<Text style={styles.photosBadgeText}>{photos.length}/5</Text>
+								<Text style={styles.photosBadgeText}>{photoUris.length}/5</Text>
 							</View>
 						</View>
 
-						{photos.length > 0 && (
+						{photoUris.length > 0 && (
 							<ScrollView
 								horizontal
 								style={styles.photosContainer}
 								showsHorizontalScrollIndicator={false}
 								contentContainerStyle={styles.photosContent}
 							>
-								{photos.map((photo, index) => (
+								{photoUris.map((photoUri, index) => (
 									<View key={index} style={styles.photoWrapper}>
-										<Image source={{ uri: photo }} style={styles.photo} />
+										<Image source={{ uri: photoUri }} style={styles.photo} />
 										<TouchableOpacity
 											style={styles.removePhotoButton}
 											onPress={() => handleRemovePhoto(index)}
@@ -284,7 +269,7 @@ export default function AddReviewModal({
 									</View>
 								))}
 
-								{photos.length < 5 && (
+								{photoUris.length < 5 && (
 									<TouchableOpacity
 										style={styles.addPhotoCard}
 										onPress={handlePickImages}
@@ -299,7 +284,7 @@ export default function AddReviewModal({
 							</ScrollView>
 						)}
 
-						{photos.length === 0 && (
+						{photoUris.length === 0 && (
 							<TouchableOpacity
 								style={styles.addPhotosButton}
 								onPress={handlePickImages}
