@@ -11,6 +11,7 @@ import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
 	Alert,
+	Image,
 	RefreshControl,
 	ScrollView,
 	StyleSheet,
@@ -20,18 +21,75 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+// Helper functions for menu available status
+const getCurrentDay = (): string => {
+	const days = [
+		'sunday',
+		'monday',
+		'tuesday',
+		'wednesday',
+		'thursday',
+		'friday',
+		'saturday',
+	];
+	const today = new Date();
+	return days[today.getDay()];
+};
+
+const getCurrentTime = (): string => {
+	const now = new Date();
+	const hours = now.getHours().toString().padStart(2, '0');
+	const minutes = now.getMinutes().toString().padStart(2, '0');
+	return `${hours}:${minutes}`;
+};
+
+const isTimeInRange = (
+	currentTime: string,
+	startTime: string,
+	endTime: string,
+): boolean => {
+	const parseTime = (time: string) => {
+		const [hours, minutes] = time.split(':').map(Number);
+		return hours * 60 + minutes;
+	};
+
+	const current = parseTime(currentTime);
+	const start = parseTime(startTime);
+	const end = parseTime(endTime);
+
+	// Handle overnight menus (end time is next day)
+	if (end < start) {
+		return current >= start || current <= end;
+	}
+
+	return current >= start && current <= end;
+};
+
+const isMenuActive = (menu: MenuData): boolean => {
+	const currentDay = getCurrentDay();
+	const currentTime = getCurrentTime();
+
+	// Check if menu is available on current day
+	if (!menu.days.includes(currentDay)) {
+		return false;
+	}
+
+	// Check if current time is within menu hours
+	return isTimeInRange(currentTime, menu.start_time, menu.end_time);
+};
+
 // Component for individual menu item
 interface MenuListItemProps {
 	menu: MenuData;
-	restaurantName: string;
 	isRestaurantActive: boolean;
+	isMenuActive: boolean;
 	onEdit: (menu: MenuData) => void;
 }
 
 function MenuListItem({
 	menu,
-	restaurantName,
 	isRestaurantActive,
+	isMenuActive,
 	onEdit,
 }: MenuListItemProps) {
 	const { t } = useTranslation();
@@ -57,22 +115,34 @@ function MenuListItem({
 		return `${formatMenuTime(startTime)} - ${formatMenuTime(endTime)}`;
 	};
 
+	const isFullyActive = isRestaurantActive && isMenuActive;
+
 	return (
 		<TouchableOpacity
-			style={[styles.menuItem, !isRestaurantActive && styles.menuItemInactive]}
+			style={[styles.menuItem, isFullyActive && styles.menuItemActive]}
 			onPress={() => onEdit(menu)}
 		>
 			<View style={styles.menuItemContent}>
 				<View style={styles.menuItemHeader}>
-					<Text
-						style={[
-							styles.menuName,
-							!isRestaurantActive && styles.textInactive,
-						]}
-						numberOfLines={1}
-					>
-						{menu.name}
-					</Text>
+					<View style={styles.menuNameContainer}>
+						<Text
+							style={[
+								styles.menuName,
+								!isRestaurantActive && styles.textInactive,
+							]}
+							numberOfLines={1}
+						>
+							{menu.name}
+						</Text>
+						{isFullyActive && (
+							<View
+								style={[
+									styles.menuStatusDot,
+									isMenuActive && styles.menuStatusDotActive,
+								]}
+							/>
+						)}
+					</View>
 					<Text
 						style={[
 							styles.menuPrice,
@@ -113,23 +183,39 @@ function MenuListItem({
 						{t('menuManagement.dishCount', { count: menu.dishes.length })}
 					</Text>
 
-					{!isRestaurantActive && (
-						<View style={styles.inactiveTag}>
-							<Text style={styles.inactiveTagText}>
-								{t('menuManagement.restaurantInactive')}
-							</Text>
-						</View>
-					)}
+					<View style={styles.statusTags}>
+						{isRestaurantActive && isMenuActive && (
+							<View style={styles.availableTag}>
+								<Text style={styles.availableTagText}>
+									{t('menuManagement.menuAvailable')}
+								</Text>
+							</View>
+						)}
+						{isRestaurantActive && !isMenuActive && (
+							<View style={styles.unavailableTag}>
+								<Text style={styles.unavailableTagText}>
+									{t('menuManagement.menuUnavailable')}
+								</Text>
+							</View>
+						)}
+						{!isRestaurantActive && (
+							<View style={styles.inactiveTag}>
+								<Text style={styles.inactiveTagText}>
+									{t('menuManagement.restaurantInactive')}
+								</Text>
+							</View>
+						)}
+					</View>
 				</View>
 			</View>
 
-			<Ionicons
-				name="chevron-forward"
-				size={20}
-				color={
-					isRestaurantActive ? colors.primaryLight : colors.primaryLight + '80'
-				}
-			/>
+			<View style={styles.chevronContainer}>
+				<Ionicons
+					name="chevron-forward"
+					size={20}
+					color={isFullyActive ? colors.primary : colors.primaryLight}
+				/>
+			</View>
 		</TouchableOpacity>
 	);
 }
@@ -138,13 +224,33 @@ function MenuListItem({
 interface RestaurantGroupHeaderProps {
 	restaurant: Restaurant;
 	menuCount: number;
+	activeMenuCount: number;
 }
 
 function RestaurantGroupHeader({
 	restaurant,
 	menuCount,
+	activeMenuCount,
 }: RestaurantGroupHeaderProps) {
 	const { t } = useTranslation();
+
+	const renderRestaurantImage = () => {
+		if (restaurant.profile_image) {
+			return (
+				<Image
+					source={{ uri: restaurant.profile_image }}
+					style={styles.restaurantImage}
+				/>
+			);
+		} else {
+			const initial = restaurant.name.charAt(0).toUpperCase();
+			return (
+				<View style={styles.restaurantImagePlaceholder}>
+					<Text style={styles.restaurantImageText}>{initial}</Text>
+				</View>
+			);
+		}
+	};
 
 	return (
 		<View
@@ -153,6 +259,12 @@ function RestaurantGroupHeader({
 				!restaurant.is_active && styles.restaurantGroupHeaderInactive,
 			]}
 		>
+			{/* Restaurant Image */}
+			<View style={styles.restaurantImageContainer}>
+				{renderRestaurantImage()}
+			</View>
+
+			{/* Restaurant Info */}
 			<View style={styles.restaurantInfo}>
 				<View style={styles.restaurantNameRow}>
 					<Text
@@ -164,17 +276,56 @@ function RestaurantGroupHeader({
 					>
 						{restaurant.name}
 					</Text>
-					{!restaurant.is_active && <View style={styles.statusDot} />}
+					<View style={styles.restaurantStatusContainer}>
+						<View
+							style={[
+								styles.restaurantStatusDot,
+								{
+									backgroundColor: restaurant.is_active ? '#10B981' : '#EF4444',
+								},
+							]}
+						/>
+						<Text
+							style={[
+								styles.restaurantStatusText,
+								{ color: restaurant.is_active ? '#10B981' : '#EF4444' },
+							]}
+						>
+							{restaurant.is_active
+								? t('profile.active')
+								: t('profile.inactive')}
+						</Text>
+					</View>
 				</View>
-				<Text
-					style={[
-						styles.restaurantDetails,
-						!restaurant.is_active && styles.textInactive,
-					]}
-				>
-					{restaurant.cuisine.name} •{' '}
-					{t('menuManagement.menuCount', { count: menuCount })}
-				</Text>
+				<View style={styles.restaurantMetaContainer}>
+					<Text
+						style={[
+							styles.restaurantDetails,
+							!restaurant.is_active && styles.textInactive,
+						]}
+					>
+						{restaurant.cuisine.name} •{' '}
+						{restaurant.rating ? (
+							<>
+								<Ionicons name="star" size={10} color="#FBB040" />{' '}
+								{restaurant.rating.toFixed(1)}
+								{restaurant.reviews && restaurant.reviews.length > 0 && (
+									<> ({restaurant.reviews.length})</>
+								)}{' '}
+								•{' '}
+							</>
+						) : (
+							''
+						)}
+						{t('menuManagement.menuCount', { count: menuCount })}
+						{restaurant.is_active && activeMenuCount > 0 && (
+							<>
+								{' '}
+								({activeMenuCount} {t('menuManagement.available')})
+							</>
+						)}
+					</Text>
+				</View>
 			</View>
 		</View>
 	);
@@ -306,7 +457,7 @@ export default function MenuManagementScreen() {
 		setEditingRestaurantId('');
 	};
 
-	// Calculate total menu count
+	// Calculate total menu count and available menu count
 	const totalMenuCount = Object.values(allMenus).reduce(
 		(total, menus) => total + menus.length,
 		0,
@@ -371,6 +522,9 @@ export default function MenuManagementScreen() {
 				>
 					{restaurants.map((restaurant) => {
 						const restaurantMenus = allMenus[restaurant.id] || [];
+						const activeMenusCount = restaurantMenus.filter((menu) =>
+							isMenuActive(menu),
+						).length;
 
 						if (restaurantMenus.length === 0) return null;
 
@@ -379,14 +533,15 @@ export default function MenuManagementScreen() {
 								<RestaurantGroupHeader
 									restaurant={restaurant}
 									menuCount={restaurantMenus.length}
+									activeMenuCount={activeMenusCount}
 								/>
 
 								{restaurantMenus.map((menu) => (
 									<MenuListItem
 										key={menu.id}
 										menu={menu}
-										restaurantName={restaurant.name}
 										isRestaurantActive={restaurant.is_active}
+										isMenuActive={isMenuActive(menu)}
 										onEdit={(menu) => handleEditMenu(menu, restaurant.id)}
 									/>
 								))}
@@ -438,7 +593,6 @@ const styles = StyleSheet.create({
 		right: 0,
 	},
 	headerRight: {
-		width: 50,
 		alignItems: 'flex-end',
 	},
 	totalCount: {
@@ -446,6 +600,12 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '500',
 		color: colors.primaryLight,
+	},
+	activeCount: {
+		fontSize: 10,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.primary,
 	},
 	content: {
 		flex: 1,
@@ -458,9 +618,33 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 4,
 		paddingVertical: 16,
 		marginBottom: 12,
+		flexDirection: 'row',
+		alignItems: 'center',
 	},
 	restaurantGroupHeaderInactive: {
 		opacity: 0.7,
+	},
+	restaurantImageContainer: {
+		marginRight: 12,
+	},
+	restaurantImage: {
+		width: 44,
+		height: 44,
+		borderRadius: 12,
+	},
+	restaurantImagePlaceholder: {
+		width: 44,
+		height: 44,
+		borderRadius: 12,
+		backgroundColor: colors.primary,
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	restaurantImageText: {
+		fontSize: 18,
+		fontFamily: 'Manrope',
+		fontWeight: '700',
+		color: colors.quaternary,
 	},
 	restaurantInfo: {
 		flex: 1,
@@ -468,6 +652,7 @@ const styles = StyleSheet.create({
 	restaurantNameRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
+		justifyContent: 'space-between',
 		marginBottom: 6,
 	},
 	restaurantName: {
@@ -476,6 +661,22 @@ const styles = StyleSheet.create({
 		fontWeight: '700',
 		color: colors.primary,
 		flex: 1,
+		marginRight: 8,
+	},
+	restaurantStatusContainer: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: 4,
+	},
+	restaurantStatusDot: {
+		width: 8,
+		height: 8,
+		borderRadius: 4,
+	},
+	restaurantStatusText: {
+		fontSize: 12,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
 	},
 	statusDot: {
 		width: 10,
@@ -485,11 +686,14 @@ const styles = StyleSheet.create({
 		marginLeft: 12,
 	},
 	restaurantDetails: {
-		fontSize: 14,
+		fontSize: 12,
 		fontFamily: 'Manrope',
 		fontWeight: '500',
 		color: colors.primaryLight,
 		marginLeft: 4,
+	},
+	restaurantMetaContainer: {
+		flex: 1,
 	},
 	menuItem: {
 		backgroundColor: colors.quaternary,
@@ -512,6 +716,11 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderColor: colors.primaryLight + '20',
 	},
+	menuItemActive: {
+		borderWidth: 2,
+		borderColor: colors.primary,
+		backgroundColor: colors.primaryLighter,
+	},
 	menuItemContent: {
 		flex: 1,
 		marginRight: 12,
@@ -522,13 +731,28 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		marginBottom: 4,
 	},
+	menuNameContainer: {
+		flex: 1,
+		flexDirection: 'row',
+		alignItems: 'center',
+		marginRight: 8,
+	},
 	menuName: {
 		fontSize: 14,
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.primary,
 		flex: 1,
-		marginRight: 8,
+		marginRight: 6,
+	},
+	menuStatusDot: {
+		width: 8,
+		height: 8,
+		borderRadius: 4,
+		backgroundColor: '#94A3B8',
+	},
+	menuStatusDotActive: {
+		backgroundColor: colors.primary,
 	},
 	menuPrice: {
 		fontSize: 14,
@@ -567,8 +791,36 @@ const styles = StyleSheet.create({
 		fontWeight: '500',
 		color: colors.primaryLight,
 	},
+	statusTags: {
+		flexDirection: 'row',
+		gap: 8,
+	},
+	availableTag: {
+		backgroundColor: colors.primary,
+		borderRadius: 8,
+		paddingHorizontal: 6,
+		paddingVertical: 2,
+	},
+	availableTagText: {
+		fontSize: 9,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		color: colors.quaternary,
+	},
+	unavailableTag: {
+		backgroundColor: colors.primaryLighter,
+		borderRadius: 8,
+		paddingHorizontal: 6,
+		paddingVertical: 2,
+	},
+	unavailableTagText: {
+		fontSize: 9,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+		color: colors.primary,
+	},
 	inactiveTag: {
-		backgroundColor: '#EF4444',
+		backgroundColor: colors.primaryLighter,
 		borderRadius: 8,
 		paddingHorizontal: 6,
 		paddingVertical: 2,
@@ -577,7 +829,10 @@ const styles = StyleSheet.create({
 		fontSize: 9,
 		fontFamily: 'Manrope',
 		fontWeight: '500',
-		color: colors.quaternary,
+		color: colors.primaryLight,
+	},
+	chevronContainer: {
+		paddingLeft: 8,
 	},
 	textInactive: {
 		opacity: 0.6,

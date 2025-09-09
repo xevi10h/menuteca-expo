@@ -469,28 +469,19 @@ export default function ProfileScreen() {
 							{t('profile.myRestaurants')} ({userRestaurants.length}/10)
 						</Text>
 						<View style={styles.restaurantActions}>
-							{/* Botón de gestión de menús */}
-							{userRestaurants.length > 0 && (
-								<TouchableOpacity
-									onPress={handleManageMenus}
-									style={styles.manageMenusButton}
-								>
-									<Image
-										source={require('@/assets/images/logo_loading_4_bars.png')}
-										style={{
-											width: 16,
-											height: 16,
-										}}
-									/>
-								</TouchableOpacity>
-							)}
-
 							{/* Botón de añadir restaurante */}
 							<TouchableOpacity
 								onPress={handleAddRestaurant}
 								style={styles.addButton}
 							>
 								<Ionicons name="add" size={20} color={colors.primary} />
+							</TouchableOpacity>
+
+							<TouchableOpacity
+								onPress={handleManageMenus}
+								style={styles.manageMenusButton}
+							>
+								<Ionicons name="list" size={20} color={colors.quaternary} />
 							</TouchableOpacity>
 						</View>
 					</View>
