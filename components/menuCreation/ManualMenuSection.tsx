@@ -48,7 +48,7 @@ export default function ManualMenuSection({
 				id: '1',
 				name: '',
 				description: '',
-				extraPrice: 0,
+				extra_price: 0,
 				is_vegetarian: false,
 				is_lactose_free: false,
 				is_spicy: false,
@@ -60,7 +60,7 @@ export default function ManualMenuSection({
 				id: '2',
 				name: '',
 				description: '',
-				extraPrice: 0,
+				extra_price: 0,
 				is_vegetarian: false,
 				is_lactose_free: false,
 				is_spicy: false,
@@ -72,7 +72,7 @@ export default function ManualMenuSection({
 				id: '3',
 				name: '',
 				description: '',
-				extraPrice: 0,
+				extra_price: 0,
 				is_vegetarian: false,
 				is_lactose_free: false,
 				is_spicy: false,
@@ -193,7 +193,7 @@ export default function ManualMenuSection({
 			id: Date.now().toString(),
 			name: '',
 			description: '',
-			extraPrice: 0,
+			extra_price: 0,
 			is_vegetarian: false,
 			is_lactose_free: false,
 			is_spicy: false,
@@ -221,7 +221,7 @@ export default function ManualMenuSection({
 
 	const openSupplementModal = useCallback((dish: Dish) => {
 		setCurrentDish(dish);
-		setSupplementPrice(dish.extraPrice.toString());
+		setSupplementPrice(dish?.extra_price?.toString() || '0');
 		setShowSupplementModal(true);
 	}, []);
 
@@ -237,7 +237,7 @@ export default function ManualMenuSection({
 		if (currentDish && supplementPrice) {
 			const updatedDish = {
 				...currentDish,
-				extraPrice: parseFloat(supplementPrice) || 0,
+				extra_price: parseFloat(supplementPrice) || 0,
 			};
 			setDishes((prev) =>
 				prev.map((d) => (d.id === updatedDish.id ? updatedDish : d)),
@@ -285,14 +285,15 @@ export default function ManualMenuSection({
 	]);
 
 	const renderDishItem = (dish: Dish) => {
-		const formatExtraPrice = (price: number) => {
-			if (price === 0) {
+		const formatExtraPrice = (price?: number) => {
+			if (!price) {
 				return '€+';
 			}
 			if (price % 1 === 0) {
 				return `+${price}€`;
 			}
-			return `+${price.toFixed(2)}€`;
+
+			return `+${price?.toFixed(2)}€`;
 		};
 
 		const dishHasDescription =
@@ -327,17 +328,17 @@ export default function ManualMenuSection({
 				<TouchableOpacity
 					style={[
 						styles.priceIcon,
-						dish.extraPrice > 0 && styles.priceIconHasContent,
+						dish.extra_price > 0 && styles.priceIconHasContent,
 					]}
 					onPress={() => openSupplementModal(dish)}
 				>
 					<Text
 						style={[
 							styles.priceIconText,
-							dish.extraPrice > 0 && styles.priceTextHasContent,
+							dish.extra_price > 0 && styles.priceTextHasContent,
 						]}
 					>
-						{formatExtraPrice(dish.extraPrice)}
+						{formatExtraPrice(dish.extra_price)}
 					</Text>
 				</TouchableOpacity>
 				<TouchableOpacity

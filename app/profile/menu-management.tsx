@@ -79,7 +79,7 @@ function MenuListItem({
 							!isRestaurantActive && styles.textInactive,
 						]}
 					>
-						{menu.price.toFixed(2)}€
+						{menu?.price?.toFixed(2)}€
 					</Text>
 				</View>
 
@@ -184,7 +184,7 @@ export default function MenuManagementScreen() {
 	const { t } = useTranslation();
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
-	const { fetchRestaurantMenus, updateMenuInCache } = useMenuStore();
+	const { fetchRestaurantMenus, updateMenuWithDishes } = useMenuStore();
 
 	// States
 	const [loading, setLoading] = useState(true);
@@ -265,19 +265,35 @@ export default function MenuManagementScreen() {
 	};
 
 	// Save menu handler
-	const handleSaveMenu = (updatedMenu: MenuData) => {
-		// Update local state
-		setAllMenus((prev) => ({
-			...prev,
-			[editingRestaurantId]: prev[editingRestaurantId].map((menu) =>
-				menu.id === updatedMenu.id ? updatedMenu : menu,
-			),
-		}));
+	const handleSaveMenu = async (updatedMenu: MenuData) => {
+		try {
+			const result = await updateMenuWithDishes(
+				editingRestaurantId,
+				updatedMenu,
+			);
 
-		// Update cache
-		updateMenuInCache(editingRestaurantId, updatedMenu.id, updatedMenu);
+			if (result.success && result.data) {
+				// Update local state
+				setAllMenus((prev) => ({
+					...prev,
+					[editingRestaurantId]: prev[editingRestaurantId].map((menu) =>
+						menu.id === updatedMenu.id ? result.data! : menu,
+					),
+				}));
+			} else {
+				Alert.alert(
+					t('validation.error'),
+					result.error || 'Failed to update menu',
+				);
+				return; // Don't close modal on error
+			}
+		} catch (error) {
+			console.error('Error updating menu:', error);
+			Alert.alert(t('validation.error'), 'Failed to update menu');
+			return; // Don't close modal on error
+		}
 
-		// Close modal
+		// Close modal only on success
 		setShowMenuModal(false);
 		setEditingMenu(undefined);
 		setEditingRestaurantId('');

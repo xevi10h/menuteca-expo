@@ -247,10 +247,10 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 				</View>
 			</View>
 			<Text style={styles.menuItemDescription}>{item.description}</Text>
-			{item.extraPrice > 0 && (
+			{item.extra_price > 0 && (
 				<View style={styles.menuItemPriceContainer}>
 					<Text style={styles.menuItemPriceText}>
-						+{item.extraPrice.toFixed(2)}€
+						+{item.extra_price.toFixed(2)}€
 					</Text>
 				</View>
 			)}

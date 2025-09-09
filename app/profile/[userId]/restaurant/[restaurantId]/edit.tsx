@@ -1,4 +1,4 @@
-import { MenuService, RestaurantService } from '@/api/index';
+import { RestaurantService } from '@/api/index';
 import { colors } from '@/assets/styles/colors';
 import LoadingScreen from '@/components/LoadingScreen';
 import MenuCreationModal from '@/components/MenuCreationModal';
@@ -15,6 +15,7 @@ import TagsSelectionModal from '@/components/restaurantCreation/TagsSelectionMod
 import { useTranslation } from '@/hooks/useTranslation';
 import { RestaurantTag } from '@/shared/enums';
 import { Address, MenuData, Restaurant } from '@/shared/types';
+import { useMenuStore } from '@/zustand/MenuStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -39,6 +40,7 @@ export default function UserRestaurantEdit() {
 		restaurantId: string;
 	}>();
 	const insets = useSafeAreaInsets();
+	const { createMenuWithDishes, updateMenuWithDishes, deleteMenuCompletely, fetchRestaurantMenus } = useMenuStore();
 
 	// Loading and data states
 	const [loading, setLoading] = useState(true);
@@ -76,17 +78,12 @@ export default function UserRestaurantEdit() {
 					const restaurantData = restaurantResponse.data;
 
 					// Load restaurant menus
-					const menusResponse = await MenuService.getRestaurantMenus(
-						restaurantId,
-					);
+					const menus = await fetchRestaurantMenus(restaurantId);
 
 					// Combine restaurant data with menus
 					const completeRestaurant: Restaurant = {
 						...restaurantData,
-						menus:
-							menusResponse.success && menusResponse.data
-								? menusResponse.data
-								: [],
+						menus: menus || [],
 					};
 
 					setRestaurant(completeRestaurant);
@@ -186,7 +183,8 @@ export default function UserRestaurantEdit() {
 			if (editingMenuIndex !== null) {
 				// Update existing menu
 				const menuToUpdate = restaurant.menus[editingMenuIndex];
-				const response = await MenuService.updateMenu(menuToUpdate.id, menu);
+				const updatedMenuData = { ...menu, id: menuToUpdate.id };
+				const response = await updateMenuWithDishes(restaurantId, updatedMenuData);
 
 				if (response.success && response.data) {
 					const updatedMenus = [...restaurant.menus];
@@ -195,16 +193,28 @@ export default function UserRestaurantEdit() {
 						...restaurant,
 						menus: updatedMenus,
 					});
+				} else {
+					Alert.alert(
+						t('validation.error'),
+						response.error || 'Error updating menu',
+					);
+					return; // Don't close modal on error
 				}
 			} else {
 				// Create new menu
-				const response = await MenuService.createMenu(restaurantId, menu);
+				const response = await createMenuWithDishes(restaurantId, menu);
 
 				if (response.success && response.data) {
 					setRestaurant({
 						...restaurant,
 						menus: [...restaurant.menus, response.data],
 					});
+				} else {
+					Alert.alert(
+						t('validation.error'),
+						response.error || 'Error creating menu',
+					);
+					return; // Don't close modal on error
 				}
 			}
 
@@ -257,7 +267,7 @@ export default function UserRestaurantEdit() {
 				// Remove ID and other fields that shouldn't be copied
 				const { id, ...menuDataWithoutId } = copiedMenuData;
 
-				const response = await MenuService.createMenu(
+				const response = await createMenuWithDishes(
 					restaurantId,
 					menuDataWithoutId,
 				);
@@ -307,12 +317,19 @@ export default function UserRestaurantEdit() {
 					style: 'destructive',
 					onPress: async () => {
 						try {
-							await MenuService.deleteMenu(menuToDelete.id);
-
-							setRestaurant({
-								...restaurant,
-								menus: restaurant.menus.filter((_, i) => i !== index),
-							});
+							const response = await deleteMenuCompletely(restaurantId, menuToDelete.id);
+							
+							if (response.success) {
+								setRestaurant({
+									...restaurant,
+									menus: restaurant.menus.filter((_, i) => i !== index),
+								});
+							} else {
+								Alert.alert(
+									t('validation.error'),
+									response.error || 'Error deleting menu',
+								);
+							}
 						} catch (error) {
 							console.error('Error deleting menu:', error);
 							Alert.alert(

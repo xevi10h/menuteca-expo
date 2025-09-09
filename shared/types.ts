@@ -135,7 +135,7 @@ export type MenuItem = {
 	id: string;
 	name: string;
 	description: string;
-	extraPrice?: number;
+	extra_price?: number;
 	category: string;
 	is_vegetarian?: boolean;
 	is_vegan?: boolean;
@@ -173,7 +173,7 @@ export type Dish = {
 	id: string;
 	name: string;
 	description: string;
-	extraPrice: number;
+	extra_price: number;
 	is_vegetarian: boolean;
 	is_lactose_free: boolean;
 	is_spicy: boolean;

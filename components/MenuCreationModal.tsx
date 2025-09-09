@@ -2,6 +2,7 @@ import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { DishCategory } from '@/shared/enums';
 import { Dish, MenuData } from '@/shared/types';
+import { useMenuStore } from '@/zustand/MenuStore';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useCallback, useState } from 'react';
@@ -104,8 +105,10 @@ const validateMenu = (
 interface MenuCreationModalProps {
 	visible: boolean;
 	onClose: () => void;
-	onSave: (menu: MenuData) => void;
+	onSave?: (menu: MenuData) => void; // Made optional for backward compatibility
 	editingMenu?: MenuData;
+	restaurantId?: string; // New prop for centralized saving
+	useDirectSave?: boolean; // Flag to use centralized saving
 }
 
 export default function MenuCreationModal({
@@ -113,8 +116,12 @@ export default function MenuCreationModal({
 	onClose,
 	onSave,
 	editingMenu,
+	restaurantId,
+	useDirectSave = false,
 }: MenuCreationModalProps) {
 	const { t } = useTranslation();
+	const { createMenuWithDishes, updateMenuWithDishes, isLoading } =
+		useMenuStore();
 
 	// Estados básicos del menú
 	const [menuName, setMenuName] = useState('');
@@ -132,6 +139,9 @@ export default function MenuCreationModal({
 
 	// New state for menu options
 	const [menuOptions, setMenuOptions] = useState<Partial<MenuData>>({});
+
+	// Local saving state
+	const [isSaving, setIsSaving] = useState(false);
 
 	// Estado para la validación del menú
 	const [validation, setValidation] = useState<MenuValidation>({
@@ -155,7 +165,7 @@ export default function MenuCreationModal({
 				name: 'Ensalada mixta',
 				description:
 					'Lechuga, tomate, cebolla, aceitunas y vinagreta de la casa',
-				extraPrice: 0,
+				extra_price: 0,
 				category: DishCategory.FIRST_COURSES,
 				is_vegetarian: true,
 				is_lactose_free: true,
@@ -168,7 +178,7 @@ export default function MenuCreationModal({
 				name: 'Sopa del día',
 				description:
 					'Sopa casera preparada con ingredientes frescos de temporada',
-				extraPrice: 0,
+				extra_price: 0,
 				category: DishCategory.FIRST_COURSES,
 				is_vegetarian: true,
 				is_lactose_free: false,
@@ -180,7 +190,7 @@ export default function MenuCreationModal({
 				id: Date.now().toString() + '_3',
 				name: 'Pollo a la plancha',
 				description: 'Pechuga de pollo a la plancha con guarnición de verduras',
-				extraPrice: 0,
+				extra_price: 0,
 				category: DishCategory.SECOND_COURSES,
 				is_vegetarian: false,
 				is_lactose_free: true,
@@ -192,7 +202,7 @@ export default function MenuCreationModal({
 				id: Date.now().toString() + '_4',
 				name: 'Merluza al horno',
 				description: 'Merluza fresca al horno con patatas panaderas',
-				extraPrice: 2.5,
+				extra_price: 2.5,
 				category: DishCategory.SECOND_COURSES,
 				is_vegetarian: false,
 				is_lactose_free: true,
@@ -204,7 +214,7 @@ export default function MenuCreationModal({
 				id: Date.now().toString() + '_5',
 				name: 'Flan casero',
 				description: 'Flan casero con caramelo líquido',
-				extraPrice: 0,
+				extra_price: 0,
 				category: DishCategory.DESSERTS,
 				is_vegetarian: true,
 				is_lactose_free: false,
@@ -216,7 +226,7 @@ export default function MenuCreationModal({
 				id: Date.now().toString() + '_6',
 				name: 'Fruta de temporada',
 				description: 'Selección de fruta fresca de temporada',
-				extraPrice: 0,
+				extra_price: 0,
 				category: DishCategory.DESSERTS,
 				is_vegetarian: true,
 				is_lactose_free: true,
@@ -432,7 +442,7 @@ export default function MenuCreationModal({
 		setValidation(newValidation);
 	}, [menuName, price, menuDishes]);
 
-	const handleSave = useCallback(() => {
+	const handleSave = useCallback(async () => {
 		// Validar el menú antes de guardar
 		const currentValidation = validateMenu(menuName, price, menuDishes);
 
@@ -469,8 +479,45 @@ export default function MenuCreationModal({
 			dishes: menuDishes,
 			...menuOptions,
 		};
-		onSave(menu);
-		onClose();
+
+		// Use centralized save if enabled and restaurant ID is provided
+		if (useDirectSave && restaurantId) {
+			setIsSaving(true);
+			try {
+				let result;
+				if (editingMenu?.id) {
+					// Update existing menu
+					result = await updateMenuWithDishes(restaurantId, menu);
+				} else {
+					// Create new menu
+					result = await createMenuWithDishes(restaurantId, menu);
+				}
+
+				if (result.success) {
+					onClose();
+					// Optionally call onSave with the saved menu for UI updates
+					if (onSave && result.data) {
+						onSave(result.data);
+					}
+				} else {
+					Alert.alert(
+						t('validation.error'),
+						result.error || 'Failed to save menu',
+					);
+				}
+			} catch (error) {
+				console.error('Error saving menu:', error);
+				Alert.alert(t('validation.error'), 'Failed to save menu');
+			} finally {
+				setIsSaving(false);
+			}
+		} else {
+			// Use traditional callback-based save
+			if (onSave) {
+				onSave(menu);
+				onClose();
+			}
+		}
 	}, [
 		menuName,
 		selectedDays,
@@ -482,6 +529,10 @@ export default function MenuCreationModal({
 		editingMenu?.id,
 		onSave,
 		onClose,
+		useDirectSave,
+		restaurantId,
+		createMenuWithDishes,
+		updateMenuWithDishes,
 		t,
 	]);
 
@@ -508,7 +559,9 @@ export default function MenuCreationModal({
 					}
 					handleClose={handleClose}
 					handleSave={handleSave}
-					saveDisabled={!validation.isValid}
+					saveDisabled={
+						!validation.isValid || isSaving || (useDirectSave && isLoading)
+					}
 					hasBorderBottom={true}
 				/>
 				<ScrollView

@@ -1,7 +1,6 @@
 // api/supabaseMenu.ts
 import { supabase } from '@/lib/supabase';
-import { MenuData, Language, DrinkInclusion, Dish } from '@/shared/types';
-import { getLocalizedText } from '@/shared/functions/utils';
+import { Dish, DrinkInclusion, Language, MenuData } from '@/shared/types';
 
 // Database types
 interface MenuRow {
@@ -31,7 +30,7 @@ interface DishRow {
 	menu_id: string;
 	name: { [key: string]: string };
 	description: { [key: string]: string };
-	extraPrice: number;
+	extra_price: number;
 	is_vegetarian: boolean;
 	is_lactose_free: boolean;
 	is_spicy: boolean;
@@ -59,7 +58,9 @@ export class SupabaseMenuService {
 	 */
 	private static async getCurrentUserId(): Promise<string | null> {
 		try {
-			const { data: { user } } = await supabase.auth.getUser();
+			const {
+				data: { user },
+			} = await supabase.auth.getUser();
 			return user?.id || null;
 		} catch (error) {
 			return null;
@@ -162,7 +163,7 @@ export class SupabaseMenuService {
 					id: dish.id,
 					name: this.getLocalizedText(dish.name, userLanguage),
 					description: this.getLocalizedText(dish.description, userLanguage),
-					extraPrice: dish.extraPrice,
+					extra_price: dish.extra_price,
 					is_vegetarian: dish.is_vegetarian,
 					is_lactose_free: dish.is_lactose_free,
 					is_spicy: dish.is_spicy,
@@ -233,7 +234,10 @@ export class SupabaseMenuService {
 			if (restaurantError) {
 				return {
 					success: false,
-					error: restaurantError.code === 'PGRST116' ? 'Restaurant not found' : 'Failed to verify restaurant',
+					error:
+						restaurantError.code === 'PGRST116'
+							? 'Restaurant not found'
+							: 'Failed to verify restaurant',
 				};
 			}
 
@@ -245,7 +249,10 @@ export class SupabaseMenuService {
 			}
 
 			const userLanguage = this.getCurrentLanguage();
-			const nameTranslated = this.createUserTranslatedText(menuData.name, userLanguage);
+			const nameTranslated = this.createUserTranslatedText(
+				menuData.name,
+				userLanguage,
+			);
 
 			// Ensure drinks has all boolean values
 			const drinks: DrinkInclusion = {
@@ -269,7 +276,8 @@ export class SupabaseMenuService {
 					desserts_to_share: menuData.desserts_to_share ?? false,
 					includes_bread: menuData.includes_bread ?? false,
 					drinks,
-					includes_coffee_and_dessert: menuData.includes_coffee_and_dessert || 'none',
+					includes_coffee_and_dessert:
+						menuData.includes_coffee_and_dessert || 'none',
 					minimum_people: menuData.minimum_people,
 					has_minimum_people: menuData.has_minimum_people ?? false,
 					is_active: true,
@@ -287,7 +295,11 @@ export class SupabaseMenuService {
 				throw error;
 			}
 
-			const menuResult = await this.convertToMenuData(data as MenuRow, userLanguage, false);
+			const menuResult = await this.convertToMenuData(
+				data as MenuRow,
+				userLanguage,
+				false,
+			);
 
 			return {
 				success: true,
@@ -322,8 +334,8 @@ export class SupabaseMenuService {
 
 			const menus = await Promise.all(
 				(data || []).map((menu: MenuRow) =>
-					this.convertToMenuData(menu, userLanguage, true)
-				)
+					this.convertToMenuData(menu, userLanguage, true),
+				),
 			);
 
 			return {
@@ -362,7 +374,11 @@ export class SupabaseMenuService {
 				throw error;
 			}
 
-			const menu = await this.convertToMenuData(data as MenuRow, userLanguage, true);
+			const menu = await this.convertToMenuData(
+				data as MenuRow,
+				userLanguage,
+				true,
+			);
 
 			return {
 				success: true,
@@ -410,10 +426,12 @@ export class SupabaseMenuService {
 			// Check ownership through menu -> restaurant
 			const { data: menuWithRestaurant, error: menuError } = await supabase
 				.from('menus')
-				.select(`
+				.select(
+					`
 					*,
 					restaurants!inner(owner_id)
-				`)
+				`,
+				)
 				.eq('id', id)
 				.is('deleted_at', null)
 				.single();
@@ -421,7 +439,10 @@ export class SupabaseMenuService {
 			if (menuError) {
 				return {
 					success: false,
-					error: menuError.code === 'PGRST116' ? 'Menu not found' : 'Failed to verify menu',
+					error:
+						menuError.code === 'PGRST116'
+							? 'Menu not found'
+							: 'Failed to verify menu',
 				};
 			}
 
@@ -433,7 +454,7 @@ export class SupabaseMenuService {
 			}
 
 			const userLanguage = this.getCurrentLanguage();
-			
+
 			// Handle name translation update
 			let finalName: { [key: string]: string } | undefined = undefined;
 			if (updateData.name) {
@@ -478,7 +499,11 @@ export class SupabaseMenuService {
 				throw error;
 			}
 
-			const menu = await this.convertToMenuData(data as MenuRow, userLanguage, false);
+			const menu = await this.convertToMenuData(
+				data as MenuRow,
+				userLanguage,
+				false,
+			);
 
 			return {
 				success: true,
@@ -508,10 +533,12 @@ export class SupabaseMenuService {
 			// Check ownership through menu -> restaurant
 			const { data: menuWithRestaurant, error: menuError } = await supabase
 				.from('menus')
-				.select(`
+				.select(
+					`
 					*,
 					restaurants!inner(owner_id)
-				`)
+				`,
+				)
 				.eq('id', id)
 				.is('deleted_at', null)
 				.single();
@@ -519,7 +546,10 @@ export class SupabaseMenuService {
 			if (menuError) {
 				return {
 					success: false,
-					error: menuError.code === 'PGRST116' ? 'Menu not found' : 'Failed to verify menu',
+					error:
+						menuError.code === 'PGRST116'
+							? 'Menu not found'
+							: 'Failed to verify menu',
 				};
 			}
 
@@ -567,10 +597,12 @@ export class SupabaseMenuService {
 			// Check ownership through menu -> restaurant
 			const { data: menuWithRestaurant, error: menuError } = await supabase
 				.from('menus')
-				.select(`
+				.select(
+					`
 					*,
 					restaurants!inner(owner_id)
-				`)
+				`,
+				)
 				.eq('id', id)
 				.is('deleted_at', null)
 				.single();
@@ -578,7 +610,10 @@ export class SupabaseMenuService {
 			if (menuError) {
 				return {
 					success: false,
-					error: menuError.code === 'PGRST116' ? 'Menu not found' : 'Failed to verify menu',
+					error:
+						menuError.code === 'PGRST116'
+							? 'Menu not found'
+							: 'Failed to verify menu',
 				};
 			}
 
@@ -635,18 +670,13 @@ export class SupabaseMenuService {
 
 			// Filter by time overlap
 			const availableMenus = (data || []).filter((menu: MenuRow) => {
-				return this.hasTimeOverlap(
-					menu.start_time,
-					menu.end_time,
-					time,
-					time,
-				);
+				return this.hasTimeOverlap(menu.start_time, menu.end_time, time, time);
 			});
 
 			const menus = await Promise.all(
 				availableMenus.map((menu: MenuRow) =>
-					this.convertToMenuData(menu, userLanguage, true)
-				)
+					this.convertToMenuData(menu, userLanguage, true),
+				),
 			);
 
 			return {
@@ -656,7 +686,10 @@ export class SupabaseMenuService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to fetch available menus',
+				error:
+					error instanceof Error
+						? error.message
+						: 'Failed to fetch available menus',
 			};
 		}
 	}
@@ -664,10 +697,7 @@ export class SupabaseMenuService {
 	/**
 	 * Search menus
 	 */
-	static async searchMenus(
-		query: string,
-		restaurantId?: string,
-	) {
+	static async searchMenus(query: string, restaurantId?: string) {
 		try {
 			const userLanguage = this.getCurrentLanguage();
 
@@ -700,8 +730,8 @@ export class SupabaseMenuService {
 
 			const menus = await Promise.all(
 				filteredMenus.map((menu: MenuRow) =>
-					this.convertToMenuData(menu, userLanguage, true)
-				)
+					this.convertToMenuData(menu, userLanguage, true),
+				),
 			);
 
 			return {
@@ -711,7 +741,8 @@ export class SupabaseMenuService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to search menus',
+				error:
+					error instanceof Error ? error.message : 'Failed to search menus',
 			};
 		}
 	}
@@ -734,7 +765,8 @@ export class SupabaseMenuService {
 			}
 
 			const total = data?.length || 0;
-			const active = data?.filter((menu: MenuRow) => menu.is_active).length || 0;
+			const active =
+				data?.filter((menu: MenuRow) => menu.is_active).length || 0;
 
 			const byDay: Record<string, number> = {
 				monday: 0,
@@ -765,7 +797,10 @@ export class SupabaseMenuService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to get menu statistics',
+				error:
+					error instanceof Error
+						? error.message
+						: 'Failed to get menu statistics',
 			};
 		}
 	}
