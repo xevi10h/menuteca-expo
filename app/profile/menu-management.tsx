@@ -3,6 +3,7 @@ import { colors } from '@/assets/styles/colors';
 import LoadingScreen from '@/components/LoadingScreen';
 import MenuCreationModal from '@/components/MenuCreationModal';
 import { useTranslation } from '@/hooks/useTranslation';
+import { formatMenuTime } from '@/shared/functions/utils';
 import { MenuData, Restaurant } from '@/shared/types';
 import { useMenuStore } from '@/zustand/MenuStore';
 import { Ionicons } from '@expo/vector-icons';
@@ -53,7 +54,7 @@ function MenuListItem({
 	};
 
 	const formatTime = (startTime: string, endTime: string): string => {
-		return `${startTime} - ${endTime}`;
+		return `${formatMenuTime(startTime)} - ${formatMenuTime(endTime)}`;
 	};
 
 	return (
@@ -231,19 +232,18 @@ export default function MenuManagementScreen() {
 			console.error('Error loading restaurants and menus:', error);
 			Alert.alert(t('validation.error'), t('menuManagement.errorLoadingData'));
 		}
-	}, []);
+	}, []); // Quitar las dependencias problemáticas
 
 	// Initial load
 	useEffect(() => {
 		const loadData = async () => {
 			setLoading(true);
 			await loadAllData();
-			console.log('allMenus', allMenus);
 			setLoading(false);
 		};
 
 		loadData();
-	}, [loadAllData]);
+	}, []); // Solo ejecutar una vez al montar el componente
 
 	// Refresh handler
 	const handleRefresh = useCallback(async () => {
@@ -422,7 +422,7 @@ const styles = StyleSheet.create({
 		right: 0,
 	},
 	headerRight: {
-		width: 40,
+		width: 50,
 		alignItems: 'flex-end',
 	},
 	totalCount: {
@@ -436,26 +436,15 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 20,
 	},
 	restaurantGroup: {
-		marginBottom: 24,
+		marginBottom: 32,
 	},
 	restaurantGroupHeader: {
-		backgroundColor: colors.quaternary,
-		borderRadius: 12,
-		padding: 16,
-		marginBottom: 8,
-		shadowColor: '#000',
-		shadowOffset: {
-			width: 0,
-			height: 1,
-		},
-		shadowOpacity: 0.1,
-		shadowRadius: 2,
-		elevation: 2,
+		paddingHorizontal: 4,
+		paddingVertical: 16,
+		marginBottom: 12,
 	},
 	restaurantGroupHeaderInactive: {
-		backgroundColor: colors.quaternary + 'E0',
-		borderWidth: 1,
-		borderColor: colors.primaryLight + '30',
+		opacity: 0.7,
 	},
 	restaurantInfo: {
 		flex: 1,
@@ -463,27 +452,28 @@ const styles = StyleSheet.create({
 	restaurantNameRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		marginBottom: 4,
+		marginBottom: 6,
 	},
 	restaurantName: {
-		fontSize: 16,
+		fontSize: 20,
 		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontWeight: '700',
 		color: colors.primary,
 		flex: 1,
 	},
 	statusDot: {
-		width: 8,
-		height: 8,
-		borderRadius: 4,
+		width: 10,
+		height: 10,
+		borderRadius: 5,
 		backgroundColor: '#EF4444',
-		marginLeft: 8,
+		marginLeft: 12,
 	},
 	restaurantDetails: {
 		fontSize: 14,
 		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontWeight: '500',
 		color: colors.primaryLight,
+		marginLeft: 4,
 	},
 	menuItem: {
 		backgroundColor: colors.quaternary,

@@ -249,8 +249,8 @@ export default function MenuCreationModal({
 	const simulateBackendCall = async (): Promise<boolean> => {
 		return new Promise((resolve) => {
 			setTimeout(() => {
-				// Simular 80% de éxito, 20% de error
-				const success = Math.random() > 0.2;
+				// Simular 100% de éxito, 0% de error
+				const success = Math.random() > 0.0;
 				resolve(success);
 			}, 2000);
 		});

@@ -1,5 +1,6 @@
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
+import { formatMenuTime } from '@/shared/functions/utils';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import React, { useCallback, useState } from 'react';
@@ -80,7 +81,7 @@ export default function TimeSelector({
 					style={styles.timeInputButton}
 					onPress={handleStartTimePress}
 				>
-					<Text style={styles.timeInputText}>{start_time}</Text>
+					<Text style={styles.timeInputText}>{formatMenuTime(start_time)}</Text>
 					<Ionicons name="time-outline" size={16} color={colors.primary} />
 				</TouchableOpacity>
 
@@ -90,7 +91,7 @@ export default function TimeSelector({
 					style={styles.timeInputButton}
 					onPress={handleEndTimePress}
 				>
-					<Text style={styles.timeInputText}>{end_time}</Text>
+					<Text style={styles.timeInputText}>{formatMenuTime(end_time)}</Text>
 					<Ionicons name="time-outline" size={16} color={colors.primary} />
 				</TouchableOpacity>
 			</View>

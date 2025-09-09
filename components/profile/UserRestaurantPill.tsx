@@ -1,11 +1,20 @@
+import { RestaurantService } from '@/api';
 import { colors } from '@/assets/styles/colors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Restaurant } from '@/shared/types';
+import { useUserRestaurantsStore } from '@/zustand/UserRestaurantStore';
 import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import {
+	Alert,
+	Image,
+	StyleSheet,
+	Text,
+	TouchableOpacity,
+	View,
+} from 'react-native';
 
 interface UserRestaurantPillProps {
 	restaurant: Restaurant;
@@ -17,6 +26,10 @@ export default function UserRestaurantPill({
 	const { t } = useTranslation();
 	const router = useRouter();
 	const user_id = useUserStore((state) => state.user.id);
+	const removeRestaurant = useUserRestaurantsStore(
+		(state) => state.removeRestaurant,
+	);
+	const [isDeleting, setIsDeleting] = useState(false);
 
 	// El status se puede obtener directamente del restaurant object
 	const status = {
@@ -29,6 +42,39 @@ export default function UserRestaurantPill({
 
 	const handleEdit = () => {
 		router.push(`/profile/${user_id}/restaurant/${restaurant.id}/edit`);
+	};
+
+	const handleDelete = () => {
+		Alert.alert(
+			t('profile.deleteRestaurant'),
+			t('profile.deleteRestaurantConfirm'),
+			[
+				{
+					text: t('general.cancel'),
+					style: 'cancel',
+				},
+				{
+					text: t('general.delete'),
+					style: 'destructive',
+					onPress: async () => {
+						setIsDeleting(true);
+						try {
+							await RestaurantService.deleteRestaurant(restaurant.id);
+							removeRestaurant(restaurant.id);
+							Alert.alert(t('general.success'), t('profile.restaurantDeleted'));
+						} catch (error) {
+							console.error('Error deleting restaurant:', error);
+							Alert.alert(
+								t('general.error'),
+								t('profile.errorDeletingRestaurant'),
+							);
+						} finally {
+							setIsDeleting(false);
+						}
+					},
+				},
+			],
+		);
 	};
 
 	const renderRestaurantImage = () => {
@@ -117,10 +163,19 @@ export default function UserRestaurantPill({
 				</TouchableOpacity>
 
 				<TouchableOpacity
-					style={[styles.actionButton, styles.editButton]}
-					onPress={handleEdit}
+					style={[
+						styles.actionButton,
+						styles.editButton,
+						isDeleting && styles.disabledButton,
+					]}
+					onPress={handleDelete}
+					disabled={isDeleting}
 				>
-					<Ionicons name="trash-outline" size={16} color={colors.primary} />
+					<Ionicons
+						name="trash-outline"
+						size={16}
+						color={isDeleting ? colors.primaryLight : colors.primary}
+					/>
 				</TouchableOpacity>
 			</View>
 		</TouchableOpacity>
@@ -255,5 +310,8 @@ const styles = StyleSheet.create({
 		backgroundColor: colors.secondary,
 		borderWidth: 1,
 		borderColor: colors.primary,
+	},
+	disabledButton: {
+		opacity: 0.5,
 	},
 });

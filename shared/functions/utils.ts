@@ -44,12 +44,19 @@ export function getLocalizedText(
 	if (translations[language]) {
 		return translations[language];
 	}
-	
+
 	if (translations[fallbackLanguage]) {
 		return translations[fallbackLanguage];
 	}
-	
+
 	// Return first available translation as last resort
 	const firstKey = Object.keys(translations)[0];
 	return translations[firstKey] || '';
+}
+
+export function formatMenuTime(time: string): string {
+	const [hours, minutes] = time.split(':').map(Number);
+	const date = new Date();
+	date.setHours(hours, minutes);
+	return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
