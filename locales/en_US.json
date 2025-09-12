@@ -260,7 +260,10 @@
 			"needValidPrice": "• The menu must have a price greater than €0",
 			"needFirstCourse": "• The menu must have at least one first course",
 			"needSecondCourse": "• The menu must have at least one second course"
-		}
+		},
+		"notMenuErrorTitle": "Invalid image",
+		"quotaExceededTitle": "Limit exceeded",
+		"networkErrorTitle": "Connection error"
 	},
 	"days": {
 		"sunday": "Sunday",

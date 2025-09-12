@@ -260,7 +260,10 @@
 			"needValidPrice": "• Le menu doit avoir un prix supérieur à 0€",
 			"needFirstCourse": "• Le menu doit avoir au moins une entrée",
 			"needSecondCourse": "• Le menu doit avoir au moins un plat principal"
-		}
+		},
+		"notMenuErrorTitle": "Image non valide",
+		"quotaExceededTitle": "Limite dépassée",
+		"networkErrorTitle": "Erreur de connexion"
 	},
 	"days": {
 		"monday": "Lundi",

@@ -102,6 +102,45 @@ const validateMenu = (
 	};
 };
 
+const convertImageToBase64 = async (uri: string): Promise<string> => {
+	try {
+		const response = await fetch(uri);
+		const blob = await response.blob();
+
+		return new Promise((resolve, reject) => {
+			const reader = new FileReader();
+			reader.onload = () => {
+				const result = reader.result as string;
+				// Remover el prefix "data:image/jpeg;base64," para obtener solo el base64
+				const base64 = result.split(',')[1];
+				resolve(base64);
+			};
+			reader.onerror = reject;
+			reader.readAsDataURL(blob);
+		});
+	} catch (error) {
+		console.error('Error converting image to base64:', error);
+		throw error;
+	}
+};
+
+const getMimeTypeFromUri = (uri: string): string => {
+	const extension = uri.split('.').pop()?.toLowerCase();
+	switch (extension) {
+		case 'jpg':
+		case 'jpeg':
+			return 'image/jpeg';
+		case 'png':
+			return 'image/png';
+		case 'gif':
+			return 'image/gif';
+		case 'webp':
+			return 'image/webp';
+		default:
+			return 'image/jpeg'; // Default fallback
+	}
+};
+
 interface MenuCreationModalProps {
 	visible: boolean;
 	onClose: () => void;
@@ -153,118 +192,6 @@ export default function MenuCreationModal({
 			hasSecondCourse: true,
 		},
 	});
-
-	// Simular un menú generado por el backend
-	const generateSimulatedMenu = (): {
-		dishes: Dish[];
-		menuData: Partial<MenuData>;
-	} => {
-		const simulatedDishes: Dish[] = [
-			{
-				id: Date.now().toString() + '_1',
-				name: 'Ensalada mixta',
-				description:
-					'Lechuga, tomate, cebolla, aceitunas y vinagreta de la casa',
-				extra_price: 0,
-				category: DishCategory.FIRST_COURSES,
-				is_vegetarian: true,
-				is_lactose_free: true,
-				is_spicy: false,
-				is_gluten_free: true,
-				is_vegan: true,
-			},
-			{
-				id: Date.now().toString() + '_2',
-				name: 'Sopa del día',
-				description:
-					'Sopa casera preparada con ingredientes frescos de temporada',
-				extra_price: 0,
-				category: DishCategory.FIRST_COURSES,
-				is_vegetarian: true,
-				is_lactose_free: false,
-				is_spicy: false,
-				is_gluten_free: false,
-				is_vegan: false,
-			},
-			{
-				id: Date.now().toString() + '_3',
-				name: 'Pollo a la plancha',
-				description: 'Pechuga de pollo a la plancha con guarnición de verduras',
-				extra_price: 0,
-				category: DishCategory.SECOND_COURSES,
-				is_vegetarian: false,
-				is_lactose_free: true,
-				is_spicy: false,
-				is_gluten_free: true,
-				is_vegan: false,
-			},
-			{
-				id: Date.now().toString() + '_4',
-				name: 'Merluza al horno',
-				description: 'Merluza fresca al horno con patatas panaderas',
-				extra_price: 2.5,
-				category: DishCategory.SECOND_COURSES,
-				is_vegetarian: false,
-				is_lactose_free: true,
-				is_spicy: false,
-				is_gluten_free: true,
-				is_vegan: false,
-			},
-			{
-				id: Date.now().toString() + '_5',
-				name: 'Flan casero',
-				description: 'Flan casero con caramelo líquido',
-				extra_price: 0,
-				category: DishCategory.DESSERTS,
-				is_vegetarian: true,
-				is_lactose_free: false,
-				is_spicy: false,
-				is_gluten_free: true,
-				is_vegan: false,
-			},
-			{
-				id: Date.now().toString() + '_6',
-				name: 'Fruta de temporada',
-				description: 'Selección de fruta fresca de temporada',
-				extra_price: 0,
-				category: DishCategory.DESSERTS,
-				is_vegetarian: true,
-				is_lactose_free: true,
-				is_spicy: false,
-				is_gluten_free: true,
-				is_vegan: true,
-			},
-		];
-
-		const simulatedMenuData: Partial<MenuData> = {
-			first_courses_to_share: false,
-			second_courses_to_share: false,
-			desserts_to_share: false,
-			includes_bread: true,
-			drinks: {
-				water: true,
-				wine: false,
-				soft_drinks: true,
-				beer: false,
-			},
-			includes_coffee_and_dessert: 'coffee',
-			has_minimum_people: false,
-			minimum_people: undefined,
-		};
-
-		return { dishes: simulatedDishes, menuData: simulatedMenuData };
-	};
-
-	// Simular llamada al backend para procesar la foto
-	const simulateBackendCall = async (): Promise<boolean> => {
-		return new Promise((resolve) => {
-			setTimeout(() => {
-				// Simular 100% de éxito, 0% de error
-				const success = Math.random() > 0.0;
-				resolve(success);
-			}, 2000);
-		});
-	};
 
 	// Manejar la carga y procesamiento de la foto
 	const handlePhotoMenuUpload = async () => {
@@ -324,28 +251,195 @@ export default function MenuCreationModal({
 		}
 	};
 
+	// Función para llamar a la API de análisis de menú (actualizada)
+	const analyzeMenuImage = async (
+		imageUri: string,
+	): Promise<{
+		success: boolean;
+		data?: {
+			dishes: Dish[];
+			menuData: Partial<MenuData>;
+			suggestedMenuName?: string;
+			suggestedPrice?: number;
+		};
+		error?: string;
+		errorType?: string;
+	}> => {
+		try {
+			console.log('🔍 Starting menu image analysis...');
+			console.log('🖼️ Image URI:', imageUri);
+
+			// Convertir imagen a base64
+			const base64Data = await convertImageToBase64(imageUri);
+			const mimeType = getMimeTypeFromUri(imageUri);
+
+			console.log('📤 Preparing to send image to analysis API...');
+			console.log('🔍 Base64 data length:', base64Data.length);
+			console.log('🔍 MIME type:', mimeType);
+			console.log('🔍 Environment URL:', process.env.EXPO_PUBLIC_SUPABASE_URL);
+			console.log('🔍 Language header:', navigator.language);
+
+			// Crear el payload
+			const payload = {
+				imageData: base64Data,
+				mimeType: mimeType,
+			};
+
+			console.log(
+				'📦 Payload size:',
+				JSON.stringify(payload).length,
+				'characters',
+			);
+
+			// Llamar a la función de Supabase
+			const response = await fetch(
+				`${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/analyze-menu-image`,
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY}`,
+						'Accept-Language': navigator.language, // Enviar idioma preferido
+					},
+					body: JSON.stringify(payload),
+				},
+			);
+
+			console.log('📡 API Response received');
+			console.log('📡 Response status:', response.status);
+			console.log('📡 Response statusText:', response.statusText);
+			console.log(
+				'📡 Response headers:',
+				Object.fromEntries(response.headers.entries()),
+			);
+
+			let errorData;
+			try {
+				const responseText = await response.text();
+				console.log('📝 Raw response text length:', responseText.length);
+				console.log(
+					'📝 Raw response text preview:',
+					responseText.substring(0, 500),
+				);
+
+				errorData = JSON.parse(responseText);
+				console.log('✅ Response parsed successfully:', errorData);
+			} catch (parseError) {
+				console.error('❌ Failed to parse response:', parseError);
+				console.error('❌ Parse error details:', {
+					name: parseError.name,
+					message: parseError.message,
+					stack: parseError.stack,
+				});
+				return {
+					success: false,
+					error:
+						'Error de conexión. Por favor, verifica tu conexión a internet e inténtalo de nuevo.',
+					errorType: 'network_error',
+				};
+			}
+
+			if (!response.ok) {
+				console.error('❌ API Error:', errorData);
+				console.error('❌ API Error details:', {
+					status: response.status,
+					statusText: response.statusText,
+					errorData: errorData,
+				});
+
+				// El servidor ya devuelve el mensaje apropiado en el idioma correcto
+				return {
+					success: false,
+					error: errorData.error,
+					errorType: errorData.errorType || 'processing_error',
+				};
+			}
+
+			console.log('✅ Analysis result:', errorData);
+			return errorData;
+		} catch (error) {
+			console.error('💥 Error analyzing menu image:', error);
+			console.error('💥 Error details:', {
+				name: error.name,
+				message: error.message,
+				stack: error.stack,
+			});
+
+			// Detectar errores de red específicos
+			let errorType = 'processing_error';
+			if (error instanceof TypeError && error.message.includes('fetch')) {
+				errorType = 'network_error';
+			}
+
+			return {
+				success: false,
+				error:
+					'Error al procesar la imagen. Por favor, asegúrate de que la imagen es clara y legible.',
+				errorType: errorType,
+			};
+		}
+	};
+
+	// Modificar la función processPhoto en el componente MenuCreationModal
 	const processPhoto = async (photoUri: string) => {
 		try {
 			setIsProcessingPhoto(true);
 			setPhotoProcessed(false);
 
-			// Simular llamada al backend
-			const success = await simulateBackendCall();
+			console.log('📸 Processing photo:', photoUri);
+
+			// Llamar a la API real de análisis de menú
+			const analysisResult = await analyzeMenuImage(photoUri);
 
 			setIsProcessingPhoto(false);
 			setPhotoProcessed(true);
-			setPhotoProcessSuccess(success);
+			setPhotoProcessSuccess(analysisResult.success);
 
-			if (success) {
-				// Si el procesamiento es exitoso, generar menú simulado
-				const { dishes, menuData } = generateSimulatedMenu();
+			console.log('🔍 Analysis result success:', analysisResult.success);
+			console.log('🔍 Analysis result data:', analysisResult.data);
 
-				// Establecer los datos ANTES de mostrar el manual menu
+			if (analysisResult.success && analysisResult.data) {
+				// Si el análisis es exitoso, establecer los datos reales
+				const { dishes, menuData, suggestedMenuName, suggestedPrice } =
+					analysisResult.data;
+
+				console.log('✅ Setting menu data:');
+				console.log('📝 Dishes count:', dishes.length);
+				console.log('📝 First dish:', dishes[0]);
+				console.log('📝 Menu options:', menuData);
+				console.log('📝 Suggested name:', suggestedMenuName);
+				console.log('📝 Suggested price:', suggestedPrice);
+
+				// Establecer los datos del menú analizados
 				setMenuDishes(dishes);
-				setMenuOptions(menuData);
+				console.log('✅ Menu dishes set');
 
-				// Luego mostrar el manual menu
+				setMenuOptions(menuData);
+				console.log('✅ Menu options set');
+
+				// Si hay nombre y precio sugeridos, establecerlos también
+				if (suggestedMenuName && suggestedMenuName !== 'Menú del día') {
+					setMenuName(suggestedMenuName);
+					console.log('✅ Menu name set to:', suggestedMenuName);
+				}
+				if (suggestedPrice && suggestedPrice > 0) {
+					setPrice(suggestedPrice.toString());
+					console.log('✅ Menu price set to:', suggestedPrice);
+				}
+
+				// Mostrar el manual menu
+				console.log('🔧 Setting showManualMenu to true');
 				setShowManualMenu(true);
+
+				// Forzar re-render agregando un pequeño delay
+				setTimeout(() => {
+					console.log('🔧 Manual menu should now be visible');
+					console.log(
+						'🔧 Current dishes state should have:',
+						dishes.length,
+						'dishes',
+					);
+				}, 100);
 
 				// Mostrar mensaje de éxito
 				setTimeout(() => {
@@ -356,11 +450,30 @@ export default function MenuCreationModal({
 					);
 				}, 500);
 			} else {
-				// Mostrar mensaje de error
+				console.log('❌ Analysis failed:', analysisResult.error);
+				console.log('❌ Error type:', analysisResult.errorType);
+
+				// Mostrar mensaje de error específico basado en el tipo de error
+				const errorType = analysisResult.errorType || 'processing_error';
+				let alertTitle = t('menuCreation.photoMenuErrorTitle');
+
+				// Personalizar título según el tipo de error usando las claves de traducción existentes
+				switch (errorType) {
+					case 'not_menu':
+						alertTitle = t('menuCreation.notMenuErrorTitle');
+						break;
+					case 'quota_exceeded':
+						alertTitle = t('menuCreation.quotaExceededTitle');
+						break;
+					case 'network_error':
+						alertTitle = t('menuCreation.networkErrorTitle');
+						break;
+				}
+
 				setTimeout(() => {
 					Alert.alert(
-						t('menuCreation.photoMenuErrorTitle'),
-						t('menuCreation.photoMenuError'),
+						alertTitle,
+						analysisResult.error || t('menuCreation.photoMenuError'),
 						[{ text: t('general.ok'), style: 'default' }],
 					);
 				}, 500);
@@ -374,10 +487,16 @@ export default function MenuCreationModal({
 		} catch (error) {
 			console.error('Error processing photo:', error);
 			setIsProcessingPhoto(false);
-			Alert.alert(
-				t('menuCreation.photoMenuErrorTitle'),
-				t('menuCreation.photoMenuError'),
-			);
+
+			setTimeout(() => {
+				Alert.alert(
+					t('menuCreation.photoMenuErrorTitle'),
+					error instanceof Error
+						? error.message
+						: t('menuCreation.photoMenuError'),
+					[{ text: t('general.ok'), style: 'default' }],
+				);
+			}, 500);
 		}
 	};
 

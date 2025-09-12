@@ -259,7 +259,10 @@
 			"needValidPrice": "• El menú debe tener un precio mayor a 0€",
 			"needFirstCourse": "• El menú debe tener al menos un primer plato",
 			"needSecondCourse": "• El menú debe tener al menos un segundo plato"
-		}
+		},
+		"notMenuErrorTitle": "Imagen no válida",
+		"quotaExceededTitle": "Límite excedido",
+		"networkErrorTitle": "Error de conexión"
 	},
 	"days": {
 		"monday": "Lunes",

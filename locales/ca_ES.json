@@ -260,7 +260,10 @@
 			"needValidPrice": "• El menú ha de tenir un preu superior a 0€",
 			"needFirstCourse": "• El menú ha de tenir almenys un primer plat",
 			"needSecondCourse": "• El menú ha de tenir almenys un segon plat"
-		}
+		},
+		"notMenuErrorTitle": "Imatge no vàlida",
+		"quotaExceededTitle": "Límit excedit",
+		"networkErrorTitle": "Error de connexió"
 	},
 	"days": {
 		"monday": "Dilluns",
