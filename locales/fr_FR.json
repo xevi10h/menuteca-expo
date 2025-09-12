@@ -399,7 +399,11 @@
 		"choosePhotoOption": "Choisissez une option pour changer votre photo de profil",
 		"cameraAccessMessage": "Nous avons besoin d'accéder à l'appareil photo pour prendre des photos",
 		"confirmRemovePhoto": "Êtes-vous sûr de vouloir supprimer votre photo de profil ?",
-		"photoDeleteError": "Erreur lors de la suppression de la photo de profil"
+		"photoDeleteError": "Erreur lors de la suppression de la photo de profil",
+		"deleteRestaurant": "Supprimer le restaurant",
+		"deleteRestaurantConfirm": "Êtes-vous sûr de vouloir supprimer ce restaurant ? Cette action ne peut pas être annulée.",
+		"restaurantDeleted": "Restaurant supprimé avec succès",
+		"errorDeletingRestaurant": "Impossible de supprimer le restaurant. Veuillez réessayer."
 	},
 	"languages": {
 		"en_US": "Anglais",

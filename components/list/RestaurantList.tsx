@@ -45,9 +45,9 @@ export default function RestaurantList({
 
 	const renderEmpty = () => (
 		<View style={styles.emptyContainer}>
-			<Text style={styles.emptyTitle}>{t('restaurants.noResults')}</Text>
+			<Text style={styles.emptyTitle}>{t('restaurant.noResults')}</Text>
 			<Text style={styles.emptySubtitle}>
-				{t('restaurants.noResultsSubtitle')}
+				{t('restaurant.noResultsSubtitle')}
 			</Text>
 		</View>
 	);
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
 		flexGrow: 1,
 	},
 	itemContainer: {
-		marginBottom: 16,
+		marginBottom: 40,
 	},
 	footer: {
 		height: 100, // Space at the bottom
