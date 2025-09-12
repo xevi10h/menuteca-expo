@@ -10,6 +10,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useState } from 'react';
 import {
+	Modal,
 	StyleSheet,
 	Switch,
 	Text,
@@ -128,8 +129,10 @@ export default function ManualMenuSection({
 	// Estados para modales
 	const [showDishModal, setShowDishModal] = useState(false);
 	const [showSupplementModal, setShowSupplementModal] = useState(false);
+	const [showEditNameModal, setShowEditNameModal] = useState(false);
 	const [currentDish, setCurrentDish] = useState<Dish | null>(null);
 	const [supplementPrice, setSupplementPrice] = useState('');
+	const [editingDishName, setEditingDishName] = useState('');
 
 	// Usar useRef para evitar bucles infinitos
 	const prevInitialDishesRef = React.useRef<Dish[]>([]);
@@ -225,6 +228,12 @@ export default function ManualMenuSection({
 		setShowSupplementModal(true);
 	}, []);
 
+	const openEditNameModal = useCallback((dish: Dish) => {
+		setCurrentDish(dish);
+		setEditingDishName(dish.name);
+		setShowEditNameModal(true);
+	}, []);
+
 	const saveDish = useCallback((updatedDish: Dish) => {
 		setDishes((prev) =>
 			prev.map((d) => (d.id === updatedDish.id ? updatedDish : d)),
@@ -247,6 +256,15 @@ export default function ManualMenuSection({
 		setSupplementPrice('');
 		setCurrentDish(null);
 	}, [currentDish, supplementPrice]);
+
+	const saveEditedName = useCallback(() => {
+		if (currentDish && editingDishName.trim() !== '') {
+			updateDishName(currentDish.id, editingDishName.trim());
+		}
+		setShowEditNameModal(false);
+		setEditingDishName('');
+		setCurrentDish(null);
+	}, [currentDish, editingDishName, updateDishName]);
 
 	// Optimizar el useEffect que actualiza el parent para evitar bucles
 	const stableOnSave = React.useCallback(onSave, []);
@@ -306,12 +324,21 @@ export default function ManualMenuSection({
 
 		return (
 			<View key={dish.id} style={styles.dishItem}>
-				<TextInput
-					style={styles.dishInput}
-					value={dish.name}
-					onChangeText={(text) => updateDishName(dish.id, text)}
-					placeholder={t('menuCreation.firstCoursePlaceholder')}
-				/>
+				<TouchableOpacity
+					style={styles.dishInputContainer}
+					onPress={() => openEditNameModal(dish)}
+				>
+					<Text
+						style={[
+							styles.dishInput,
+							!dish.name && styles.dishInputPlaceholder,
+						]}
+						numberOfLines={1}
+						ellipsizeMode="tail"
+					>
+						{dish.name || t('menuCreation.firstCoursePlaceholder')}
+					</Text>
+				</TouchableOpacity>
 				<TouchableOpacity
 					style={[
 						styles.dishIcon,
@@ -566,6 +593,46 @@ export default function ManualMenuSection({
 				}}
 				onSave={addSupplement}
 			/>
+
+			{/* Edit Name Modal */}
+			<Modal visible={showEditNameModal} transparent animationType="fade">
+				<View style={styles.editNameModalOverlay}>
+					<View style={styles.editNameModalContent}>
+						<Text style={styles.editNameModalTitle}>
+							{t('menuCreation.editDishName')}
+						</Text>
+						<TextInput
+							style={styles.editNameModalInput}
+							value={editingDishName}
+							onChangeText={setEditingDishName}
+							placeholder={t('menuCreation.dishNamePlaceholder')}
+							multiline={true}
+							numberOfLines={3}
+							autoFocus
+						/>
+						<View style={styles.editNameModalButtons}>
+							<TouchableOpacity
+								style={[styles.editNameModalButton, styles.cancelButton]}
+								onPress={() => {
+									setShowEditNameModal(false);
+									setEditingDishName('');
+									setCurrentDish(null);
+								}}
+							>
+								<Text style={styles.cancelButtonText}>
+									{t('general.cancel')}
+								</Text>
+							</TouchableOpacity>
+							<TouchableOpacity
+								style={[styles.editNameModalButton, styles.saveButton]}
+								onPress={saveEditedName}
+							>
+								<Text style={styles.saveButtonText}>{t('general.save')}</Text>
+							</TouchableOpacity>
+						</View>
+					</View>
+				</View>
+			</Modal>
 		</>
 	);
 }
@@ -788,5 +855,88 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '400',
 		color: colors.primary,
+	},
+	dishInputContainer: {
+		flex: 1,
+		borderColor: colors.primaryLight,
+		minHeight: 50,
+		justifyContent: 'center',
+	},
+	dishInputPlaceholder: {
+		color: colors.primaryLight,
+		fontStyle: 'italic',
+	},
+	editNameModalOverlay: {
+		flex: 1,
+		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingHorizontal: 20,
+	},
+	editNameModalContent: {
+		backgroundColor: colors.secondary,
+		borderRadius: 16,
+		paddingVertical: 24,
+		paddingHorizontal: 20,
+		width: '100%',
+		maxWidth: 400,
+		elevation: 10,
+		shadowColor: '#000',
+		shadowOffset: {
+			width: 0,
+			height: 5,
+		},
+		shadowOpacity: 0.3,
+		shadowRadius: 10,
+	},
+	editNameModalTitle: {
+		fontSize: 18,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.primary,
+		marginBottom: 16,
+		textAlign: 'center',
+	},
+	editNameModalInput: {
+		borderRadius: 12,
+		paddingHorizontal: 16,
+		paddingVertical: 12,
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		color: colors.primary,
+		borderWidth: 1,
+		borderColor: colors.primaryLight,
+		marginBottom: 20,
+		textAlignVertical: 'top',
+	},
+	editNameModalButtons: {
+		flexDirection: 'row',
+		gap: 12,
+	},
+	editNameModalButton: {
+		flex: 1,
+		paddingVertical: 12,
+		borderRadius: 12,
+		alignItems: 'center',
+	},
+	cancelButton: {
+		backgroundColor: 'transparent',
+		borderWidth: 1,
+		borderColor: colors.primaryLight,
+	},
+	cancelButtonText: {
+		color: colors.primary,
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
+	},
+	saveButton: {
+		backgroundColor: colors.primary,
+	},
+	saveButtonText: {
+		color: colors.quaternary,
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
 	},
 });

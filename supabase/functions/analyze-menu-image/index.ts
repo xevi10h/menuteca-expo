@@ -80,7 +80,7 @@ function getPreferredLanguage(req: Request): 'es' | 'ca' | 'en' | 'fr' {
 	return 'es'; // Por defecto español
 }
 
-// Función para limpiar la respuesta de markdown
+// Función para limpiar la respuesta de markdown y comentarios
 function cleanMarkdownResponse(response: string): string {
 	// Remover bloques de código markdown
 	let cleaned = response.trim();
@@ -99,7 +99,17 @@ function cleanMarkdownResponse(response: string): string {
 	cleaned = cleaned.replace(/^```[\w]*\n?/gm, '');
 	cleaned = cleaned.replace(/\n?```$/gm, '');
 
-	return cleaned.trim();
+	// Remover comentarios de línea que rompen el JSON
+	cleaned = cleaned.replace(/,\s*\/\/.*$/gm, ','); // Comentarios después de comas
+	cleaned = cleaned.replace(/\s*\/\/.*$/gm, ''); // Otros comentarios de línea
+
+	// Remover comentarios de bloque /* */
+	cleaned = cleaned.replace(/\/\*[\s\S]*?\*\//g, '');
+
+	// Limpiar espacios extra
+	cleaned = cleaned.replace(/\s+/g, ' ').trim();
+
+	return cleaned;
 }
 
 const MENU_ANALYSIS_PROMPT = `
@@ -112,7 +122,8 @@ Si NO es un menú de restaurante, responde únicamente con:
 }
 
 Si SÍ es un menú de restaurante, EXTRAE TODA LA INFORMACIÓN DEL MENÚ Y TODOS SUS PLATOS y responde únicamente con un JSON válido.
-Sobretodo, es muy importante que busques y extraigas todos todos TODOS LOS PLATOS (TODOS LOS APERITIVOS/ENTRANTES, TODOS LOS PRIMEROS, TODOS LOS SEGUNDOS Y TODOS LOS POSTRES) que encuentres en el menú y los intentes organizar segun creas que trata de un aperitivo/entrante, primer plato, segundo plato o postre.
+Sobretodo, es muy importante que busques y extraigas todos todos TODOS LOS PLATOS (TODOS LOS APERITIVOS/ENTRANTES, TODOS LOS PRIMEROS, TODOS LOS SEGUNDOS Y TODOS LOS POSTRES => QUIERO ABSOLUTAMENTE TODOS LOS PLATOS QUE ENCUENTRES EN LA IMAGEN) que encuentres en el menú y los intentes organizar segun creas que trata de un aperitivo/entrante, primer plato, segundo plato o postre.
+Por favor, tomate el tiempo que sea necesario para extraer todos los platos de la imagen! LOS QUIERO TODOS! TU MISIÓN ES SACAR LA MAYOR INFORMACIÓN POSIBLE DE LA IMÁGEN.
 Debe seguir esta estructura exacta:
 
 {

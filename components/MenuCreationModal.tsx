@@ -10,6 +10,7 @@ import {
 	ActivityIndicator,
 	Alert,
 	Modal,
+	Platform,
 	ScrollView,
 	StyleSheet,
 	Text,
@@ -175,6 +176,7 @@ export default function MenuCreationModal({
 	const [isProcessingPhoto, setIsProcessingPhoto] = useState(false);
 	const [photoProcessed, setPhotoProcessed] = useState(false);
 	const [photoProcessSuccess, setPhotoProcessSuccess] = useState(false);
+	const [showProcessingModal, setShowProcessingModal] = useState(false);
 
 	// New state for menu options
 	const [menuOptions, setMenuOptions] = useState<Partial<MenuData>>({});
@@ -242,8 +244,9 @@ export default function MenuCreationModal({
 	const openGallery = async () => {
 		const result = await ImagePicker.launchImageLibraryAsync({
 			mediaTypes: ['images'],
-			allowsEditing: true,
+			allowsEditing: Platform.OS === 'android',
 			quality: 0.8,
+			aspect: undefined,
 		});
 
 		if (!result.canceled) {
@@ -326,11 +329,6 @@ export default function MenuCreationModal({
 				console.log('✅ Response parsed successfully:', errorData);
 			} catch (parseError) {
 				console.error('❌ Failed to parse response:', parseError);
-				console.error('❌ Parse error details:', {
-					name: parseError.name,
-					message: parseError.message,
-					stack: parseError.stack,
-				});
 				return {
 					success: false,
 					error:
@@ -359,11 +357,6 @@ export default function MenuCreationModal({
 			return errorData;
 		} catch (error) {
 			console.error('💥 Error analyzing menu image:', error);
-			console.error('💥 Error details:', {
-				name: error.name,
-				message: error.message,
-				stack: error.stack,
-			});
 
 			// Detectar errores de red específicos
 			let errorType = 'processing_error';
@@ -380,10 +373,19 @@ export default function MenuCreationModal({
 		}
 	};
 
+	// Función para cancelar el procesamiento
+	const cancelPhotoProcessing = () => {
+		setIsProcessingPhoto(false);
+		setShowProcessingModal(false);
+		setPhotoProcessed(false);
+		setPhotoProcessSuccess(false);
+	};
+
 	// Modificar la función processPhoto en el componente MenuCreationModal
 	const processPhoto = async (photoUri: string) => {
 		try {
 			setIsProcessingPhoto(true);
+			setShowProcessingModal(true);
 			setPhotoProcessed(false);
 
 			console.log('📸 Processing photo:', photoUri);
@@ -392,6 +394,7 @@ export default function MenuCreationModal({
 			const analysisResult = await analyzeMenuImage(photoUri);
 
 			setIsProcessingPhoto(false);
+			setShowProcessingModal(false);
 			setPhotoProcessed(true);
 			setPhotoProcessSuccess(analysisResult.success);
 
@@ -487,6 +490,7 @@ export default function MenuCreationModal({
 		} catch (error) {
 			console.error('Error processing photo:', error);
 			setIsProcessingPhoto(false);
+			setShowProcessingModal(false);
 
 			setTimeout(() => {
 				Alert.alert(
@@ -800,6 +804,29 @@ export default function MenuCreationModal({
 					</View>
 				</ScrollView>
 			</View>
+
+			{/* Modal de procesamiento de foto */}
+			<Modal visible={showProcessingModal} transparent animationType="fade">
+				<View style={styles.processingModalOverlay}>
+					<View style={styles.processingModalContent}>
+						<ActivityIndicator size="large" color={colors.primary} />
+						<Text style={styles.processingModalTitle}>
+							{t('menuCreation.processingPhoto')}
+						</Text>
+						<Text style={styles.processingModalSubtitle}>
+							{t('menuCreation.analysingMenu')}
+						</Text>
+						<TouchableOpacity
+							style={styles.cancelProcessingButton}
+							onPress={cancelPhotoProcessing}
+						>
+							<Text style={styles.cancelProcessingText}>
+								{t('general.cancel')}
+							</Text>
+						</TouchableOpacity>
+					</View>
+				</View>
+			</Modal>
 		</Modal>
 	);
 }
@@ -909,5 +936,56 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		fontFamily: 'Manrope',
 		fontWeight: '300',
+	},
+	processingModalOverlay: {
+		flex: 1,
+		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	processingModalContent: {
+		backgroundColor: colors.secondary,
+		borderRadius: 20,
+		paddingVertical: 40,
+		paddingHorizontal: 30,
+		alignItems: 'center',
+		minWidth: 280,
+		elevation: 10,
+		shadowColor: '#000',
+		shadowOffset: {
+			width: 0,
+			height: 5,
+		},
+		shadowOpacity: 0.3,
+		shadowRadius: 10,
+	},
+	processingModalTitle: {
+		fontSize: 18,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.primary,
+		marginTop: 20,
+		textAlign: 'center',
+	},
+	processingModalSubtitle: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '300',
+		color: colors.tertiary,
+		marginTop: 10,
+		textAlign: 'center',
+		marginBottom: 30,
+	},
+	cancelProcessingButton: {
+		backgroundColor: colors.primary,
+		paddingHorizontal: 30,
+		paddingVertical: 12,
+		borderRadius: 25,
+	},
+	cancelProcessingText: {
+		color: colors.quaternary,
+		fontSize: 16,
+		fontFamily: 'Manrope',
+		fontWeight: '500',
 	},
 });

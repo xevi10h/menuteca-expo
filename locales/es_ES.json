@@ -262,7 +262,10 @@
 		},
 		"notMenuErrorTitle": "Imagen no válida",
 		"quotaExceededTitle": "Límite excedido",
-		"networkErrorTitle": "Error de conexión"
+		"networkErrorTitle": "Error de conexión",
+		"editDishName": "Editar nombre del plato",
+		"dishNamePlaceholder": "ej: Ensalada mixta con vinagreta",
+		"analysingMenu": "Analizando el menú con IA..."
 	},
 	"days": {
 		"monday": "Lunes",

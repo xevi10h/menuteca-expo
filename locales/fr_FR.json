@@ -263,7 +263,10 @@
 		},
 		"notMenuErrorTitle": "Image non valide",
 		"quotaExceededTitle": "Limite dépassée",
-		"networkErrorTitle": "Erreur de connexion"
+		"networkErrorTitle": "Erreur de connexion",
+		"editDishName": "Modifier le nom du plat",
+		"dishNamePlaceholder": "ex: Salade mixte à la vinaigrette",
+		"analysingMenu": "Analyse du menu avec IA..."
 	},
 	"days": {
 		"monday": "Lundi",

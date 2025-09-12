@@ -1,7 +1,6 @@
 import { colors } from '@/assets/styles/colors';
 import React, { useEffect, useRef } from 'react';
 import {
-	ActivityIndicator,
 	Animated,
 	Dimensions,
 	Easing,
@@ -145,11 +144,6 @@ export default function LoadingScreen({
 					>
 						<View style={styles.spinnerRing} />
 					</Animated.View>
-					<ActivityIndicator
-						size="large"
-						color={colors.primary}
-						style={styles.activityIndicator}
-					/>
 				</View>
 
 				{/* Loading Message */}
@@ -238,30 +232,28 @@ const styles = StyleSheet.create({
 	},
 	loadingSection: {
 		alignItems: 'center',
+		justifyContent: 'center',
 	},
 	spinnerContainer: {
 		position: 'relative',
-		marginBottom: 20,
+		marginBottom: 40,
+		justifyContent: 'center',
+		alignContent: 'center',
+		alignItems: 'center',
 	},
 	spinner: {
-		width: 60,
-		height: 60,
+		width: 50,
+		height: 50,
 		position: 'absolute',
-		top: -6,
-		left: -6,
 	},
 	spinnerRing: {
-		width: 60,
-		height: 60,
-		borderRadius: 30,
-		borderWidth: 3,
+		width: 50,
+		height: 50,
+		borderRadius: 25,
+		borderWidth: 4,
 		borderColor: 'transparent',
 		borderTopColor: colors.primary,
 		borderRightColor: colors.primary,
-	},
-	activityIndicator: {
-		width: 48,
-		height: 48,
 	},
 	loadingText: {
 		fontSize: 16,

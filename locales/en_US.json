@@ -263,7 +263,10 @@
 		},
 		"notMenuErrorTitle": "Invalid image",
 		"quotaExceededTitle": "Limit exceeded",
-		"networkErrorTitle": "Connection error"
+		"networkErrorTitle": "Connection error",
+		"editDishName": "Edit dish name",
+		"dishNamePlaceholder": "e.g: Mixed salad with vinaigrette",
+		"analysingMenu": "Analyzing menu with AI..."
 	},
 	"days": {
 		"sunday": "Sunday",

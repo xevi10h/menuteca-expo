@@ -137,7 +137,7 @@ export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
 
 					<View style={styles.priceContainer}>
 						<Text style={styles.priceText}>
-							{t('restaurant.from')} {restaurant.minimum_price}€
+							{t('general.from')} {restaurant.minimum_price}€
 						</Text>
 					</View>
 				</View>
@@ -160,6 +160,7 @@ const styles = StyleSheet.create({
 		elevation: 3,
 		marginBottom: 16,
 		overflow: 'hidden',
+		minWidth: '100%',
 	},
 	imageContainer: {
 		position: 'relative',

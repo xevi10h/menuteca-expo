@@ -263,7 +263,10 @@
 		},
 		"notMenuErrorTitle": "Imatge no vàlida",
 		"quotaExceededTitle": "Límit excedit",
-		"networkErrorTitle": "Error de connexió"
+		"networkErrorTitle": "Error de connexió",
+		"editDishName": "Editar nom del plat",
+		"dishNamePlaceholder": "ex: Amanida mixta amb vinagreta",
+		"analysingMenu": "Analitzant el menú amb IA..."
 	},
 	"days": {
 		"monday": "Dilluns",
