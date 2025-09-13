@@ -161,6 +161,11 @@ export default function ListFilter() {
 		setTempSelectedTags(filters.tags || []);
 		setTempDistance(filters.distance?.toString() || '');
 
+		// For rating modal, set default to 4 if no filter is active
+		if (type === 'rating' && filters.ratingRange.min === 0) {
+			setTempRating('4'); // Default to 4+ stars
+		}
+
 		// Set up time pickers
 		if (type === 'schedule') {
 			const startTimeObj = createTimeFromString(
@@ -268,15 +273,18 @@ export default function ListFilter() {
 
 		// Rating filter
 		if (hasRatingFilter) {
+			const ratingText =
+				filters.ratingRange.min === 0
+					? 'Any rating'
+					: `${filters.ratingRange.min}+ ★`;
+
 			activeFilters.push(
 				<TouchableOpacity
 					key="rating"
 					style={styles.activeFilterPill}
 					onPress={() => openModal('rating')}
 				>
-					<Text style={styles.activeFilterText}>
-						+{filters.ratingRange.min}★
-					</Text>
+					<Text style={styles.activeFilterText}>{ratingText}</Text>
 					<TouchableOpacity
 						onPress={() => setRatingRange({ min: 0, max: 5 })}
 						style={styles.removeFilterButton}
@@ -558,7 +566,7 @@ export default function ListFilter() {
 				)}
 			</Modal>
 
-			{/* Rating Filter Modal */}
+			{/* Rating Filter Modal - NUEVO DISEÑO */}
 			<Modal
 				visible={activeModal === 'rating'}
 				transparent
@@ -567,16 +575,142 @@ export default function ListFilter() {
 				{renderModalWithKeyboardSupport(
 					<>
 						<Text style={styles.modalTitle}>{t('filters.minimumRating')}</Text>
+						<Text style={styles.modalSubtitle}>
+							Selecciona valoración mínima para restaurantes
+						</Text>
 
-						<View style={styles.ratingContainer}>
-							<TextInput
-								style={styles.ratingInput}
-								value={tempRating}
-								onChangeText={setTempRating}
-								keyboardType="numeric"
-								placeholder="0"
-							/>
-							<Text style={styles.ratingLabel}>★ {t('filters.orMore')}</Text>
+						{/* Rating Options */}
+						<View style={styles.ratingOptionsContainer}>
+							{/* 4+ Stars - Recommended */}
+							<TouchableOpacity
+								style={[
+									styles.ratingOption,
+									tempRating === '4' && styles.ratingOptionSelected,
+									styles.ratingOptionRecommended,
+								]}
+								onPress={() => setTempRating('4')}
+							>
+								<View style={styles.ratingOptionHeader}>
+									<View style={styles.starsContainer}>
+										{[1, 2, 3, 4].map((star) => (
+											<Ionicons
+												key={star}
+												name="star"
+												size={16}
+												color={colors.primary}
+											/>
+										))}
+										<Ionicons
+											name="star-outline"
+											size={16}
+											color={colors.primaryLight}
+										/>
+									</View>
+									<Text style={styles.ratingOptionText}>4+ estrellas</Text>
+									<View style={styles.recommendedBadge}>
+										<Text style={styles.recommendedText}>Recomendado</Text>
+									</View>
+								</View>
+								<Text style={styles.ratingOptionDescription}>
+									Lugares altamente valorados
+								</Text>
+							</TouchableOpacity>
+
+							{/* 3+ Stars */}
+							<TouchableOpacity
+								style={[
+									styles.ratingOption,
+									tempRating === '3' && styles.ratingOptionSelected,
+								]}
+								onPress={() => setTempRating('3')}
+							>
+								<View style={styles.ratingOptionHeader}>
+									<View style={styles.starsContainer}>
+										{[1, 2, 3].map((star) => (
+											<Ionicons
+												key={star}
+												name="star"
+												size={16}
+												color={colors.primary}
+											/>
+										))}
+										{[4, 5].map((star) => (
+											<Ionicons
+												key={star}
+												name="star-outline"
+												size={16}
+												color={colors.primaryLight}
+											/>
+										))}
+									</View>
+									<Text style={styles.ratingOptionText}>3+ estrellas</Text>
+								</View>
+								<Text style={styles.ratingOptionDescription}>
+									Buena calidad general
+								</Text>
+							</TouchableOpacity>
+
+							{/* 2+ Stars */}
+							<TouchableOpacity
+								style={[
+									styles.ratingOption,
+									tempRating === '2' && styles.ratingOptionSelected,
+								]}
+								onPress={() => setTempRating('2')}
+							>
+								<View style={styles.ratingOptionHeader}>
+									<View style={styles.starsContainer}>
+										{[1, 2].map((star) => (
+											<Ionicons
+												key={star}
+												name="star"
+												size={16}
+												color={colors.primary}
+											/>
+										))}
+										{[3, 4, 5].map((star) => (
+											<Ionicons
+												key={star}
+												name="star-outline"
+												size={16}
+												color={colors.primaryLight}
+											/>
+										))}
+									</View>
+									<Text style={styles.ratingOptionText}>2+ estrellas</Text>
+								</View>
+								<Text style={styles.ratingOptionDescription}>
+									Incluir más opciones
+								</Text>
+							</TouchableOpacity>
+
+							{/* Any Rating */}
+							<TouchableOpacity
+								style={[
+									styles.ratingOption,
+									tempRating === '0' && styles.ratingOptionSelected,
+								]}
+								onPress={() => setTempRating('0')}
+							>
+								<View style={styles.ratingOptionHeader}>
+									<View style={styles.starsContainer}>
+										{[1, 2, 3, 4, 5].map((star) => (
+											<Ionicons
+												key={star}
+												name="star-outline"
+												size={16}
+												color={colors.primaryLight}
+											/>
+										))}
+									</View>
+									<Text style={styles.ratingOptionText}>
+										Cualquier valoración
+									</Text>
+								</View>
+								<Text style={styles.ratingOptionDescription}>
+									Sin filtro de valoración
+								</Text>
+							</TouchableOpacity>
 						</View>
 
 						<View style={styles.modalButtons}>
@@ -596,7 +730,7 @@ export default function ListFilter() {
 							</TouchableOpacity>
 						</View>
 					</>,
-					true, // Has numeric inputs
+					false, // No numeric inputs
 				)}
 			</Modal>
 
@@ -913,26 +1047,89 @@ const styles = StyleSheet.create({
 		marginHorizontal: 10,
 		marginBottom: 12,
 	},
-	ratingContainer: {
+	// NUEVOS ESTILOS PARA EL RATING FILTER
+	ratingScrollView: {
+		maxHeight: 400,
+	},
+	ratingOptionsContainer: {
+		marginBottom: 20,
+	},
+	ratingOption: {
+		borderWidth: 1,
+		borderColor: colors.primaryLight,
+		borderRadius: 12,
+		padding: 16,
+		marginBottom: 12,
+		backgroundColor: 'transparent',
+	},
+	ratingOptionSelected: {
+		borderColor: colors.primary,
+		backgroundColor: colors.secondary,
+	},
+	ratingOptionRecommended: {
+		borderColor: colors.primary,
+		borderWidth: 2,
+	},
+	ratingOptionHeader: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		justifyContent: 'center',
-		gap: 10,
-		marginBottom: 30,
+		marginBottom: 4,
+		gap: 8,
 	},
-	ratingInput: {
+	starsContainer: {
+		flexDirection: 'row',
+		gap: 2,
+	},
+	ratingOptionText: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.primary,
+		flex: 1,
+	},
+	recommendedBadge: {
+		backgroundColor: colors.primary,
+		paddingHorizontal: 8,
+		paddingVertical: 2,
+		borderRadius: 10,
+	},
+	recommendedText: {
+		fontSize: 10,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.quaternary,
+	},
+	ratingOptionDescription: {
+		fontSize: 12,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primaryLight,
+		marginLeft: 24,
+	},
+	customRatingOption: {
+		paddingBottom: 16,
+	},
+	customInputContainer: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		marginTop: 12,
+		marginLeft: 24,
+		gap: 8,
+	},
+	customRatingInput: {
 		borderWidth: 1,
 		borderColor: colors.primaryLight,
 		borderRadius: 8,
-		padding: 12,
+		padding: 8,
 		fontSize: 16,
 		fontFamily: 'Manrope',
 		color: colors.primary,
 		textAlign: 'center',
 		minWidth: 60,
+		backgroundColor: colors.quaternary,
 	},
-	ratingLabel: {
-		fontSize: 16,
+	customRatingLabel: {
+		fontSize: 14,
 		fontFamily: 'Manrope',
 		fontWeight: '500',
 		color: colors.primary,
