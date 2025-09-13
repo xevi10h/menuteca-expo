@@ -84,9 +84,10 @@ export default function ListFilter() {
 	const [tempSelectedTags, setTempSelectedTags] = useState<RestaurantTag[]>([]);
 	const [tempDistance, setTempDistance] = useState('');
 
-	// Time picker states
-	const [showStartTimePicker, setShowStartTimePicker] = useState(false);
-	const [showEndTimePicker, setShowEndTimePicker] = useState(false);
+	// Time picker states - CAMBIO IMPLEMENTADO
+	const [activeTimePicker, setActiveTimePicker] = useState<
+		'start' | 'end' | null
+	>(null);
 	const [start_time, setStartTime] = useState(new Date());
 	const [end_time, setEndTime] = useState(new Date());
 
@@ -173,10 +174,10 @@ export default function ListFilter() {
 		setActiveModal(type);
 	};
 
+	// CAMBIO IMPLEMENTADO - closeModal actualizado
 	const closeModal = () => {
 		setActiveModal(null);
-		setShowStartTimePicker(false);
-		setShowEndTimePicker(false);
+		setActiveTimePicker(null);
 	};
 
 	// Apply filters handlers
@@ -212,31 +213,22 @@ export default function ListFilter() {
 		closeModal();
 	};
 
-	// Time picker handlers
-	const handleStartTimeChange = (event: any, selectedDate?: Date) => {
+	// CAMBIO IMPLEMENTADO - Time picker handlers unificados
+	const handleTimeChange = (event: any, selectedDate?: Date) => {
 		if (Platform.OS === 'android') {
-			setShowStartTimePicker(false);
+			setActiveTimePicker(null);
 		}
 		if (selectedDate) {
-			setStartTime(selectedDate);
+			if (activeTimePicker === 'start') {
+				setStartTime(selectedDate);
+			} else if (activeTimePicker === 'end') {
+				setEndTime(selectedDate);
+			}
 		}
 	};
 
-	const handleEndTimeChange = (event: any, selectedDate?: Date) => {
-		if (Platform.OS === 'android') {
-			setShowEndTimePicker(false);
-		}
-		if (selectedDate) {
-			setEndTime(selectedDate);
-		}
-	};
-
-	const confirmStartTime = () => {
-		setShowStartTimePicker(false);
-	};
-
-	const confirmEndTime = () => {
-		setShowEndTimePicker(false);
+	const confirmTime = () => {
+		setActiveTimePicker(null);
 	};
 
 	// Toggle tag selection
@@ -620,7 +612,7 @@ export default function ListFilter() {
 				)}
 			</Modal>
 
-			{/* Schedule Filter Modal */}
+			{/* CAMBIO IMPLEMENTADO - Schedule Filter Modal con un solo Time Picker */}
 			<Modal
 				visible={activeModal === 'schedule'}
 				transparent
@@ -635,7 +627,7 @@ export default function ListFilter() {
 								<Text style={styles.inputLabel}>{t('filters.from')}</Text>
 								<TouchableOpacity
 									style={styles.timePickerButton}
-									onPress={() => setShowStartTimePicker(true)}
+									onPress={() => setActiveTimePicker('start')}
 								>
 									<Text style={styles.timePickerText}>
 										{formatTimeFromDate(start_time)}
@@ -654,7 +646,7 @@ export default function ListFilter() {
 								<Text style={styles.inputLabel}>{t('filters.to')}</Text>
 								<TouchableOpacity
 									style={styles.timePickerButton}
-									onPress={() => setShowEndTimePicker(true)}
+									onPress={() => setActiveTimePicker('end')}
 								>
 									<Text style={styles.timePickerText}>
 										{formatTimeFromDate(end_time)}
@@ -668,45 +660,26 @@ export default function ListFilter() {
 							</View>
 						</View>
 
-						{/* Start Time Picker */}
-						{showStartTimePicker && (
+						{/* Single Time Picker que cambia según activeTimePicker */}
+						{activeTimePicker && (
 							<View style={styles.timePickerContainer}>
+								<Text style={styles.timePickerLabel}>
+									{activeTimePicker === 'start'
+										? t('filters.from')
+										: t('filters.to')}
+								</Text>
 								<DateTimePicker
-									value={start_time}
+									value={activeTimePicker === 'start' ? start_time : end_time}
 									mode="time"
 									is24Hour={true}
 									display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-									onChange={handleStartTimeChange}
+									onChange={handleTimeChange}
 									style={styles.timePicker}
 								/>
 								{Platform.OS === 'ios' && (
 									<TouchableOpacity
 										style={styles.timePickerConfirm}
-										onPress={confirmStartTime}
-									>
-										<Text style={styles.timePickerConfirmText}>
-											{t('general.ok')}
-										</Text>
-									</TouchableOpacity>
-								)}
-							</View>
-						)}
-
-						{/* End Time Picker */}
-						{showEndTimePicker && (
-							<View style={styles.timePickerContainer}>
-								<DateTimePicker
-									value={end_time}
-									mode="time"
-									is24Hour={true}
-									display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-									onChange={handleEndTimeChange}
-									style={styles.timePicker}
-								/>
-								{Platform.OS === 'ios' && (
-									<TouchableOpacity
-										style={styles.timePickerConfirm}
-										onPress={confirmEndTime}
+										onPress={confirmTime}
 									>
 										<Text style={styles.timePickerConfirmText}>
 											{t('general.ok')}
@@ -992,6 +965,13 @@ const styles = StyleSheet.create({
 		padding: 10,
 		marginVertical: 10,
 		alignItems: 'center',
+	},
+	timePickerLabel: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.primary,
+		marginBottom: 10,
 	},
 	timePicker: {
 		width: 200,
