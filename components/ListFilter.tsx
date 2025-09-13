@@ -3,24 +3,27 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { RestaurantTag } from '@/shared/enums';
 import { useFilterStore } from '@/zustand/FilterStore';
 import { Ionicons } from '@expo/vector-icons';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
-	Animated,
-	Keyboard,
-	KeyboardAvoidingView,
-	Modal,
 	Platform,
 	ScrollView,
 	StyleSheet,
 	Text,
-	TextInput,
 	TouchableOpacity,
 	View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import DistanceFilterModal from './filters/DistanceFilterModal';
 import FilterButton from './filters/FilterButton';
+import PriceFilterModal from './filters/PriceFilterModal';
+import RatingFilterModal from './filters/RatingFilterModal';
+import ScheduleFilterModal from './filters/ScheduleFilterModal';
 import SortButton from './filters/SortButton';
+import TagsFilterModal from './filters/TagsFilterModal';
+import {
+	createTimeFromString,
+	formatTime,
+	formatTimeFromDate,
+} from './filters/filterUtils';
 
 // Type for filter modal
 type FilterModalType =
@@ -31,42 +34,9 @@ type FilterModalType =
 	| 'distance'
 	| null;
 
-// Component for individual tag selection
-const TagButton = ({
-	tag,
-	isSelected,
-	onToggle,
-}: {
-	tag: RestaurantTag;
-	isSelected: boolean;
-	onToggle: () => void;
-}) => {
-	const { t } = useTranslation();
-
-	return (
-		<TouchableOpacity
-			style={[styles.tagButton, isSelected && styles.tagButtonSelected]}
-			onPress={onToggle}
-		>
-			<Text
-				style={[
-					styles.tagButtonText,
-					isSelected && styles.tagButtonTextSelected,
-				]}
-			>
-				{t(`restaurantTags.${tag}`)}
-			</Text>
-		</TouchableOpacity>
-	);
-};
-
 export default function ListFilter() {
 	const { t } = useTranslation();
 	const [activeModal, setActiveModal] = useState<FilterModalType>(null);
-	const { bottom } = useSafeAreaInsets();
-
-	// Animated value for modal slide
-	const slideAnimation = useState(new Animated.Value(0))[0];
 
 	// Get filter state
 	const {
@@ -85,6 +55,10 @@ export default function ListFilter() {
 	const [tempRating, setTempRating] = useState('0');
 	const [tempSelectedTags, setTempSelectedTags] = useState<RestaurantTag[]>([]);
 	const [tempDistance, setTempDistance] = useState('');
+
+	// Estados para rating personalizado
+	const [customRating, setCustomRating] = useState('');
+	const [isCustomRatingSelected, setIsCustomRatingSelected] = useState(false);
 
 	// Time picker states
 	const [activeTimePicker, setActiveTimePicker] = useState<
@@ -109,49 +83,6 @@ export default function ListFilter() {
 		hasScheduleFilter ||
 		hasDistanceFilter;
 
-	// Animate modal slide when activeModal changes
-	useEffect(() => {
-		if (activeModal) {
-			// Reset and animate in
-			slideAnimation.setValue(0);
-			Animated.timing(slideAnimation, {
-				toValue: 1,
-				duration: 300,
-				useNativeDriver: true,
-			}).start();
-		} else {
-			// Animate out
-			Animated.timing(slideAnimation, {
-				toValue: 0,
-				duration: 250,
-				useNativeDriver: true,
-			}).start();
-		}
-	}, [activeModal]);
-
-	// Helper function to create time from string
-	const createTimeFromString = (timeString: string) => {
-		const [hours, minutes] = timeString
-			.split(':')
-			.map((num) => parseInt(num, 10));
-		const date = new Date();
-		date.setHours(hours, minutes, 0, 0);
-		return date;
-	};
-
-	// Helper function to format time from date
-	const formatTimeFromDate = (date: Date) => {
-		const hours = date.getHours().toString().padStart(2, '0');
-		const minutes = date.getMinutes().toString().padStart(2, '0');
-		return `${hours}:${minutes}`;
-	};
-
-	// Format time for display
-	const formatTime = (time: string) => {
-		if (!time) return '';
-		return time.length === 5 ? time : time + ':00';
-	};
-
 	// Modal handlers
 	const openModal = (type: FilterModalType) => {
 		// Reset temp values to current filter values
@@ -161,9 +92,24 @@ export default function ListFilter() {
 		setTempSelectedTags(filters.tags || []);
 		setTempDistance(filters.distance?.toString() || '');
 
-		// For rating modal, set default to 4 if no filter is active
-		if (type === 'rating' && filters.ratingRange.min === 0) {
-			setTempRating('4'); // Default to 4+ stars
+		// Para rating modal, configurar valores por defecto
+		if (type === 'rating') {
+			const currentRating = filters.ratingRange.min;
+			// Verificar si es una opción predefinida
+			if ([4, 4.5, 3, 3.5].includes(currentRating)) {
+				setTempRating(currentRating.toString());
+				setIsCustomRatingSelected(false);
+				setCustomRating('');
+			} else if (currentRating > 0) {
+				// Es una valoración personalizada
+				setTempRating('custom');
+				setIsCustomRatingSelected(true);
+				setCustomRating(currentRating.toString());
+			} else {
+				// Si no hay filtro activo, usar 4 por defecto
+				setTempRating('4');
+				setIsCustomRatingSelected(false);
+			}
 		}
 
 		// Set up time pickers
@@ -184,8 +130,8 @@ export default function ListFilter() {
 	const closeModal = () => {
 		setActiveModal(null);
 		setActiveTimePicker(null);
-		// Dismiss keyboard when closing modal
-		Keyboard.dismiss();
+		setIsCustomRatingSelected(false);
+		setCustomRating('');
 	};
 
 	// Apply filters handlers
@@ -197,8 +143,17 @@ export default function ListFilter() {
 	};
 
 	const applyRatingFilter = () => {
-		const min = Math.max(0, Math.min(5, parseFloat(tempRating) || 0));
-		setRatingRange({ min, max: 5 });
+		let minRating = 0;
+
+		if (isCustomRatingSelected) {
+			// Usar valoración personalizada
+			minRating = Math.max(0, Math.min(5, parseFloat(customRating) || 0));
+		} else {
+			// Usar valoración predefinida
+			minRating = Math.max(0, Math.min(5, parseFloat(tempRating) || 0));
+		}
+
+		setRatingRange({ min: minRating, max: 5 });
 		closeModal();
 	};
 
@@ -246,6 +201,18 @@ export default function ListFilter() {
 		);
 	};
 
+	// Rating option handlers
+	const selectRatingOption = (rating: string) => {
+		if (rating === 'custom') {
+			setIsCustomRatingSelected(true);
+			setTempRating('custom');
+		} else {
+			setIsCustomRatingSelected(false);
+			setTempRating(rating);
+			setCustomRating('');
+		}
+	};
+
 	// Render active filters (excluding sort and cuisines)
 	const renderActiveFilters = () => {
 		const activeFilters = [];
@@ -273,10 +240,7 @@ export default function ListFilter() {
 
 		// Rating filter
 		if (hasRatingFilter) {
-			const ratingText =
-				filters.ratingRange.min === 0
-					? 'Any rating'
-					: `${filters.ratingRange.min}+ ★`;
+			const ratingText = `${filters.ratingRange.min}+ ★`;
 
 			activeFilters.push(
 				<TouchableOpacity
@@ -422,67 +386,6 @@ export default function ListFilter() {
 		return availableFilters;
 	};
 
-	// Transform for slide animation
-	const slideTransform = {
-		transform: [
-			{
-				translateY: slideAnimation.interpolate({
-					inputRange: [0, 1],
-					outputRange: [300, 0], // Slide from 300px below to 0
-				}),
-			},
-		],
-	};
-
-	// Render modal content with KeyboardAvoidingView for numeric inputs
-	const renderModalWithKeyboardSupport = (
-		content: React.ReactNode,
-		hasNumericInputs: boolean = false,
-	) => (
-		<TouchableOpacity
-			style={styles.modalOverlay}
-			activeOpacity={1}
-			onPress={closeModal}
-		>
-			{hasNumericInputs ? (
-				<KeyboardAvoidingView
-					behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-					style={styles.keyboardAvoidingView}
-				>
-					<Animated.View
-						style={[
-							styles.modalContent,
-							{ paddingBottom: bottom + 20 },
-							slideTransform,
-						]}
-					>
-						<TouchableOpacity
-							activeOpacity={1}
-							onPress={(e) => e.stopPropagation()}
-						>
-							{content}
-						</TouchableOpacity>
-					</Animated.View>
-				</KeyboardAvoidingView>
-			) : (
-				<Animated.View
-					style={[
-						styles.modalContent,
-						{ paddingBottom: bottom + 20 },
-						slideTransform,
-					]}
-				>
-					<TouchableOpacity
-						activeOpacity={1}
-						onPress={(e) => e.stopPropagation()}
-					>
-						{content}
-					</TouchableOpacity>
-				</Animated.View>
-			)}
-		</TouchableOpacity>
-	);
-
 	return (
 		<View style={styles.container}>
 			<ScrollView
@@ -511,411 +414,60 @@ export default function ListFilter() {
 				{renderDefaultFilters()}
 			</ScrollView>
 
-			{/* Price Filter Modal */}
-			<Modal visible={activeModal === 'price'} transparent animationType="fade">
-				{renderModalWithKeyboardSupport(
-					<>
-						<Text style={styles.modalTitle}>{t('filters.priceRange')}</Text>
+			<PriceFilterModal
+				visible={activeModal === 'price'}
+				tempPriceMin={tempPriceMin}
+				tempPriceMax={tempPriceMax}
+				onMinChange={setTempPriceMin}
+				onMaxChange={setTempPriceMax}
+				onApply={applyPriceFilter}
+				onClose={closeModal}
+			/>
 
-						<View style={styles.priceInputContainer}>
-							<View style={styles.priceInputWrapper}>
-								<Text style={styles.inputLabel}>{t('filters.from')}</Text>
-								<TextInput
-									style={styles.priceInput}
-									value={tempPriceMin}
-									onChangeText={setTempPriceMin}
-									keyboardType="numeric"
-									placeholder="0"
-								/>
-								<Text style={styles.currencyLabel}>€</Text>
-							</View>
-
-							<Text style={styles.priceSeparator}>-</Text>
-
-							<View style={styles.priceInputWrapper}>
-								<Text style={styles.inputLabel}>{t('filters.to')}</Text>
-								<TextInput
-									style={styles.priceInput}
-									value={tempPriceMax}
-									onChangeText={setTempPriceMax}
-									keyboardType="numeric"
-									placeholder="1000"
-								/>
-								<Text style={styles.currencyLabel}>€</Text>
-							</View>
-						</View>
-
-						<View style={styles.modalButtons}>
-							<TouchableOpacity
-								style={styles.cancelButton}
-								onPress={closeModal}
-							>
-								<Text style={styles.cancelButtonText}>
-									{t('general.cancel')}
-								</Text>
-							</TouchableOpacity>
-							<TouchableOpacity
-								style={styles.applyButton}
-								onPress={applyPriceFilter}
-							>
-								<Text style={styles.applyButtonText}>{t('filters.apply')}</Text>
-							</TouchableOpacity>
-						</View>
-					</>,
-					true, // Has numeric inputs
-				)}
-			</Modal>
-
-			{/* Rating Filter Modal - NUEVO DISEÑO */}
-			<Modal
+			<RatingFilterModal
 				visible={activeModal === 'rating'}
-				transparent
-				animationType="fade"
-			>
-				{renderModalWithKeyboardSupport(
-					<>
-						<Text style={styles.modalTitle}>{t('filters.minimumRating')}</Text>
-						<Text style={styles.modalSubtitle}>
-							Selecciona valoración mínima para restaurantes
-						</Text>
+				tempRating={tempRating}
+				isCustomRatingSelected={isCustomRatingSelected}
+				customRating={customRating}
+				onSelectRating={selectRatingOption}
+				onCustomRatingChange={(text) => {
+					const regex = /^[0-5]?(\.[0-9]?)?$/;
+					if (regex.test(text) || text === '') {
+						setCustomRating(text);
+					}
+				}}
+				onApply={applyRatingFilter}
+				onClose={closeModal}
+			/>
 
-						{/* Rating Options */}
-						<View style={styles.ratingOptionsContainer}>
-							{/* 4+ Stars - Recommended */}
-							<TouchableOpacity
-								style={[
-									styles.ratingOption,
-									tempRating === '4' && styles.ratingOptionSelected,
-									styles.ratingOptionRecommended,
-								]}
-								onPress={() => setTempRating('4')}
-							>
-								<View style={styles.ratingOptionHeader}>
-									<View style={styles.starsContainer}>
-										{[1, 2, 3, 4].map((star) => (
-											<Ionicons
-												key={star}
-												name="star"
-												size={16}
-												color={colors.primary}
-											/>
-										))}
-										<Ionicons
-											name="star-outline"
-											size={16}
-											color={colors.primaryLight}
-										/>
-									</View>
-									<Text style={styles.ratingOptionText}>4+ estrellas</Text>
-									<View style={styles.recommendedBadge}>
-										<Text style={styles.recommendedText}>Recomendado</Text>
-									</View>
-								</View>
-								<Text style={styles.ratingOptionDescription}>
-									Lugares altamente valorados
-								</Text>
-							</TouchableOpacity>
+			<TagsFilterModal
+				visible={activeModal === 'tags'}
+				tempSelectedTags={tempSelectedTags}
+				onToggleTag={toggleTag}
+				onApply={applyTagsFilter}
+				onClose={closeModal}
+			/>
 
-							{/* 3+ Stars */}
-							<TouchableOpacity
-								style={[
-									styles.ratingOption,
-									tempRating === '3' && styles.ratingOptionSelected,
-								]}
-								onPress={() => setTempRating('3')}
-							>
-								<View style={styles.ratingOptionHeader}>
-									<View style={styles.starsContainer}>
-										{[1, 2, 3].map((star) => (
-											<Ionicons
-												key={star}
-												name="star"
-												size={16}
-												color={colors.primary}
-											/>
-										))}
-										{[4, 5].map((star) => (
-											<Ionicons
-												key={star}
-												name="star-outline"
-												size={16}
-												color={colors.primaryLight}
-											/>
-										))}
-									</View>
-									<Text style={styles.ratingOptionText}>3+ estrellas</Text>
-								</View>
-								<Text style={styles.ratingOptionDescription}>
-									Buena calidad general
-								</Text>
-							</TouchableOpacity>
-
-							{/* 2+ Stars */}
-							<TouchableOpacity
-								style={[
-									styles.ratingOption,
-									tempRating === '2' && styles.ratingOptionSelected,
-								]}
-								onPress={() => setTempRating('2')}
-							>
-								<View style={styles.ratingOptionHeader}>
-									<View style={styles.starsContainer}>
-										{[1, 2].map((star) => (
-											<Ionicons
-												key={star}
-												name="star"
-												size={16}
-												color={colors.primary}
-											/>
-										))}
-										{[3, 4, 5].map((star) => (
-											<Ionicons
-												key={star}
-												name="star-outline"
-												size={16}
-												color={colors.primaryLight}
-											/>
-										))}
-									</View>
-									<Text style={styles.ratingOptionText}>2+ estrellas</Text>
-								</View>
-								<Text style={styles.ratingOptionDescription}>
-									Incluir más opciones
-								</Text>
-							</TouchableOpacity>
-
-							{/* Any Rating */}
-							<TouchableOpacity
-								style={[
-									styles.ratingOption,
-									tempRating === '0' && styles.ratingOptionSelected,
-								]}
-								onPress={() => setTempRating('0')}
-							>
-								<View style={styles.ratingOptionHeader}>
-									<View style={styles.starsContainer}>
-										{[1, 2, 3, 4, 5].map((star) => (
-											<Ionicons
-												key={star}
-												name="star-outline"
-												size={16}
-												color={colors.primaryLight}
-											/>
-										))}
-									</View>
-									<Text style={styles.ratingOptionText}>
-										Cualquier valoración
-									</Text>
-								</View>
-								<Text style={styles.ratingOptionDescription}>
-									Sin filtro de valoración
-								</Text>
-							</TouchableOpacity>
-						</View>
-
-						<View style={styles.modalButtons}>
-							<TouchableOpacity
-								style={styles.cancelButton}
-								onPress={closeModal}
-							>
-								<Text style={styles.cancelButtonText}>
-									{t('general.cancel')}
-								</Text>
-							</TouchableOpacity>
-							<TouchableOpacity
-								style={styles.applyButton}
-								onPress={applyRatingFilter}
-							>
-								<Text style={styles.applyButtonText}>{t('filters.apply')}</Text>
-							</TouchableOpacity>
-						</View>
-					</>,
-					false, // No numeric inputs
-				)}
-			</Modal>
-
-			{/* Tags Filter Modal */}
-			<Modal visible={activeModal === 'tags'} transparent animationType="fade">
-				{renderModalWithKeyboardSupport(
-					<>
-						<Text style={styles.modalTitle}>{t('filters.categories')}</Text>
-						<Text style={styles.modalSubtitle}>
-							{t('filters.categoriesSubtitle')}
-						</Text>
-
-						<ScrollView style={styles.tagsScrollView}>
-							<View style={styles.tagsGrid}>
-								{Object.values(RestaurantTag).map((tag) => (
-									<TagButton
-										key={tag}
-										tag={tag}
-										isSelected={tempSelectedTags.includes(tag)}
-										onToggle={() => toggleTag(tag)}
-									/>
-								))}
-							</View>
-						</ScrollView>
-
-						<View style={styles.modalButtons}>
-							<TouchableOpacity
-								style={styles.cancelButton}
-								onPress={closeModal}
-							>
-								<Text style={styles.cancelButtonText}>
-									{t('general.cancel')}
-								</Text>
-							</TouchableOpacity>
-							<TouchableOpacity
-								style={styles.applyButton}
-								onPress={applyTagsFilter}
-							>
-								<Text style={styles.applyButtonText}>{t('filters.apply')}</Text>
-							</TouchableOpacity>
-						</View>
-					</>,
-					false, // No numeric inputs
-				)}
-			</Modal>
-
-			{/* Schedule Filter Modal */}
-			<Modal
+			<ScheduleFilterModal
 				visible={activeModal === 'schedule'}
-				transparent
-				animationType="fade"
-			>
-				{renderModalWithKeyboardSupport(
-					<>
-						<Text style={styles.modalTitle}>{t('filters.schedule')}</Text>
+				startTime={start_time}
+				endTime={end_time}
+				activeTimePicker={activeTimePicker}
+				onStartTimePress={() => setActiveTimePicker('start')}
+				onEndTimePress={() => setActiveTimePicker('end')}
+				onTimeChange={handleTimeChange}
+				onConfirmTime={confirmTime}
+				onApply={applyScheduleFilter}
+				onClose={closeModal}
+			/>
 
-						<View style={styles.timeInputContainer}>
-							<View style={styles.timeInputWrapper}>
-								<Text style={styles.inputLabel}>{t('filters.from')}</Text>
-								<TouchableOpacity
-									style={styles.timePickerButton}
-									onPress={() => setActiveTimePicker('start')}
-								>
-									<Text style={styles.timePickerText}>
-										{formatTimeFromDate(start_time)}
-									</Text>
-									<Ionicons
-										name="time-outline"
-										size={16}
-										color={colors.primary}
-									/>
-								</TouchableOpacity>
-							</View>
-
-							<Text style={styles.timeSeparator}>-</Text>
-
-							<View style={styles.timeInputWrapper}>
-								<Text style={styles.inputLabel}>{t('filters.to')}</Text>
-								<TouchableOpacity
-									style={styles.timePickerButton}
-									onPress={() => setActiveTimePicker('end')}
-								>
-									<Text style={styles.timePickerText}>
-										{formatTimeFromDate(end_time)}
-									</Text>
-									<Ionicons
-										name="time-outline"
-										size={16}
-										color={colors.primary}
-									/>
-								</TouchableOpacity>
-							</View>
-						</View>
-
-						{/* Single Time Picker que cambia según activeTimePicker */}
-						{activeTimePicker && (
-							<View style={styles.timePickerContainer}>
-								<Text style={styles.timePickerLabel}>
-									{activeTimePicker === 'start'
-										? t('filters.from')
-										: t('filters.to')}
-								</Text>
-								<DateTimePicker
-									value={activeTimePicker === 'start' ? start_time : end_time}
-									mode="time"
-									is24Hour={true}
-									display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-									onChange={handleTimeChange}
-									style={styles.timePicker}
-								/>
-								{Platform.OS === 'ios' && (
-									<TouchableOpacity
-										style={styles.timePickerConfirm}
-										onPress={confirmTime}
-									>
-										<Text style={styles.timePickerConfirmText}>
-											{t('general.ok')}
-										</Text>
-									</TouchableOpacity>
-								)}
-							</View>
-						)}
-
-						<View style={styles.modalButtons}>
-							<TouchableOpacity
-								style={styles.cancelButton}
-								onPress={closeModal}
-							>
-								<Text style={styles.cancelButtonText}>
-									{t('general.cancel')}
-								</Text>
-							</TouchableOpacity>
-							<TouchableOpacity
-								style={styles.applyButton}
-								onPress={applyScheduleFilter}
-							>
-								<Text style={styles.applyButtonText}>{t('filters.apply')}</Text>
-							</TouchableOpacity>
-						</View>
-					</>,
-					false, // No numeric inputs
-				)}
-			</Modal>
-
-			{/* Distance Filter Modal */}
-			<Modal
+			<DistanceFilterModal
 				visible={activeModal === 'distance'}
-				transparent
-				animationType="fade"
-			>
-				{renderModalWithKeyboardSupport(
-					<>
-						<Text style={styles.modalTitle}>{t('filters.maxDistance')}</Text>
-
-						<View style={styles.distanceContainer}>
-							<TextInput
-								style={styles.distanceInput}
-								value={tempDistance}
-								onChangeText={setTempDistance}
-								keyboardType="numeric"
-								placeholder="10"
-							/>
-							<Text style={styles.distanceLabel}>km</Text>
-						</View>
-
-						<View style={styles.modalButtons}>
-							<TouchableOpacity
-								style={styles.cancelButton}
-								onPress={closeModal}
-							>
-								<Text style={styles.cancelButtonText}>
-									{t('general.cancel')}
-								</Text>
-							</TouchableOpacity>
-							<TouchableOpacity
-								style={styles.applyButton}
-								onPress={applyDistanceFilter}
-							>
-								<Text style={styles.applyButtonText}>{t('filters.apply')}</Text>
-							</TouchableOpacity>
-						</View>
-					</>,
-					true, // Has numeric inputs
-				)}
-			</Modal>
+				tempDistance={tempDistance}
+				onDistanceChange={setTempDistance}
+				onApply={applyDistanceFilter}
+				onClose={closeModal}
+			/>
 		</View>
 	);
 }
@@ -970,323 +522,5 @@ const styles = StyleSheet.create({
 		backgroundColor: 'rgba(255,255,255,0.3)',
 		alignItems: 'center',
 		justifyContent: 'center',
-	},
-	modalOverlay: {
-		flex: 1,
-		backgroundColor: 'rgba(0, 0, 0, 0.5)',
-		justifyContent: 'flex-end',
-	},
-	keyboardAvoidingView: {
-		flex: 1,
-		justifyContent: 'flex-end',
-	},
-	modalContent: {
-		backgroundColor: colors.quaternary,
-		borderTopLeftRadius: 20,
-		borderTopRightRadius: 20,
-		padding: 20,
-		paddingBottom: 40,
-		maxHeight: '70%',
-	},
-	modalTitle: {
-		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
-		color: colors.primary,
-		textAlign: 'center',
-		marginBottom: 20,
-	},
-	modalSubtitle: {
-		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
-		color: colors.primaryLight,
-		textAlign: 'center',
-		marginBottom: 15,
-	},
-	priceInputContainer: {
-		flexDirection: 'row',
-		alignItems: 'flex-end',
-		justifyContent: 'space-between',
-		marginBottom: 30,
-	},
-	priceInputWrapper: {
-		flex: 1,
-		alignItems: 'center',
-	},
-	inputLabel: {
-		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
-		color: colors.primary,
-		marginBottom: 8,
-	},
-	priceInput: {
-		borderWidth: 1,
-		borderColor: colors.primaryLight,
-		borderRadius: 8,
-		padding: 12,
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		color: colors.primary,
-		textAlign: 'center',
-		minWidth: 80,
-	},
-	currencyLabel: {
-		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
-		color: colors.primary,
-		marginTop: 4,
-	},
-	priceSeparator: {
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
-		color: colors.primary,
-		marginHorizontal: 10,
-		marginBottom: 12,
-	},
-	// NUEVOS ESTILOS PARA EL RATING FILTER
-	ratingScrollView: {
-		maxHeight: 400,
-	},
-	ratingOptionsContainer: {
-		marginBottom: 20,
-	},
-	ratingOption: {
-		borderWidth: 1,
-		borderColor: colors.primaryLight,
-		borderRadius: 12,
-		padding: 16,
-		marginBottom: 12,
-		backgroundColor: 'transparent',
-	},
-	ratingOptionSelected: {
-		borderColor: colors.primary,
-		backgroundColor: colors.secondary,
-	},
-	ratingOptionRecommended: {
-		borderColor: colors.primary,
-		borderWidth: 2,
-	},
-	ratingOptionHeader: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginBottom: 4,
-		gap: 8,
-	},
-	starsContainer: {
-		flexDirection: 'row',
-		gap: 2,
-	},
-	ratingOptionText: {
-		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
-		color: colors.primary,
-		flex: 1,
-	},
-	recommendedBadge: {
-		backgroundColor: colors.primary,
-		paddingHorizontal: 8,
-		paddingVertical: 2,
-		borderRadius: 10,
-	},
-	recommendedText: {
-		fontSize: 10,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
-		color: colors.quaternary,
-	},
-	ratingOptionDescription: {
-		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
-		color: colors.primaryLight,
-		marginLeft: 24,
-	},
-	customRatingOption: {
-		paddingBottom: 16,
-	},
-	customInputContainer: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginTop: 12,
-		marginLeft: 24,
-		gap: 8,
-	},
-	customRatingInput: {
-		borderWidth: 1,
-		borderColor: colors.primaryLight,
-		borderRadius: 8,
-		padding: 8,
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		color: colors.primary,
-		textAlign: 'center',
-		minWidth: 60,
-		backgroundColor: colors.quaternary,
-	},
-	customRatingLabel: {
-		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
-		color: colors.primary,
-	},
-	tagsScrollView: {
-		maxHeight: 300,
-		marginBottom: 20,
-	},
-	tagsGrid: {
-		flexDirection: 'row',
-		flexWrap: 'wrap',
-		gap: 8,
-	},
-	tagButton: {
-		paddingHorizontal: 12,
-		paddingVertical: 8,
-		borderRadius: 16,
-		borderWidth: 1,
-		borderColor: colors.primary,
-		backgroundColor: 'transparent',
-	},
-	tagButtonSelected: {
-		backgroundColor: colors.primary,
-	},
-	tagButtonText: {
-		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
-		color: colors.primary,
-	},
-	tagButtonTextSelected: {
-		color: colors.quaternary,
-	},
-	timeInputContainer: {
-		flexDirection: 'row',
-		alignItems: 'flex-end',
-		justifyContent: 'space-between',
-		marginBottom: 30,
-	},
-	timeInputWrapper: {
-		flex: 1,
-		alignItems: 'center',
-	},
-	timePickerButton: {
-		borderWidth: 1,
-		borderColor: colors.primaryLight,
-		borderRadius: 8,
-		padding: 12,
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		color: colors.primary,
-		textAlign: 'center',
-		minWidth: 80,
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
-		gap: 8,
-	},
-	timePickerText: {
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		color: colors.primary,
-	},
-	timePickerContainer: {
-		backgroundColor: colors.secondary,
-		borderRadius: 8,
-		padding: 10,
-		marginVertical: 10,
-		alignItems: 'center',
-	},
-	timePickerLabel: {
-		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
-		color: colors.primary,
-		marginBottom: 10,
-	},
-	timePicker: {
-		width: 200,
-		height: 100,
-	},
-	timePickerConfirm: {
-		backgroundColor: colors.primary,
-		paddingHorizontal: 20,
-		paddingVertical: 8,
-		borderRadius: 6,
-		marginTop: 10,
-	},
-	timePickerConfirmText: {
-		color: colors.quaternary,
-		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
-	},
-	timeSeparator: {
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
-		color: colors.primary,
-		marginHorizontal: 10,
-		marginBottom: 12,
-	},
-	distanceContainer: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
-		gap: 10,
-		marginBottom: 30,
-	},
-	distanceInput: {
-		borderWidth: 1,
-		borderColor: colors.primaryLight,
-		borderRadius: 8,
-		padding: 12,
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		color: colors.primary,
-		textAlign: 'center',
-		minWidth: 80,
-	},
-	distanceLabel: {
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
-		color: colors.primary,
-	},
-	modalButtons: {
-		flexDirection: 'row',
-		gap: 12,
-		marginTop: 10,
-	},
-	cancelButton: {
-		flex: 1,
-		padding: 12,
-		backgroundColor: colors.secondary,
-		borderRadius: 8,
-		borderWidth: 1,
-		borderColor: colors.primary,
-	},
-	cancelButtonText: {
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
-		color: colors.primary,
-		textAlign: 'center',
-	},
-	applyButton: {
-		flex: 1,
-		padding: 12,
-		backgroundColor: colors.primary,
-		borderRadius: 8,
-	},
-	applyButtonText: {
-		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
-		color: colors.quaternary,
-		textAlign: 'center',
 	},
 });
