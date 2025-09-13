@@ -7,6 +7,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import React, { useEffect, useState } from 'react';
 import {
 	Animated,
+	Keyboard,
+	KeyboardAvoidingView,
 	Modal,
 	Platform,
 	ScrollView,
@@ -84,7 +86,7 @@ export default function ListFilter() {
 	const [tempSelectedTags, setTempSelectedTags] = useState<RestaurantTag[]>([]);
 	const [tempDistance, setTempDistance] = useState('');
 
-	// Time picker states - CAMBIO IMPLEMENTADO
+	// Time picker states
 	const [activeTimePicker, setActiveTimePicker] = useState<
 		'start' | 'end' | null
 	>(null);
@@ -174,10 +176,11 @@ export default function ListFilter() {
 		setActiveModal(type);
 	};
 
-	// CAMBIO IMPLEMENTADO - closeModal actualizado
 	const closeModal = () => {
 		setActiveModal(null);
 		setActiveTimePicker(null);
+		// Dismiss keyboard when closing modal
+		Keyboard.dismiss();
 	};
 
 	// Apply filters handlers
@@ -213,7 +216,7 @@ export default function ListFilter() {
 		closeModal();
 	};
 
-	// CAMBIO IMPLEMENTADO - Time picker handlers unificados
+	// Time picker handlers
 	const handleTimeChange = (event: any, selectedDate?: Date) => {
 		if (Platform.OS === 'android') {
 			setActiveTimePicker(null);
@@ -423,27 +426,52 @@ export default function ListFilter() {
 		],
 	};
 
-	// Render modal content with animation
-	const renderModalContent = (content: React.ReactNode) => (
+	// Render modal content with KeyboardAvoidingView for numeric inputs
+	const renderModalWithKeyboardSupport = (
+		content: React.ReactNode,
+		hasNumericInputs: boolean = false,
+	) => (
 		<TouchableOpacity
 			style={styles.modalOverlay}
 			activeOpacity={1}
 			onPress={closeModal}
 		>
-			<Animated.View
-				style={[
-					styles.modalContent,
-					{ paddingBottom: bottom + 20 },
-					slideTransform,
-				]}
-			>
-				<TouchableOpacity
-					activeOpacity={1}
-					onPress={(e) => e.stopPropagation()}
+			{hasNumericInputs ? (
+				<KeyboardAvoidingView
+					behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+					style={styles.keyboardAvoidingView}
 				>
-					{content}
-				</TouchableOpacity>
-			</Animated.View>
+					<Animated.View
+						style={[
+							styles.modalContent,
+							{ paddingBottom: bottom + 20 },
+							slideTransform,
+						]}
+					>
+						<TouchableOpacity
+							activeOpacity={1}
+							onPress={(e) => e.stopPropagation()}
+						>
+							{content}
+						</TouchableOpacity>
+					</Animated.View>
+				</KeyboardAvoidingView>
+			) : (
+				<Animated.View
+					style={[
+						styles.modalContent,
+						{ paddingBottom: bottom + 20 },
+						slideTransform,
+					]}
+				>
+					<TouchableOpacity
+						activeOpacity={1}
+						onPress={(e) => e.stopPropagation()}
+					>
+						{content}
+					</TouchableOpacity>
+				</Animated.View>
+			)}
 		</TouchableOpacity>
 	);
 
@@ -477,7 +505,7 @@ export default function ListFilter() {
 
 			{/* Price Filter Modal */}
 			<Modal visible={activeModal === 'price'} transparent animationType="fade">
-				{renderModalContent(
+				{renderModalWithKeyboardSupport(
 					<>
 						<Text style={styles.modalTitle}>{t('filters.priceRange')}</Text>
 
@@ -526,6 +554,7 @@ export default function ListFilter() {
 							</TouchableOpacity>
 						</View>
 					</>,
+					true, // Has numeric inputs
 				)}
 			</Modal>
 
@@ -535,7 +564,7 @@ export default function ListFilter() {
 				transparent
 				animationType="fade"
 			>
-				{renderModalContent(
+				{renderModalWithKeyboardSupport(
 					<>
 						<Text style={styles.modalTitle}>{t('filters.minimumRating')}</Text>
 
@@ -567,12 +596,13 @@ export default function ListFilter() {
 							</TouchableOpacity>
 						</View>
 					</>,
+					true, // Has numeric inputs
 				)}
 			</Modal>
 
 			{/* Tags Filter Modal */}
 			<Modal visible={activeModal === 'tags'} transparent animationType="fade">
-				{renderModalContent(
+				{renderModalWithKeyboardSupport(
 					<>
 						<Text style={styles.modalTitle}>{t('filters.categories')}</Text>
 						<Text style={styles.modalSubtitle}>
@@ -609,16 +639,17 @@ export default function ListFilter() {
 							</TouchableOpacity>
 						</View>
 					</>,
+					false, // No numeric inputs
 				)}
 			</Modal>
 
-			{/* CAMBIO IMPLEMENTADO - Schedule Filter Modal con un solo Time Picker */}
+			{/* Schedule Filter Modal */}
 			<Modal
 				visible={activeModal === 'schedule'}
 				transparent
 				animationType="fade"
 			>
-				{renderModalContent(
+				{renderModalWithKeyboardSupport(
 					<>
 						<Text style={styles.modalTitle}>{t('filters.schedule')}</Text>
 
@@ -706,6 +737,7 @@ export default function ListFilter() {
 							</TouchableOpacity>
 						</View>
 					</>,
+					false, // No numeric inputs
 				)}
 			</Modal>
 
@@ -715,7 +747,7 @@ export default function ListFilter() {
 				transparent
 				animationType="fade"
 			>
-				{renderModalContent(
+				{renderModalWithKeyboardSupport(
 					<>
 						<Text style={styles.modalTitle}>{t('filters.maxDistance')}</Text>
 
@@ -747,6 +779,7 @@ export default function ListFilter() {
 							</TouchableOpacity>
 						</View>
 					</>,
+					true, // Has numeric inputs
 				)}
 			</Modal>
 		</View>
@@ -807,6 +840,10 @@ const styles = StyleSheet.create({
 	modalOverlay: {
 		flex: 1,
 		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+		justifyContent: 'flex-end',
+	},
+	keyboardAvoidingView: {
+		flex: 1,
 		justifyContent: 'flex-end',
 	},
 	modalContent: {
