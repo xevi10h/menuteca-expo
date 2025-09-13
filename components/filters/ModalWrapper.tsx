@@ -15,7 +15,11 @@ interface ModalWrapperProps {
 	hasNumericInputs?: boolean;
 }
 
-export function ModalWrapper({ children, onClose, hasNumericInputs = false }: ModalWrapperProps) {
+export function ModalWrapper({
+	children,
+	onClose,
+	hasNumericInputs = false,
+}: ModalWrapperProps) {
 	const { bottom } = useSafeAreaInsets();
 	const [slideAnimation] = useState(new Animated.Value(0));
 
@@ -111,6 +115,6 @@ const styles = StyleSheet.create({
 		borderTopRightRadius: 20,
 		padding: 20,
 		paddingBottom: 40,
-		maxHeight: '60%',
+		maxHeight: '70%',
 	},
 });
