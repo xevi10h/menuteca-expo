@@ -28,8 +28,8 @@ export default function ScrollHorizontalRestaurant({
 					marginTop: 10,
 				}}
 			>
-				{restaurants.map((restaurant) => {
-					return <RestaurantCard restaurant={restaurant} />;
+				{restaurants.map((restaurant, index) => {
+					return <RestaurantCard key={index} restaurant={restaurant} />;
 				})}
 			</ScrollView>
 		</View>

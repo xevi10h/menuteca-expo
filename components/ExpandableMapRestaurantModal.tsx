@@ -5,7 +5,7 @@ import { Restaurant, Review } from '@/shared/types';
 import { useMenuStore } from '@/zustand/MenuStore';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
 	Dimensions,
 	Image,
@@ -83,11 +83,11 @@ export default function ExpandableMapRestaurantModal({
 	const tabIndicatorX = useSharedValue(0);
 	const tabIndicatorWidth = useSharedValue(0);
 
-	// Load menus when restaurant changes
-	useEffect(() => {
-		if (restaurant?.id && isVisible) {
+	// Memoized function to load menus
+	const loadMenusForRestaurant = useCallback(
+		async (restaurantId: string) => {
 			// First check if we have cached menus
-			const cachedMenus = getMenusByRestaurantId(restaurant.id);
+			const cachedMenus = getMenusByRestaurantId(restaurantId);
 
 			if (cachedMenus) {
 				setMenus(cachedMenus);
@@ -98,12 +98,33 @@ export default function ExpandableMapRestaurantModal({
 				}
 
 				// Fetch fresh menu data
-				fetchRestaurantMenus(restaurant.id).then((fetchedMenus) => {
+
+				try {
+					const fetchedMenus = await fetchRestaurantMenus(restaurantId);
 					setMenus(fetchedMenus);
-				});
+				} catch (error) {
+					console.error('❌ Error fetching menus:', error);
+				}
 			}
+		},
+		[getMenusByRestaurantId, fetchRestaurantMenus, restaurant.menus],
+	);
+
+	// Load menus when restaurant changes or modal becomes visible
+	useEffect(() => {
+		if (restaurant?.id && isVisible) {
+			loadMenusForRestaurant(restaurant.id);
+		} else {
 		}
-	}, [restaurant?.id, isVisible, fetchRestaurantMenus, getMenusByRestaurantId]);
+	}, [restaurant?.id, isVisible, loadMenusForRestaurant]);
+
+	// Additional effect that runs on mount to ensure we catch the loading
+	useEffect(() => {
+		// Force load if conditions are met
+		if (restaurant?.id && isVisible) {
+			loadMenusForRestaurant(restaurant.id);
+		}
+	}, []);
 
 	const informationComponent = useMemo(
 		() => (
@@ -288,7 +309,15 @@ export default function ExpandableMapRestaurantModal({
 	});
 
 	useEffect(() => {
+		console.log('🎭 MODAL ANIMATION EFFECT - isVisible/restaurant changed:', {
+			isVisible,
+			restaurantId: restaurant?.id,
+			restaurantName: restaurant?.name,
+			timestamp: new Date().toISOString(),
+		});
+
 		if (isVisible && restaurant) {
+			console.log('🎭 Modal opening animation started');
 			opacity.value = withTiming(1, { duration: 200 });
 			translateY.value = withSpring(0, {
 				damping: 20,
@@ -298,6 +327,7 @@ export default function ExpandableMapRestaurantModal({
 			isExpanded.value = false;
 			handleTabChange('information');
 		} else if (!isVisible) {
+			console.log('🎭 Modal closing');
 			handleClose();
 		}
 	}, [isVisible, restaurant]);

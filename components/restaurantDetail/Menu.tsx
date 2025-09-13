@@ -34,6 +34,15 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 	const { t } = useTranslation();
 	const [currentMenuIndex, setCurrentMenuIndex] = useState(0);
 
+	// Early return if no menus available
+	if (!menus || menus.length === 0) {
+		return (
+			<View style={styles.emptyContainer}>
+				<Text style={styles.emptyText}>{t('restaurant.noMenusAvailable')}</Text>
+			</View>
+		);
+	}
+
 	const currentMenu = menus[currentMenuIndex];
 	const canGoLeft = currentMenuIndex > 0;
 	const canGoRight = currentMenuIndex < menus.length - 1;
@@ -188,15 +197,15 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 	};
 
 	const showSchedule =
-		currentMenu.days?.length > 0 ||
-		currentMenu.start_time !== '00:00' ||
-		currentMenu.end_time !== '00:00';
+		currentMenu?.days?.length > 0 ||
+		currentMenu?.start_time !== '00:00' ||
+		currentMenu?.end_time !== '00:00';
 
 	const showOptions =
-		currentMenu.includes_bread ||
-		currentMenu.includes_coffee_and_dessert !== 'none' ||
-		currentMenu.has_minimum_people ||
-		hasDrinks(currentMenu.drinks);
+		currentMenu?.includes_bread ||
+		currentMenu?.includes_coffee_and_dessert !== 'none' ||
+		currentMenu?.has_minimum_people ||
+		hasDrinks(currentMenu?.drinks);
 
 	const renderMenuItem = ({ item }: { item: Dish }) => (
 		<View style={styles.menuItem}>
@@ -260,11 +269,11 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 	const renderCategoryHeader = ({ item }: { item: GroupedDishes }) => {
 		const isToShare =
 			(item.category === DishCategory.FIRST_COURSES &&
-				currentMenu.first_courses_to_share) ||
+				currentMenu?.first_courses_to_share) ||
 			(item.category === DishCategory.SECOND_COURSES &&
-				currentMenu.second_courses_to_share) ||
+				currentMenu?.second_courses_to_share) ||
 			(item.category === DishCategory.DESSERTS &&
-				currentMenu.desserts_to_share);
+				currentMenu?.desserts_to_share);
 
 		return (
 			<View style={styles.categoryHeaderContainer}>
@@ -300,7 +309,7 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 	}
 
 	// Agrupar los platos del menú actual por categoría
-	const groupedDishes = groupDishesByCategory(currentMenu.dishes);
+	const groupedDishes = groupDishesByCategory(currentMenu?.dishes || []);
 
 	return (
 		<View style={styles.menuContainer}>
@@ -318,9 +327,9 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 				</TouchableOpacity>
 
 				<View style={styles.menuHeaderContainer}>
-					<Text style={styles.menuHeader}>{currentMenu.name}</Text>
+					<Text style={styles.menuHeader}>{currentMenu?.name}</Text>
 					<Text style={styles.menuSubHeader}>{`${t('general.from')} ${
-						currentMenu.price
+						currentMenu?.price
 					}€`}</Text>
 				</View>
 
@@ -358,7 +367,7 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 					{/* Schedule and Days */}
 					{showSchedule && (
 						<View style={styles.scheduleContainer}>
-							{formatDays(currentMenu.days) && (
+							{formatDays(currentMenu?.days) && (
 								<View style={styles.scheduleItem}>
 									<Ionicons
 										name="calendar-outline"
@@ -366,11 +375,11 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 										color={colors.primary}
 									/>
 									<Text style={styles.scheduleText}>
-										{formatDays(currentMenu.days)}
+										{formatDays(currentMenu?.days)}
 									</Text>
 								</View>
 							)}
-							{formatSchedule(currentMenu.start_time, currentMenu.end_time) && (
+							{formatSchedule(currentMenu?.start_time, currentMenu?.end_time) && (
 								<View style={[styles.scheduleItem]}>
 									<Ionicons
 										name="time-outline"
@@ -379,8 +388,8 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 									/>
 									<Text style={styles.scheduleText}>
 										{formatSchedule(
-											currentMenu.start_time,
-											currentMenu.end_time,
+											currentMenu?.start_time,
+											currentMenu?.end_time,
 										)}
 									</Text>
 								</View>
@@ -395,7 +404,7 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 								{t('menuCreation.menuOptions')}
 							</Text>
 							<View style={styles.includesGrid}>
-								{currentMenu.includes_bread && (
+								{currentMenu?.includes_bread && (
 									<View style={styles.includeTag}>
 										<Ionicons
 											name="restaurant-outline"
@@ -408,17 +417,17 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 									</View>
 								)}
 
-								{currentMenu.drinks && hasDrinks(currentMenu.drinks) && (
+								{currentMenu?.drinks && hasDrinks(currentMenu?.drinks) && (
 									<View style={styles.includeTag}>
-										{renderDrinksIcon(currentMenu.drinks)}
+										{renderDrinksIcon(currentMenu?.drinks)}
 										<Text style={styles.includeTagText}>
-											{formatDrinks(currentMenu.drinks)}
+											{formatDrinks(currentMenu?.drinks)}
 										</Text>
 									</View>
 								)}
 
-								{currentMenu.includes_coffee_and_dessert &&
-									currentMenu.includes_coffee_and_dessert !== 'none' && (
+								{currentMenu?.includes_coffee_and_dessert &&
+									currentMenu?.includes_coffee_and_dessert !== 'none' && (
 										<View style={styles.includeTag}>
 											<Ionicons
 												name="cafe-outline"
@@ -427,13 +436,13 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 											/>
 											<Text style={styles.includeTagText}>
 												{formatCoffeeDesert(
-													currentMenu.includes_coffee_and_dessert,
+													currentMenu?.includes_coffee_and_dessert,
 												)}
 											</Text>
 										</View>
 									)}
-								{currentMenu.has_minimum_people &&
-									currentMenu.minimum_people && (
+								{currentMenu?.has_minimum_people &&
+									currentMenu?.minimum_people && (
 										<View style={styles.includeTag}>
 											<Ionicons
 												name="people-outline"
@@ -442,7 +451,7 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 											/>
 											<Text style={styles.includeTagText}>
 												{t('menuCreation.minimumPeopleLabel')}{' '}
-												{currentMenu.minimum_people}
+												{currentMenu?.minimum_people}
 											</Text>
 										</View>
 									)}

@@ -749,7 +749,7 @@ function MainAppContent() {
 			/>
 
 			{/* Modal para detalles del restaurante desde el mapa */}
-			{selectedRestaurant && (
+			{selectedRestaurant && modalVisible && (
 				<ExpandableMapRestaurantModal
 					restaurant={selectedRestaurant}
 					isVisible={modalVisible}

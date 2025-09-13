@@ -15,8 +15,6 @@ export default function RestaurantBasicInformation({
 	const { t } = useTranslation();
 	const colorToUse = color || colors.primary;
 
-	console.log('RestaurantBasicInformation', restaurant);
-
 	return (
 		<View style={styles.headerInfo}>
 			<View style={styles.restaurantIcon}>

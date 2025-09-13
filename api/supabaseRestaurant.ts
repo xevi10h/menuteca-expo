@@ -425,6 +425,8 @@ export class SupabaseRestaurantService {
 				),
 			);
 
+			console.log('Fetched restaurants:', restaurants.length);
+
 			// Filter by distance if radius provided
 			if (params?.radius && userCoords) {
 				restaurants = restaurants.filter(
