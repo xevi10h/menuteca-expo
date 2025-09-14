@@ -10,8 +10,8 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native';
-import { renderStars } from './filterUtils';
 import { ModalWrapper } from './ModalWrapper';
+import { renderStars } from './filterUtils';
 
 interface RatingFilterModalProps {
 	visible: boolean;
@@ -53,9 +53,7 @@ export default function RatingFilterModal({
 						]}
 						onPress={() => onSelectRating('4.5')}
 					>
-						<View style={styles.compactStarsContainer}>
-							{renderStars(4.5)}
-						</View>
+						<View style={styles.compactStarsContainer}>{renderStars(4.5)}</View>
 						<Text style={styles.compactRatingText}>4.5+</Text>
 					</TouchableOpacity>
 					<TouchableOpacity
@@ -65,9 +63,7 @@ export default function RatingFilterModal({
 						]}
 						onPress={() => onSelectRating('4')}
 					>
-						<View style={styles.compactStarsContainer}>
-							{renderStars(4)}
-						</View>
+						<View style={styles.compactStarsContainer}>{renderStars(4)}</View>
 						<Text style={styles.compactRatingText}>4+</Text>
 					</TouchableOpacity>
 					<TouchableOpacity
@@ -77,9 +73,7 @@ export default function RatingFilterModal({
 						]}
 						onPress={() => onSelectRating('3.5')}
 					>
-						<View style={styles.compactStarsContainer}>
-							{renderStars(3.5)}
-						</View>
+						<View style={styles.compactStarsContainer}>{renderStars(3.5)}</View>
 						<Text style={styles.compactRatingText}>3.5+</Text>
 					</TouchableOpacity>
 					<TouchableOpacity
@@ -89,9 +83,7 @@ export default function RatingFilterModal({
 						]}
 						onPress={() => onSelectRating('3')}
 					>
-						<View style={styles.compactStarsContainer}>
-							{renderStars(3)}
-						</View>
+						<View style={styles.compactStarsContainer}>{renderStars(3)}</View>
 						<Text style={styles.compactRatingText}>3+</Text>
 					</TouchableOpacity>
 				</View>
@@ -100,17 +92,12 @@ export default function RatingFilterModal({
 				<TouchableOpacity
 					style={[
 						styles.customRatingFullOption,
-						isCustomRatingSelected &&
-							styles.customRatingFullOptionSelected,
+						isCustomRatingSelected && styles.customRatingFullOptionSelected,
 					]}
 					onPress={() => onSelectRating('custom')}
 				>
 					<View style={styles.customRatingHeader}>
-						<Ionicons
-							name="create-outline"
-							size={18}
-							color={colors.primary}
-						/>
+						<Ionicons name="create-outline" size={18} color={colors.primary} />
 						<Text style={styles.customRatingTitle}>
 							Valoración personalizada
 						</Text>
@@ -122,10 +109,12 @@ export default function RatingFilterModal({
 								style={styles.customRatingInput}
 								value={customRating}
 								onChangeText={(text) => {
-									// Permitir números decimales del 0 al 5
-									const regex = /^[0-5]?(\.[0-9]?)?$/;
+									// Permitir números decimales del 0 al 5 con punto o coma
+									const regex = /^([0-4]([.,][0-9]*)?|5([.,]0*)?|[.,])$/;
 									if (regex.test(text) || text === '') {
-										onCustomRatingChange(text);
+										// Normalizar coma a punto para procesamiento interno
+										const normalizedText = text.replace(',', '.');
+										onCustomRatingChange(normalizedText);
 									}
 								}}
 								keyboardType="numeric"
@@ -140,9 +129,7 @@ export default function RatingFilterModal({
 
 			<View style={styles.modalButtons}>
 				<TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-					<Text style={styles.cancelButtonText}>
-						{t('general.cancel')}
-					</Text>
+					<Text style={styles.cancelButtonText}>{t('general.cancel')}</Text>
 				</TouchableOpacity>
 				<TouchableOpacity style={styles.applyButton} onPress={onApply}>
 					<Text style={styles.applyButtonText}>{t('filters.apply')}</Text>
