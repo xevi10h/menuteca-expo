@@ -393,18 +393,19 @@ export default function ListFilter() {
 				showsHorizontalScrollIndicator={false}
 				contentContainerStyle={styles.scrollContent}
 			>
-				{/* Sort Button - Always first and always visible */}
-				<SortButton />
-
 				{/* Clear all filters button (only show if removable filters are active) */}
 				{hasActiveFilters && (
-					<TouchableOpacity
-						style={styles.clearAllButton}
-						onPress={resetRemovableFilters}
-					>
-						<Ionicons name="close-circle" size={16} color={colors.primary} />
-						<Text style={styles.clearAllText}>{t('filters.clearAll')}</Text>
-					</TouchableOpacity>
+					<>
+						<TouchableOpacity
+							style={styles.clearAllButton}
+							onPress={resetRemovableFilters}
+						>
+							<Ionicons name="close-circle" size={16} color={colors.primary} />
+							<Text style={styles.clearAllText}>{t('filters.clearAll')}</Text>
+						</TouchableOpacity>
+
+						<SortButton />
+					</>
 				)}
 
 				{/* Active filters */}
