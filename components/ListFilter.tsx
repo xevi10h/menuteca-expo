@@ -74,6 +74,7 @@ export default function ListFilter() {
 	const hasTagsFilter = filters.tags && filters.tags.length > 0;
 	const hasScheduleFilter = filters.timeRange !== null;
 	const hasDistanceFilter = filters.distance !== null;
+	const hasCuisinesFilter = filters.cuisines && filters.cuisines.length > 0;
 
 	// Check if any non-persistent filters are active (excludes sort and cuisines)
 	const hasActiveFilters =
@@ -81,7 +82,8 @@ export default function ListFilter() {
 		hasRatingFilter ||
 		hasTagsFilter ||
 		hasScheduleFilter ||
-		hasDistanceFilter;
+		hasDistanceFilter ||
+		hasCuisinesFilter;
 
 	// Modal handlers
 	const openModal = (type: FilterModalType) => {

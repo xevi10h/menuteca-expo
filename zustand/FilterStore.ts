@@ -139,6 +139,7 @@ export const useFilterStore = create<FilterState>((set, get) => ({
 				tags: null,
 				timeRange: null,
 				distance: null,
+				cuisines: null,
 			},
 		}));
 	},
