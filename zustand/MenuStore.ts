@@ -1,6 +1,6 @@
 import { MenuService } from '@/api/index';
 import { supabase } from '@/lib/supabase';
-import { Language, MenuData } from '@/shared/types';
+import { Language, MenuData, MenuCreationData } from '@/shared/types';
 import { create } from 'zustand';
 
 interface CachedMenuData {
@@ -30,7 +30,7 @@ interface MenuState {
 	// Centralized menu and dish management
 	createMenuWithDishes: (
 		restaurant_id: string,
-		menuData: MenuData,
+		menuData: MenuCreationData,
 	) => Promise<{ success: boolean; data?: MenuData; error?: string }>;
 	updateMenuWithDishes: (
 		restaurant_id: string,
@@ -212,7 +212,7 @@ export const useMenuStore = create<MenuState>((set, get) => ({
 		set({ cache: newCache });
 	},
 
-	createMenuWithDishes: async (restaurant_id: string, menuData: MenuData) => {
+	createMenuWithDishes: async (restaurant_id: string, menuData: MenuCreationData) => {
 		set({ isLoading: true, error: null });
 
 		try {

@@ -14,7 +14,7 @@ import TagsSection from '@/components/restaurantCreation/TagsSection';
 import TagsSelectionModal from '@/components/restaurantCreation/TagsSelectionModal';
 import { useTranslation } from '@/hooks/useTranslation';
 import { RestaurantTag } from '@/shared/enums';
-import { Address, MenuData, Restaurant } from '@/shared/types';
+import { Address, MenuData, MenuCreationData, Restaurant } from '@/shared/types';
 import { useMenuStore } from '@/zustand/MenuStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -265,7 +265,7 @@ export default function UserRestaurantEdit() {
 				};
 
 				// Remove ID and other fields that shouldn't be copied
-				const { id, ...menuDataWithoutId } = copiedMenuData;
+				const { id, ...menuDataWithoutId }: { id: string; } & MenuCreationData = copiedMenuData;
 
 				const response = await createMenuWithDishes(
 					restaurantId,

@@ -14,7 +14,6 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { RestaurantTag } from '@/shared/enums';
 import { Address, MenuData } from '@/shared/types';
 import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
-import { useMenuStore } from '@/zustand/MenuStore';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {

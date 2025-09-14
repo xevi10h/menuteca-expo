@@ -748,32 +748,20 @@ export default function MenuCreationModal({
 
 						{/* Photo Upload Button */}
 						<TouchableOpacity
-							style={[
-								styles.addPhotoMenuButton,
-								isProcessingPhoto && styles.addPhotoMenuButtonDisabled,
-							]}
+							style={styles.addPhotoMenuButton}
 							onPress={handlePhotoMenuUpload}
 							disabled={isProcessingPhoto}
 						>
-							{isProcessingPhoto ? (
-								<>
-									<ActivityIndicator size="small" color={colors.quaternary} />
-									<Text style={styles.addPhotoMenuText}>
-										{t('menuCreation.processingPhoto')}
-									</Text>
-								</>
-							) : (
-								<>
-									<Ionicons
-										name="sparkles-outline"
-										size={16}
-										color={colors.quaternary}
-									/>
-									<Text style={styles.addPhotoMenuText}>
-										{t('menuCreation.addPhotoMenu')}
-									</Text>
-								</>
-							)}
+							<>
+								<Ionicons
+									name="sparkles-outline"
+									size={16}
+									color={colors.quaternary}
+								/>
+								<Text style={styles.addPhotoMenuText}>
+									{t('menuCreation.addPhotoMenu')}
+								</Text>
+							</>
 						</TouchableOpacity>
 
 						<DividerWithCircle color={colors.primary} marginVertical={20} />

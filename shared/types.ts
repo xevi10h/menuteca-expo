@@ -169,6 +169,9 @@ export type MenuData = {
 	has_minimum_people?: boolean;
 };
 
+// Type for creating menus (same as MenuData but without required id)
+export type MenuCreationData = Omit<MenuData, 'id'>;
+
 export type Dish = {
 	id: string;
 	name: string;
