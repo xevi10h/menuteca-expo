@@ -5,11 +5,10 @@ import { useFilterStore } from '@/zustand/FilterStore';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ModalWrapper } from './ModalWrapper';
 
 export default function SortButton() {
 	const { t } = useTranslation();
-	const { bottom } = useSafeAreaInsets();
 	const { main: filters, setOrderBy, setOrderDirection } = useFilterStore();
 	const [showSortModal, setShowSortModal] = useState(false);
 
@@ -51,9 +50,9 @@ export default function SortButton() {
 			</TouchableOpacity>
 
 			{/* Sort Modal */}
-			<Modal visible={showSortModal} transparent animationType="slide">
-				<View style={styles.modalOverlay}>
-					<View style={[styles.modalContent, { paddingBottom: bottom + 20 }]}>
+			<Modal visible={showSortModal} transparent animationType="fade">
+				<ModalWrapper onClose={() => setShowSortModal(false)}>
+					<>
 						<Text style={styles.modalTitle}>{t('filters.sortBy')}</Text>
 
 						<View style={styles.sortOptions}>
@@ -143,8 +142,8 @@ export default function SortButton() {
 						>
 							<Text style={styles.cancelButtonText}>{t('general.cancel')}</Text>
 						</TouchableOpacity>
-					</View>
-				</View>
+					</>
+				</ModalWrapper>
 			</Modal>
 		</>
 	);
@@ -167,18 +166,6 @@ const styles = StyleSheet.create({
 		fontSize: 12,
 		fontFamily: 'Manrope',
 		fontWeight: '500',
-	},
-	modalOverlay: {
-		flex: 1,
-		backgroundColor: 'rgba(0, 0, 0, 0.5)',
-		justifyContent: 'flex-end',
-	},
-	modalContent: {
-		backgroundColor: colors.quaternary,
-		borderTopLeftRadius: 20,
-		borderTopRightRadius: 20,
-		padding: 20,
-		paddingBottom: 40,
 	},
 	modalTitle: {
 		fontSize: 18,
