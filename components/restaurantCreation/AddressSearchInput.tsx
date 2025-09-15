@@ -87,6 +87,7 @@ export default function AddressSearchInput({
 
 	const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const lastSearchRef = useRef<string>('');
+	const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	// Rate limiting simple
 	const rateLimits = useRef<
@@ -307,7 +308,16 @@ export default function AddressSearchInput({
 	};
 
 	const handleSuggestionSelect = async (suggestion: AddressSuggestion) => {
+		// Clear any pending hide timeout
+		if (hideTimeoutRef.current) {
+			clearTimeout(hideTimeoutRef.current);
+			hideTimeoutRef.current = null;
+		}
+
 		setIsSearching(true);
+
+		// Immediately hide suggestions to prevent multiple taps
+		setShowSuggestions(false);
 
 		// Get detailed information about the selected place
 		const addressDetails = await getPlaceDetails(suggestion.placeId);
@@ -317,13 +327,11 @@ export default function AddressSearchInput({
 				addressDetails.formatted_address || suggestion.description,
 			);
 			setSuggestions([]);
-			setShowSuggestions(false);
 			onAddressSelected(addressDetails);
 		} else {
 			// Fallback to basic suggestion info
 			setSearchQuery(suggestion.description);
 			setSuggestions([]);
-			setShowSuggestions(false);
 
 			// Create a basic address from the suggestion
 			const basicAddress: Address = {
@@ -343,10 +351,15 @@ export default function AddressSearchInput({
 	};
 
 	const handleInputBlur = () => {
+		// Clear any existing timeout
+		if (hideTimeoutRef.current) {
+			clearTimeout(hideTimeoutRef.current);
+		}
+
 		// Delay hiding suggestions to allow tap on suggestion
-		setTimeout(() => {
+		hideTimeoutRef.current = setTimeout(() => {
 			setShowSuggestions(false);
-		}, 200);
+		}, 150);
 	};
 
 	const renderSuggestion = (item: AddressSuggestion) => (
@@ -354,6 +367,7 @@ export default function AddressSearchInput({
 			key={item.id}
 			style={styles.suggestionItem}
 			onPress={() => handleSuggestionSelect(item)}
+			activeOpacity={0.7}
 		>
 			<View style={styles.suggestionIcon}>
 				<Ionicons name="location-outline" size={16} color={colors.primary} />
@@ -403,6 +417,8 @@ export default function AddressSearchInput({
 							style={styles.suggestionsScrollView}
 							showsVerticalScrollIndicator={true}
 							nestedScrollEnabled={true}
+							keyboardShouldPersistTaps="handled"
+							scrollEventThrottle={16}
 						>
 							{suggestions.map(renderSuggestion)}
 						</ScrollView>
