@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useRef, useState } from 'react';
 import {
 	ActivityIndicator,
+	Keyboard,
 	ScrollView,
 	StyleSheet,
 	Text,
@@ -315,6 +316,9 @@ export default function AddressSearchInput({
 		}
 
 		setIsSearching(true);
+
+		// Hide keyboard immediately
+		Keyboard.dismiss();
 
 		// Immediately hide suggestions to prevent multiple taps
 		setShowSuggestions(false);
