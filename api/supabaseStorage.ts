@@ -26,28 +26,29 @@ export class SupabaseStorageService {
 			const {
 				data: { user },
 			} = await supabase.auth.getUser();
-
 			if (!user) {
 				throw new Error('User not authenticated');
 			}
 
-			// Generate unique filename if not provided
 			const fileExt = file.uri.split('.').pop()?.toLowerCase() || 'jpg';
 			const finalFileName = fileName || `${Date.now()}.${fileExt}`;
-
-			// Create file path
 			const folderPath = folder ? `${folder}/` : '';
 			const filePath = `${folderPath}${finalFileName}`;
 
-			// Convert file to base64 using FileSystem (more reliable than fetch for local URIs)
-			const base64 = await FileSystem.readAsStringAsync(file.uri, {
-				encoding: FileSystem.EncodingType.Base64,
-			});
+			let base64: string;
 
-			// Convert base64 to ArrayBuffer (better React Native support)
+			// ✅ Mejorar el manejo de base64
+			if (file.base64) {
+				base64 = file.base64;
+			} else {
+				// Fallback usando FileSystem
+				base64 = await FileSystem.readAsStringAsync(file.uri, {
+					encoding: FileSystem.EncodingType.Base64,
+				});
+			}
+
 			const arrayBuffer = decode(base64);
 
-			// Upload to Supabase
 			const { data, error } = await supabase.storage
 				.from(SupabaseStorageService.BUCKETS[bucket])
 				.upload(filePath, arrayBuffer, {
@@ -55,9 +56,11 @@ export class SupabaseStorageService {
 					upsert,
 				});
 
-			if (error) throw error;
+			if (error) {
+				console.error('Supabase storage error:', error); // ✅ Agregar más logging
+				throw error;
+			}
 
-			// Get public URL
 			const {
 				data: { publicUrl },
 			} = supabase.storage
@@ -311,16 +314,23 @@ export class SupabaseStorageService {
 		try {
 			const folder = `${userId}/reviews/${restaurantId}`;
 			console.log('Uploading review photos to folder:', folder);
-			
-			const uploadResult = await this.uploadMultipleImages('REVIEWS', files, folder);
-			
+
+			const uploadResult = await this.uploadMultipleImages(
+				'REVIEWS',
+				files,
+				folder,
+			);
+
 			console.log('Review photos upload result:', uploadResult);
 			return uploadResult;
 		} catch (error) {
 			console.error('Review photos upload error:', error);
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to upload review photos',
+				error:
+					error instanceof Error
+						? error.message
+						: 'Failed to upload review photos',
 			};
 		}
 	}

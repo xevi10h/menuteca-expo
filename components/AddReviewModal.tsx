@@ -1,6 +1,6 @@
 import { colors } from '@/assets/styles/colors';
-import { useTranslation } from '@/hooks/useTranslation';
 import { useReviewSubmit } from '@/hooks/useReviewSubmit';
+import { useTranslation } from '@/hooks/useTranslation';
 import { Review } from '@/shared/types';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -127,14 +127,14 @@ export default function AddReviewModal({
 			mediaTypes: ['images'],
 			allowsMultipleSelection: true,
 			quality: 0.8,
-			base64: false, // We'll read base64 in the storage service if needed
+			base64: true,
 			selectionLimit: 5 - photos.length,
 		});
 
 		if (!result.canceled) {
 			const newPhotos = result.assets.slice(0, 5 - photos.length);
 			const newPhotoUris = newPhotos.map((asset) => asset.uri);
-			
+
 			setPhotos((prev) => [...prev, ...newPhotos]);
 			setPhotoUris((prev) => [...prev, ...newPhotoUris]);
 		}

@@ -1,24 +1,8 @@
 // api/supabaseReview.ts
 import { supabase } from '@/lib/supabase';
-import { Review, Language } from '@/shared/types';
-import { getLocalizedText } from '@/shared/functions/utils';
-import { SupabaseStorageService } from './supabaseStorage';
+import { Language, Review } from '@/shared/types';
 import { SupabaseRestaurantService } from './supabaseRestaurant';
-
-// Database types
-interface ReviewRow {
-	id: string;
-	profile_id: string; // Using profile_id as per database schema
-	restaurant_id: string;
-	rating: number;
-	comment: { [key: string]: string };
-	photos: string[];
-	restaurant_response_message?: { [key: string]: string };
-	restaurant_response_date?: string;
-	created_at: string;
-	updated_at: string;
-	deleted_at?: string;
-}
+import { SupabaseStorageService } from './supabaseStorage';
 
 export class SupabaseReviewService {
 	/**
@@ -39,7 +23,9 @@ export class SupabaseReviewService {
 	 */
 	private static async getCurrentUserId(): Promise<string | null> {
 		try {
-			const { data: { user } } = await supabase.auth.getUser();
+			const {
+				data: { user },
+			} = await supabase.auth.getUser();
 			return user?.id || null;
 		} catch (error) {
 			return null;
@@ -107,7 +93,7 @@ export class SupabaseReviewService {
 	): Promise<Review> {
 		return {
 			id: reviewRow.id,
-			user_id: reviewRow.profile_id, // Map profile_id to user_id for type compatibility
+			user_id: reviewRow.user_id,
 			user_name: reviewRow.profiles?.name || 'Unknown User',
 			user_avatar: reviewRow.profiles?.photo || '',
 			restaurant_id: reviewRow.restaurant_id,
@@ -152,10 +138,17 @@ export class SupabaseReviewService {
 				};
 			}
 
-			console.log('Creating review for restaurant:', restaurant_id, 'by user:', userId);
+			console.log(
+				'Creating review for restaurant:',
+				restaurant_id,
+				'by user:',
+				userId,
+			);
 
 			// Check if restaurant exists
-			const restaurantCheck = await SupabaseRestaurantService.getRestaurantById(restaurant_id);
+			const restaurantCheck = await SupabaseRestaurantService.getRestaurantById(
+				restaurant_id,
+			);
 			if (!restaurantCheck.success) {
 				return {
 					success: false,
@@ -167,7 +160,7 @@ export class SupabaseReviewService {
 			const { data: existingReview } = await supabase
 				.from('reviews')
 				.select('id')
-				.eq('profile_id', userId) // Note: using profile_id not user_id
+				.eq('user_id', userId)
 				.eq('restaurant_id', restaurant_id)
 				.is('deleted_at', null)
 				.maybeSingle();
@@ -185,7 +178,7 @@ export class SupabaseReviewService {
 			// Handle photo uploads with proper folder structure
 			if (reviewData.photo_files?.length) {
 				console.log('Uploading review photos:', reviewData.photo_files.length);
-				
+
 				const uploadResult = await SupabaseStorageService.uploadReviewPhotos(
 					userId,
 					restaurant_id,
@@ -206,24 +199,32 @@ export class SupabaseReviewService {
 			}
 
 			const userLanguage = this.getCurrentLanguage();
-			const commentTranslated = this.createUserTranslatedText(finalData.comment, userLanguage);
+			const commentTranslated = this.createUserTranslatedText(
+				finalData.comment,
+				userLanguage,
+			);
 
-			console.log('Inserting review into database with photos:', uploadedPhotos);
+			console.log(
+				'Inserting review into database with photos:',
+				uploadedPhotos,
+			);
 
 			const { data, error } = await supabase
 				.from('reviews')
 				.insert({
-					profile_id: userId, // Note: using profile_id not user_id
+					user_id: userId,
 					restaurant_id,
 					rating: finalData.rating,
 					comment: commentTranslated,
 					photos: uploadedPhotos,
 				})
-				.select(`
+				.select(
+					`
 					*,
-					profiles:profile_id (id, username, name, photo),
-					restaurants:restaurant_id (id, name, main_image)
-				`)
+					profiles!user_id (id, username, name, photo), 
+					restaurants!restaurant_id (id, name, main_image)
+				`,
+				)
 				.single();
 
 			if (error) {
@@ -235,7 +236,7 @@ export class SupabaseReviewService {
 							error: 'Invalid restaurant ID',
 						};
 					}
-					if (error.message.includes('profile_id')) {
+					if (error.message.includes('user_id')) {
 						return {
 							success: false,
 							error: 'Invalid user ID',
@@ -251,7 +252,7 @@ export class SupabaseReviewService {
 				throw error;
 			}
 
-			console.log('Review created successfully:', data.id);
+			console.log('Review created successfully:', data);
 
 			// Update restaurant rating
 			await SupabaseRestaurantService.updateRestaurantRating(restaurant_id);
@@ -266,7 +267,8 @@ export class SupabaseReviewService {
 			console.error('Create review error:', error);
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to create review',
+				error:
+					error instanceof Error ? error.message : 'Failed to create review',
 			};
 		}
 	}
@@ -295,7 +297,7 @@ export class SupabaseReviewService {
 				.select(
 					`
 					*,
-					profiles:profile_id (id, username, name, photo),
+					profiles:user_id (id, username, name, photo),
 					restaurants:restaurant_id (id, name, main_image)
 				`,
 					{ count: 'exact' },
@@ -314,8 +316,12 @@ export class SupabaseReviewService {
 
 			// Apply sorting
 			const validSortFields = ['created_at', 'rating', 'updated_at'];
-			const sortField = validSortFields.includes(params?.sortBy || '') ? params?.sortBy : 'created_at';
-			query = query.order(sortField!, { ascending: params?.sortOrder === 'asc' });
+			const sortField = validSortFields.includes(params?.sortBy || '')
+				? params?.sortBy
+				: 'created_at';
+			query = query.order(sortField!, {
+				ascending: params?.sortOrder === 'asc',
+			});
 
 			// Apply pagination
 			const offset = (page - 1) * limit;
@@ -329,8 +335,8 @@ export class SupabaseReviewService {
 
 			const reviews = await Promise.all(
 				(data || []).map((review: any) =>
-					this.convertToReview(review, userLanguage)
-				)
+					this.convertToReview(review, userLanguage),
+				),
 			);
 
 			const totalPages = Math.ceil((count || 0) / limit);
@@ -352,7 +358,10 @@ export class SupabaseReviewService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to fetch restaurant reviews',
+				error:
+					error instanceof Error
+						? error.message
+						: 'Failed to fetch restaurant reviews',
 			};
 		}
 	}
@@ -384,18 +393,22 @@ export class SupabaseReviewService {
 				.select(
 					`
 					*,
-					profiles:profile_id (id, username, name, photo),
+					profiles:user_id (id, username, name, photo),
 					restaurants:restaurant_id (id, name, main_image)
 				`,
 					{ count: 'exact' },
 				)
-				.eq('profile_id', userId)
+				.eq('user_id', userId)
 				.is('deleted_at', null);
 
 			// Apply sorting
 			const validSortFields = ['created_at', 'rating', 'updated_at'];
-			const sortField = validSortFields.includes(params?.sortBy || '') ? params?.sortBy : 'created_at';
-			query = query.order(sortField!, { ascending: params?.sortOrder === 'asc' });
+			const sortField = validSortFields.includes(params?.sortBy || '')
+				? params?.sortBy
+				: 'created_at';
+			query = query.order(sortField!, {
+				ascending: params?.sortOrder === 'asc',
+			});
 
 			// Apply pagination
 			const offset = (page - 1) * limit;
@@ -409,8 +422,8 @@ export class SupabaseReviewService {
 
 			const reviews = await Promise.all(
 				(data || []).map((review: any) =>
-					this.convertToReview(review, userLanguage)
-				)
+					this.convertToReview(review, userLanguage),
+				),
 			);
 
 			const totalPages = Math.ceil((count || 0) / limit);
@@ -432,7 +445,10 @@ export class SupabaseReviewService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to fetch user reviews',
+				error:
+					error instanceof Error
+						? error.message
+						: 'Failed to fetch user reviews',
 			};
 		}
 	}
@@ -460,7 +476,7 @@ export class SupabaseReviewService {
 			// Check ownership
 			const { data: reviewCheck, error: reviewError } = await supabase
 				.from('reviews')
-				.select('profile_id, restaurant_id')
+				.select('user_id, restaurant_id')
 				.eq('id', id)
 				.is('deleted_at', null)
 				.single();
@@ -468,11 +484,14 @@ export class SupabaseReviewService {
 			if (reviewError) {
 				return {
 					success: false,
-					error: reviewError.code === 'PGRST116' ? 'Review not found' : 'Failed to verify review',
+					error:
+						reviewError.code === 'PGRST116'
+							? 'Review not found'
+							: 'Failed to verify review',
 				};
 			}
 
-			if (reviewCheck.profile_id !== userId) {
+			if (reviewCheck.user_id !== userId) {
 				return {
 					success: false,
 					error: 'Not authorized to update this review',
@@ -480,7 +499,7 @@ export class SupabaseReviewService {
 			}
 
 			const userLanguage = this.getCurrentLanguage();
-			
+
 			// Handle comment translation update
 			let finalUpdateData: any = { ...updateData };
 			if (updateData.comment) {
@@ -511,11 +530,13 @@ export class SupabaseReviewService {
 					updated_at: new Date().toISOString(),
 				})
 				.eq('id', id)
-				.select(`
+				.select(
+					`
 					*,
-					profiles:profile_id (id, username, name, photo),
+					profiles:user_id (id, username, name, photo),
 					restaurants:restaurant_id (id, name, main_image)
-				`)
+				`,
+				)
 				.single();
 
 			if (error) {
@@ -530,7 +551,9 @@ export class SupabaseReviewService {
 
 			// Update restaurant rating if rating changed
 			if (updateData.rating !== undefined) {
-				await SupabaseRestaurantService.updateRestaurantRating(reviewCheck.restaurant_id);
+				await SupabaseRestaurantService.updateRestaurantRating(
+					reviewCheck.restaurant_id,
+				);
 			}
 
 			const review = await this.convertToReview(data, userLanguage);
@@ -542,7 +565,8 @@ export class SupabaseReviewService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to update review',
+				error:
+					error instanceof Error ? error.message : 'Failed to update review',
 			};
 		}
 	}
@@ -563,7 +587,7 @@ export class SupabaseReviewService {
 			// Check ownership and get restaurant_id for rating update
 			const { data: reviewCheck, error: reviewError } = await supabase
 				.from('reviews')
-				.select('profile_id, restaurant_id')
+				.select('user_id, restaurant_id')
 				.eq('id', id)
 				.is('deleted_at', null)
 				.single();
@@ -571,28 +595,30 @@ export class SupabaseReviewService {
 			if (reviewError) {
 				return {
 					success: false,
-					error: reviewError.code === 'PGRST116' ? 'Review not found' : 'Failed to verify review',
+					error:
+						reviewError.code === 'PGRST116'
+							? 'Review not found'
+							: 'Failed to verify review',
 				};
 			}
 
-			if (reviewCheck.profile_id !== userId) {
+			if (reviewCheck.user_id !== userId) {
 				return {
 					success: false,
 					error: 'Not authorized to delete this review',
 				};
 			}
 
-			const { error } = await supabase
-				.from('reviews')
-				.delete()
-				.eq('id', id);
+			const { error } = await supabase.from('reviews').delete().eq('id', id);
 
 			if (error) {
 				throw error;
 			}
 
 			// Update restaurant rating
-			await SupabaseRestaurantService.updateRestaurantRating(reviewCheck.restaurant_id);
+			await SupabaseRestaurantService.updateRestaurantRating(
+				reviewCheck.restaurant_id,
+			);
 
 			return {
 				success: true,
@@ -600,7 +626,8 @@ export class SupabaseReviewService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to delete review',
+				error:
+					error instanceof Error ? error.message : 'Failed to delete review',
 			};
 		}
 	}
@@ -621,7 +648,7 @@ export class SupabaseReviewService {
 			// Check ownership and get restaurant_id for rating update
 			const { data: reviewCheck, error: reviewError } = await supabase
 				.from('reviews')
-				.select('profile_id, restaurant_id')
+				.select('user_id, restaurant_id')
 				.eq('id', id)
 				.is('deleted_at', null)
 				.single();
@@ -629,11 +656,14 @@ export class SupabaseReviewService {
 			if (reviewError) {
 				return {
 					success: false,
-					error: reviewError.code === 'PGRST116' ? 'Review not found' : 'Failed to verify review',
+					error:
+						reviewError.code === 'PGRST116'
+							? 'Review not found'
+							: 'Failed to verify review',
 				};
 			}
 
-			if (reviewCheck.profile_id !== userId) {
+			if (reviewCheck.user_id !== userId) {
 				return {
 					success: false,
 					error: 'Not authorized to delete this review',
@@ -651,7 +681,9 @@ export class SupabaseReviewService {
 			}
 
 			// Update restaurant rating
-			await SupabaseRestaurantService.updateRestaurantRating(reviewCheck.restaurant_id);
+			await SupabaseRestaurantService.updateRestaurantRating(
+				reviewCheck.restaurant_id,
+			);
 
 			return {
 				success: true,
@@ -659,7 +691,8 @@ export class SupabaseReviewService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to delete review',
+				error:
+					error instanceof Error ? error.message : 'Failed to delete review',
 			};
 		}
 	}
@@ -680,10 +713,12 @@ export class SupabaseReviewService {
 			// Check if review exists and verify restaurant ownership
 			const { data: reviewWithRestaurant, error: reviewError } = await supabase
 				.from('reviews')
-				.select(`
+				.select(
+					`
 					*,
 					restaurants!inner(owner_id)
-				`)
+				`,
+				)
 				.eq('id', reviewId)
 				.is('deleted_at', null)
 				.single();
@@ -691,7 +726,10 @@ export class SupabaseReviewService {
 			if (reviewError) {
 				return {
 					success: false,
-					error: reviewError.code === 'PGRST116' ? 'Review not found' : 'Failed to verify review',
+					error:
+						reviewError.code === 'PGRST116'
+							? 'Review not found'
+							: 'Failed to verify review',
 				};
 			}
 
@@ -703,7 +741,10 @@ export class SupabaseReviewService {
 			}
 
 			const userLanguage = this.getCurrentLanguage();
-			const responseTranslated = this.createUserTranslatedText(message, userLanguage);
+			const responseTranslated = this.createUserTranslatedText(
+				message,
+				userLanguage,
+			);
 
 			const { data, error } = await supabase
 				.from('reviews')
@@ -712,11 +753,13 @@ export class SupabaseReviewService {
 					restaurant_response_date: new Date().toISOString(),
 				})
 				.eq('id', reviewId)
-				.select(`
+				.select(
+					`
 					*,
-					profiles:profile_id (id, username, name, photo),
+					profiles:user_id (id, username, name, photo),
 					restaurants:restaurant_id (id, name, main_image)
-				`)
+				`,
+				)
 				.single();
 
 			if (error) {
@@ -738,7 +781,10 @@ export class SupabaseReviewService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to add restaurant response',
+				error:
+					error instanceof Error
+						? error.message
+						: 'Failed to add restaurant response',
 			};
 		}
 	}
@@ -759,10 +805,12 @@ export class SupabaseReviewService {
 			// Check if review exists and verify restaurant ownership
 			const { data: reviewWithRestaurant, error: reviewError } = await supabase
 				.from('reviews')
-				.select(`
+				.select(
+					`
 					*,
 					restaurants!inner(owner_id)
-				`)
+				`,
+				)
 				.eq('id', reviewId)
 				.is('deleted_at', null)
 				.single();
@@ -770,7 +818,10 @@ export class SupabaseReviewService {
 			if (reviewError) {
 				return {
 					success: false,
-					error: reviewError.code === 'PGRST116' ? 'Review not found' : 'Failed to verify review',
+					error:
+						reviewError.code === 'PGRST116'
+							? 'Review not found'
+							: 'Failed to verify review',
 				};
 			}
 
@@ -788,11 +839,13 @@ export class SupabaseReviewService {
 					restaurant_response_date: null,
 				})
 				.eq('id', reviewId)
-				.select(`
+				.select(
+					`
 					*,
-					profiles:profile_id (id, username, name, photo),
+					profiles:user_id (id, username, name, photo),
 					restaurants:restaurant_id (id, name, main_image)
-				`)
+				`,
+				)
 				.single();
 
 			if (error) {
@@ -815,7 +868,10 @@ export class SupabaseReviewService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to remove restaurant response',
+				error:
+					error instanceof Error
+						? error.message
+						: 'Failed to remove restaurant response',
 			};
 		}
 	}
@@ -829,11 +885,13 @@ export class SupabaseReviewService {
 
 			const { data, error } = await supabase
 				.from('reviews')
-				.select(`
+				.select(
+					`
 					*,
-					profiles:profile_id (id, username, name, photo),
+					profiles:user_id (id, username, name, photo),
 					restaurants:restaurant_id (id, name, main_image)
-				`)
+				`,
+				)
 				.eq('id', id)
 				.is('deleted_at', null)
 				.single();
@@ -857,7 +915,8 @@ export class SupabaseReviewService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to fetch review',
+				error:
+					error instanceof Error ? error.message : 'Failed to fetch review',
 			};
 		}
 	}
@@ -937,7 +996,10 @@ export class SupabaseReviewService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to get review statistics',
+				error:
+					error instanceof Error
+						? error.message
+						: 'Failed to get review statistics',
 			};
 		}
 	}
@@ -963,11 +1025,16 @@ export class SupabaseReviewService {
 
 			const userLanguage = this.getCurrentLanguage();
 
-			let dbQuery = supabase.from('reviews').select(`
+			let dbQuery = supabase
+				.from('reviews')
+				.select(
+					`
 				*,
-				profiles:profile_id (id, username, name, photo),
+				profiles:user_id (id, username, name, photo),
 				restaurants:restaurant_id (id, name, main_image)
-			`).is('deleted_at', null);
+			`,
+				)
+				.is('deleted_at', null);
 
 			// Apply filters
 			if (filters?.restaurant_id) {
@@ -1003,8 +1070,8 @@ export class SupabaseReviewService {
 
 			const reviews = await Promise.all(
 				filteredReviews.map((review: any) =>
-					this.convertToReview(review, userLanguage)
-				)
+					this.convertToReview(review, userLanguage),
+				),
 			);
 
 			return {
@@ -1014,7 +1081,8 @@ export class SupabaseReviewService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to search reviews',
+				error:
+					error instanceof Error ? error.message : 'Failed to search reviews',
 			};
 		}
 	}
@@ -1025,7 +1093,7 @@ export class SupabaseReviewService {
 	static async getRecentReviews(limit?: number) {
 		try {
 			const searchLimit = limit || 10;
-			
+
 			if (searchLimit < 1 || searchLimit > 50) {
 				return {
 					success: false,
@@ -1039,11 +1107,13 @@ export class SupabaseReviewService {
 
 			const { data, error } = await supabase
 				.from('reviews')
-				.select(`
+				.select(
+					`
 					*,
-					profiles:profile_id (id, username, name, photo),
+					profiles:user_id (id, username, name, photo),
 					restaurants:restaurant_id (id, name, main_image)
-				`)
+				`,
+				)
 				.is('deleted_at', null)
 				.gte('created_at', thirtyDaysAgo.toISOString())
 				.order('created_at', { ascending: false })
@@ -1055,8 +1125,8 @@ export class SupabaseReviewService {
 
 			const reviews = await Promise.all(
 				(data || []).map((review: any) =>
-					this.convertToReview(review, userLanguage)
-				)
+					this.convertToReview(review, userLanguage),
+				),
 			);
 
 			return {
@@ -1066,7 +1136,10 @@ export class SupabaseReviewService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to fetch recent reviews',
+				error:
+					error instanceof Error
+						? error.message
+						: 'Failed to fetch recent reviews',
 			};
 		}
 	}
@@ -1078,7 +1151,7 @@ export class SupabaseReviewService {
 		try {
 			const searchLimit = limit || 10;
 			const minRating = min_rating || 4.0;
-			
+
 			if (searchLimit < 1 || searchLimit > 50) {
 				return {
 					success: false,
@@ -1090,11 +1163,13 @@ export class SupabaseReviewService {
 
 			const { data, error } = await supabase
 				.from('reviews')
-				.select(`
+				.select(
+					`
 					*,
-					profiles:profile_id (id, username, name, photo),
+					profiles:user_id (id, username, name, photo),
 					restaurants:restaurant_id (id, name, main_image)
-				`)
+				`,
+				)
 				.is('deleted_at', null)
 				.gte('rating', minRating)
 				.order('rating', { ascending: false })
@@ -1107,8 +1182,8 @@ export class SupabaseReviewService {
 
 			const reviews = await Promise.all(
 				(data || []).map((review: any) =>
-					this.convertToReview(review, userLanguage)
-				)
+					this.convertToReview(review, userLanguage),
+				),
 			);
 
 			return {
@@ -1118,7 +1193,10 @@ export class SupabaseReviewService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to fetch top rated reviews',
+				error:
+					error instanceof Error
+						? error.message
+						: 'Failed to fetch top rated reviews',
 			};
 		}
 	}
@@ -1126,9 +1204,7 @@ export class SupabaseReviewService {
 	/**
 	 * Check if user has reviewed a restaurant
 	 */
-	static async getUserReviewForRestaurant(
-		restaurant_id: string,
-	) {
+	static async getUserReviewForRestaurant(restaurant_id: string) {
 		try {
 			const userId = await this.getCurrentUserId();
 			if (!userId) {
@@ -1141,7 +1217,7 @@ export class SupabaseReviewService {
 			const { data, error } = await supabase
 				.from('reviews')
 				.select('*')
-				.eq('profile_id', userId)
+				.eq('user_id', userId)
 				.eq('restaurant_id', restaurant_id)
 				.is('deleted_at', null)
 				.maybeSingle();
@@ -1157,7 +1233,10 @@ export class SupabaseReviewService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to check user review',
+				error:
+					error instanceof Error
+						? error.message
+						: 'Failed to check user review',
 			};
 		}
 	}
