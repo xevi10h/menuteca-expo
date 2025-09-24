@@ -279,17 +279,38 @@ export class SupabaseStorageService {
 	}
 
 	/**
-	 * Upload restaurant main image
+	 * Upload restaurant image with corrected folder structure
 	 */
 	static async uploadRestaurantImage(
 		restaurantId: string,
 		file: ImagePicker.ImagePickerAsset,
 		type: 'main' | 'profile' | 'gallery' = 'main',
 	) {
-		const folder = `restaurants/${restaurantId}`;
-		const fileName = `${type}_${Date.now()}`;
+		let folder: string;
+		let fileName: string;
+
+		if (type === 'profile') {
+			folder = `${restaurantId}/profile`;
+			fileName = `${Date.now()}`;
+		} else {
+			folder = `${restaurantId}`;
+			fileName = `${type}_${Date.now()}`;
+		}
+
+		console.log('Upload path will be:', `${folder}/${fileName}`);
 
 		return this.uploadImage('RESTAURANTS', file, folder, fileName);
+	}
+
+	/**
+	 * Upload multiple restaurant images (gallery images)
+	 */
+	static async uploadRestaurantImages(
+		restaurantId: string,
+		files: ImagePicker.ImagePickerAsset[],
+	) {
+		const folder = `${restaurantId}`;
+		return this.uploadMultipleImages('RESTAURANTS', files, folder);
 	}
 
 	/**

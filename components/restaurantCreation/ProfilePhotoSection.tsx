@@ -14,7 +14,7 @@ import {
 
 interface ProfilePhotoSectionProps {
 	profile_image?: string;
-	onImageSelected: (imageUri: string) => void;
+	onImageSelected: (imageAsset: ImagePicker.ImagePickerAsset) => void;
 	required?: boolean;
 }
 
@@ -40,10 +40,11 @@ export default function ProfilePhotoSection({
 			allowsEditing: true,
 			aspect: [1, 1],
 			quality: 0.8,
+			base64: true,
 		});
 
 		if (!result.canceled && result.assets[0]) {
-			onImageSelected(result.assets[0].uri);
+			onImageSelected(result.assets[0]);
 		}
 	};
 

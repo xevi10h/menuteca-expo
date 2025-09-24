@@ -15,9 +15,9 @@ import {
 
 interface PhotosSectionProps {
 	images?: string[];
-	onImagesAdded: (imageUris: string[]) => void;
+	onImagesAdded: (imageAssets: ImagePicker.ImagePickerAsset[]) => void;
 	onImageRemoved: (index: number) => void;
-	showTitle?: boolean; // Nueva prop para controlar si mostrar el título
+	showTitle?: boolean;
 }
 
 export default function PhotosSection({
@@ -42,11 +42,12 @@ export default function PhotosSection({
 			mediaTypes: ['images'],
 			allowsMultipleSelection: true,
 			quality: 0.8,
+			selectionLimit: 5 - images.length,
+			base64: true,
 		});
 
 		if (!result.canceled) {
-			const imageUris = result.assets.map((asset) => asset.uri);
-			onImagesAdded(imageUris);
+			onImagesAdded(result.assets);
 		}
 	};
 

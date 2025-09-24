@@ -1,4 +1,5 @@
 import { RestaurantService } from '@/api/index';
+import { SupabaseStorageService } from '@/api/supabaseStorage';
 import { colors } from '@/assets/styles/colors';
 import LoadingScreen from '@/components/LoadingScreen';
 import MenuCreationModal from '@/components/MenuCreationModal';
@@ -14,9 +15,15 @@ import TagsSection from '@/components/restaurantCreation/TagsSection';
 import TagsSelectionModal from '@/components/restaurantCreation/TagsSelectionModal';
 import { useTranslation } from '@/hooks/useTranslation';
 import { RestaurantTag } from '@/shared/enums';
-import { Address, MenuData, MenuCreationData, Restaurant } from '@/shared/types';
+import {
+	Address,
+	MenuCreationData,
+	MenuData,
+	Restaurant,
+} from '@/shared/types';
 import { useMenuStore } from '@/zustand/MenuStore';
 import { Ionicons } from '@expo/vector-icons';
+import { ImagePickerAsset } from 'expo-image-picker';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -40,7 +47,12 @@ export default function UserRestaurantEdit() {
 		restaurantId: string;
 	}>();
 	const insets = useSafeAreaInsets();
-	const { createMenuWithDishes, updateMenuWithDishes, deleteMenuCompletely, fetchRestaurantMenus } = useMenuStore();
+	const {
+		createMenuWithDishes,
+		updateMenuWithDishes,
+		deleteMenuCompletely,
+		fetchRestaurantMenus,
+	} = useMenuStore();
 
 	// Loading and data states
 	const [loading, setLoading] = useState(true);
@@ -120,7 +132,6 @@ export default function UserRestaurantEdit() {
 
 		setSaving(true);
 		try {
-			// Update restaurant status and other fields
 			const updateData = {
 				is_active: isActive,
 				phone: restaurant.phone,
@@ -142,7 +153,7 @@ export default function UserRestaurantEdit() {
 					[{ text: 'OK', onPress: () => router.back() }],
 				);
 			} else {
-				throw new Error('Failed to update restaurant');
+				throw new Error(response.error || 'Failed to update restaurant');
 			}
 		} catch (error) {
 			console.error('Error updating restaurant:', error);
@@ -152,12 +163,33 @@ export default function UserRestaurantEdit() {
 		}
 	};
 
-	const handleAddImages = (imageUris: string[]) => {
-		if (!restaurant) return;
-		setRestaurant({
-			...restaurant,
-			images: [...restaurant.images, ...imageUris],
-		});
+	const handleAddImages = async (imageAssets: ImagePickerAsset[]) => {
+		if (!restaurant || !restaurantId) return;
+
+		try {
+			// ✅ Usar la nueva función específica para restaurantes
+			const uploadResult = await SupabaseStorageService.uploadRestaurantImages(
+				restaurantId,
+				imageAssets,
+			);
+
+			if (uploadResult.success && uploadResult.data?.successful?.length) {
+				const newUrls = uploadResult.data.successful.map(
+					(img: any) => img.publicUrl,
+				);
+
+				setRestaurant({
+					...restaurant,
+					images: [...restaurant.images, ...newUrls],
+				});
+			} else {
+				console.error('Failed to upload images:', uploadResult);
+				Alert.alert(t('validation.error'), 'Error uploading images');
+			}
+		} catch (error) {
+			console.error('Error uploading images:', error);
+			Alert.alert(t('validation.error'), 'Error uploading images');
+		}
 	};
 
 	const handleRemoveImage = (index: number) => {
@@ -168,12 +200,38 @@ export default function UserRestaurantEdit() {
 		});
 	};
 
-	const handleSetProfileImage = (imageUri: string) => {
-		if (!restaurant) return;
-		setRestaurant({
-			...restaurant,
-			profile_image: imageUri,
-		});
+	const handleSetProfileImage = async (imageAsset: ImagePickerAsset) => {
+		if (!restaurant || !restaurantId) return;
+
+		try {
+			// Subir imagen de perfil inmediatamente al storage
+			const uploadResult = await SupabaseStorageService.uploadRestaurantImage(
+				restaurantId,
+				imageAsset,
+				'profile',
+			);
+
+			if (uploadResult.success && uploadResult.data?.publicUrl) {
+				setRestaurant({
+					...restaurant,
+					profile_image: uploadResult.data.publicUrl,
+				});
+			} else {
+				console.error('Failed to upload profile image:', uploadResult);
+				Alert.alert(
+					t('validation.error'),
+					t('editRestaurant.errorUploadingProfileImage') ||
+						'Error uploading profile image',
+				);
+			}
+		} catch (error) {
+			console.error('Error uploading profile image:', error);
+			Alert.alert(
+				t('validation.error'),
+				t('editRestaurant.errorUploadingProfileImage') ||
+					'Error uploading profile image',
+			);
+		}
 	};
 
 	const handleAddMenu = async (menu: MenuData) => {
@@ -184,7 +242,10 @@ export default function UserRestaurantEdit() {
 				// Update existing menu
 				const menuToUpdate = restaurant.menus[editingMenuIndex];
 				const updatedMenuData = { ...menu, id: menuToUpdate.id };
-				const response = await updateMenuWithDishes(restaurantId, updatedMenuData);
+				const response = await updateMenuWithDishes(
+					restaurantId,
+					updatedMenuData,
+				);
 
 				if (response.success && response.data) {
 					const updatedMenus = [...restaurant.menus];
@@ -265,7 +326,8 @@ export default function UserRestaurantEdit() {
 				};
 
 				// Remove ID and other fields that shouldn't be copied
-				const { id, ...menuDataWithoutId }: { id: string; } & MenuCreationData = copiedMenuData;
+				const { id, ...menuDataWithoutId }: { id: string } & MenuCreationData =
+					copiedMenuData;
 
 				const response = await createMenuWithDishes(
 					restaurantId,
@@ -317,8 +379,11 @@ export default function UserRestaurantEdit() {
 					style: 'destructive',
 					onPress: async () => {
 						try {
-							const response = await deleteMenuCompletely(restaurantId, menuToDelete.id);
-							
+							const response = await deleteMenuCompletely(
+								restaurantId,
+								menuToDelete.id,
+							);
+
 							if (response.success) {
 								setRestaurant({
 									...restaurant,
