@@ -19,7 +19,6 @@ export const defaultRegisterRestaurant: Restaurant = {
 	tags: [],
 	minimum_price: 0,
 	rating: undefined,
-	main_image: '',
 	distance: 0,
 	phone: '',
 	reservation_link: '',

@@ -35,7 +35,7 @@ export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
 			activeOpacity={0.7}
 		>
 			<Image
-				source={{ uri: restaurant.main_image }}
+				source={{ uri: restaurant.images?.[0] || '' }}
 				style={{
 					borderTopRightRadius: 24,
 					borderTopLeftRadius: 24,

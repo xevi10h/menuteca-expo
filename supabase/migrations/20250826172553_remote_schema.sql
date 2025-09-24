@@ -369,7 +369,6 @@ CREATE TABLE IF NOT EXISTS "public"."restaurants" (
     "minimum_price" numeric(10,2) NOT NULL,
     "cuisine_id" "uuid" NOT NULL,
     "rating" numeric(3,2),
-    "main_image" "text" NOT NULL,
     "profile_image" "text",
     "images" "text"[] DEFAULT '{}'::"text"[],
     "address_id" "uuid" NOT NULL,

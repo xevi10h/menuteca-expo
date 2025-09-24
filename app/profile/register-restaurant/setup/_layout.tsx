@@ -146,7 +146,6 @@ export default function SetupLayout(): React.JSX.Element {
 				phone: provisionalRegisterRestaurant.phone,
 				reservation_link: provisionalRegisterRestaurant.reservation_link,
 				// No incluimos imágenes en este paso
-				main_image: '',
 				profile_image: '',
 				images: [],
 			};
@@ -169,7 +168,6 @@ export default function SetupLayout(): React.JSX.Element {
 			console.log('Restaurant created with ID:', restaurantId);
 
 			// PASO 2: Upload images with the correct folder structure
-			let main_image = '';
 			let profile_image = '';
 			let images: string[] = [];
 
@@ -184,23 +182,23 @@ export default function SetupLayout(): React.JSX.Element {
 				return;
 			}
 
-			// Upload main image (if it's a file object)
-			if (provisionalRegisterRestaurant.main_image_file) {
+			// Upload profile image (if it's a file object)
+			if (provisionalRegisterRestaurant.profile_image_file) {
 				const uploadResult = await SupabaseStorageService.uploadImage(
 					'RESTAURANTS',
-					provisionalRegisterRestaurant.main_image_file,
-					`${userId}/restaurants/${restaurantId}`, // Correct folder structure
-					'main_image',
+					provisionalRegisterRestaurant.profile_image_file,
+					`${userId}/restaurants/${restaurantId}`,
+					'profile_image',
 				);
 
 				if (uploadResult.success) {
-					main_image = uploadResult.data?.publicUrl || '';
+					profile_image = uploadResult.data?.publicUrl || '';
 				} else {
 					console.warn('Failed to upload main image:', uploadResult.error);
 				}
-			} else if (provisionalRegisterRestaurant.main_image) {
+			} else if (provisionalRegisterRestaurant.profile_image) {
 				// If it's already a URL, use it directly
-				main_image = provisionalRegisterRestaurant.main_image;
+				profile_image = provisionalRegisterRestaurant.profile_image;
 			}
 
 			// Upload profile image (if it's a file object)
@@ -248,16 +246,10 @@ export default function SetupLayout(): React.JSX.Element {
 				images = provisionalRegisterRestaurant.images;
 			}
 
-			// If main_image is empty but we have gallery images, use the first one
-			if (!main_image && images.length > 0) {
-				main_image = images[0];
-			}
-
 			// PASO 3: Update restaurant with image URLs
 			const updateResult = await RestaurantService.updateRestaurant(
 				restaurantId,
 				{
-					main_image,
 					profile_image,
 					images,
 				},

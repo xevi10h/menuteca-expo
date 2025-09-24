@@ -98,7 +98,7 @@ export class SupabaseReviewService {
 			user_avatar: reviewRow.profiles?.photo || '',
 			restaurant_id: reviewRow.restaurant_id,
 			restaurant_name: reviewRow.restaurants?.name || 'Unknown Restaurant',
-			restaurant_image: reviewRow.restaurants?.main_image || '',
+			restaurant_image: reviewRow.restaurants?.profile_image || '',
 			rating: reviewRow.rating,
 			comment: this.getLocalizedText(reviewRow.comment, userLanguage),
 			photos: reviewRow.photos || [],
@@ -222,7 +222,7 @@ export class SupabaseReviewService {
 					`
 					*,
 					profiles!user_id (id, username, name, photo), 
-					restaurants!restaurant_id (id, name, main_image)
+					restaurants!restaurant_id (id, name, profile_image)
 				`,
 				)
 				.single();
@@ -298,7 +298,7 @@ export class SupabaseReviewService {
 					`
 					*,
 					profiles:user_id (id, username, name, photo),
-					restaurants:restaurant_id (id, name, main_image)
+					restaurants:restaurant_id (id, name, profile_image)
 				`,
 					{ count: 'exact' },
 				)
@@ -394,7 +394,7 @@ export class SupabaseReviewService {
 					`
 					*,
 					profiles:user_id (id, username, name, photo),
-					restaurants:restaurant_id (id, name, main_image)
+					restaurants:restaurant_id (id, name, profile_image)
 				`,
 					{ count: 'exact' },
 				)
@@ -534,7 +534,7 @@ export class SupabaseReviewService {
 					`
 					*,
 					profiles:user_id (id, username, name, photo),
-					restaurants:restaurant_id (id, name, main_image)
+					restaurants:restaurant_id (id, name, profile_image)
 				`,
 				)
 				.single();
@@ -757,7 +757,7 @@ export class SupabaseReviewService {
 					`
 					*,
 					profiles:user_id (id, username, name, photo),
-					restaurants:restaurant_id (id, name, main_image)
+					restaurants:restaurant_id (id, name, profile_image)
 				`,
 				)
 				.single();
@@ -843,7 +843,7 @@ export class SupabaseReviewService {
 					`
 					*,
 					profiles:user_id (id, username, name, photo),
-					restaurants:restaurant_id (id, name, main_image)
+					restaurants:restaurant_id (id, name, profile_image)
 				`,
 				)
 				.single();
@@ -889,7 +889,7 @@ export class SupabaseReviewService {
 					`
 					*,
 					profiles:user_id (id, username, name, photo),
-					restaurants:restaurant_id (id, name, main_image)
+					restaurants:restaurant_id (id, name, profile_image)
 				`,
 				)
 				.eq('id', id)
@@ -1031,7 +1031,7 @@ export class SupabaseReviewService {
 					`
 				*,
 				profiles:user_id (id, username, name, photo),
-				restaurants:restaurant_id (id, name, main_image)
+				restaurants:restaurant_id (id, name, profile_image)
 			`,
 				)
 				.is('deleted_at', null);
@@ -1111,7 +1111,7 @@ export class SupabaseReviewService {
 					`
 					*,
 					profiles:user_id (id, username, name, photo),
-					restaurants:restaurant_id (id, name, main_image)
+					restaurants:restaurant_id (id, name, profile_image)
 				`,
 				)
 				.is('deleted_at', null)
@@ -1167,7 +1167,7 @@ export class SupabaseReviewService {
 					`
 					*,
 					profiles:user_id (id, username, name, photo),
-					restaurants:restaurant_id (id, name, main_image)
+					restaurants:restaurant_id (id, name, profile_image)
 				`,
 				)
 				.is('deleted_at', null)

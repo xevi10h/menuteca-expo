@@ -301,7 +301,6 @@ export type Database = {
 					minimum_price: number;
 					cuisine_id: string;
 					rating: number | null;
-					main_image: string;
 					profile_image: string | null;
 					images: string[];
 					address_id: string;
@@ -320,7 +319,6 @@ export type Database = {
 					minimum_price: number;
 					cuisine_id: string;
 					rating?: number | null;
-					main_image: string;
 					profile_image?: string | null;
 					images?: string[];
 					address_id: string;
@@ -336,7 +334,6 @@ export type Database = {
 					minimum_price?: number;
 					cuisine_id?: string;
 					rating?: number | null;
-					main_image?: string;
 					profile_image?: string | null;
 					images?: string[];
 					address_id?: string;

@@ -92,10 +92,7 @@ export type Restaurant = {
 	updated_at: string;
 	profile_image?: string;
 	images: string[];
-	main_image?: string;
-
 	profile_image_file?: ImagePickerAsset;
-	main_image_file?: ImagePickerAsset;
 	image_files?: ImagePickerAsset[];
 };
 

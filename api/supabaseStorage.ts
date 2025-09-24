@@ -314,6 +314,84 @@ export class SupabaseStorageService {
 	}
 
 	/**
+	 * Upload temporary restaurant images for new restaurant creation
+	 * Uses user ID as temporary folder
+	 */
+	static async uploadTempRestaurantImages(
+		userId: string,
+		files: ImagePicker.ImagePickerAsset[],
+	) {
+		const folder = `temp/${userId}/restaurant`;
+		return this.uploadMultipleImages('RESTAURANTS', files, folder);
+	}
+
+	/**
+	 * Upload temporary restaurant profile image for new restaurant creation
+	 */
+	static async uploadTempRestaurantProfileImage(
+		userId: string,
+		file: ImagePicker.ImagePickerAsset,
+	) {
+		const folder = `temp/${userId}/restaurant/profile`;
+		const fileName = `${Date.now()}`;
+		return this.uploadImage('RESTAURANTS', file, folder, fileName);
+	}
+
+	/**
+	 * Move temporary images to final restaurant folder
+	 */
+	static async moveTempImagesToRestaurant(
+		userId: string,
+		restaurantId: string,
+		imageUrls: string[],
+	) {
+		try {
+			const movePromises = imageUrls.map(async (url) => {
+				// Extract path from URL
+				const urlParts = url.split('/storage/v1/object/public/restaurants/')[1];
+				if (!urlParts) return null;
+
+				const oldPath = urlParts;
+				// Determine if it's a profile image or gallery image
+				const isProfile = oldPath.includes('/profile/');
+
+				let newPath: string;
+				if (isProfile) {
+					const fileName = oldPath.split('/').pop();
+					newPath = `${restaurantId}/profile/${fileName}`;
+				} else {
+					const fileName = oldPath.split('/').pop();
+					newPath = `${restaurantId}/${fileName}`;
+				}
+
+				const moveResult = await this.moveFile('RESTAURANTS', oldPath, newPath);
+				if (moveResult.success) {
+					return this.getPublicUrl('RESTAURANTS', newPath);
+				}
+				return null;
+			});
+
+			const results = await Promise.allSettled(movePromises);
+			const successfulMoves = results
+				.filter(
+					(result): result is PromiseFulfilledResult<string> =>
+						result.status === 'fulfilled' && result.value !== null,
+				)
+				.map((result) => result.value);
+
+			return {
+				success: true,
+				data: successfulMoves,
+			};
+		} catch (error) {
+			return {
+				success: false,
+				error: error instanceof Error ? error.message : 'Failed to move images',
+			};
+		}
+	}
+
+	/**
 	 * Upload user profile photo (DEPRECATED - use uploadUserProfilePhoto instead)
 	 * Keeping this for backward compatibility
 	 */

@@ -1,3 +1,4 @@
+import { SupabaseStorageService } from '@/api/supabaseStorage';
 import { colors } from '@/assets/styles/colors';
 import MenuCreationModal from '@/components/MenuCreationModal';
 import AddressEditModal from '@/components/restaurantCreation/AddressEditModal';
@@ -14,7 +15,9 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { RestaurantTag } from '@/shared/enums';
 import { Address, MenuData } from '@/shared/types';
 import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
+import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
+import { ImagePickerAsset } from 'expo-image-picker';
 import React, { useState } from 'react';
 import {
 	Alert,
@@ -29,6 +32,7 @@ import {
 
 export default function EditTab() {
 	const { t } = useTranslation();
+	const { user } = useUserStore();
 	const [showMenuModal, setShowMenuModal] = useState(false);
 	const [editingMenuIndex, setEditingMenuIndex] = useState<number | null>(null);
 	const [showAddressModal, setShowAddressModal] = useState(false);
@@ -55,10 +59,75 @@ export default function EditTab() {
 		setRegisterRestaurantReservationLink,
 	} = useRegisterRestaurantStore();
 
-	const handleAddImages = (imageUris: string[]) => {
-		imageUris.forEach((uri) => {
-			addRegisterRestaurantImage(uri);
-		});
+	const handleAddImages = async (imageAssets: ImagePickerAsset[]) => {
+		try {
+			const userId = user?.id; // Usa la opción que prefieras
+			if (!userId) {
+				Alert.alert(t('validation.error'), 'User not authenticated');
+				return;
+			}
+
+			console.log('Uploading temp images immediately...', imageAssets.length);
+
+			// Subir imágenes temporalmente
+			const uploadResult =
+				await SupabaseStorageService.uploadTempRestaurantImages(
+					userId,
+					imageAssets,
+				);
+
+			if (uploadResult.success && uploadResult.data?.successful?.length) {
+				const newUrls = uploadResult.data.successful.map(
+					(img: any) => img.publicUrl,
+				);
+
+				// Agregar las URLs al store (una por una)
+				newUrls.forEach((url) => {
+					addRegisterRestaurantImage(url);
+				});
+
+				console.log('Temp images uploaded successfully:', newUrls);
+			} else {
+				console.error('Failed to upload images:', uploadResult);
+				Alert.alert(t('validation.error'), 'Error uploading images');
+			}
+		} catch (error) {
+			console.error('Error uploading images:', error);
+			Alert.alert(t('validation.error'), 'Error uploading images');
+		}
+	};
+
+	const handleSetProfileImage = async (imageAsset: ImagePickerAsset) => {
+		try {
+			const userId = user?.id;
+			if (!userId) {
+				Alert.alert(t('validation.error'), 'User not authenticated');
+				return;
+			}
+
+			console.log('Uploading temp profile image immediately...');
+
+			// Subir imagen de perfil temporalmente
+			const uploadResult =
+				await SupabaseStorageService.uploadTempRestaurantProfileImage(
+					userId,
+					imageAsset,
+				);
+
+			if (uploadResult.success && uploadResult.data?.publicUrl) {
+				setRegisterRestaurantprofile_image(uploadResult.data.publicUrl);
+				console.log(
+					'Temp profile image uploaded successfully:',
+					uploadResult.data.publicUrl,
+				);
+			} else {
+				console.error('Failed to upload profile image:', uploadResult);
+				Alert.alert(t('validation.error'), 'Error uploading profile image');
+			}
+		} catch (error) {
+			console.error('Error uploading profile image:', error);
+			Alert.alert(t('validation.error'), 'Error uploading profile image');
+		}
 	};
 
 	const handleAddMenu = (menu: MenuData) => {
@@ -165,7 +234,7 @@ export default function EditTab() {
 				{/* Profile Photo Section */}
 				<ProfilePhotoSection
 					profile_image={registerRestaurant.profile_image}
-					onImageSelected={setRegisterRestaurantprofile_image}
+					onImageSelected={handleSetProfileImage}
 					required={true}
 				/>
 				<View style={styles.sectionContainer}>

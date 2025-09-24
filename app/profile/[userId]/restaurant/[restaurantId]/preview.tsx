@@ -223,9 +223,9 @@ export default function UserRestaurantPreview() {
 		<View style={styles.container}>
 			{/* Header Image */}
 			<View style={styles.imageContainer}>
-				{restaurant.main_image && (
+				{restaurant.images[0] && (
 					<Image
-						source={{ uri: restaurant.main_image }}
+						source={{ uri: restaurant.images[0] }}
 						style={[styles.headerImage, { height: 250 + insets.top }]}
 						resizeMode="cover"
 					/>

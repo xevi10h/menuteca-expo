@@ -12,8 +12,7 @@ interface RestaurantRow {
 	address_id: string;
 	owner_id: string;
 	rating?: number;
-	main_image: string;
-	profile_image?: string;
+	profile_image: string;
 	images: string[];
 	tags?: RestaurantTag[];
 	phone?: string;
@@ -163,7 +162,6 @@ export class SupabaseRestaurantService {
 			minimum_price: restaurantRow.minimum_price,
 			cuisineId: restaurantRow.cuisine_id,
 			rating: restaurantRow.rating,
-			main_image: restaurantRow.main_image,
 			profile_image: restaurantRow.profile_image,
 			images: restaurantRow.images || [],
 			distance,
@@ -187,15 +185,13 @@ export class SupabaseRestaurantService {
 		name: string;
 		minimum_price: number;
 		cuisine_id: string;
-		main_image?: string;
-		profile_image?: string;
-		images?: string[];
+		profile_image: string;
+		images: string[];
 		address_id: string;
 		tags?: RestaurantTag[];
 		phone?: string;
 		reservation_link?: string;
 		// File upload support
-		main_image_file?: any;
 		profile_image_file?: any;
 		image_files?: any[];
 	}) {
@@ -210,19 +206,6 @@ export class SupabaseRestaurantService {
 
 			let finalData = { ...restaurantData };
 
-			// Handle image uploads
-			if (restaurantData.main_image_file) {
-				const uploadResult = await SupabaseStorageService.uploadImage(
-					'RESTAURANTS',
-					restaurantData.main_image_file,
-					'temp',
-				);
-
-				if (uploadResult.success) {
-					finalData.main_image = uploadResult.data?.publicUrl;
-				}
-			}
-
 			if (restaurantData.profile_image_file) {
 				const uploadResult = await SupabaseStorageService.uploadImage(
 					'RESTAURANTS',
@@ -230,7 +213,7 @@ export class SupabaseRestaurantService {
 					'temp',
 				);
 
-				if (uploadResult.success) {
+				if (uploadResult.success && uploadResult.data?.publicUrl) {
 					finalData.profile_image = uploadResult.data?.publicUrl;
 				}
 			}
@@ -242,7 +225,7 @@ export class SupabaseRestaurantService {
 					'temp',
 				);
 
-				if (uploadResult.success) {
+				if (uploadResult.success && uploadResult.data?.successful) {
 					finalData.images = uploadResult.data?.successful.map(
 						(img) => img.publicUrl,
 					);
@@ -258,7 +241,6 @@ export class SupabaseRestaurantService {
 					cuisine_id: finalData.cuisine_id,
 					address_id: finalData.address_id,
 					owner_id: userId,
-					main_image: finalData.main_image || '',
 					profile_image: finalData.profile_image,
 					images: finalData.images || [],
 					tags: finalData.tags || [],
@@ -515,7 +497,6 @@ export class SupabaseRestaurantService {
 					user_avatar: review.users.photo,
 					restaurant_id: review.restaurant_id,
 					restaurant_name: data.name,
-					restaurant_image: data.main_image,
 					rating: review.rating,
 					comment: this.getLocalizedText(review.comment, userLanguage),
 					photos: review.photos || [],
@@ -563,8 +544,7 @@ export class SupabaseRestaurantService {
 			name: string;
 			minimum_price: number;
 			cuisine_id: string;
-			main_image: string;
-			profile_image?: string;
+			profile_image: string;
 			images: string[];
 			address_id: string;
 			tags?: RestaurantTag[];

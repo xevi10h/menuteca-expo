@@ -386,7 +386,7 @@ export default function ExpandableMapRestaurantModal({
 						style={[styles.headerImageContainer, headerImageStyle]}
 					>
 						<Image
-							source={{ uri: restaurant.main_image }}
+							source={{ uri: restaurant.images[0] }}
 							style={[styles.headerImage, { height: 200 + insets.top }]}
 							resizeMode="cover"
 						/>
