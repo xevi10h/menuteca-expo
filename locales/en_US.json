@@ -71,7 +71,8 @@
 		"writeReview": "Tap to write a review",
 		"beFirstToReview": "Be the first to review",
 		"noResults": "No restaurants found",
-		"noResultsSubtitle": "Try searching for another restaurant or cuisine"
+		"noResultsSubtitle": "Try searching for another restaurant or cuisine",
+		"noMenusAvailable": "This restaurant has no menus available"
 	},
 	"notFound": {
 		"restaurant": {

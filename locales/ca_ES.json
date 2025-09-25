@@ -71,7 +71,8 @@
 		"writeReview": "Toca per escriure una opinió",
 		"beFirstToReview": "Sigues el primer a opinar",
 		"noResults": "No s'han trobat resultats",
-		"noResultsSubtitle": "Prova amb una cerca més específica o canvia els filtres"
+		"noResultsSubtitle": "Prova amb una cerca més específica o canvia els filtres",
+		"noMenusAvailable": "Aquest restaurant no té menús disponibles"
 	},
 	"notFound": {
 		"restaurant": {

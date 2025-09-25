@@ -71,7 +71,8 @@
 		"writeReview": "Appuyez pour laisser un avis",
 		"beFirstToReview": "Soyez le premier à donner votre avis",
 		"noResults": "Aucun résultat trouvé",
-		"noResultsSubtitle": "Essayez de modifier vos filtres ou de rechercher un autre restaurant"
+		"noResultsSubtitle": "Essayez de modifier vos filtres ou de rechercher un autre restaurant",
+		"noMenusAvailable": "Ce restaurant n'a pas de menus disponibles"
 	},
 	"notFound": {
 		"restaurant": {
