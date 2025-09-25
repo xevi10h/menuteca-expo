@@ -61,7 +61,10 @@ export default function UserRestaurantPill({
 						try {
 							await RestaurantService.deleteRestaurant(restaurant.id);
 							removeRestaurant(restaurant.id);
-							Alert.alert(t('general.success'), t('profile.restaurantDeleted'));
+							Alert.alert(
+								t('validation.success'),
+								t('profile.restaurantDeleted'),
+							);
 						} catch (error) {
 							console.error('Error deleting restaurant:', error);
 							Alert.alert(

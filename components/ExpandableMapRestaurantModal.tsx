@@ -1,3 +1,4 @@
+import { ReviewService } from '@/api';
 import { colors } from '@/assets/styles/colors';
 import AddReviewModal from '@/components/AddReviewModal';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -71,6 +72,8 @@ export default function ExpandableMapRestaurantModal({
 	);
 	const [isTransitioning, setIsTransitioning] = useState(false);
 	const [showAddReviewModal, setShowAddReviewModal] = useState(false);
+	const [userReview, setUserReview] = useState<any>(null);
+	const [checkingUserReview, setCheckingUserReview] = useState(true);
 
 	// Estado para almacenar las medidas de los tabs
 	const [tabMeasurements, setTabMeasurements] = useState<TabMeasurements>({
@@ -114,9 +117,27 @@ export default function ExpandableMapRestaurantModal({
 	useEffect(() => {
 		if (restaurant?.id && isVisible) {
 			loadMenusForRestaurant(restaurant.id);
+			checkUserReview(restaurant.id);
 		} else {
 		}
 	}, [restaurant?.id, isVisible, loadMenusForRestaurant]);
+
+	// Check if user has already reviewed this restaurant
+	const checkUserReview = async (restaurantId: string) => {
+		try {
+			setCheckingUserReview(true);
+			const response = await ReviewService.getUserReviewForRestaurant(
+				restaurantId,
+			);
+			if (response.success) {
+				setUserReview(response.data);
+			}
+		} catch (error) {
+			console.error('Error checking user review:', error);
+		} finally {
+			setCheckingUserReview(false);
+		}
+	};
 
 	// Additional effect that runs on mount to ensure we catch the loading
 	useEffect(() => {
@@ -128,9 +149,14 @@ export default function ExpandableMapRestaurantModal({
 
 	const informationComponent = useMemo(
 		() => (
-			<Information restaurant={restaurant} onMapPress={openMapNavigation} />
+			<Information
+				restaurant={restaurant}
+				onMapPress={openMapNavigation}
+				userReview={userReview}
+				checkingUserReview={checkingUserReview}
+			/>
 		),
-		[restaurant],
+		[restaurant, userReview, checkingUserReview],
 	);
 
 	const menuComponent = useMemo(() => <Menu menus={menus} />, [menus]);
@@ -164,6 +190,8 @@ export default function ExpandableMapRestaurantModal({
 		// En una app real, aquí enviarías la review a tu backend
 		console.log('New review added from map modal:', newReview);
 		setShowAddReviewModal(false);
+		// Update user review state so button changes to "already reviewed"
+		setUserReview(newReview);
 	};
 
 	// Pan gesture for expanding/collapsing
@@ -328,6 +356,9 @@ export default function ExpandableMapRestaurantModal({
 			handleTabChange('information');
 		} else if (!isVisible) {
 			console.log('🎭 Modal closing');
+			// Reset user review state when closing modal
+			setUserReview(null);
+			setCheckingUserReview(true);
 			handleClose();
 		}
 	}, [isVisible, restaurant]);

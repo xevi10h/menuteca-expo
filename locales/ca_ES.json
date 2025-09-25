@@ -353,7 +353,8 @@
 			"3": "Regular",
 			"4": "Bo",
 			"5": "Excel·lent"
-		}
+		},
+		"reviewed": "Resenyat"
 	},
 	"photoGallery": {
 		"doubleTapToZoom": "Doble toc per zoom",

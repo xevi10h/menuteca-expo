@@ -1,4 +1,4 @@
-import { MenuService, RestaurantService } from '@/api/index';
+import { MenuService, RestaurantService, ReviewService } from '@/api/index';
 import { colors } from '@/assets/styles/colors';
 import LoadingScreen from '@/components/LoadingScreen';
 import NotFoundRestaurant from '@/components/NotFoundRestaurant';
@@ -92,6 +92,8 @@ export default function RestaurantDetail() {
 	const [loadingState, setLoadingState] = useState<LoadingState>('loading');
 	const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
 	const [menus, setMenus] = useState<MenuData[]>([]);
+	const [userReview, setUserReview] = useState<any>(null);
+	const [checkingUserReview, setCheckingUserReview] = useState(true);
 
 	// Estado para las pestañas
 	const [activeTab, setActiveTab] = useState<'information' | 'menu'>(
@@ -144,6 +146,19 @@ export default function RestaurantDetail() {
 				setMenus([]);
 			}
 
+			// Check if user has already reviewed this restaurant
+			try {
+				setCheckingUserReview(true);
+				const response = await ReviewService.getUserReviewForRestaurant(id);
+				if (response.success) {
+					setUserReview(response.data);
+				}
+			} catch (error) {
+				console.error('Error checking user review:', error);
+			} finally {
+				setCheckingUserReview(false);
+			}
+
 			setLoadingState('success');
 		} catch (error) {
 			console.error('Error loading restaurant:', error);
@@ -160,9 +175,14 @@ export default function RestaurantDetail() {
 	const informationComponent = useMemo(() => {
 		if (!restaurant) return null;
 		return (
-			<Information restaurant={restaurant} onMapPress={openMapNavigation} />
+			<Information
+				restaurant={restaurant}
+				onMapPress={openMapNavigation}
+				userReview={userReview}
+				checkingUserReview={checkingUserReview}
+			/>
 		);
-	}, [restaurant]);
+	}, [restaurant, userReview, checkingUserReview]);
 
 	const menuComponent = useMemo(() => {
 		return <Menu menus={menus} />;

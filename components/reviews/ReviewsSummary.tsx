@@ -17,6 +17,7 @@ interface ReviewsSummaryProps {
 	onWriteReview: () => void | undefined;
 	scrollY: Animated.SharedValue<number>;
 	isCompact?: boolean;
+	alreadyReviewed?: boolean;
 }
 
 export default function ReviewsSummary({
@@ -25,6 +26,7 @@ export default function ReviewsSummary({
 	onWriteReview,
 	scrollY,
 	isCompact = false,
+	alreadyReviewed = false,
 }: ReviewsSummaryProps) {
 	const { t } = useTranslation();
 
@@ -106,12 +108,19 @@ export default function ReviewsSummary({
 						{t('reviews.totalReviews', { count: reviews.length })}
 					</Text>
 				</View>
-				<TouchableOpacity
-					style={styles.compactWriteButton}
-					onPress={onWriteReview}
-				>
-					<Ionicons name="create-outline" size={16} color={colors.quaternary} />
-				</TouchableOpacity>
+				{/* Write Review Button */}
+				{!alreadyReviewed && (
+					<TouchableOpacity
+						style={styles.compactWriteButton}
+						onPress={onWriteReview}
+					>
+						<Ionicons
+							name="create-outline"
+							size={16}
+							color={colors.quaternary}
+						/>
+					</TouchableOpacity>
+				)}
 			</Animated.View>
 		);
 	}
@@ -154,13 +163,15 @@ export default function ReviewsSummary({
 			</View>
 
 			{/* Write Review Button */}
-			<TouchableOpacity
-				style={styles.writeReviewButton}
-				onPress={onWriteReview}
-			>
-				<Ionicons name="create-outline" size={16} color={colors.quaternary} />
-				<Text style={styles.writeReviewText}>{t('reviews.writeReview')}</Text>
-			</TouchableOpacity>
+			{!alreadyReviewed && (
+				<TouchableOpacity
+					style={styles.writeReviewButton}
+					onPress={onWriteReview}
+				>
+					<Ionicons name="create-outline" size={16} color={colors.quaternary} />
+					<Text style={styles.writeReviewText}>{t('reviews.writeReview')}</Text>
+				</TouchableOpacity>
+			)}
 		</Animated.View>
 	);
 }

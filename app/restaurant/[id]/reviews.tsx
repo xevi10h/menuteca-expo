@@ -50,6 +50,8 @@ export default function ReviewsScreen() {
 	const [page, setPage] = useState(1);
 	const [hasMore, setHasMore] = useState(true);
 	const [restaurantName, setRestaurantName] = useState('');
+	const [userReview, setUserReview] = useState<any>(null);
+	const [checkingUserReview, setCheckingUserReview] = useState(true);
 
 	// Animated scroll value
 	const scrollY = useSharedValue(0);
@@ -59,8 +61,29 @@ export default function ReviewsScreen() {
 	useEffect(() => {
 		if (id) {
 			loadReviews(1);
+			checkUserReview();
 		}
 	}, [id, currentSort]);
+
+	// Check if user has already reviewed this restaurant
+	const checkUserReview = async () => {
+		if (!id || isOwn) {
+			setCheckingUserReview(false);
+			return;
+		}
+
+		try {
+			setCheckingUserReview(true);
+			const response = await ReviewService.getUserReviewForRestaurant(id);
+			if (response.success) {
+				setUserReview(response.data);
+			}
+		} catch (error) {
+			console.error('Error checking user review:', error);
+		} finally {
+			setCheckingUserReview(false);
+		}
+	};
 
 	const loadReviews = async (pageNumber = 1, isRefresh = false) => {
 		if (!id) return;
@@ -204,6 +227,8 @@ export default function ReviewsScreen() {
 				// Add new review to the beginning of the list
 				setReviews((prev) => [response.data, ...prev]);
 				setShowAddReviewModal(false);
+				// Update user review state so button changes to "already reviewed"
+				setUserReview(response.data);
 
 				// Show success message
 				Alert.alert(t('validation.success'), t('reviews.reviewAdded'));
@@ -267,6 +292,7 @@ export default function ReviewsScreen() {
 				averageRating={averageRating}
 				onWriteReview={!isOwn ? handleWriteReview : () => {}}
 				scrollY={scrollY}
+				alreadyReviewed={!isOwn && userReview}
 			/>
 
 			{/* Compact Summary (shown when scrolling) */}
@@ -276,6 +302,7 @@ export default function ReviewsScreen() {
 				onWriteReview={!isOwn ? handleWriteReview : () => {}}
 				scrollY={scrollY}
 				isCompact={true}
+				alreadyReviewed={!isOwn && userReview}
 			/>
 
 			{/* Sort Options */}
@@ -309,7 +336,7 @@ export default function ReviewsScreen() {
 			/>
 			<Text style={styles.emptyStateTitle}>{t('reviews.noReviews')}</Text>
 			<Text style={styles.emptyStateSubtitle}>{t('reviews.beFirst')}</Text>
-			{!isOwn && (
+			{!isOwn && !userReview && (
 				<TouchableOpacity
 					style={styles.firstReviewButton}
 					onPress={() => setShowAddReviewModal(true)}
@@ -319,6 +346,21 @@ export default function ReviewsScreen() {
 						{t('reviews.writeReview')}
 					</Text>
 				</TouchableOpacity>
+			)}
+			{!isOwn && userReview && (
+				<View style={styles.alreadyReviewedContainer}>
+					<Ionicons
+						name="checkmark-circle-outline"
+						size={48}
+						color={colors.primary}
+					/>
+					<Text style={styles.alreadyReviewedTitle}>
+						{t('reviews.alreadyReviewed')}
+					</Text>
+					<Text style={styles.alreadyReviewedSubtitle}>
+						{t('reviews.viewYourReview')}
+					</Text>
+				</View>
 			)}
 		</View>
 	);
@@ -332,17 +374,27 @@ export default function ReviewsScreen() {
 		<View style={[styles.container, { paddingTop: insets.top }]}>
 			{/* Header */}
 			<View style={styles.header}>
+				<Text style={styles.headerTitle}>{t('reviews.title')}</Text>
 				<TouchableOpacity onPress={handleBack} style={styles.backButton}>
 					<Ionicons name="chevron-back" size={24} color={colors.primary} />
 				</TouchableOpacity>
-				<Text style={styles.headerTitle}>{t('reviews.title')}</Text>
-				{!isOwn && (
+				{!isOwn && !userReview && !checkingUserReview && (
 					<TouchableOpacity
 						onPress={() => setShowAddReviewModal(true)}
 						style={styles.addReviewButton}
 					>
 						<Ionicons name="add" size={24} color={colors.primary} />
 					</TouchableOpacity>
+				)}
+				{!isOwn && userReview && (
+					<View style={styles.reviewedBadge}>
+						<Ionicons
+							name="checkmark-circle"
+							size={16}
+							color={colors.quaternary}
+						/>
+						<Text style={styles.reviewedText}>{t('reviews.reviewed')}</Text>
+					</View>
 				)}
 			</View>
 
@@ -514,5 +566,41 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.quaternary,
+	},
+	reviewedBadge: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		backgroundColor: colors.primary,
+		paddingHorizontal: 12,
+		paddingVertical: 6,
+		borderRadius: 16,
+		gap: 4,
+	},
+	reviewedText: {
+		fontSize: 12,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.quaternary,
+	},
+	alreadyReviewedContainer: {
+		alignItems: 'center',
+		paddingVertical: 40,
+	},
+	alreadyReviewedTitle: {
+		fontSize: 18,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.primary,
+		marginTop: 16,
+		marginBottom: 8,
+		textAlign: 'center',
+	},
+	alreadyReviewedSubtitle: {
+		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '400',
+		color: colors.primaryLight,
+		textAlign: 'center',
+		lineHeight: 20,
 	},
 });

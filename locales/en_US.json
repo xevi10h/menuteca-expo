@@ -353,7 +353,8 @@
 			"3": "Average",
 			"4": "Good",
 			"5": "Excellent"
-		}
+		},
+		"reviewed": "Reviewed"
 	},
 	"photoGallery": {
 		"doubleTapToZoom": "Double tap to zoom",

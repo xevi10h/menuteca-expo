@@ -27,6 +27,8 @@ interface InformationProps {
 	onMapPress: () => void;
 	dontShowReviews?: boolean;
 	isOwnRestaurant?: boolean;
+	userReview?: any;
+	checkingUserReview?: boolean;
 }
 
 const Information: React.FC<InformationProps> = ({
@@ -34,6 +36,8 @@ const Information: React.FC<InformationProps> = ({
 	onMapPress,
 	dontShowReviews,
 	isOwnRestaurant = false,
+	userReview,
+	checkingUserReview = false,
 }) => {
 	const { t } = useTranslation();
 	const router = useRouter();
@@ -215,7 +219,19 @@ const Information: React.FC<InformationProps> = ({
 			{/* Reviews Section */}
 			{!dontShowReviews && (
 				<View>
-					<Text style={styles.sectionTitle}>{t('restaurant.reviews')}</Text>
+					<View style={styles.reviewContainer}>
+						<Text style={styles.sectionTitle}>{t('restaurant.reviews')}</Text>
+						{!isOwnRestaurant && userReview && (
+							<View style={styles.reviewedBadge}>
+								<Ionicons
+									name="checkmark-circle"
+									size={16}
+									color={colors.quaternary}
+								/>
+								<Text style={styles.reviewedText}>{t('reviews.reviewed')}</Text>
+							</View>
+						)}
+					</View>
 					<TouchableOpacity
 						style={styles.ratingContainer}
 						onPress={handleViewReviews}
@@ -250,7 +266,7 @@ const Information: React.FC<InformationProps> = ({
 
 					{/* Si es el restaurante del usuario, no mostrar botón para escribir reseña */}
 
-					{!isOwnRestaurant && (
+					{!isOwnRestaurant && !userReview && !checkingUserReview && (
 						<TouchableOpacity
 							style={styles.writeReviewButton}
 							onPress={() => setShowAddReviewModal(true)}
@@ -409,7 +425,6 @@ const styles = StyleSheet.create({
 		fontFamily: 'Manrope',
 		fontWeight: '500',
 		color: colors.primary,
-		marginBottom: 15,
 	},
 	ratingContainer: {
 		flexDirection: 'row',
@@ -469,6 +484,29 @@ const styles = StyleSheet.create({
 	},
 	writeReviewButtonText: {
 		fontSize: 14,
+		fontFamily: 'Manrope',
+		fontWeight: '600',
+		color: colors.quaternary,
+	},
+	reviewContainer: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: 10,
+		flex: 1,
+		marginBottom: 20,
+		justifyContent: 'space-between',
+	},
+	reviewedBadge: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		backgroundColor: colors.primary,
+		paddingHorizontal: 12,
+		paddingVertical: 6,
+		borderRadius: 16,
+		gap: 4,
+	},
+	reviewedText: {
+		fontSize: 12,
 		fontFamily: 'Manrope',
 		fontWeight: '600',
 		color: colors.quaternary,
