@@ -72,6 +72,25 @@ export default function UserRestaurantEdit() {
 	const [copyingMenuIndex, setCopyingMenuIndex] = useState<number | null>(null);
 	const [newMenuName, setNewMenuName] = useState('');
 
+	// Helper function to recalculate and update minimum price
+	const updateMinimumPrice = async (updatedRestaurant: Restaurant) => {
+		try {
+			const allPrices: number[] = [];
+			updatedRestaurant.menus.forEach((menu) => {
+				if (menu.price !== undefined && menu.price !== null) {
+					allPrices.push(menu.price);
+				}
+			});
+			const newMinimumPrice = allPrices.length > 0 ? Math.min(...allPrices) : 0;
+			await RestaurantService.updateRestaurant(updatedRestaurant.id, {
+				minimum_price: newMinimumPrice,
+			});
+		} catch (error) {
+			console.error('Error updating minimum price:', error);
+			// Don't show error to user, as the main operation succeeded
+		}
+	};
+
 	useEffect(() => {
 		const loadRestaurantData = async () => {
 			if (!restaurantId) {
@@ -132,6 +151,16 @@ export default function UserRestaurantEdit() {
 
 		setSaving(true);
 		try {
+			// Calculate minimum price from all menus
+			const minimumPrice =
+				restaurant.menus.reduce((min, menu) => {
+					if (menu.price && (min === null || menu.price < min)) {
+						return menu.price;
+					}
+
+					return min;
+				}, null as number | null) ?? 0;
+
 			const updateData = {
 				is_active: isActive,
 				phone: restaurant.phone,
@@ -139,6 +168,7 @@ export default function UserRestaurantEdit() {
 				tags: restaurant.tags,
 				profile_image: restaurant.profile_image,
 				images: restaurant.images,
+				minimum_price: minimumPrice,
 			};
 
 			const response = await RestaurantService.updateRestaurant(
@@ -238,6 +268,8 @@ export default function UserRestaurantEdit() {
 		if (!restaurant || !restaurantId) return;
 
 		try {
+			let updatedRestaurant: Restaurant;
+
 			if (editingMenuIndex !== null) {
 				// Update existing menu
 				const menuToUpdate = restaurant.menus[editingMenuIndex];
@@ -250,10 +282,11 @@ export default function UserRestaurantEdit() {
 				if (response.success && response.data) {
 					const updatedMenus = [...restaurant.menus];
 					updatedMenus[editingMenuIndex] = response.data;
-					setRestaurant({
+					updatedRestaurant = {
 						...restaurant,
 						menus: updatedMenus,
-					});
+					};
+					setRestaurant(updatedRestaurant);
 				} else {
 					Alert.alert(
 						t('validation.error'),
@@ -266,10 +299,11 @@ export default function UserRestaurantEdit() {
 				const response = await createMenuWithDishes(restaurantId, menu);
 
 				if (response.success && response.data) {
-					setRestaurant({
+					updatedRestaurant = {
 						...restaurant,
 						menus: [...restaurant.menus, response.data],
-					});
+					};
+					setRestaurant(updatedRestaurant);
 				} else {
 					Alert.alert(
 						t('validation.error'),
@@ -278,6 +312,9 @@ export default function UserRestaurantEdit() {
 					return; // Don't close modal on error
 				}
 			}
+
+			// Recalculate and update minimum price in the background
+			await updateMinimumPrice(updatedRestaurant);
 
 			setEditingMenuIndex(null);
 			setShowMenuModal(false);
@@ -335,10 +372,14 @@ export default function UserRestaurantEdit() {
 				);
 
 				if (response.success && response.data) {
-					setRestaurant({
+					const updatedRestaurant = {
 						...restaurant,
 						menus: [...restaurant.menus, response.data],
-					});
+					};
+					setRestaurant(updatedRestaurant);
+
+					// Recalculate and update minimum price in the background
+					await updateMinimumPrice(updatedRestaurant);
 				}
 			} catch (error) {
 				console.error('Error copying menu:', error);
@@ -385,10 +426,14 @@ export default function UserRestaurantEdit() {
 							);
 
 							if (response.success) {
-								setRestaurant({
+								const updatedRestaurant = {
 									...restaurant,
 									menus: restaurant.menus.filter((_, i) => i !== index),
-								});
+								};
+								setRestaurant(updatedRestaurant);
+
+								// Recalculate and update minimum price in the background
+								await updateMinimumPrice(updatedRestaurant);
 							} else {
 								Alert.alert(
 									t('validation.error'),
