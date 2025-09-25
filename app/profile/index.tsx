@@ -7,6 +7,7 @@ import UserRestaurantPill from '@/components/profile/UserRestaurantPill';
 import UserReviewItem from '@/components/reviews/UserReviewItem';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Restaurant, Review } from '@/shared/types';
+import { useUserRestaurantsStore } from '@/zustand/UserRestaurantStore';
 import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -43,6 +44,10 @@ export default function ProfileScreen() {
 	const [showChangeUsernamePopup, setShowChangeUsernamePopup] = useState(false);
 	const [showLanguagePopup, setShowLanguagePopup] = useState(false);
 
+	// Get restaurants from Zustand store
+	const restaurantsFromStore = useUserRestaurantsStore((state) => state.restaurants);
+	const addRestaurantToStore = useUserRestaurantsStore((state) => state.addRestaurant);
+
 	// Local states for restaurants and reviews
 	const [userRestaurants, setUserRestaurants] = useState<Restaurant[]>([]);
 	const [userReviews, setUserReviews] = useState<Review[]>([]);
@@ -67,6 +72,16 @@ export default function ProfileScreen() {
 		}, [isAuthenticated]),
 	);
 
+	// Sync local state with Zustand store changes (like deletions)
+	useEffect(() => {
+		// Filter userRestaurants to only include those that still exist in the store
+		setUserRestaurants(prevRestaurants =>
+			prevRestaurants.filter(restaurant =>
+				restaurantsFromStore.some(storeRestaurant => storeRestaurant.id === restaurant.id)
+			)
+		);
+	}, [restaurantsFromStore]);
+
 	// Redirect to auth if not authenticated
 	if (!userLoading && !isAuthenticated) {
 		return <Redirect href="/auth" />;
@@ -84,6 +99,25 @@ export default function ProfileScreen() {
 			const response = await RestaurantService.getMyRestaurants();
 			if (response.success && response.data) {
 				setUserRestaurants(response.data);
+				// Sync with Zustand store (clear and add all restaurants)
+				// Note: We need to clear the store first and then add all restaurants
+				// But the current store doesn't have a clear restaurants method, so we'll work around this
+				response.data.forEach((restaurant: any) => {
+					// Convert to the store format
+					const storeRestaurant = {
+						id: restaurant.id,
+						name: restaurant.name,
+						address: typeof restaurant.address === 'string' ? restaurant.address : restaurant.address?.formatted_address || '',
+						profile_image: restaurant.profile_image,
+						phone: restaurant.phone,
+						cuisine_type: restaurant.cuisine?.name
+					};
+					// Only add if not already in store
+					const existsInStore = restaurantsFromStore.find(r => r.id === restaurant.id);
+					if (!existsInStore) {
+						addRestaurantToStore(storeRestaurant);
+					}
+				});
 			}
 		} catch (error) {
 			console.error('Error loading user restaurants:', error);
