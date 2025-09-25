@@ -365,8 +365,8 @@ export default function ReviewsScreen() {
 		</View>
 	);
 
-	// Show loading screen on initial load
-	if (loading && reviews.length === 0) {
+	// Show loading screen on initial load OR while checking user review
+	if ((loading && reviews.length === 0) || checkingUserReview) {
 		return <LoadingScreen />;
 	}
 
