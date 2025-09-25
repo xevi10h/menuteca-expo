@@ -46,6 +46,7 @@ export default function ProfileScreen() {
 	// Local states for restaurants and reviews
 	const [userRestaurants, setUserRestaurants] = useState<Restaurant[]>([]);
 	const [userReviews, setUserReviews] = useState<Review[]>([]);
+	const [totalReviews, setTotalReviews] = useState(0);
 	const [restaurantsLoading, setRestaurantsLoading] = useState(false);
 	const [reviewsLoading, setReviewsLoading] = useState(false);
 	const [refreshing, setRefreshing] = useState(false);
@@ -99,6 +100,7 @@ export default function ProfileScreen() {
 			const response = await ReviewService.getMyReviews({ limit: 2 });
 			if (response.success && response.data) {
 				setUserReviews(response.data.data);
+				setTotalReviews(response.data.pagination?.total || response.data.data.length);
 			}
 		} catch (error) {
 			console.error('Error loading user reviews:', error);
@@ -520,14 +522,14 @@ export default function ProfileScreen() {
 				<View style={styles.section}>
 					<View style={styles.sectionHeader}>
 						<Text style={styles.sectionTitle}>{t('profile.myReviews')}</Text>
-						{userReviews.length > 0 && (
+						{totalReviews > 0 && (
 							<TouchableOpacity
 								onPress={handleViewAllReviews}
 								style={styles.viewAllButton}
 							>
 								<Text style={styles.viewAllText}>
 									{t('profile.viewAllReviews', {
-										count: userReviews.length,
+										count: totalReviews,
 									})}
 								</Text>
 								<Ionicons
