@@ -4,7 +4,9 @@ import { colors } from '@/assets/styles/colors';
 import HeaderModal from '@/components/restaurantCreation/HeaderModal';
 import { useTranslation } from '@/hooks/useTranslation';
 import { supabase } from '@/lib/supabase';
+import { Language } from '@/shared/types';
 import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
+import { useUserStore } from '@/zustand/UserStore';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -24,6 +26,24 @@ const { width: screenWidth } = Dimensions.get('window');
 const HORIZONTAL_PADDING = 40; // 20px on each side
 const TAB_CONTAINER_WIDTH = screenWidth - HORIZONTAL_PADDING;
 const TAB_BUTTON_WIDTH = (TAB_CONTAINER_WIDTH - 8) / 2; // 8px total for padding (4px on each side)
+
+// Helper functions for multilingual text
+const getCurrentLanguage = (): Language => {
+	try {
+		const { useUserStore } = require('@/zustand/UserStore');
+		const user = useUserStore.getState().user;
+		return (user?.language as Language) || 'es_ES';
+	} catch (error) {
+		return 'es_ES';
+	}
+};
+
+const createUserTranslatedText = (
+	text: string,
+	userLanguage: Language,
+): { [key: string]: string } => {
+	return { [userLanguage]: text };
+};
 
 export default function SetupLayout(): React.JSX.Element {
 	const { t } = useTranslation();
@@ -136,10 +156,16 @@ export default function SetupLayout(): React.JSX.Element {
 				return;
 			}
 
+			// Calculate minimum price from all menus
+			const allPrices = (provisionalRegisterRestaurant.menus || [])
+				.map(menu => menu.price)
+				.filter(price => price !== undefined && price !== null) as number[];
+			const minimum_price = allPrices.length > 0 ? Math.min(...allPrices) : 0;
+
 			// PASO 1: Create restaurant WITHOUT images first
 			const restaurantDataWithoutImages = {
 				name: provisionalRegisterRestaurant.name,
-				minimum_price: provisionalRegisterRestaurant.minimum_price,
+				minimum_price: minimum_price,
 				cuisine_id: provisionalRegisterRestaurant.cuisineId,
 				address_id: addressId,
 				tags: provisionalRegisterRestaurant.tags,
@@ -267,26 +293,63 @@ export default function SetupLayout(): React.JSX.Element {
 
 			// PASO 4: Create menus for the restaurant
 			const menusToCreate = provisionalRegisterRestaurant.menus || [];
-			for (const menu of menusToCreate) {
-				const menuData = {
-					name: menu.name,
-					days: menu.days,
-					start_time: menu.start_time,
-					end_time: menu.end_time,
-					price: menu.price,
-					first_courses_to_share: menu.first_courses_to_share,
-					second_courses_to_share: menu.second_courses_to_share,
-					desserts_to_share: menu.desserts_to_share,
-					includes_bread: menu.includes_bread,
-					drinks: menu.drinks,
-					includes_coffee_and_dessert: menu.includes_coffee_and_dessert,
-					minimum_people: menu.minimum_people,
-					has_minimum_people: menu.has_minimum_people,
-				};
+			const userLanguage = getCurrentLanguage();
 
-				const menuResult = await MenuService.createMenu(restaurantId, menuData);
-				if (!menuResult.success) {
-					console.warn('Failed to create menu:', menuResult.error);
+			for (const menu of menusToCreate) {
+				// Create menu directly with Supabase to support multilingual names
+				const { data: menuResult, error: menuError } = await supabase
+					.from('menus')
+					.insert({
+						restaurant_id: restaurantId,
+						name: createUserTranslatedText(menu.name, userLanguage),
+						days: menu.days,
+						start_time: menu.start_time,
+						end_time: menu.end_time,
+						price: menu.price,
+						first_courses_to_share: menu.first_courses_to_share ?? false,
+						second_courses_to_share: menu.second_courses_to_share ?? false,
+						desserts_to_share: menu.desserts_to_share ?? false,
+						includes_bread: menu.includes_bread ?? false,
+						drinks: menu.drinks || {
+							water: false,
+							wine: false,
+							soft_drinks: false,
+							beer: false,
+						},
+						includes_coffee_and_dessert: menu.includes_coffee_and_dessert || 'none',
+						minimum_people: menu.minimum_people || 1,
+						has_minimum_people: menu.has_minimum_people ?? false,
+						is_active: true,
+					})
+					.select()
+					.single();
+
+				if (menuError) {
+					console.warn('Failed to create menu:', menuError);
+				} else if (menuResult?.id && menu.dishes && menu.dishes.length > 0) {
+					// Create dishes for this menu
+					const dishesData = menu.dishes.map((dish) => ({
+						menu_id: menuResult.id,
+						name: createUserTranslatedText(dish.name, userLanguage),
+						description: createUserTranslatedText(dish.description || '', userLanguage),
+						extra_price: dish.extra_price || 0,
+						category: dish.category,
+						is_vegetarian: dish.is_vegetarian ?? false,
+						is_lactose_free: dish.is_lactose_free ?? false,
+						is_spicy: dish.is_spicy ?? false,
+						is_gluten_free: dish.is_gluten_free ?? false,
+						is_vegan: dish.is_vegan ?? false,
+						is_active: true,
+					}));
+
+					// Create dishes using supabase directly since we don't have a DishService
+					const { error: dishError } = await supabase
+						.from('dishes')
+						.insert(dishesData);
+
+					if (dishError) {
+						console.warn('Failed to create dishes for menu:', dishError);
+					}
 				}
 			}
 

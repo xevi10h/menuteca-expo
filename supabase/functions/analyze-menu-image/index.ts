@@ -264,7 +264,7 @@ serve(async (req) => {
 
 		// Configurar el modelo Gemini con parámetros optimizados para análisis exhaustivo
 		const model = genAI.getGenerativeModel({
-			model: 'gemini-1.5-pro', // Usar pro para mejor comprensión de imágenes
+			model: 'gemini-2.5-flash',
 			generationConfig: {
 				temperature: 0.2, // Ligeramente más alta para creatividad en encontrar platos
 				topK: 40, // Permitir más variedad en las respuestas

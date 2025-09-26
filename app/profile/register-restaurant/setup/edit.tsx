@@ -131,6 +131,34 @@ export default function EditTab() {
 	};
 
 	const handleAddMenu = (menu: MenuData) => {
+		// During registration, we don't have a restaurant ID yet,
+		// so we just manage menus in the store. The actual creation
+		// happens in _layout.tsx during the final submission.
+
+		// Calculate minimum price from all menus including the new/updated one
+		const updatedMenus = editingMenuIndex !== null
+			? registerRestaurant.menus?.map((m, i) => i === editingMenuIndex ? menu : m) || []
+			: [...(registerRestaurant.menus || []), menu];
+
+		// Update minimum_price in the store
+		const allPrices = updatedMenus
+			.map(m => m.price)
+			.filter(price => price !== undefined && price !== null) as number[];
+		const newMinimumPrice = allPrices.length > 0 ? Math.min(...allPrices) : 0;
+
+		// Update the restaurant with the new minimum price
+		const {
+			setRegisterRestaurantName,
+		} = useRegisterRestaurantStore.getState();
+
+		// We need to update the minimum_price in the store
+		useRegisterRestaurantStore.setState((state) => ({
+			registerRestaurant: {
+				...state.registerRestaurant,
+				minimum_price: newMinimumPrice,
+			}
+		}));
+
 		if (editingMenuIndex !== null) {
 			updateRegisterRestaurantMenu(editingMenuIndex, menu);
 			setEditingMenuIndex(null);
@@ -167,6 +195,22 @@ export default function EditTab() {
 					id: Date.now().toString(), // Nuevo ID único
 					name: newMenuName.trim(),
 				};
+
+				// Calculate minimum price including the new copied menu
+				const updatedMenus = [...(registerRestaurant.menus || []), copiedMenu];
+				const allPrices = updatedMenus
+					.map(m => m.price)
+					.filter(price => price !== undefined && price !== null) as number[];
+				const newMinimumPrice = allPrices.length > 0 ? Math.min(...allPrices) : 0;
+
+				// Update the restaurant with the new minimum price
+				useRegisterRestaurantStore.setState((state) => ({
+					registerRestaurant: {
+						...state.registerRestaurant,
+						minimum_price: newMinimumPrice,
+					}
+				}));
+
 				addRegisterRestaurantMenu(copiedMenu);
 			}
 		}
@@ -196,7 +240,24 @@ export default function EditTab() {
 				{
 					text: t('general.delete'),
 					style: 'destructive',
-					onPress: () => removeRegisterRestaurantMenu(index),
+					onPress: () => {
+						// Calculate minimum price after removing the menu
+						const updatedMenus = registerRestaurant.menus?.filter((_, i) => i !== index) || [];
+						const allPrices = updatedMenus
+							.map(m => m.price)
+							.filter(price => price !== undefined && price !== null) as number[];
+						const newMinimumPrice = allPrices.length > 0 ? Math.min(...allPrices) : 0;
+
+						// Update the restaurant with the new minimum price
+						useRegisterRestaurantStore.setState((state) => ({
+							registerRestaurant: {
+								...state.registerRestaurant,
+								minimum_price: newMinimumPrice,
+							}
+						}));
+
+						removeRegisterRestaurantMenu(index);
+					},
 				},
 			],
 		);

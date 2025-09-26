@@ -500,6 +500,7 @@ export class SupabaseRestaurantService {
 					rating: review.rating,
 					comment: this.getLocalizedText(review.comment, userLanguage),
 					photos: review.photos || [],
+					restaurant_image: data?.profile_image,
 					restaurant_response: review.restaurant_response_message
 						? {
 								message: this.getLocalizedText(
@@ -517,6 +518,7 @@ export class SupabaseRestaurantService {
 
 			// Convert to Restaurant type
 			const restaurant = await this.convertToRestaurant(data, userLanguage);
+
 			restaurant.reviews = reviews;
 
 			// TODO: Load menus when MenuService is migrated
