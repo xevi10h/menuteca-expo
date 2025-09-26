@@ -91,11 +91,13 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 
 	// Función para formatear coffee/dessert option
 	const formatCoffeeDesert = (
-		option: 'none' | 'coffee' | 'dessert' | 'both' | undefined,
+		option: 'none' | 'eitherOne' | 'coffee' | 'dessert' | 'both' | undefined,
 	): string => {
 		if (!option || option === 'none') return '';
 		if (option === 'coffee') return t('menuCreation.includesCoffee');
 		if (option === 'dessert') return t('menuCreation.includesDessert');
+		if (option === 'eitherOne')
+			return t('menuCreation.includes_coffee_or_dessert');
 		if (option === 'both') return t('menuCreation.includes_coffee_and_dessert');
 		return '';
 	};
@@ -379,7 +381,10 @@ const Menu: React.FC<MenuProps> = ({ menus }) => {
 									</Text>
 								</View>
 							)}
-							{formatSchedule(currentMenu?.start_time, currentMenu?.end_time) && (
+							{formatSchedule(
+								currentMenu?.start_time,
+								currentMenu?.end_time,
+							) && (
 								<View style={[styles.scheduleItem]}>
 									<Ionicons
 										name="time-outline"

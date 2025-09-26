@@ -179,7 +179,12 @@ export type Database = {
 					desserts_to_share: boolean;
 					includes_bread: boolean;
 					drinks: any; // jsonb with structure: {"beer": boolean, "wine": boolean, "water": boolean, "soft_drinks": boolean}
-					includes_coffee_and_dessert: 'none' | 'coffee' | 'dessert' | 'both';
+					includes_coffee_and_dessert:
+						| 'none'
+						| 'eitherOne'
+						| 'coffee'
+						| 'dessert'
+						| 'both';
 					minimum_people: number;
 					has_minimum_people: boolean;
 					is_active: boolean;
@@ -200,7 +205,12 @@ export type Database = {
 					desserts_to_share?: boolean;
 					includes_bread?: boolean;
 					drinks?: any;
-					includes_coffee_and_dessert?: 'none' | 'coffee' | 'dessert' | 'both';
+					includes_coffee_and_dessert?:
+						| 'none'
+						| 'eitherOne'
+						| 'coffee'
+						| 'dessert'
+						| 'both';
 					minimum_people?: number;
 					has_minimum_people?: boolean;
 					is_active?: boolean;
@@ -218,7 +228,12 @@ export type Database = {
 					desserts_to_share?: boolean;
 					includes_bread?: boolean;
 					drinks?: any;
-					includes_coffee_and_dessert?: 'none' | 'coffee' | 'dessert' | 'both';
+					includes_coffee_and_dessert?:
+						| 'none'
+						| 'eitherOne'
+						| 'coffee'
+						| 'dessert'
+						| 'both';
 					minimum_people?: number;
 					has_minimum_people?: boolean;
 					is_active?: boolean;

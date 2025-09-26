@@ -234,6 +234,7 @@
 		"includesDrink": "Inclou beguda",
 		"includesCoffee": "Inclou cafè",
 		"includesDessert": "Inclou postre",
+		"includes_coffee_or_dessert": "Inclou postre o cafè",
 		"includes_coffee_and_dessert": "Inclou postre i cafè",
 		"coffeeAndDessertOptions": "Cafè i/o postre",
 		"has_minimum_people": "Mínim de persones",
@@ -253,6 +254,7 @@
 			"none": "Cap",
 			"coffee": "Només cafè",
 			"dessert": "Només postre",
+			"eitherOne": "Cafè o postre",
 			"coffeeAndDessert": "Cafè i postre"
 		},
 		"validation": {

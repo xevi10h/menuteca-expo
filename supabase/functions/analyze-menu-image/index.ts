@@ -43,7 +43,12 @@ interface AnalyzedMenu {
 		soft_drinks: boolean;
 		beer: boolean;
 	};
-	includes_coffee_and_dessert?: 'none' | 'coffee' | 'dessert' | 'both';
+	includes_coffee_and_dessert?:
+		| 'none'
+		| 'eitherOne'
+		| 'coffee'
+		| 'dessert'
+		| 'both';
 	has_minimum_people?: boolean;
 	minimum_people?: number;
 }
@@ -136,7 +141,7 @@ Debe seguir esta estructura exacta:
         "name": "Nombre del plato",
         "description": "Descripción detallada del plato basada en los ingredientes mencionados",
         "extra_price": 0.0,
-        "category": "firstCourses|secondCourses|desserts|appetizers|mainCourses|sides|drinks",
+        "category": "firstCourses" | "secondCourses" | "desserts" | "appetizers" | "mainCourses" | "sides" | "drinks",
         "is_vegetarian": true/false,
         "is_lactose_free": true/false,
         "is_spicy": true/false,
@@ -144,19 +149,19 @@ Debe seguir esta estructura exacta:
         "is_vegan": true/false
       }
     ],
-    "first_courses_to_share": false,
-    "second_courses_to_share": false,
-    "desserts_to_share": false,
-    "includes_bread": false,
+    "first_courses_to_share": true/false,
+    "second_courses_to_share": true/false,
+    "desserts_to_share": true/false,
+    "includes_bread": true/false,
     "drinks": {
-      "water": false,
-      "wine": false,
-      "soft_drinks": false,
-      "beer": false
+      "water": true/false,
+      "wine": true/false,
+      "soft_drinks": true/false,
+      "beer": true/false
     },
-    "includes_coffee_and_dessert": "none",
-    "has_minimum_people": false,
-    "minimum_people": 1
+    "includes_coffee_and_dessert": "none" | "eitherOne" | "coffee" | "dessert" | "both",
+    "has_minimum_people": true/false,
+    "minimum_people": <number>
   }
 }
 

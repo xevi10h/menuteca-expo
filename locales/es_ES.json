@@ -233,6 +233,7 @@
 		"includes_bread": "Incluye pan",
 		"includesCoffee": "Incluye café",
 		"includesDessert": "Incluye postre",
+		"includes_coffee_or_dessert": "Incluye postre o café",
 		"includes_coffee_and_dessert": "Incluye postre y café",
 		"coffeeAndDessertOptions": "Café y/o postre",
 		"has_minimum_people": "Mínimo de personas",
@@ -252,6 +253,7 @@
 			"none": "Ninguno",
 			"coffee": "Solo café",
 			"dessert": "Solo postre",
+			"eitherOne": "Café o postre",
 			"coffeeAndDessert": "Café y postre"
 		},
 		"validation": {

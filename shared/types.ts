@@ -161,7 +161,12 @@ export type MenuData = {
 	desserts_to_share?: boolean;
 	includes_bread?: boolean;
 	drinks?: DrinkInclusion;
-	includes_coffee_and_dessert?: 'none' | 'coffee' | 'dessert' | 'both';
+	includes_coffee_and_dessert?:
+		| 'none'
+		| 'eitherOne'
+		| 'coffee'
+		| 'dessert'
+		| 'both';
 	minimum_people?: number;
 	has_minimum_people?: boolean;
 };

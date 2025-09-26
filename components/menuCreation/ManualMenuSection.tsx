@@ -109,7 +109,7 @@ export default function ManualMenuSection({
 	);
 
 	const [includes_coffee_and_dessert, setIncludesCoffeeAndDessert] = useState<
-		'none' | 'coffee' | 'dessert' | 'both'
+		'none' | 'eitherOne' | 'coffee' | 'dessert' | 'both'
 	>(
 		initialMenuOptions?.includes_coffee_and_dessert ||
 			editingMenu?.includes_coffee_and_dessert ||
@@ -383,6 +383,7 @@ export default function ManualMenuSection({
 			{ key: 'none', label: t('menuCreation.options.none') },
 			{ key: 'coffee', label: t('menuCreation.options.coffee') },
 			{ key: 'dessert', label: t('menuCreation.options.dessert') },
+			{ key: 'eitherOne', label: t('menuCreation.options.eitherOne') },
 			{ key: 'both', label: t('menuCreation.options.coffeeAndDessert') },
 		];
 

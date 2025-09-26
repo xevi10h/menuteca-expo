@@ -234,6 +234,7 @@
 		"includesDrink": "Includes drink",
 		"includesCoffee": "Includes coffee",
 		"includesDessert": "Includes dessert",
+		"includes_coffee_or_dessert": "Includes dessert or coffee",
 		"includes_coffee_and_dessert": "Includes dessert and coffee",
 		"coffeeAndDessertOptions": "Coffee and/or dessert",
 		"has_minimum_people": "Minimum people",
@@ -253,6 +254,7 @@
 			"none": "None",
 			"coffee": "Coffee only",
 			"dessert": "Dessert only",
+			"eitherOne": "Cafè or dessert",
 			"coffeeAndDessert": "Coffee and dessert"
 		},
 		"validation": {
