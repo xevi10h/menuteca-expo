@@ -45,8 +45,12 @@ export default function ProfileScreen() {
 	const [showLanguagePopup, setShowLanguagePopup] = useState(false);
 
 	// Get restaurants from Zustand store
-	const restaurantsFromStore = useUserRestaurantsStore((state) => state.restaurants);
-	const addRestaurantToStore = useUserRestaurantsStore((state) => state.addRestaurant);
+	const restaurantsFromStore = useUserRestaurantsStore(
+		(state) => state.restaurants,
+	);
+	const addRestaurantToStore = useUserRestaurantsStore(
+		(state) => state.addRestaurant,
+	);
 
 	// Local states for restaurants and reviews
 	const [userRestaurants, setUserRestaurants] = useState<Restaurant[]>([]);
@@ -75,10 +79,12 @@ export default function ProfileScreen() {
 	// Sync local state with Zustand store changes (like deletions)
 	useEffect(() => {
 		// Filter userRestaurants to only include those that still exist in the store
-		setUserRestaurants(prevRestaurants =>
-			prevRestaurants.filter(restaurant =>
-				restaurantsFromStore.some(storeRestaurant => storeRestaurant.id === restaurant.id)
-			)
+		setUserRestaurants((prevRestaurants) =>
+			prevRestaurants.filter((restaurant) =>
+				restaurantsFromStore.some(
+					(storeRestaurant) => storeRestaurant.id === restaurant.id,
+				),
+			),
 		);
 	}, [restaurantsFromStore]);
 
@@ -107,13 +113,18 @@ export default function ProfileScreen() {
 					const storeRestaurant = {
 						id: restaurant.id,
 						name: restaurant.name,
-						address: typeof restaurant.address === 'string' ? restaurant.address : restaurant.address?.formatted_address || '',
+						address:
+							typeof restaurant.address === 'string'
+								? restaurant.address
+								: restaurant.address?.formatted_address || '',
 						profile_image: restaurant.profile_image,
 						phone: restaurant.phone,
-						cuisine_type: restaurant.cuisine?.name
+						cuisine_type: restaurant.cuisine?.name,
 					};
 					// Only add if not already in store
-					const existsInStore = restaurantsFromStore.find(r => r.id === restaurant.id);
+					const existsInStore = restaurantsFromStore.find(
+						(r) => r.id === restaurant.id,
+					);
 					if (!existsInStore) {
 						addRestaurantToStore(storeRestaurant);
 					}
@@ -134,7 +145,9 @@ export default function ProfileScreen() {
 			const response = await ReviewService.getMyReviews({ limit: 2 });
 			if (response.success && response.data) {
 				setUserReviews(response.data.data);
-				setTotalReviews(response.data.pagination?.total || response.data.data.length);
+				setTotalReviews(
+					response.data.pagination?.total || response.data.data.length,
+				);
 			}
 		} catch (error) {
 			console.error('Error loading user reviews:', error);
@@ -605,6 +618,7 @@ export default function ProfileScreen() {
 						</View>
 					)}
 				</View>
+				<View style={{ height: 50 }} />
 			</ScrollView>
 
 			{/* Popups */}
