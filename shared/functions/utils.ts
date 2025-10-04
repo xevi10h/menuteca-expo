@@ -60,3 +60,38 @@ export function formatMenuTime(time: string): string {
 	date.setHours(hours, minutes);
 	return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
+
+/**
+ * Generate a deep link URL for a restaurant
+ * @param restaurantId - The restaurant ID
+ * @param domain - The domain for the deep link (default: menutecaapp.com)
+ * @returns Deep link URL for the restaurant
+ */
+export function generateRestaurantDeepLink(
+	restaurantId: string,
+	domain: string = 'menutecaapp.com',
+): string {
+	return `https://${domain}/restaurant/${restaurantId}`;
+}
+
+/**
+ * Generate a shareable message for a restaurant
+ * @param restaurantName - The name of the restaurant
+ * @param deepLink - The deep link URL
+ * @param language - The language for the message (default: 'es_ES')
+ * @returns Formatted share message
+ */
+export function generateRestaurantShareMessage(
+	restaurantName: string,
+	deepLink: string,
+	language: Language = 'es_ES',
+): string {
+	const messages: { [key in Language]: string } = {
+		es_ES: `¡Mira este restaurante en Menuteca! ${restaurantName}\n\n${deepLink}`,
+		ca_ES: `Mira aquest restaurant a Menuteca! ${restaurantName}\n\n${deepLink}`,
+		fr_FR: `Découvrez ce restaurant sur Menuteca ! ${restaurantName}\n\n${deepLink}`,
+		en_US: `Check out this restaurant on Menuteca! ${restaurantName}\n\n${deepLink}`,
+	};
+
+	return messages[language] || messages.es_ES;
+}

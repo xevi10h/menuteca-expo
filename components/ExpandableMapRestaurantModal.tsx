@@ -2,15 +2,22 @@ import { ReviewService } from '@/api';
 import { colors } from '@/assets/styles/colors';
 import AddReviewModal from '@/components/AddReviewModal';
 import { useTranslation } from '@/hooks/useTranslation';
+import {
+	generateRestaurantDeepLink,
+	generateRestaurantShareMessage,
+	getDeviceLanguage,
+} from '@/shared/functions/utils';
 import { Restaurant, Review } from '@/shared/types';
 import { useMenuStore } from '@/zustand/MenuStore';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
+	Alert,
 	Dimensions,
 	Image,
 	ImageBackground,
+	Share,
 	StyleSheet,
 	Text,
 	TouchableOpacity,
@@ -298,6 +305,44 @@ export default function ExpandableMapRestaurantModal({
 		);
 	};
 
+	const handleShareRestaurant = async () => {
+		if (!restaurant) return;
+
+		try {
+			const deepLink = generateRestaurantDeepLink(restaurant.id);
+			const language = getDeviceLanguage();
+			const message = generateRestaurantShareMessage(
+				restaurant.name,
+				deepLink,
+				language,
+			);
+
+			const result = await Share.share({
+				message,
+				url: deepLink, // For iOS
+			});
+
+			if (result.action === Share.sharedAction) {
+				if (result.activityType) {
+					// Shared with activity type
+					console.log('Shared with activity type:', result.activityType);
+				} else {
+					// Shared
+					console.log('Restaurant shared successfully');
+				}
+			} else if (result.action === Share.dismissedAction) {
+				// Dismissed
+				console.log('Share dismissed');
+			}
+		} catch (error) {
+			console.error('Error sharing restaurant:', error);
+			Alert.alert(
+				t('restaurant.error.title'),
+				t('restaurant.error.shareError'),
+			);
+		}
+	};
+
 	const handleTabChange = (tab: 'information' | 'menu') => {
 		if (tab === activeTab || isTransitioning) return;
 
@@ -438,9 +483,7 @@ export default function ExpandableMapRestaurantModal({
 						{/* Share Button */}
 						<TouchableOpacity
 							style={[styles.shareButton, { top: insets.top - 20 }]}
-							onPress={() => {
-								/* Handle share */
-							}}
+							onPress={handleShareRestaurant}
 						>
 							<Ionicons
 								name="share-outline"

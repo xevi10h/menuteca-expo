@@ -401,8 +401,6 @@ export const useUserStore = create<UserState>()(
 				const state = get();
 				if (!state.isAuthenticated) return;
 
-				set({ isLoading: true, error: null });
-
 				try {
 					const result = await SupabaseAuthService.getSession();
 
@@ -419,7 +417,6 @@ export const useUserStore = create<UserState>()(
 										? session.user.user_metadata.sub
 										: '',
 							},
-							isLoading: false,
 						}));
 					} else {
 						throw new Error('Failed to refresh profile');
@@ -429,7 +426,7 @@ export const useUserStore = create<UserState>()(
 						error instanceof Error
 							? error.message
 							: 'Failed to refresh profile';
-					set({ error: errorMessage, isLoading: false });
+					set({ error: errorMessage });
 
 					// If session is invalid, logout
 					get().logout();

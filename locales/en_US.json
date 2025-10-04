@@ -64,7 +64,8 @@
 		"error": {
 			"title": "Connection error",
 			"description": "We couldn't load the restaurant information. Please check your internet connection and try again.",
-			"retry": "Try again"
+			"retry": "Try again",
+			"shareError": "Could not share the restaurant. Please try again."
 		},
 		"viewAll": "View all",
 		"basedOnReviews": "Based on {{count}} reviews",

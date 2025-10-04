@@ -450,8 +450,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		paddingHorizontal: 20,
 		paddingVertical: 15,
-		borderBottomWidth: 1,
-		borderBottomColor: '#E5E5E5',
 		shadowColor: '#000',
 		shadowOffset: {
 			width: 0,

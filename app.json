@@ -8,14 +8,20 @@
 		"scheme": "menutecaapp",
 		"userInterfaceStyle": "automatic",
 		"newArchEnabled": true,
-		"associatedDomains": ["applinks:menutecaapp.com"],
+		"associatedDomains": [
+			"applinks:menutecaapp.com",
+			"applinks:www.menutecaapp.com"
+		],
 		"ios": {
 			"supportsTablet": true,
 			"usesAppleSignIn": true,
 			"bundleIdentifier": "com.menutecaapp.mobile",
 			"entitlements": {
 				"com.apple.developer.applesignin": ["Default", "Default"],
-				"com.apple.developer.associated-domains": ["applinks:menutecaapp.com"],
+				"com.apple.developer.associated-domains": [
+					"applinks:menutecaapp.com",
+					"applinks:www.menutecaapp.com"
+				],
 				"com.apple.developer.in-app-payments": [
 					"merchant.com.menutecaapp.mobile"
 				]
@@ -38,7 +44,16 @@
 					"data": [
 						{
 							"scheme": "https",
-							"host": "redbeeapp.com"
+							"host": "menutecaapp.com",
+							"pathPrefix": "/restaurant"
+						},
+						{
+							"scheme": "https",
+							"host": "www.menutecaapp.com",
+							"pathPrefix": "/restaurant"
+						},
+						{
+							"scheme": "menutecaapp"
 						}
 					],
 					"category": ["BROWSABLE", "DEFAULT"]

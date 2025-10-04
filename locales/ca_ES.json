@@ -64,7 +64,8 @@
 		"error": {
 			"title": "Error de connexió",
 			"description": "No hem pogut carregar la informació del restaurant. Verifica la teva connexió a internet i torna-ho a intentar.",
-			"retry": "Intentar de nou"
+			"retry": "Intentar de nou",
+			"shareError": "No s'ha pogut compartir el restaurant. Torna-ho a intentar."
 		},
 		"viewAll": "Veure totes",
 		"basedOnReviews": "Basat en {{count}} opinions",

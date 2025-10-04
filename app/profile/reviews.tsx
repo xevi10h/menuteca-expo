@@ -366,8 +366,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		paddingHorizontal: 20,
 		paddingVertical: 16,
-		borderBottomWidth: 1,
-		borderBottomColor: colors.primaryLight,
 		marginHorizontal: -20,
 	},
 	backButton: {

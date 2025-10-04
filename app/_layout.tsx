@@ -5,7 +5,8 @@ import {
 	ThemeProvider,
 } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import * as Linking from 'expo-linking';
+import { Stack, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -19,6 +20,7 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
 	const colorScheme = useColorScheme();
+	const router = useRouter();
 	const [loaded] = useFonts({
 		Manrope: require('../assets/fonts/Manrope-VariableFont_wght.ttf'),
 	});
@@ -30,6 +32,38 @@ export default function RootLayout() {
 	// Authentication state
 	const isAuthenticated = useUserStore((state) => state.isAuthenticated);
 	const userLoading = useUserStore((state) => state.isLoading);
+
+	// Handle deep linking
+	useEffect(() => {
+		const handleDeepLink = ({ url }: { url: string }) => {
+			console.log('🔗 Deep link received:', url);
+
+			const { hostname, path, queryParams } = Linking.parse(url);
+
+			// Handle restaurant deep links: https://menutecaapp.com/restaurant/{id}
+			if (path && path.includes('restaurant/')) {
+				const restaurantId = path.split('restaurant/')[1]?.split('/')[0];
+				if (restaurantId) {
+					console.log('🍽️ Navigating to restaurant:', restaurantId);
+					router.push(`/restaurant/${restaurantId}`);
+				}
+			}
+		};
+
+		// Get initial URL (if app was opened from a deep link)
+		Linking.getInitialURL().then((url) => {
+			if (url) {
+				handleDeepLink({ url });
+			}
+		});
+
+		// Listen for deep links while app is open
+		const subscription = Linking.addEventListener('url', handleDeepLink);
+
+		return () => {
+			subscription.remove();
+		};
+	}, [router]);
 
 	useEffect(() => {
 		if (loaded) {

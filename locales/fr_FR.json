@@ -64,7 +64,8 @@
 		"error": {
 			"title": "Erreur de connexion",
 			"description": "Nous n'avons pas pu charger les informations du restaurant. Vérifiez votre connexion internet et réessayez.",
-			"retry": "Réessayer"
+			"retry": "Réessayer",
+			"shareError": "Impossible de partager le restaurant. Veuillez réessayer."
 		},
 		"viewAll": "Voir tout",
 		"basedOnReviews": "Basé sur {{count}} avis",
