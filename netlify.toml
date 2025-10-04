@@ -1,0 +1,65 @@
+# Netlify Configuration for Menuteca Web App
+
+[build]
+  # Directory to publish (relative to root of your repo)
+  publish = "dist"
+
+  # Build command
+  command = "npm run build:web"
+
+# Redirect all requests to index.html for client-side routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers for security and performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Security headers
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+    # Cache control for static assets
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/static/*"
+  [headers.values]
+    # Long cache for static assets (hashed filenames)
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    # Cache for JavaScript files
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    # Cache for CSS files
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    # Cache for asset files
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Environment variables (configure these in Netlify UI for security)
+# [build.environment]
+#   NODE_VERSION = "18"
+
+# Deploy contexts
+[context.production]
+  command = "npm run build:web"
+
+[context.deploy-preview]
+  command = "npm run build:web"
+
+[context.branch-deploy]
+  command = "npm run build:web"

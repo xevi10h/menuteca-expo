@@ -1,0 +1,5 @@
+# Netlify Redirects for Expo Router SPA
+
+# Redirect all routes to index.html for client-side routing
+# This ensures that deep links work correctly (e.g., /restaurant/123)
+/*    /index.html   200
