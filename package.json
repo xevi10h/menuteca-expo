@@ -21,6 +21,7 @@
     "@react-navigation/elements": "^2.3.8",
     "@react-navigation/material-top-tabs": "^7.2.14",
     "@supabase/supabase-js": "^2.51.0",
+    "@teovilla/react-native-web-maps": "^0.9.5",
     "base64-arraybuffer": "^1.0.2",
     "expo": "53.0.22",
     "expo-apple-authentication": "~7.2.4",
