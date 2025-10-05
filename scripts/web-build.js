@@ -76,7 +76,7 @@ try {
 	}
 
 	// Copy assetlinks.json for Android
-	const assetlinksSource = 'website-files/.well-known/assetlinks.json';
+	const assetlinksSource = 'public/.well-known/assetlinks.json';
 	const assetlinksTarget = path.join(wellKnownDir, 'assetlinks.json');
 
 	if (fs.existsSync(assetlinksSource)) {
@@ -87,7 +87,7 @@ try {
 	}
 
 	// Copy apple-app-site-association for iOS
-	const appleSource = 'website-files/.well-known/apple-app-site-association';
+	const appleSource = 'public/.well-known/apple-app-site-association';
 	const appleTarget = path.join(wellKnownDir, 'apple-app-site-association');
 
 	if (fs.existsSync(appleSource)) {

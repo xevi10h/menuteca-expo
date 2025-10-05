@@ -4,7 +4,10 @@
 		"target": {
 			"namespace": "android_app",
 			"package_name": "com.menutecaapp.mobile",
-			"sha256_cert_fingerprints": ["REPLACE_WITH_YOUR_SHA256_FINGERPRINT"]
+			"sha256_cert_fingerprints": [
+				"6C:01:EE:50:5C:B0:16:3E:51:9D:6B:D9:DC:EC:1E:D8:72:F2:8A:33:E1:5A:4A:D5:92:70:0E:90:85:9F:D7:27",
+				"E6:CA:AB:1D:05:05:66:F7:46:38:5F:1C:7E:C2:2A:A8:AC:20:9B:37:3F:7D:19:D8:65:B0:F3:A4:37:AF:BE:B3"
+			]
 		}
 	}
 ]
