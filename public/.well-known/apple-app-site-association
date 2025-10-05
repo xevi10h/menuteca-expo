@@ -1,0 +1,22 @@
+{
+	"applinks": {
+		"details": [
+			{
+				"appIDs": [
+					"4WWBHK245Y.com.menutecaapp.mobile"
+				],
+				"components": [
+					{
+						"/": "/restaurant/*",
+						"comment": "Matches any profile URL"
+					}
+				]
+			}
+		]
+	},
+	"webcredentials": {
+		"apps": [
+			"4WWBHK245Y.com.menutecaapp.mobile"
+		]
+	}
+}

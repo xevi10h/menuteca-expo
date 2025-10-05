@@ -7,6 +7,12 @@
   # Build command
   command = "npm run build:web"
 
+# Deep linking files - exclude from SPA redirect
+[[redirects]]
+  from = "/.well-known/*"
+  to = "/.well-known/:splat"
+  status = 200
+
 # Redirect all requests to index.html for client-side routing
 [[redirects]]
   from = "/*"
@@ -49,6 +55,21 @@
   [headers.values]
     # Cache for asset files
     Cache-Control = "public, max-age=31536000, immutable"
+
+# Deep linking files headers
+[[headers]]
+  for = "/.well-known/apple-app-site-association"
+  [headers.values]
+    Content-Type = "application/json"
+    Access-Control-Allow-Origin = "*"
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/.well-known/assetlinks.json"
+  [headers.values]
+    Content-Type = "application/json"
+    Access-Control-Allow-Origin = "*"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 # Environment variables (configure these in Netlify UI for security)
 # [build.environment]
