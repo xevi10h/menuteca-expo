@@ -640,5 +640,204 @@
 		"addFirstMenu": "Aller à mes restaurants",
 		"errorLoadingData": "Erreur lors du chargement des données. Veuillez réessayer.",
 		"manageMenus": "Gérer les Menus"
+	},
+	"web": {
+		"nav": {
+			"product": "Produit",
+			"support": "Support",
+			"privacy": "Confidentialité"
+		},
+		"footer": {
+			"rights": "Tous droits réservés."
+		},
+		"support": {
+			"title": "Support",
+			"subtitle": "Nous sommes là pour vous aider",
+			"email": "Email",
+			"phone": "Téléphone",
+			"responseTime": "Nous répondons généralement dans les 24 à 48 heures pendant les jours ouvrables.",
+			"diners": {
+				"title": "Pour les Convives",
+				"description": "Besoin d'aide pour utiliser l'application ? Des questions sur les restaurants ou les menus ? Nous sommes là pour vous aider.",
+				"helpWith": "Nous pouvons vous aider avec :",
+				"help1": "Problèmes de compte et de connexion",
+				"help2": "Questions sur les informations des restaurants",
+				"help3": "Comment écrire et gérer les avis",
+				"help4": "Utilisation générale de l'application et fonctionnalités"
+			},
+			"restaurants": {
+				"title": "Pour les Propriétaires de Restaurants",
+				"description": "Des questions sur la gestion de votre profil de restaurant ou de vos menus ? Notre équipe est prête à vous aider.",
+				"helpWith": "Nous pouvons vous aider avec :",
+				"help1": "Création et gestion de votre profil de restaurant",
+				"help2": "Création et mise à jour des menus",
+				"help3": "Traitement des photos de menus par IA",
+				"help4": "Gestion du compte et paramètres"
+			}
+		},
+		"privacy": {
+			"title": "Politique de Confidentialité",
+			"lastUpdated": "Dernière mise à jour",
+			"intro": {
+				"title": "Introduction",
+				"text1": "Chez Menuteca, nous respectons votre vie privée et nous nous engageons à protéger vos données personnelles. Cette politique de confidentialité explique comment nous collectons, utilisons et protégeons vos informations lorsque vous utilisez notre application mobile.",
+				"text2": "Cette politique est conforme au Règlement Général sur la Protection des Données (RGPD) et aux lois espagnoles applicables en matière de protection des données."
+			},
+			"dataCollect": {
+				"title": "Informations que Nous Collectons",
+				"diners": {
+					"title": "Des Convives :",
+					"item1": "Informations de compte : email, nom, nom d'utilisateur",
+					"item2": "Données de profil : photo de profil (optionnelle)",
+					"item3": "Contenu généré par l'utilisateur : avis, notes et photos",
+					"item4": "Données de localisation : localisation en temps réel (avec permission) pour la fonctionnalité de carte"
+				},
+				"restaurants": {
+					"title": "Des Propriétaires de Restaurants :",
+					"item1": "Informations commerciales : nom du restaurant, adresse, coordonnées",
+					"item2": "Données des menus : noms des menus, prix, plats, descriptions",
+					"item3": "Médias : photos du restaurant et des plats",
+					"item4": "Informations de compte : email, nom d'utilisateur"
+				}
+			},
+			"dataUse": {
+				"title": "Comment Nous Utilisons Vos Données",
+				"item1": "Fournir les fonctionnalités principales du service (affichage des menus et restaurants)",
+				"item2": "Permettre les avis et notes des utilisateurs",
+				"item3": "Permettre aux restaurants de gérer leurs profils et menus",
+				"item4": "Afficher les restaurants à proximité pertinents en fonction de la localisation",
+				"item5": "Améliorer les fonctionnalités de l'application et l'expérience utilisateur"
+			},
+			"ai": {
+				"title": "Traitement des Menus par IA",
+				"text1": "Les propriétaires de restaurants peuvent télécharger des photos de leurs menus pour qu'elles soient traitées par notre système IA. Ce système extrait automatiquement les informations du menu (plats, prix, descriptions) pour rendre la création de menus plus rapide.",
+				"text2": "Les photos téléchargées pour le traitement IA sont utilisées uniquement pour l'extraction du menu et ne sont pas stockées de manière permanente ni utilisées à d'autres fins."
+			},
+			"sharing": {
+				"title": "Partage des Données",
+				"text": "Nous ne vendons PAS vos données personnelles à des tiers. Nous pouvons partager des informations uniquement dans les circonstances limitées suivantes :",
+				"item1": "Les avis publics sont visibles par tous les utilisateurs de l'application",
+				"item2": "Avec les prestataires de services qui nous aident à faire fonctionner l'application (hébergement, analyse)",
+				"item3": "Lorsque requis par la loi ou pour protéger nos droits légaux"
+			},
+			"gdpr": {
+				"title": "Vos Droits (RGPD)",
+				"intro": "En vertu du RGPD, vous disposez des droits suivants concernant vos données personnelles :",
+				"right1": "Droit d'accès à vos données personnelles",
+				"right2": "Droit de rectification (mise à jour ou correction des informations)",
+				"right3": "Droit à l'effacement (demande de suppression des données)",
+				"right4": "Droit à la portabilité des données (exporter vos données)",
+				"right5": "Droit de limitation du traitement",
+				"right6": "Droit d'opposition au traitement",
+				"contact": "Pour exercer l'un de ces droits, veuillez nous contacter à admin@menutecaapp.com"
+			},
+			"cookies": {
+				"title": "Cookies et Suivi",
+				"text1": "Notre application utilise un minimum de cookies et de technologies de suivi :",
+				"types": {
+					"title": "Types de données stockées :",
+					"essential": "Essentiels : Jetons d'authentification pour vous garder connecté",
+					"functional": "Fonctionnels : Préférences linguistiques, paramètres de l'application"
+				},
+				"text2": "Nous n'utilisons pas de cookies publicitaires tiers et ne vous suivons pas sur d'autres sites web."
+			},
+			"retention": {
+				"title": "Conservation des Données",
+				"item1": "Comptes actifs : Données conservées indéfiniment tant que le compte est actif",
+				"item2": "Comptes supprimés : Données personnelles supprimées dans les 30 jours",
+				"item3": "Avis publics : Peuvent rester anonymisés après la suppression du compte pour préserver l'intégrité des avis"
+			},
+			"security": {
+				"title": "Sécurité des Données",
+				"text": "Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données personnelles contre tout accès, modification, divulgation ou destruction non autorisés. Cependant, aucune méthode de transmission sur Internet n'est sécurisée à 100%."
+			},
+			"children": {
+				"title": "Confidentialité des Enfants",
+				"text": "Notre service n'est pas destiné aux utilisateurs de moins de 13 ans. Nous ne collectons pas sciemment d'informations personnelles auprès d'enfants de moins de 13 ans."
+			},
+			"changes": {
+				"title": "Modifications de Cette Politique",
+				"text": "Nous pouvons mettre à jour cette politique de confidentialité de temps à autre. Nous vous informerons de tout changement en mettant à jour la date de 'Dernière mise à jour' en haut de cette politique."
+			},
+			"contact": {
+				"title": "Nous Contacter",
+				"text": "Si vous avez des questions concernant cette politique de confidentialité ou la manière dont nous traitons vos données, veuillez nous contacter :",
+				"phone": "Téléphone"
+			}
+		},
+		"product": {
+			"comingSoon": "Bientôt disponible sur l'App Store et Google Play !",
+			"hero": {
+				"title": "Découvrez les meilleurs menus près de chez vous",
+				"subtitle": "La seule application dédiée exclusivement aux menus de restaurants à prix fixe. Trouvez des menus du jour, des menus du week-end et des menus dégustation en toute transparence.",
+				"cta": "Télécharger l'Application"
+			},
+			"features": {
+				"title": "Pourquoi Choisir Menuteca ?",
+				"feature1": {
+					"title": "Focus Exclusif sur les Menus à Prix Fixe",
+					"text": "Aucune distraction. Nous montrons uniquement les restaurants avec des menus à prix fixe, rendant votre recherche rapide et ciblée."
+				},
+				"feature2": {
+					"title": "Localisation en Temps Réel",
+					"text": "Trouvez des restaurants près de chez vous avec notre carte interactive. Voyez exactement où se trouve chaque restaurant et à quelle distance."
+				},
+				"feature3": {
+					"title": "Transparence Totale des Prix",
+					"text": "Tous les prix sont visibles à l'avance. Voyez exactement ce qui est inclus : pain, boissons, café, dessert et tous les suppléments."
+				},
+				"feature4": {
+					"title": "Toujours à Jour",
+					"text": "Les restaurants mettent à jour leurs menus quotidiennement. Plus d'informations obsolètes ou de surprises à votre arrivée."
+				},
+				"feature5": {
+					"title": "Création de Menus Assistée par IA",
+					"text": "Pour les restaurants : prenez une photo de votre ardoise de menu et notre IA la convertit en numérique en quelques secondes."
+				},
+				"feature6": {
+					"title": "Avis Authentiques",
+					"text": "De vrais avis de vrais convives avec des photos. Voyez ce que les autres ont vécu avant d'y aller."
+				}
+			},
+			"restaurants": {
+				"title": "Pour les Restaurants",
+				"subtitle": "Attirez plus de clients en présentant vos menus du jour",
+				"benefit1": {
+					"title": "100% Gratuit pour Toujours",
+					"text": "Pas de frais d'abonnement, pas de commissions, pas de coûts cachés. Enregistrez jusqu'à 10 restaurants complètement gratuitement."
+				},
+				"benefit2": {
+					"title": "Mettez à Jour les Menus en Quelques Secondes",
+					"text": "Prenez une photo de votre ardoise de menu et notre IA fait le reste. Ou modifiez manuellement quand vous le souhaitez."
+				},
+				"benefit3": {
+					"title": "Touchez des Clients Affamés",
+					"text": "Vos menus apparaissent aux utilisateurs qui recherchent à proximité. Soyez découvert par des personnes qui cherchent exactement ce que vous offrez."
+				}
+			},
+			"testimonials": {
+				"title": "Ce Que Disent Nos Utilisateurs",
+				"testimonial1": {
+					"text": "Je perdais tellement de temps à appeler les restaurants pour demander leur menu du jour. Maintenant, j'ouvre simplement Menuteca et je vois tout en quelques secondes !",
+					"author": "Marie G.",
+					"role": "Barcelone"
+				},
+				"testimonial2": {
+					"text": "En tant que propriétaire de restaurant, cette application a changé la donne. La fonction de menu IA me fait gagner 10 minutes chaque matin, et nous recevons plus de clients pour le déjeuner que jamais.",
+					"author": "Carlos R.",
+					"role": "Propriétaire de Restaurant"
+				},
+				"testimonial3": {
+					"text": "Parfait pour trouver des options de déjeuner abordables près de mon bureau. J'adore pouvoir voir tous les plats avant d'y aller. Plus de surprises !",
+					"author": "Jordi M.",
+					"role": "Barcelone"
+				}
+			},
+			"cta": {
+				"title": "Prêt à Découvrir de Superbes Menus ?",
+				"text": "Téléchargez Menuteca aujourd'hui et ne vous demandez plus jamais ce qu'il y a pour le déjeuner.",
+				"button": "Obtenir l'Application"
+			}
+		}
 	}
 }

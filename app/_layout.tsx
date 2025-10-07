@@ -26,7 +26,14 @@ export default function RootLayout() {
 	});
 	const [showCustomLoading, setShowCustomLoading] = useState(false);
 
-	// Use the app initialization hook
+	// Check if we're on a web marketing page (skip loading screen for those)
+	const isWebMarketingPage =
+		typeof window !== 'undefined' &&
+		(window.location.pathname.includes('/product') ||
+			window.location.pathname.includes('/support') ||
+			window.location.pathname.includes('/privacy'));
+
+	// Use the app initialization hook (skip for marketing pages)
 	const { isInitialized, isLoading, error } = useAppInitialization();
 
 	// Authentication state
@@ -83,8 +90,12 @@ export default function RootLayout() {
 		return null;
 	}
 
-	// Show custom loading screen during app initialization or user loading
-	if (showCustomLoading && (!isInitialized || isLoading || userLoading)) {
+	// Show custom loading screen during app initialization or user loading (but not for web marketing pages)
+	if (
+		!isWebMarketingPage &&
+		showCustomLoading &&
+		(!isInitialized || isLoading || userLoading)
+	) {
 		return (
 			<LoadingScreen
 				onLoadingComplete={handleLoadingComplete}
@@ -119,6 +130,9 @@ export default function RootLayout() {
 
 						{/* Restaurant stack - available for all users */}
 						<Stack.Screen name="restaurant" />
+
+						{/* Web marketing pages - available for all users */}
+						<Stack.Screen name="[locale]" />
 					</Stack>
 				</ThemeProvider>
 			</ActionSheetProvider>

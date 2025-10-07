@@ -640,5 +640,204 @@
 		"addFirstMenu": "Go to my restaurants",
 		"errorLoadingData": "Error loading data. Please try again.",
 		"manageMenus": "Manage Menus"
+	},
+	"web": {
+		"nav": {
+			"product": "Product",
+			"support": "Support",
+			"privacy": "Privacy"
+		},
+		"footer": {
+			"rights": "All rights reserved."
+		},
+		"support": {
+			"title": "Support",
+			"subtitle": "We're here to help you",
+			"email": "Email",
+			"phone": "Phone",
+			"responseTime": "We typically respond within 24-48 hours during business days.",
+			"diners": {
+				"title": "For Diners",
+				"description": "Need help using the app? Have questions about restaurants or menus? We're here to assist you.",
+				"helpWith": "We can help you with:",
+				"help1": "Account issues and login problems",
+				"help2": "Questions about restaurant information",
+				"help3": "How to write and manage reviews",
+				"help4": "General app usage and features"
+			},
+			"restaurants": {
+				"title": "For Restaurant Owners",
+				"description": "Questions about managing your restaurant profile or menus? Our team is ready to help.",
+				"helpWith": "We can help you with:",
+				"help1": "Setting up and managing your restaurant profile",
+				"help2": "Creating and updating menus",
+				"help3": "AI menu photo processing",
+				"help4": "Account management and settings"
+			}
+		},
+		"privacy": {
+			"title": "Privacy Policy",
+			"lastUpdated": "Last updated",
+			"intro": {
+				"title": "Introduction",
+				"text1": "At Menuteca, we respect your privacy and are committed to protecting your personal data. This privacy policy explains how we collect, use, and protect your information when you use our mobile application.",
+				"text2": "This policy complies with the General Data Protection Regulation (GDPR) and applicable Spanish data protection laws."
+			},
+			"dataCollect": {
+				"title": "Information We Collect",
+				"diners": {
+					"title": "From Diners:",
+					"item1": "Account information: email, name, username",
+					"item2": "Profile data: profile photo (optional)",
+					"item3": "User-generated content: reviews, ratings, and photos",
+					"item4": "Location data: real-time location (with permission) for map functionality"
+				},
+				"restaurants": {
+					"title": "From Restaurant Owners:",
+					"item1": "Business information: restaurant name, address, contact details",
+					"item2": "Menu data: menu names, prices, dishes, descriptions",
+					"item3": "Media: photos of restaurant and dishes",
+					"item4": "Account information: email, username"
+				}
+			},
+			"dataUse": {
+				"title": "How We Use Your Data",
+				"item1": "Provide core service functionality (showing menus and restaurants)",
+				"item2": "Enable user reviews and ratings",
+				"item3": "Allow restaurants to manage their profiles and menus",
+				"item4": "Display relevant nearby restaurants based on location",
+				"item5": "Improve app functionality and user experience"
+			},
+			"ai": {
+				"title": "AI Menu Processing",
+				"text1": "Restaurant owners can upload photos of their menus to be processed by our AI system. This system automatically extracts menu information (dishes, prices, descriptions) to make menu creation faster.",
+				"text2": "Photos uploaded for AI processing are used solely for menu extraction and are not stored permanently or used for any other purpose."
+			},
+			"sharing": {
+				"title": "Data Sharing",
+				"text": "We do NOT sell your personal data to third parties. We may share information only in the following limited circumstances:",
+				"item1": "Public reviews are visible to all app users",
+				"item2": "With service providers who help us operate the app (hosting, analytics)",
+				"item3": "When required by law or to protect our legal rights"
+			},
+			"gdpr": {
+				"title": "Your Rights (GDPR)",
+				"intro": "Under GDPR, you have the following rights regarding your personal data:",
+				"right1": "Right to access your personal data",
+				"right2": "Right to rectification (update or correct information)",
+				"right3": "Right to erasure (request data deletion)",
+				"right4": "Right to data portability (export your data)",
+				"right5": "Right to restrict processing",
+				"right6": "Right to object to processing",
+				"contact": "To exercise any of these rights, please contact us at admin@menutecaapp.com"
+			},
+			"cookies": {
+				"title": "Cookies and Tracking",
+				"text1": "Our app uses minimal cookies and tracking technologies:",
+				"types": {
+					"title": "Types of data stored:",
+					"essential": "Essential: Authentication tokens to keep you logged in",
+					"functional": "Functional: Language preferences, app settings"
+				},
+				"text2": "We do not use third-party advertising cookies or track you across other websites."
+			},
+			"retention": {
+				"title": "Data Retention",
+				"item1": "Active accounts: Data retained indefinitely while account is active",
+				"item2": "Deleted accounts: Personal data removed within 30 days",
+				"item3": "Public reviews: May remain anonymized after account deletion to preserve review integrity"
+			},
+			"security": {
+				"title": "Data Security",
+				"text": "We implement appropriate technical and organizational measures to protect your personal data against unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the internet is 100% secure."
+			},
+			"children": {
+				"title": "Children's Privacy",
+				"text": "Our service is not intended for users under 13 years of age. We do not knowingly collect personal information from children under 13."
+			},
+			"changes": {
+				"title": "Changes to This Policy",
+				"text": "We may update this privacy policy from time to time. We will notify you of any changes by updating the 'Last Updated' date at the top of this policy."
+			},
+			"contact": {
+				"title": "Contact Us",
+				"text": "If you have questions about this privacy policy or how we handle your data, please contact us:",
+				"phone": "Phone"
+			}
+		},
+		"product": {
+			"comingSoon": "Coming soon to the App Store and Google Play!",
+			"hero": {
+				"title": "Discover the best set menus near you",
+				"subtitle": "The only app dedicated exclusively to fixed-price restaurant menus. Find daily menus, weekend specials, and tasting menus with complete transparency.",
+				"cta": "Download the App"
+			},
+			"features": {
+				"title": "Why Choose Menuteca?",
+				"feature1": {
+					"title": "Exclusive Focus on Set Menus",
+					"text": "No distractions. We only show restaurants with fixed-price menus, making your search quick and focused."
+				},
+				"feature2": {
+					"title": "Real-Time Location",
+					"text": "Find restaurants near you with our interactive map. See exactly where each restaurant is and how far away."
+				},
+				"feature3": {
+					"title": "Complete Price Transparency",
+					"text": "All prices are visible upfront. See exactly what's included: bread, drinks, coffee, dessert, and any supplements."
+				},
+				"feature4": {
+					"title": "Always Up-to-Date",
+					"text": "Restaurants update their menus daily. No more outdated information or surprises when you arrive."
+				},
+				"feature5": {
+					"title": "AI-Powered Menu Creation",
+					"text": "For restaurants: take a photo of your menu board and our AI converts it to digital in seconds."
+				},
+				"feature6": {
+					"title": "Authentic Reviews",
+					"text": "Real reviews from real diners with photos. See what others experienced before you go."
+				}
+			},
+			"restaurants": {
+				"title": "For Restaurants",
+				"subtitle": "Attract more customers by showcasing your daily menus",
+				"benefit1": {
+					"title": "100% Free Forever",
+					"text": "No subscription fees, no commissions, no hidden costs. Register up to 10 restaurants completely free."
+				},
+				"benefit2": {
+					"title": "Update Menus in Seconds",
+					"text": "Take a photo of your menu board and our AI does the rest. Or edit manually anytime you want."
+				},
+				"benefit3": {
+					"title": "Reach Hungry Customers",
+					"text": "Your menus appear to users searching nearby. Get discovered by people looking for exactly what you offer."
+				}
+			},
+			"testimonials": {
+				"title": "What Our Users Say",
+				"testimonial1": {
+					"text": "I used to waste so much time calling restaurants to ask about their daily menu. Now I just open Menuteca and see everything in seconds!",
+					"author": "Maria G.",
+					"role": "Barcelona"
+				},
+				"testimonial2": {
+					"text": "As a restaurant owner, this app has been a game-changer. The AI menu feature saves me 10 minutes every morning, and we're getting more lunch customers than ever.",
+					"author": "Carlos R.",
+					"role": "Restaurant Owner"
+				},
+				"testimonial3": {
+					"text": "Perfect for finding affordable lunch options near my office. I love that I can see all the dishes before I go. No more surprises!",
+					"author": "Jordi M.",
+					"role": "Barcelona"
+				}
+			},
+			"cta": {
+				"title": "Ready to Discover Great Menus?",
+				"text": "Download Menuteca today and never wonder what's for lunch again.",
+				"button": "Get the App"
+			}
+		}
 	}
 }

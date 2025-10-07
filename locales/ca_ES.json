@@ -640,5 +640,204 @@
 		"addFirstMenu": "Anar als meus restaurants",
 		"errorLoadingData": "Error en carregar les dades. Si us plau, torna-ho a intentar.",
 		"manageMenus": "Gestionar Menús"
+	},
+	"web": {
+		"nav": {
+			"product": "Producte",
+			"support": "Suport",
+			"privacy": "Privacitat"
+		},
+		"footer": {
+			"rights": "Tots els drets reservats."
+		},
+		"support": {
+			"title": "Suport",
+			"subtitle": "Estem aquí per ajudar-te",
+			"email": "Correu electrònic",
+			"phone": "Telèfon",
+			"responseTime": "Normalment responem en 24-48 hores durant els dies laborables.",
+			"diners": {
+				"title": "Per a Comensals",
+				"description": "Necessites ajuda usant l'app? Tens preguntes sobre restaurants o menús? Estem aquí per ajudar-te.",
+				"helpWith": "Podem ajudar-te amb:",
+				"help1": "Problemes amb el compte i inici de sessió",
+				"help2": "Preguntes sobre informació de restaurants",
+				"help3": "Com escriure i gestionar opinions",
+				"help4": "Ús general de l'app i funcionalitats"
+			},
+			"restaurants": {
+				"title": "Per a Propietaris de Restaurants",
+				"description": "Tens preguntes sobre la gestió del perfil del teu restaurant o els menús? El nostre equip està preparat per ajudar-te.",
+				"helpWith": "Podem ajudar-te amb:",
+				"help1": "Configurar i gestionar el perfil del teu restaurant",
+				"help2": "Crear i actualitzar menús",
+				"help3": "Processament de fotos de menús amb IA",
+				"help4": "Gestió del compte i configuració"
+			}
+		},
+		"privacy": {
+			"title": "Política de Privacitat",
+			"lastUpdated": "Última actualització",
+			"intro": {
+				"title": "Introducció",
+				"text1": "A Menuteca, respectem la teva privacitat i estem compromesos a protegir les teves dades personals. Aquesta política de privacitat explica com recopilem, utilitzem i protegim la teva informació quan uses la nostra aplicació mòbil.",
+				"text2": "Aquesta política compleix amb el Reglament General de Protecció de Dades (RGPD) i les lleis de protecció de dades espanyoles aplicables."
+			},
+			"dataCollect": {
+				"title": "Informació que Recopilem",
+				"diners": {
+					"title": "De Comensals:",
+					"item1": "Informació del compte: correu electrònic, nom, nom d'usuari",
+					"item2": "Dades del perfil: foto de perfil (opcional)",
+					"item3": "Contingut generat per l'usuari: opinions, valoracions i fotos",
+					"item4": "Dades d'ubicació: ubicació en temps real (amb permís) per a la funcionalitat del mapa"
+				},
+				"restaurants": {
+					"title": "De Propietaris de Restaurants:",
+					"item1": "Informació del negoci: nom del restaurant, adreça, dades de contacte",
+					"item2": "Dades del menú: noms de menús, preus, plats, descripcions",
+					"item3": "Mitjans: fotos del restaurant i plats",
+					"item4": "Informació del compte: correu electrònic, nom d'usuari"
+				}
+			},
+			"dataUse": {
+				"title": "Com Utilitzem les Teves Dades",
+				"item1": "Proporcionar la funcionalitat principal del servei (mostrar menús i restaurants)",
+				"item2": "Permetre opinions i valoracions d'usuaris",
+				"item3": "Permetre als restaurants gestionar els seus perfils i menús",
+				"item4": "Mostrar restaurants propers rellevants basats en la ubicació",
+				"item5": "Millorar la funcionalitat de l'app i l'experiència d'usuari"
+			},
+			"ai": {
+				"title": "Processament de Menús amb IA",
+				"text1": "Els propietaris de restaurants poden pujar fotos dels seus menús per ser processades pel nostre sistema d'IA. Aquest sistema extreu automàticament la informació del menú (plats, preus, descripcions) per fer la creació de menús més ràpida.",
+				"text2": "Les fotos pujades per al processament amb IA s'utilitzen únicament per a l'extracció del menú i no s'emmagatzemen permanentment ni s'utilitzen per a cap altre propòsit."
+			},
+			"sharing": {
+				"title": "Compartició de Dades",
+				"text": "NO venem les teves dades personals a tercers. Només podem compartir informació en les següents circumstàncies limitades:",
+				"item1": "Les opinions públiques són visibles per a tots els usuaris de l'app",
+				"item2": "Amb proveïdors de serveis que ens ajuden a operar l'app (hosting, analítiques)",
+				"item3": "Quan ho requereixi la llei o per protegir els nostres drets legals"
+			},
+			"gdpr": {
+				"title": "Els Teus Drets (RGPD)",
+				"intro": "Sota el RGPD, tens els següents drets respecte a les teves dades personals:",
+				"right1": "Dret d'accés a les teves dades personals",
+				"right2": "Dret de rectificació (actualitzar o corregir informació)",
+				"right3": "Dret de supressió (sol·licitar l'eliminació de dades)",
+				"right4": "Dret a la portabilitat de dades (exportar les teves dades)",
+				"right5": "Dret a la limitació del tractament",
+				"right6": "Dret d'oposició al tractament",
+				"contact": "Per exercir qualsevol d'aquests drets, si us plau contacta'ns a admin@menutecaapp.com"
+			},
+			"cookies": {
+				"title": "Cookies i Seguiment",
+				"text1": "La nostra app utilitza cookies i tecnologies de seguiment mínimes:",
+				"types": {
+					"title": "Tipus de dades emmagatzemades:",
+					"essential": "Essencials: Tokens d'autenticació per mantenir-te amb sessió iniciada",
+					"functional": "Funcionals: Preferències d'idioma, configuració de l'app"
+				},
+				"text2": "No utilitzem cookies publicitàries de tercers ni et seguim a través d'altres llocs web."
+			},
+			"retention": {
+				"title": "Retenció de Dades",
+				"item1": "Comptes actius: Les dades es retenen indefinidament mentre el compte estigui actiu",
+				"item2": "Comptes eliminats: Les dades personals s'eliminen en 30 dies",
+				"item3": "Opinions públiques: Poden romandre anonimitzades després de l'eliminació del compte per preservar la integritat de les opinions"
+			},
+			"security": {
+				"title": "Seguretat de les Dades",
+				"text": "Implementem mesures tècniques i organitzatives apropiades per protegir les teves dades personals contra l'accés no autoritzat, alteració, divulgació o destrucció. No obstant això, cap mètode de transmissió per internet és 100% segur."
+			},
+			"children": {
+				"title": "Privacitat de Menors",
+				"text": "El nostre servei no està destinat a usuaris menors de 13 anys. No recopilem conscientment informació personal de menors de 13 anys."
+			},
+			"changes": {
+				"title": "Canvis en Aquesta Política",
+				"text": "Podem actualitzar aquesta política de privacitat de tant en tant. T'informarem de qualsevol canvi actualitzant la data d'\"Última actualització\" a la part superior d'aquesta política."
+			},
+			"contact": {
+				"title": "Contacta'ns",
+				"text": "Si tens preguntes sobre aquesta política de privacitat o com gestionem les teves dades, si us plau contacta'ns:",
+				"phone": "Telèfon"
+			}
+		},
+		"product": {
+			"comingSoon": "Properament a l'App Store i Google Play!",
+			"hero": {
+				"title": "Descobreix els millors menús a prop teu",
+				"subtitle": "L'única app dedicada exclusivament a menús de preu tancat de restaurants. Troba menús del dia, menús de cap de setmana i menús degustació amb total transparència.",
+				"cta": "Descarrega l'App"
+			},
+			"features": {
+				"title": "Per Què Triar Menuteca?",
+				"feature1": {
+					"title": "Enfocament Exclusiu en Menús de Preu Tancat",
+					"text": "Sense distraccions. Només mostrem restaurants amb menús de preu tancat, fent que la teva cerca sigui ràpida i enfocada."
+				},
+				"feature2": {
+					"title": "Ubicació en Temps Real",
+					"text": "Troba restaurants a prop teu amb el nostre mapa interactiu. Veu exactament on està cada restaurant i a quina distància."
+				},
+				"feature3": {
+					"title": "Transparència Total de Preus",
+					"text": "Tots els preus són visibles per endavant. Veu exactament què s'inclou: pa, begudes, cafè, postre i qualsevol suplement."
+				},
+				"feature4": {
+					"title": "Sempre Actualitzat",
+					"text": "Els restaurants actualitzen els seus menús diàriament. No més informació obsoleta ni sorpreses quan arribes."
+				},
+				"feature5": {
+					"title": "Creació de Menús amb IA",
+					"text": "Per a restaurants: fes una foto del teu tauler de menú i la nostra IA el converteix a digital en segons."
+				},
+				"feature6": {
+					"title": "Opinions Autèntiques",
+					"text": "Opinions reals de comensals reals amb fotos. Veu el que altres han experimentat abans d'anar-hi."
+				}
+			},
+			"restaurants": {
+				"title": "Per a Restaurants",
+				"subtitle": "Atrau més clients mostrant els teus menús diaris",
+				"benefit1": {
+					"title": "100% Gratuït per Sempre",
+					"text": "Sense quotes de subscripció, sense comissions, sense costos ocults. Registra fins a 10 restaurants completament gratis."
+				},
+				"benefit2": {
+					"title": "Actualitza Menús en Segons",
+					"text": "Fes una foto del teu tauler de menú i la nostra IA fa la resta. O edita manualment quan vulguis."
+				},
+				"benefit3": {
+					"title": "Arriba a Clients Afamats",
+					"text": "Els teus menús apareixen als usuaris que cerquen a prop. Sigues descobert per persones que busquen exactament el que ofereixes."
+				}
+			},
+			"testimonials": {
+				"title": "Què Diuen els Nostres Usuaris",
+				"testimonial1": {
+					"text": "Abans perdía molt de temps trucant a restaurants per preguntar sobre el menú del dia. Ara només obro Menuteca i ho veig tot en segons!",
+					"author": "Maria G.",
+					"role": "Barcelona"
+				},
+				"testimonial2": {
+					"text": "Com a propietari de restaurant, aquesta app ha estat un canvi radical. La funcionalitat de menú amb IA m'estalvia 10 minuts cada matí, i estem aconseguint més clients de dinar que mai.",
+					"author": "Carlos R.",
+					"role": "Propietari de Restaurant"
+				},
+				"testimonial3": {
+					"text": "Perfecte per trobar opcions de dinar assequibles a prop de la meva oficina. M'encanta que pugui veure tots els plats abans d'anar-hi. No més sorpreses!",
+					"author": "Jordi M.",
+					"role": "Barcelona"
+				}
+			},
+			"cta": {
+				"title": "Preparat per Descobrir Grans Menús?",
+				"text": "Descarrega Menuteca avui i no et tornis a preguntar què hi ha per dinar.",
+				"button": "Descarrega l'App"
+			}
+		}
 	}
 }

@@ -639,5 +639,204 @@
 		"addFirstMenu": "Ir a mis restaurantes",
 		"errorLoadingData": "Error al cargar los datos. Por favor, inténtalo de nuevo.",
 		"manageMenus": "Gestionar Menús"
+	},
+	"web": {
+		"nav": {
+			"product": "Producto",
+			"support": "Soporte",
+			"privacy": "Privacidad"
+		},
+		"footer": {
+			"rights": "Todos los derechos reservados."
+		},
+		"support": {
+			"title": "Soporte",
+			"subtitle": "Estamos aquí para ayudarte",
+			"email": "Email",
+			"phone": "Teléfono",
+			"responseTime": "Normalmente respondemos en 24-48 horas durante días laborables.",
+			"diners": {
+				"title": "Para Comensales",
+				"description": "¿Necesitas ayuda usando la app? ¿Tienes preguntas sobre restaurantes o menús? Estamos aquí para asistirte.",
+				"helpWith": "Te podemos ayudar con:",
+				"help1": "Problemas de cuenta e inicio de sesión",
+				"help2": "Preguntas sobre información de restaurantes",
+				"help3": "Cómo escribir y gestionar opiniones",
+				"help4": "Uso general de la app y funcionalidades"
+			},
+			"restaurants": {
+				"title": "Para Propietarios de Restaurantes",
+				"description": "¿Preguntas sobre la gestión de tu perfil de restaurante o menús? Nuestro equipo está listo para ayudar.",
+				"helpWith": "Te podemos ayudar con:",
+				"help1": "Configurar y gestionar el perfil de tu restaurante",
+				"help2": "Crear y actualizar menús",
+				"help3": "Procesamiento de fotos de menú con IA",
+				"help4": "Gestión de cuenta y configuración"
+			}
+		},
+		"privacy": {
+			"title": "Política de Privacidad",
+			"lastUpdated": "Última actualización",
+			"intro": {
+				"title": "Introducción",
+				"text1": "En Menuteca, respetamos tu privacidad y nos comprometemos a proteger tus datos personales. Esta política de privacidad explica cómo recopilamos, usamos y protegemos tu información cuando utilizas nuestra aplicación móvil.",
+				"text2": "Esta política cumple con el Reglamento General de Protección de Datos (RGPD) y las leyes españolas de protección de datos aplicables."
+			},
+			"dataCollect": {
+				"title": "Información que Recopilamos",
+				"diners": {
+					"title": "De los Comensales:",
+					"item1": "Información de cuenta: email, nombre, nombre de usuario",
+					"item2": "Datos de perfil: foto de perfil (opcional)",
+					"item3": "Contenido generado por el usuario: opiniones, valoraciones y fotos",
+					"item4": "Datos de ubicación: ubicación en tiempo real (con permiso) para la funcionalidad del mapa"
+				},
+				"restaurants": {
+					"title": "De los Propietarios de Restaurantes:",
+					"item1": "Información del negocio: nombre del restaurante, dirección, datos de contacto",
+					"item2": "Datos del menú: nombres de menús, precios, platos, descripciones",
+					"item3": "Multimedia: fotos del restaurante y platos",
+					"item4": "Información de cuenta: email, nombre de usuario"
+				}
+			},
+			"dataUse": {
+				"title": "Cómo Usamos Tus Datos",
+				"item1": "Proporcionar la funcionalidad principal del servicio (mostrar menús y restaurantes)",
+				"item2": "Permitir opiniones y valoraciones de usuarios",
+				"item3": "Permitir a los restaurantes gestionar sus perfiles y menús",
+				"item4": "Mostrar restaurantes cercanos relevantes basados en la ubicación",
+				"item5": "Mejorar la funcionalidad de la app y la experiencia del usuario"
+			},
+			"ai": {
+				"title": "Procesamiento de Menús con IA",
+				"text1": "Los propietarios de restaurantes pueden subir fotos de sus menús para ser procesadas por nuestro sistema de IA. Este sistema extrae automáticamente la información del menú (platos, precios, descripciones) para hacer la creación de menús más rápida.",
+				"text2": "Las fotos subidas para el procesamiento con IA se utilizan únicamente para la extracción del menú y no se almacenan permanentemente ni se usan para ningún otro propósito."
+			},
+			"sharing": {
+				"title": "Compartir Datos",
+				"text": "NO vendemos tus datos personales a terceros. Podemos compartir información solo en las siguientes circunstancias limitadas:",
+				"item1": "Las opiniones públicas son visibles para todos los usuarios de la app",
+				"item2": "Con proveedores de servicios que nos ayudan a operar la app (alojamiento, analíticas)",
+				"item3": "Cuando lo requiera la ley o para proteger nuestros derechos legales"
+			},
+			"gdpr": {
+				"title": "Tus Derechos (RGPD)",
+				"intro": "Bajo el RGPD, tienes los siguientes derechos respecto a tus datos personales:",
+				"right1": "Derecho de acceso a tus datos personales",
+				"right2": "Derecho de rectificación (actualizar o corregir información)",
+				"right3": "Derecho de supresión (solicitar la eliminación de datos)",
+				"right4": "Derecho a la portabilidad de datos (exportar tus datos)",
+				"right5": "Derecho a restringir el procesamiento",
+				"right6": "Derecho a oponerte al procesamiento",
+				"contact": "Para ejercer cualquiera de estos derechos, por favor contáctanos en admin@menutecaapp.com"
+			},
+			"cookies": {
+				"title": "Cookies y Rastreo",
+				"text1": "Nuestra app utiliza cookies y tecnologías de rastreo mínimas:",
+				"types": {
+					"title": "Tipos de datos almacenados:",
+					"essential": "Esenciales: Tokens de autenticación para mantenerte conectado",
+					"functional": "Funcionales: Preferencias de idioma, configuración de la app"
+				},
+				"text2": "No utilizamos cookies publicitarias de terceros ni te rastreamos en otros sitios web."
+			},
+			"retention": {
+				"title": "Retención de Datos",
+				"item1": "Cuentas activas: Los datos se retienen indefinidamente mientras la cuenta esté activa",
+				"item2": "Cuentas eliminadas: Los datos personales se eliminan en un plazo de 30 días",
+				"item3": "Opiniones públicas: Pueden permanecer anonimizadas después de la eliminación de la cuenta para preservar la integridad de las opiniones"
+			},
+			"security": {
+				"title": "Seguridad de los Datos",
+				"text": "Implementamos medidas técnicas y organizativas apropiadas para proteger tus datos personales contra el acceso no autorizado, alteración, divulgación o destrucción. Sin embargo, ningún método de transmisión por internet es 100% seguro."
+			},
+			"children": {
+				"title": "Privacidad de Menores",
+				"text": "Nuestro servicio no está destinado a usuarios menores de 13 años. No recopilamos intencionadamente información personal de niños menores de 13 años."
+			},
+			"changes": {
+				"title": "Cambios a Esta Política",
+				"text": "Podemos actualizar esta política de privacidad de vez en cuando. Te notificaremos de cualquier cambio actualizando la fecha de 'Última actualización' en la parte superior de esta política."
+			},
+			"contact": {
+				"title": "Contáctanos",
+				"text": "Si tienes preguntas sobre esta política de privacidad o cómo manejamos tus datos, por favor contáctanos:",
+				"phone": "Teléfono"
+			}
+		},
+		"product": {
+			"comingSoon": "¡Próximamente en la App Store y Google Play!",
+			"hero": {
+				"title": "Descubre los mejores menús del día cerca de ti",
+				"subtitle": "La única app dedicada exclusivamente a menús de precio fijo de restaurantes. Encuentra menús del día, especiales de fin de semana y menús degustación con total transparencia.",
+				"cta": "Descarga la App"
+			},
+			"features": {
+				"title": "¿Por Qué Elegir Menuteca?",
+				"feature1": {
+					"title": "Enfoque Exclusivo en Menús del Día",
+					"text": "Sin distracciones. Solo mostramos restaurantes con menús de precio fijo, haciendo tu búsqueda rápida y enfocada."
+				},
+				"feature2": {
+					"title": "Ubicación en Tiempo Real",
+					"text": "Encuentra restaurantes cerca de ti con nuestro mapa interactivo. Ve exactamente dónde está cada restaurante y a qué distancia."
+				},
+				"feature3": {
+					"title": "Transparencia Total de Precios",
+					"text": "Todos los precios son visibles por adelantado. Ve exactamente qué está incluido: pan, bebidas, café, postre y cualquier suplemento."
+				},
+				"feature4": {
+					"title": "Siempre Actualizado",
+					"text": "Los restaurantes actualizan sus menús diariamente. No más información desactualizada o sorpresas al llegar."
+				},
+				"feature5": {
+					"title": "Creación de Menús con IA",
+					"text": "Para restaurantes: toma una foto de tu pizarra de menú y nuestra IA lo convierte a digital en segundos."
+				},
+				"feature6": {
+					"title": "Opiniones Auténticas",
+					"text": "Opiniones reales de comensales reales con fotos. Ve lo que otros experimentaron antes de ir."
+				}
+			},
+			"restaurants": {
+				"title": "Para Restaurantes",
+				"subtitle": "Atrae más clientes mostrando tus menús del día",
+				"benefit1": {
+					"title": "100% Gratis Para Siempre",
+					"text": "Sin cuotas de suscripción, sin comisiones, sin costes ocultos. Registra hasta 10 restaurantes completamente gratis."
+				},
+				"benefit2": {
+					"title": "Actualiza Menús en Segundos",
+					"text": "Toma una foto de tu pizarra de menú y nuestra IA hace el resto. O edita manualmente cuando quieras."
+				},
+				"benefit3": {
+					"title": "Alcanza Clientes Hambrientos",
+					"text": "Tus menús aparecen a usuarios que buscan cerca. Sé descubierto por personas que buscan exactamente lo que ofreces."
+				}
+			},
+			"testimonials": {
+				"title": "Lo Que Dicen Nuestros Usuarios",
+				"testimonial1": {
+					"text": "Solía perder mucho tiempo llamando a restaurantes para preguntar por su menú del día. ¡Ahora solo abro Menuteca y veo todo en segundos!",
+					"author": "María G.",
+					"role": "Barcelona"
+				},
+				"testimonial2": {
+					"text": "Como propietario de restaurante, esta app ha sido un cambio radical. La función de menú con IA me ahorra 10 minutos cada mañana, y estamos recibiendo más clientes para comer que nunca.",
+					"author": "Carlos R.",
+					"role": "Propietario de Restaurante"
+				},
+				"testimonial3": {
+					"text": "Perfecto para encontrar opciones de almuerzo asequibles cerca de mi oficina. Me encanta que puedo ver todos los platos antes de ir. ¡Sin más sorpresas!",
+					"author": "Jordi M.",
+					"role": "Barcelona"
+				}
+			},
+			"cta": {
+				"title": "¿Listo para Descubrir Grandes Menús?",
+				"text": "Descarga Menuteca hoy y nunca más te preguntes qué hay para comer.",
+				"button": "Obtén la App"
+			}
+		}
 	}
 }
