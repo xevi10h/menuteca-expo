@@ -42,3 +42,9 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
+
+# Keystore files
+*.keystore
+keystore.properties
+*.aab
+*.keystore.old

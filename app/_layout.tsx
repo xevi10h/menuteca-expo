@@ -26,7 +26,7 @@ export default function RootLayout() {
 	});
 	const [showCustomLoading, setShowCustomLoading] = useState(false);
 
-	// Check if we're on a web marketing page (skip loading screen for those)
+	// Check if we're on a web marketing page (skip loading screen and initialization for those)
 	const isWebMarketingPage =
 		typeof window !== 'undefined' &&
 		(window.location.pathname.includes('/product') ||
@@ -34,11 +34,15 @@ export default function RootLayout() {
 			window.location.pathname.includes('/privacy'));
 
 	// Use the app initialization hook (skip for marketing pages)
-	const { isInitialized, isLoading, error } = useAppInitialization();
+	const { isInitialized, isLoading, error} = isWebMarketingPage
+		? { isInitialized: true, isLoading: false, error: null }
+		: useAppInitialization();
 
-	// Authentication state
+	// Authentication state (skip for marketing pages)
 	const isAuthenticated = useUserStore((state) => state.isAuthenticated);
-	const userLoading = useUserStore((state) => state.isLoading);
+	const userLoading = isWebMarketingPage
+		? false
+		: useUserStore((state) => state.isLoading);
 
 	// Handle deep linking
 	useEffect(() => {

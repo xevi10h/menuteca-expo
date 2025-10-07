@@ -5,7 +5,7 @@
   publish = "dist"
 
   # Build command
-  command = "npm run build:web"
+  command = "node scripts/web-build.js"
 
 # Deep linking files - exclude from SPA redirect
 [[redirects]]
@@ -77,10 +77,10 @@
 
 # Deploy contexts
 [context.production]
-  command = "npm run build:web"
+  command = "node scripts/web-build.js"
 
 [context.deploy-preview]
-  command = "npm run build:web"
+  command = "node scripts/web-build.js"
 
 [context.branch-deploy]
-  command = "npm run build:web"
+  command = "node scripts/web-build.js"

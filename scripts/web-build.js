@@ -57,7 +57,7 @@ console.log('🚀 Starting Expo web build...');
 
 try {
 	// Run the expo export command
-	execSync('NODE_ENV=production expo export --platform web', {
+	execSync('NODE_ENV=production npx expo export --platform web', {
 		stdio: 'inherit',
 		cwd: process.cwd(),
 	});
@@ -118,6 +118,17 @@ try {
 		console.log('✅ Copied favicon.png');
 	} else {
 		console.warn('⚠️  favicon.png not found at', faviconSource);
+	}
+
+	// Fix HTML to add type="module" to script tags
+	console.log('🔧 Fixing HTML script tags for module support...');
+	const indexHtmlPath = path.join(distDir, 'index.html');
+	if (fs.existsSync(indexHtmlPath)) {
+		let html = fs.readFileSync(indexHtmlPath, 'utf8');
+		// Add type="module" to all script tags
+		html = html.replace(/<script src=/g, '<script type="module" src=');
+		fs.writeFileSync(indexHtmlPath, html);
+		console.log('✅ Fixed index.html script tags');
 	}
 } catch (error) {
 	console.error('❌ Build failed:', error.message);
