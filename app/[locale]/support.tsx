@@ -22,72 +22,149 @@ export default function SupportPage() {
 	return (
 		<WebLayout locale={currentLocale}>
 			<View style={styles.container}>
-				<Text style={styles.title}>{i18n.t('web.support.title')}</Text>
-				<Text style={styles.subtitle}>{i18n.t('web.support.subtitle')}</Text>
-
-				{/* For Diners */}
-				<View style={styles.section}>
-					<Text style={styles.sectionTitle}>{i18n.t('web.support.diners.title')}</Text>
-					<Text style={styles.sectionText}>{i18n.t('web.support.diners.description')}</Text>
-
-					<View style={styles.contactBox}>
-						<View style={styles.contactItem}>
-							<Text style={styles.contactLabel}>{i18n.t('web.support.email')}</Text>
-							<Pressable onPress={handleEmail}>
-								<Text style={styles.contactValue}>admin@menutecaapp.com</Text>
-							</Pressable>
-						</View>
-						<View style={styles.contactItem}>
-							<Text style={styles.contactLabel}>{i18n.t('web.support.phone')}</Text>
-							<Pressable onPress={handlePhone}>
-								<Text style={styles.contactValue}>+34 606 404 251</Text>
-							</Pressable>
-						</View>
-					</View>
-
-					<View style={styles.helpList}>
-						<Text style={styles.helpTitle}>{i18n.t('web.support.diners.helpWith')}</Text>
-						<Text style={styles.helpItem}>• {i18n.t('web.support.diners.help1')}</Text>
-						<Text style={styles.helpItem}>• {i18n.t('web.support.diners.help2')}</Text>
-						<Text style={styles.helpItem}>• {i18n.t('web.support.diners.help3')}</Text>
-						<Text style={styles.helpItem}>• {i18n.t('web.support.diners.help4')}</Text>
+				{/* Hero Section */}
+				<View style={styles.hero}>
+					<View style={styles.heroContent}>
+						<Text style={styles.heroTitle}>{i18n.t('web.support.title')}</Text>
+						<Text style={styles.heroSubtitle}>{i18n.t('web.support.subtitle')}</Text>
 					</View>
 				</View>
 
-				{/* For Restaurants */}
-				<View style={styles.section}>
-					<Text style={styles.sectionTitle}>{i18n.t('web.support.restaurants.title')}</Text>
-					<Text style={styles.sectionText}>
-						{i18n.t('web.support.restaurants.description')}
-					</Text>
-
-					<View style={styles.contactBox}>
-						<View style={styles.contactItem}>
-							<Text style={styles.contactLabel}>{i18n.t('web.support.email')}</Text>
-							<Pressable onPress={handleEmail}>
-								<Text style={styles.contactValue}>admin@menutecaapp.com</Text>
-							</Pressable>
+				{/* Contact Cards Grid */}
+				<View style={styles.cardsGrid}>
+					{/* For Diners Card */}
+					<View style={styles.card}>
+						<View style={styles.cardHeader}>
+							<View style={styles.iconContainer}>
+								<Text style={styles.icon}>🍽️</Text>
+							</View>
+							<Text style={styles.cardTitle}>{i18n.t('web.support.diners.title')}</Text>
 						</View>
-						<View style={styles.contactItem}>
-							<Text style={styles.contactLabel}>{i18n.t('web.support.phone')}</Text>
-							<Pressable onPress={handlePhone}>
-								<Text style={styles.contactValue}>+34 606 404 251</Text>
-							</Pressable>
+
+						<Text style={styles.cardDescription}>{i18n.t('web.support.diners.description')}</Text>
+
+						<View style={styles.contactBox}>
+							<View style={styles.contactRow}>
+								<View style={styles.contactIconBox}>
+									<Text style={styles.contactIcon}>📧</Text>
+								</View>
+								<View style={styles.contactInfo}>
+									<Text style={styles.contactLabel}>{i18n.t('web.support.email')}</Text>
+									<Pressable onPress={handleEmail}>
+										<Text style={styles.contactValue}>admin@menutecaapp.com</Text>
+									</Pressable>
+								</View>
+							</View>
+
+							<View style={styles.divider} />
+
+							<View style={styles.contactRow}>
+								<View style={styles.contactIconBox}>
+									<Text style={styles.contactIcon}>📱</Text>
+								</View>
+								<View style={styles.contactInfo}>
+									<Text style={styles.contactLabel}>{i18n.t('web.support.phone')}</Text>
+									<Pressable onPress={handlePhone}>
+										<Text style={styles.contactValue}>+34 606 404 251</Text>
+									</Pressable>
+								</View>
+							</View>
+						</View>
+
+						<View style={styles.helpSection}>
+							<Text style={styles.helpTitle}>{i18n.t('web.support.diners.helpWith')}</Text>
+							<View style={styles.helpList}>
+								<View style={styles.helpItem}>
+									<View style={styles.bullet} />
+									<Text style={styles.helpText}>{i18n.t('web.support.diners.help1')}</Text>
+								</View>
+								<View style={styles.helpItem}>
+									<View style={styles.bullet} />
+									<Text style={styles.helpText}>{i18n.t('web.support.diners.help2')}</Text>
+								</View>
+								<View style={styles.helpItem}>
+									<View style={styles.bullet} />
+									<Text style={styles.helpText}>{i18n.t('web.support.diners.help3')}</Text>
+								</View>
+								<View style={styles.helpItem}>
+									<View style={styles.bullet} />
+									<Text style={styles.helpText}>{i18n.t('web.support.diners.help4')}</Text>
+								</View>
+							</View>
 						</View>
 					</View>
 
-					<View style={styles.helpList}>
-						<Text style={styles.helpTitle}>{i18n.t('web.support.restaurants.helpWith')}</Text>
-						<Text style={styles.helpItem}>• {i18n.t('web.support.restaurants.help1')}</Text>
-						<Text style={styles.helpItem}>• {i18n.t('web.support.restaurants.help2')}</Text>
-						<Text style={styles.helpItem}>• {i18n.t('web.support.restaurants.help3')}</Text>
-						<Text style={styles.helpItem}>• {i18n.t('web.support.restaurants.help4')}</Text>
+					{/* For Restaurants Card */}
+					<View style={styles.card}>
+						<View style={styles.cardHeader}>
+							<View style={[styles.iconContainer, styles.iconContainerSecondary]}>
+								<Text style={styles.icon}>🏪</Text>
+							</View>
+							<Text style={styles.cardTitle}>{i18n.t('web.support.restaurants.title')}</Text>
+						</View>
+
+						<Text style={styles.cardDescription}>
+							{i18n.t('web.support.restaurants.description')}
+						</Text>
+
+						<View style={styles.contactBox}>
+							<View style={styles.contactRow}>
+								<View style={styles.contactIconBox}>
+									<Text style={styles.contactIcon}>📧</Text>
+								</View>
+								<View style={styles.contactInfo}>
+									<Text style={styles.contactLabel}>{i18n.t('web.support.email')}</Text>
+									<Pressable onPress={handleEmail}>
+										<Text style={styles.contactValue}>admin@menutecaapp.com</Text>
+									</Pressable>
+								</View>
+							</View>
+
+							<View style={styles.divider} />
+
+							<View style={styles.contactRow}>
+								<View style={styles.contactIconBox}>
+									<Text style={styles.contactIcon}>📱</Text>
+								</View>
+								<View style={styles.contactInfo}>
+									<Text style={styles.contactLabel}>{i18n.t('web.support.phone')}</Text>
+									<Pressable onPress={handlePhone}>
+										<Text style={styles.contactValue}>+34 606 404 251</Text>
+									</Pressable>
+								</View>
+							</View>
+						</View>
+
+						<View style={styles.helpSection}>
+							<Text style={styles.helpTitle}>{i18n.t('web.support.restaurants.helpWith')}</Text>
+							<View style={styles.helpList}>
+								<View style={styles.helpItem}>
+									<View style={styles.bullet} />
+									<Text style={styles.helpText}>{i18n.t('web.support.restaurants.help1')}</Text>
+								</View>
+								<View style={styles.helpItem}>
+									<View style={styles.bullet} />
+									<Text style={styles.helpText}>{i18n.t('web.support.restaurants.help2')}</Text>
+								</View>
+								<View style={styles.helpItem}>
+									<View style={styles.bullet} />
+									<Text style={styles.helpText}>{i18n.t('web.support.restaurants.help3')}</Text>
+								</View>
+								<View style={styles.helpItem}>
+									<View style={styles.bullet} />
+									<Text style={styles.helpText}>{i18n.t('web.support.restaurants.help4')}</Text>
+								</View>
+							</View>
+						</View>
 					</View>
 				</View>
 
-				{/* Response Time */}
-				<View style={styles.infoBox}>
-					<Text style={styles.infoText}>{i18n.t('web.support.responseTime')}</Text>
+				{/* Response Time Banner */}
+				<View style={styles.banner}>
+					<View style={styles.bannerIcon}>
+						<Text style={styles.bannerIconText}>⏱️</Text>
+					</View>
+					<Text style={styles.bannerText}>{i18n.t('web.support.responseTime')}</Text>
 				</View>
 			</View>
 		</WebLayout>
@@ -98,58 +175,127 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 	},
-	title: {
-		fontSize: 48,
-		fontWeight: '700',
-		color: colors.primary,
-		marginBottom: 16,
-		textAlign: 'center',
+	// Hero Section
+	hero: {
+		alignItems: 'center',
+		marginBottom: 72,
 	},
-	subtitle: {
-		fontSize: 18,
-		color: colors.tertiary,
-		marginBottom: 48,
+	heroContent: {
+		alignItems: 'center',
+		maxWidth: 800,
+	},
+	heroTitle: {
+		fontSize: 56,
+		fontWeight: '800',
+		color: colors.primary,
+		marginBottom: 20,
 		textAlign: 'center',
+		lineHeight: 64,
+		letterSpacing: -1,
+	},
+	heroSubtitle: {
+		fontSize: 20,
+		color: colors.tertiary,
+		textAlign: 'center',
+		lineHeight: 32,
+		fontWeight: '400',
 		opacity: 0.8,
 	},
-	section: {
-		marginBottom: 48,
-		padding: 32,
-		backgroundColor: colors.quaternary,
-		borderRadius: 12,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.1,
-		shadowRadius: 8,
-		elevation: 3,
+	// Cards Grid
+	cardsGrid: {
+		flexDirection: 'row',
+		flexWrap: 'wrap',
+		gap: 32,
+		justifyContent: 'center',
+		marginBottom: 64,
 	},
-	sectionTitle: {
+	card: {
+		backgroundColor: colors.quaternary,
+		borderRadius: 24,
+		padding: 48,
+		width: 580,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 8 },
+		shadowOpacity: 0.1,
+		shadowRadius: 24,
+		elevation: 6,
+		borderWidth: 1,
+		borderColor: 'rgba(0, 0, 0, 0.05)',
+	},
+	cardHeader: {
+		alignItems: 'center',
+		marginBottom: 24,
+	},
+	iconContainer: {
+		width: 80,
+		height: 80,
+		borderRadius: 20,
+		backgroundColor: colors.primaryLighter,
+		alignItems: 'center',
+		justifyContent: 'center',
+		marginBottom: 20,
+	},
+	iconContainerSecondary: {
+		backgroundColor: '#FFE5E5',
+	},
+	icon: {
+		fontSize: 40,
+	},
+	cardTitle: {
 		fontSize: 32,
 		fontWeight: '700',
 		color: colors.primary,
-		marginBottom: 16,
+		textAlign: 'center',
+		letterSpacing: -0.5,
 	},
-	sectionText: {
-		fontSize: 16,
+	cardDescription: {
+		fontSize: 17,
 		color: colors.tertiary,
-		marginBottom: 24,
-		lineHeight: 24,
+		marginBottom: 32,
+		lineHeight: 28,
+		textAlign: 'center',
+		fontWeight: '400',
 	},
+	// Contact Box
 	contactBox: {
-		backgroundColor: colors.secondary,
-		borderRadius: 8,
-		padding: 24,
-		marginBottom: 24,
+		backgroundColor: '#F5F5F5',
+		borderRadius: 16,
+		padding: 28,
+		marginBottom: 32,
+		borderWidth: 1,
+		borderColor: 'rgba(0, 0, 0, 0.06)',
+	},
+	contactRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
 		gap: 16,
 	},
-	contactItem: {
+	contactIconBox: {
+		width: 52,
+		height: 52,
+		borderRadius: 12,
+		backgroundColor: colors.quaternary,
+		alignItems: 'center',
+		justifyContent: 'center',
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.05,
+		shadowRadius: 4,
+	},
+	contactIcon: {
+		fontSize: 24,
+	},
+	contactInfo: {
+		flex: 1,
 		gap: 4,
 	},
 	contactLabel: {
-		fontSize: 14,
+		fontSize: 13,
 		color: colors.primary,
 		fontWeight: '600',
-		opacity: 0.7,
+		opacity: 0.6,
+		textTransform: 'uppercase',
+		letterSpacing: 0.5,
 	},
 	contactValue: {
 		fontSize: 18,
@@ -157,30 +303,72 @@ const styles = StyleSheet.create({
 		fontWeight: '600',
 		textDecorationLine: 'underline',
 	},
-	helpList: {
-		gap: 8,
+	divider: {
+		height: 1,
+		backgroundColor: 'rgba(0, 0, 0, 0.08)',
+		marginVertical: 20,
+	},
+	// Help Section
+	helpSection: {
+		gap: 16,
 	},
 	helpTitle: {
-		fontSize: 16,
-		fontWeight: '600',
+		fontSize: 18,
+		fontWeight: '700',
 		color: colors.primary,
 		marginBottom: 8,
+		letterSpacing: 0.3,
+	},
+	helpList: {
+		gap: 12,
 	},
 	helpItem: {
-		fontSize: 15,
+		flexDirection: 'row',
+		alignItems: 'flex-start',
+		gap: 12,
+	},
+	bullet: {
+		width: 6,
+		height: 6,
+		borderRadius: 3,
+		backgroundColor: colors.primary,
+		marginTop: 8,
+	},
+	helpText: {
+		flex: 1,
+		fontSize: 16,
 		color: colors.tertiary,
-		lineHeight: 24,
+		lineHeight: 26,
+		fontWeight: '400',
 	},
-	infoBox: {
+	// Response Time Banner
+	banner: {
 		backgroundColor: colors.primaryLighter,
-		borderRadius: 8,
-		padding: 24,
-		marginTop: 32,
+		borderRadius: 20,
+		padding: 32,
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: 20,
+		borderWidth: 2,
+		borderColor: colors.primary,
+		borderStyle: 'dashed',
 	},
-	infoText: {
-		fontSize: 15,
+	bannerIcon: {
+		width: 56,
+		height: 56,
+		borderRadius: 28,
+		backgroundColor: colors.quaternary,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	bannerIconText: {
+		fontSize: 28,
+	},
+	bannerText: {
+		flex: 1,
+		fontSize: 17,
 		color: colors.primary,
-		textAlign: 'center',
-		lineHeight: 22,
+		lineHeight: 26,
+		fontWeight: '600',
 	},
 });

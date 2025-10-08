@@ -16,7 +16,7 @@ export function WebLayout({ children, locale }: WebLayoutProps) {
 	const currentYear = new Date().getFullYear();
 
 	return (
-		<View style={styles.container}>
+		<ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
 			{/* Header */}
 			<View style={styles.header}>
 				<View style={styles.headerContent}>
@@ -67,9 +67,11 @@ export function WebLayout({ children, locale }: WebLayoutProps) {
 			</View>
 
 			{/* Main Content */}
-			<ScrollView style={styles.main} contentContainerStyle={styles.mainContent}>
-				{children}
-			</ScrollView>
+			<View style={styles.main}>
+				<View style={styles.mainContent}>
+					{children}
+				</View>
+			</View>
 
 			{/* Footer */}
 			<View style={styles.footer}>
@@ -90,7 +92,7 @@ export function WebLayout({ children, locale }: WebLayoutProps) {
 					</View>
 				</View>
 			</View>
-		</View>
+		</ScrollView>
 	);
 }
 
@@ -104,18 +106,26 @@ function getCurrentPage(locale: string): string {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: colors.secondary,
+		backgroundColor: '#FAFAFA',
+	},
+	scrollContent: {
+		flexGrow: 1,
 	},
 	header: {
 		backgroundColor: colors.quaternary,
 		borderBottomWidth: 1,
-		borderBottomColor: colors.secondaryDark,
-		paddingVertical: 16,
+		borderBottomColor: 'rgba(0, 0, 0, 0.06)',
+		paddingVertical: 20,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.05,
+		shadowRadius: 10,
+		elevation: 3,
 	},
 	headerContent: {
-		maxWidth: 1200,
+		maxWidth: 1280,
 		marginHorizontal: 'auto',
-		paddingHorizontal: 24,
+		paddingHorizontal: 40,
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
@@ -125,32 +135,40 @@ const styles = StyleSheet.create({
 		textDecorationLine: 'none',
 	},
 	logo: {
-		width: 120,
-		height: 40,
+		width: 140,
+		height: 45,
 	},
 	nav: {
 		flexDirection: 'row',
-		gap: 32,
+		gap: 40,
 		alignItems: 'center',
 	},
 	navLink: {
 		textDecorationLine: 'none',
+		paddingVertical: 8,
+		paddingHorizontal: 4,
 	},
 	navText: {
 		color: colors.primary,
 		fontSize: 16,
-		fontWeight: '500',
+		fontWeight: '600',
+		letterSpacing: 0.3,
 	},
 	languageSelector: {
 		flexDirection: 'row',
-		gap: 8,
+		gap: 10,
 		alignItems: 'center',
+		backgroundColor: 'rgba(0, 0, 0, 0.03)',
+		paddingVertical: 8,
+		paddingHorizontal: 16,
+		borderRadius: 20,
 	},
 	langText: {
 		color: colors.primary,
 		fontSize: 14,
-		fontWeight: '500',
-		opacity: 0.6,
+		fontWeight: '600',
+		opacity: 0.5,
+		letterSpacing: 0.5,
 	},
 	langTextActive: {
 		opacity: 1,
@@ -158,40 +176,42 @@ const styles = StyleSheet.create({
 	},
 	langSeparator: {
 		color: colors.primary,
-		opacity: 0.3,
+		opacity: 0.2,
+		fontSize: 12,
 	},
 	main: {
 		flex: 1,
+		backgroundColor: '#FAFAFA',
 	},
 	mainContent: {
-		maxWidth: 1200,
+		maxWidth: 1280,
 		marginHorizontal: 'auto',
-		paddingHorizontal: 24,
-		paddingVertical: 48,
+		paddingHorizontal: 40,
+		paddingVertical: 64,
 		width: '100%',
 	},
 	footer: {
 		backgroundColor: colors.primary,
-		paddingVertical: 32,
-		borderTopWidth: 1,
-		borderTopColor: colors.primaryLight,
+		paddingVertical: 48,
 	},
 	footerContent: {
-		maxWidth: 1200,
+		maxWidth: 1280,
 		marginHorizontal: 'auto',
-		paddingHorizontal: 24,
+		paddingHorizontal: 40,
 		width: '100%',
 		alignItems: 'center',
-		gap: 16,
+		gap: 20,
 	},
 	footerText: {
 		color: colors.secondary,
-		fontSize: 14,
+		fontSize: 15,
 		textAlign: 'center',
+		fontWeight: '500',
+		opacity: 0.9,
 	},
 	footerLinks: {
 		flexDirection: 'row',
-		gap: 8,
+		gap: 12,
 		alignItems: 'center',
 		flexWrap: 'wrap',
 		justifyContent: 'center',
@@ -199,10 +219,12 @@ const styles = StyleSheet.create({
 	footerLink: {
 		color: colors.secondary,
 		fontSize: 14,
-		opacity: 0.8,
+		opacity: 0.85,
+		fontWeight: '500',
 	},
 	footerSeparator: {
 		color: colors.secondary,
-		opacity: 0.5,
+		opacity: 0.4,
+		fontSize: 16,
 	},
 });
