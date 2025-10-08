@@ -9,6 +9,7 @@ import {
 	Alert,
 	Image,
 	KeyboardAvoidingView,
+	Linking,
 	Platform,
 	ScrollView,
 	StyleSheet,
@@ -20,7 +21,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function RegisterScreen() {
-	const { t } = useTranslation();
+	const { t, locale } = useTranslation();
 	const router = useRouter();
 	const register = useUserStore((state) => state.register);
 	const checkEmailAvailability = useUserStore(
@@ -181,8 +182,10 @@ export default function RegisterScreen() {
 	};
 
 	const handleTermsPress = () => {
-		// TODO: Open terms and conditions
-		Alert.alert(t('auth.terms'), t('auth.termsMessage'));
+		const validLocales = ['ca_ES', 'es_ES', 'en_US', 'fr_FR'];
+		const currentLocale = validLocales.includes(locale) ? locale : 'en_US';
+		const url = `https://menutecaapp.com/${currentLocale}/privacy`;
+		Linking.openURL(url);
 	};
 
 	return (
@@ -373,14 +376,12 @@ export default function RegisterScreen() {
 									)}
 								</View>
 								<View style={styles.termsTextContainer}>
-									<Text style={styles.termsText}>
-										{t('auth.iAccept')}{' '}
-										<TouchableOpacity onPress={handleTermsPress}>
-											<Text style={styles.termsLink}>
-												{t('auth.termsAndConditions')}
-											</Text>
-										</TouchableOpacity>
-									</Text>
+									<Text style={styles.termsText}>{t('auth.iAccept')} </Text>
+									<TouchableOpacity onPress={handleTermsPress}>
+										<Text style={styles.termsLink}>
+											{t('auth.termsAndConditions')}
+										</Text>
+									</TouchableOpacity>
 								</View>
 							</TouchableOpacity>
 							{termsError ? (
@@ -554,6 +555,8 @@ const styles = StyleSheet.create({
 	},
 	termsTextContainer: {
 		flex: 1,
+		flexDirection: 'row',
+		alignItems: 'center',
 	},
 	termsText: {
 		fontSize: 14,
