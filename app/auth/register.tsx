@@ -184,7 +184,7 @@ export default function RegisterScreen() {
 	const handleTermsPress = () => {
 		const validLocales = ['ca_ES', 'es_ES', 'en_US', 'fr_FR'];
 		const currentLocale = validLocales.includes(locale) ? locale : 'en_US';
-		const url = `https://menutecaapp.com/${currentLocale}/privacy`;
+		const url = `https://menutecaapp.com/${currentLocale}/terms`;
 		Linking.openURL(url);
 	};
 

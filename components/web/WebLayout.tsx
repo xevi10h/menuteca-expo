@@ -37,6 +37,9 @@ export function WebLayout({ children, locale }: WebLayoutProps) {
 						<Link href={`/${locale}/privacy`} style={styles.navLink}>
 							<Text style={styles.navText}>{i18n.t('web.nav.privacy')}</Text>
 						</Link>
+						<Link href={`/${locale}/terms`} style={styles.navLink}>
+							<Text style={styles.navText}>{i18n.t('web.nav.terms')}</Text>
+						</Link>
 					</View>
 					<View style={styles.languageSelector}>
 						<Link href={`/ca_ES/${getCurrentPage(locale)}`}>
@@ -82,6 +85,10 @@ export function WebLayout({ children, locale }: WebLayoutProps) {
 					<View style={styles.footerLinks}>
 						<Link href={`/${locale}/privacy`}>
 							<Text style={styles.footerLink}>{i18n.t('web.nav.privacy')}</Text>
+						</Link>
+						<Text style={styles.footerSeparator}>·</Text>
+						<Link href={`/${locale}/terms`}>
+							<Text style={styles.footerLink}>{i18n.t('web.nav.terms')}</Text>
 						</Link>
 						<Text style={styles.footerSeparator}>·</Text>
 						<Link href={`/${locale}/support`}>

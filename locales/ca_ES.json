@@ -645,7 +645,8 @@
 		"nav": {
 			"product": "Producte",
 			"support": "Suport",
-			"privacy": "Privacitat"
+			"privacy": "Privacitat",
+			"terms": "Termes"
 		},
 		"footer": {
 			"rights": "Tots els drets reservats."
@@ -837,6 +838,113 @@
 				"title": "Preparat per Descobrir Grans Menús?",
 				"text": "Descarrega Menuteca avui i no et tornis a preguntar què hi ha per dinar.",
 				"button": "Descarrega l'App"
+			}
+		},
+		"terms": {
+			"title": "Termes i Condicions",
+			"lastUpdated": "Última actualització",
+			"intro": {
+				"title": "Introducció",
+				"text1": "Benvingut a Menuteca. En accedir o utilitzar la nostra aplicació mòbil, acceptes estar subjecte a aquests Termes i Condicions.",
+				"text2": "Llegeix atentament aquests termes abans d'utilitzar el nostre servei. Si no estàs d'acord amb alguna part d'aquests termes, no podràs utilitzar la nostra aplicació."
+			},
+			"acceptance": {
+				"title": "Acceptació dels Termes",
+				"text": "En crear un compte i utilitzar Menuteca, reconèixes que has llegit, comprès i acceptes estar subjecte a aquests Termes i Condicions, així com a la nostra Política de Privacitat."
+			},
+			"userAccounts": {
+				"title": "Comptes d'Usuari",
+				"subtitle1": "Creació de Compte:",
+				"item1": "Has de tenir almenys 13 anys per utilitzar aquest servei",
+				"item2": "Has de proporcionar informació precisa i completa",
+				"item3": "Ets responsable de mantenir la seguretat del teu compte",
+				"item4": "No has de compartir les credencials del teu compte amb altres",
+				"subtitle2": "Tipus de Compte:",
+				"diner": "Compte de Comensal: Per a usuaris que volen descobrir restaurants i escriure ressenyes",
+				"restaurant": "Compte de Restaurant: Per a propietaris de restaurants que volen gestionar el perfil i els menús del seu establiment"
+			},
+			"userConduct": {
+				"title": "Conducta i Responsabilitats de l'Usuari",
+				"subtitle1": "Tots els Usuaris Han de:",
+				"item1": "Proporcionar informació veraç i precisa",
+				"item2": "No participar en activitats fraudulentes o enganyoses",
+				"item3": "No violar lleis o regulacions aplicables",
+				"item4": "No assetjar, abusar o fer mal a altres usuaris",
+				"item5": "No carregar programari maliciós o virus",
+				"subtitle2": "Els Comensals Han de:",
+				"diner1": "Escriure ressenyes honestes i genuïnes basades en experiències reals",
+				"diner2": "No publicar ressenyes falses, enganyoses o malicioses",
+				"diner3": "No publicar contingut ofensiu, discriminatori o inapropiat",
+				"diner4": "No intentar manipular qualificacions o ressenyes",
+				"subtitle3": "Els Propietaris de Restaurants Han de:",
+				"restaurant1": "Proporcionar informació precisa sobre el seu restaurant",
+				"restaurant2": "Mantenir la informació del menú actualitzada i precisa",
+				"restaurant3": "No crear ressenyes falses ni manipular qualificacions",
+				"restaurant4": "No fer-se passar per altres restaurants o usuaris"
+			},
+			"intellectualProperty": {
+				"title": "Propietat Intel·lectual",
+				"item1": "Propietat del Contingut: Conserves la propietat del contingut que puges (fotos, ressenyes, informació del menú)",
+				"item2": "Llicència a Menuteca: En pujar contingut, atorges a Menuteca una llicència mundial no exclusiva per utilitzar, mostrar i distribuir el teu contingut dins de l'aplicació",
+				"item3": "Propietat de l'App: Tots els drets sobre l'aplicació Menuteca, disseny i funcionalitat romanen amb Menuteca",
+				"item4": "Ús Prohibit: No pots copiar, modificar o fer enginyeria inversa de cap part de l'aplicació"
+			},
+			"reviews": {
+				"title": "Ressenyes i Contingut Generat per Usuaris",
+				"item1": "Les ressenyes han de basar-se en experiències personals genuïnes",
+				"item2": "Ens reservem el dret d'eliminar ressenyes que violin les nostres polítiques",
+				"item3": "Les ressenyes poden romandre a la plataforma fins i tot després de l'eliminació del compte per preservar la integritat de les ressenyes",
+				"item4": "Acceptes no publicar contingut difamatori, obscè o que infringeixi els drets d'altres"
+			},
+			"restaurantServices": {
+				"title": "Serveis per a Restaurants",
+				"free": {
+					"title": "Servei Gratuït:",
+					"text": "Menuteca és completament gratuït per a restaurants. Pots registrar fins a 10 restaurants per compte sense cap cost."
+				},
+				"ai": {
+					"title": "Processament de Menús amb IA:",
+					"text": "El nostre processament de fotos de menús amb IA es proporciona tal qual. Tot i que ens esforcem per la precisió, no podem garantir una precisió del 100% en l'extracció del menú. Els propietaris de restaurants són responsables de verificar i corregir les dades del menú generades per IA."
+				},
+				"noCommissions": {
+					"title": "Sense Comissions:",
+					"text": "No cobrem comissions per reserves o comandes. Qualsevol funció de reserva o contacte enllaça directament amb els sistemes propis del restaurant."
+				}
+			},
+			"disclaimers": {
+				"title": "Exoneracions de Responsabilitat i Limitacions",
+				"accuracy": {
+					"title": "Precisió de la Informació:",
+					"text": "Tot i que ens esforcem per mantenir informació precisa, no podem garantir que tota la informació del restaurant, menús i preus siguin sempre actuals o correctes. Els usuaris han de verificar els detalls directament amb els restaurants."
+				},
+				"service": {
+					"title": "Disponibilitat del Servei:",
+					"text": "Proporcionem el servei 'tal qual' sense garanties de cap tipus. No garantim un servei ininterromput o lliure d'errors."
+				},
+				"liability": {
+					"title": "Limitació de Responsabilitat:",
+					"text": "Menuteca no és responsable de disputes entre usuaris i restaurants, qualitat del menjar, al·lèrgies o experiències gastronòmiques. Som només una plataforma de descobriment."
+				}
+			},
+			"termination": {
+				"title": "Terminació de Compte",
+				"item1": "Pots eliminar el teu compte en qualsevol moment des de la configuració de l'aplicació",
+				"item2": "Ens reservem el dret de suspendre o terminar comptes que violin aquests termes",
+				"item3": "Després de la terminació, les teves dades personals seran eliminades segons el descrit a la nostra Política de Privacitat",
+				"item4": "Les ressenyes públiques poden romandre anonimitzades després de l'eliminació del compte"
+			},
+			"modifications": {
+				"title": "Modificacions dels Termes",
+				"text": "Podem actualitzar aquests Termes i Condicions de tant en tant. Notificarem els usuaris de canvis significatius a través de l'aplicació. L'ús continuat del servei després dels canvis constitueix l'acceptació dels nous termes."
+			},
+			"governingLaw": {
+				"title": "Llei Aplicable",
+				"text": "Aquests Termes i Condicions es regeixen per les lleis d'Espanya. Qualsevol disputa serà resolta als tribunals de Barcelona, Espanya."
+			},
+			"contact": {
+				"title": "Contacta'ns",
+				"text": "Si tens preguntes sobre aquests Termes i Condicions, contacta'ns:",
+				"phone": "Telèfon"
 			}
 		}
 	}

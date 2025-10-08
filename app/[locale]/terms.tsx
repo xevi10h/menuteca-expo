@@ -5,7 +5,7 @@ import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-export default function PrivacyPage() {
+export default function TermsPage() {
 	const { locale } = useLocalSearchParams<{ locale: string }>();
 	const currentLocale = locale || 'en_US';
 
@@ -18,9 +18,9 @@ export default function PrivacyPage() {
 			<View style={styles.container}>
 				{/* Hero Section */}
 				<View style={styles.hero}>
-					<Text style={styles.heroTitle}>{i18n.t('web.privacy.title')}</Text>
+					<Text style={styles.heroTitle}>{i18n.t('web.terms.title')}</Text>
 					<Text style={styles.lastUpdated}>
-						{i18n.t('web.privacy.lastUpdated')}: {lastUpdated}
+						{i18n.t('web.terms.lastUpdated')}: {lastUpdated}
 					</Text>
 				</View>
 
@@ -29,316 +29,372 @@ export default function PrivacyPage() {
 					{/* Introduction */}
 					<View style={styles.section}>
 						<Text style={styles.sectionTitle}>
-							{i18n.t('web.privacy.intro.title')}
+							{i18n.t('web.terms.intro.title')}
 						</Text>
 						<Text style={styles.paragraph}>
-							{i18n.t('web.privacy.intro.text1')}
+							{i18n.t('web.terms.intro.text1')}
 						</Text>
 						<Text style={styles.paragraph}>
-							{i18n.t('web.privacy.intro.text2')}
+							{i18n.t('web.terms.intro.text2')}
 						</Text>
 					</View>
 
-					{/* Data We Collect */}
+					{/* Acceptance */}
 					<View style={styles.section}>
 						<Text style={styles.sectionTitle}>
-							{i18n.t('web.privacy.dataCollect.title')}
+							{i18n.t('web.terms.acceptance.title')}
+						</Text>
+						<Text style={styles.paragraph}>
+							{i18n.t('web.terms.acceptance.text')}
+						</Text>
+					</View>
+
+					{/* User Accounts */}
+					<View style={styles.section}>
+						<Text style={styles.sectionTitle}>
+							{i18n.t('web.terms.userAccounts.title')}
 						</Text>
 
 						<Text style={styles.subsectionTitle}>
-							{i18n.t('web.privacy.dataCollect.diners.title')}
+							{i18n.t('web.terms.userAccounts.subtitle1')}
 						</Text>
 						<View style={styles.list}>
 							<View style={styles.listItem}>
 								<View style={styles.bullet} />
 								<Text style={styles.listText}>
-									{i18n.t('web.privacy.dataCollect.diners.item1')}
+									{i18n.t('web.terms.userAccounts.item1')}
 								</Text>
 							</View>
 							<View style={styles.listItem}>
 								<View style={styles.bullet} />
 								<Text style={styles.listText}>
-									{i18n.t('web.privacy.dataCollect.diners.item2')}
+									{i18n.t('web.terms.userAccounts.item2')}
 								</Text>
 							</View>
 							<View style={styles.listItem}>
 								<View style={styles.bullet} />
 								<Text style={styles.listText}>
-									{i18n.t('web.privacy.dataCollect.diners.item3')}
+									{i18n.t('web.terms.userAccounts.item3')}
 								</Text>
 							</View>
 							<View style={styles.listItem}>
 								<View style={styles.bullet} />
 								<Text style={styles.listText}>
-									{i18n.t('web.privacy.dataCollect.diners.item4')}
+									{i18n.t('web.terms.userAccounts.item4')}
 								</Text>
 							</View>
 						</View>
 
 						<Text style={styles.subsectionTitle}>
-							{i18n.t('web.privacy.dataCollect.restaurants.title')}
+							{i18n.t('web.terms.userAccounts.subtitle2')}
 						</Text>
 						<View style={styles.list}>
 							<View style={styles.listItem}>
 								<View style={styles.bullet} />
 								<Text style={styles.listText}>
-									{i18n.t('web.privacy.dataCollect.restaurants.item1')}
+									{i18n.t('web.terms.userAccounts.diner')}
 								</Text>
 							</View>
 							<View style={styles.listItem}>
 								<View style={styles.bullet} />
 								<Text style={styles.listText}>
-									{i18n.t('web.privacy.dataCollect.restaurants.item2')}
-								</Text>
-							</View>
-							<View style={styles.listItem}>
-								<View style={styles.bullet} />
-								<Text style={styles.listText}>
-									{i18n.t('web.privacy.dataCollect.restaurants.item3')}
-								</Text>
-							</View>
-							<View style={styles.listItem}>
-								<View style={styles.bullet} />
-								<Text style={styles.listText}>
-									{i18n.t('web.privacy.dataCollect.restaurants.item4')}
+									{i18n.t('web.terms.userAccounts.restaurant')}
 								</Text>
 							</View>
 						</View>
 					</View>
 
-					{/* How We Use Data */}
-					<View style={styles.section}>
-						<Text style={styles.sectionTitle}>
-							{i18n.t('web.privacy.dataUse.title')}
-						</Text>
-						<View style={styles.list}>
-							<View style={styles.listItem}>
-								<View style={styles.bullet} />
-								<Text style={styles.listText}>
-									{i18n.t('web.privacy.dataUse.item1')}
-								</Text>
-							</View>
-							<View style={styles.listItem}>
-								<View style={styles.bullet} />
-								<Text style={styles.listText}>
-									{i18n.t('web.privacy.dataUse.item2')}
-								</Text>
-							</View>
-							<View style={styles.listItem}>
-								<View style={styles.bullet} />
-								<Text style={styles.listText}>
-									{i18n.t('web.privacy.dataUse.item3')}
-								</Text>
-							</View>
-							<View style={styles.listItem}>
-								<View style={styles.bullet} />
-								<Text style={styles.listText}>
-									{i18n.t('web.privacy.dataUse.item4')}
-								</Text>
-							</View>
-							<View style={styles.listItem}>
-								<View style={styles.bullet} />
-								<Text style={styles.listText}>
-									{i18n.t('web.privacy.dataUse.item5')}
-								</Text>
-							</View>
-						</View>
-					</View>
-
-					{/* AI Processing */}
+					{/* User Conduct */}
 					<View style={[styles.section, styles.highlightSection]}>
 						<View style={styles.highlightHeader}>
-							<Text style={styles.highlightIcon}>🤖</Text>
+							<Text style={styles.highlightIcon}>⚖️</Text>
 							<Text style={styles.sectionTitle}>
-								{i18n.t('web.privacy.ai.title')}
+								{i18n.t('web.terms.userConduct.title')}
 							</Text>
 						</View>
-						<Text style={styles.paragraph}>
-							{i18n.t('web.privacy.ai.text1')}
-						</Text>
-						<Text style={styles.paragraph}>
-							{i18n.t('web.privacy.ai.text2')}
-						</Text>
-					</View>
 
-					{/* Data Sharing */}
-					<View style={styles.section}>
-						<Text style={styles.sectionTitle}>
-							{i18n.t('web.privacy.sharing.title')}
-						</Text>
-						<Text style={styles.paragraph}>
-							{i18n.t('web.privacy.sharing.text')}
+						<Text style={styles.subsectionTitle}>
+							{i18n.t('web.terms.userConduct.subtitle1')}
 						</Text>
 						<View style={styles.list}>
 							<View style={styles.listItem}>
 								<View style={styles.bullet} />
 								<Text style={styles.listText}>
-									{i18n.t('web.privacy.sharing.item1')}
+									{i18n.t('web.terms.userConduct.item1')}
 								</Text>
 							</View>
 							<View style={styles.listItem}>
 								<View style={styles.bullet} />
 								<Text style={styles.listText}>
-									{i18n.t('web.privacy.sharing.item2')}
+									{i18n.t('web.terms.userConduct.item2')}
 								</Text>
 							</View>
 							<View style={styles.listItem}>
 								<View style={styles.bullet} />
 								<Text style={styles.listText}>
-									{i18n.t('web.privacy.sharing.item3')}
+									{i18n.t('web.terms.userConduct.item3')}
+								</Text>
+							</View>
+							<View style={styles.listItem}>
+								<View style={styles.bullet} />
+								<Text style={styles.listText}>
+									{i18n.t('web.terms.userConduct.item4')}
+								</Text>
+							</View>
+							<View style={styles.listItem}>
+								<View style={styles.bullet} />
+								<Text style={styles.listText}>
+									{i18n.t('web.terms.userConduct.item5')}
+								</Text>
+							</View>
+						</View>
+
+						<Text style={styles.subsectionTitle}>
+							{i18n.t('web.terms.userConduct.subtitle2')}
+						</Text>
+						<View style={styles.list}>
+							<View style={styles.listItem}>
+								<View style={styles.bullet} />
+								<Text style={styles.listText}>
+									{i18n.t('web.terms.userConduct.diner1')}
+								</Text>
+							</View>
+							<View style={styles.listItem}>
+								<View style={styles.bullet} />
+								<Text style={styles.listText}>
+									{i18n.t('web.terms.userConduct.diner2')}
+								</Text>
+							</View>
+							<View style={styles.listItem}>
+								<View style={styles.bullet} />
+								<Text style={styles.listText}>
+									{i18n.t('web.terms.userConduct.diner3')}
+								</Text>
+							</View>
+							<View style={styles.listItem}>
+								<View style={styles.bullet} />
+								<Text style={styles.listText}>
+									{i18n.t('web.terms.userConduct.diner4')}
+								</Text>
+							</View>
+						</View>
+
+						<Text style={styles.subsectionTitle}>
+							{i18n.t('web.terms.userConduct.subtitle3')}
+						</Text>
+						<View style={styles.list}>
+							<View style={styles.listItem}>
+								<View style={styles.bullet} />
+								<Text style={styles.listText}>
+									{i18n.t('web.terms.userConduct.restaurant1')}
+								</Text>
+							</View>
+							<View style={styles.listItem}>
+								<View style={styles.bullet} />
+								<Text style={styles.listText}>
+									{i18n.t('web.terms.userConduct.restaurant2')}
+								</Text>
+							</View>
+							<View style={styles.listItem}>
+								<View style={styles.bullet} />
+								<Text style={styles.listText}>
+									{i18n.t('web.terms.userConduct.restaurant3')}
+								</Text>
+							</View>
+							<View style={styles.listItem}>
+								<View style={styles.bullet} />
+								<Text style={styles.listText}>
+									{i18n.t('web.terms.userConduct.restaurant4')}
 								</Text>
 							</View>
 						</View>
 					</View>
 
-					{/* GDPR Rights */}
+					{/* Intellectual Property */}
+					<View style={styles.section}>
+						<Text style={styles.sectionTitle}>
+							{i18n.t('web.terms.intellectualProperty.title')}
+						</Text>
+						<View style={styles.list}>
+							<View style={styles.listItem}>
+								<View style={styles.bullet} />
+								<Text style={styles.listText}>
+									{i18n.t('web.terms.intellectualProperty.item1')}
+								</Text>
+							</View>
+							<View style={styles.listItem}>
+								<View style={styles.bullet} />
+								<Text style={styles.listText}>
+									{i18n.t('web.terms.intellectualProperty.item2')}
+								</Text>
+							</View>
+							<View style={styles.listItem}>
+								<View style={styles.bullet} />
+								<Text style={styles.listText}>
+									{i18n.t('web.terms.intellectualProperty.item3')}
+								</Text>
+							</View>
+							<View style={styles.listItem}>
+								<View style={styles.bullet} />
+								<Text style={styles.listText}>
+									{i18n.t('web.terms.intellectualProperty.item4')}
+								</Text>
+							</View>
+						</View>
+					</View>
+
+					{/* Reviews */}
+					<View style={styles.section}>
+						<Text style={styles.sectionTitle}>
+							{i18n.t('web.terms.reviews.title')}
+						</Text>
+						<View style={styles.list}>
+							<View style={styles.listItem}>
+								<View style={styles.bullet} />
+								<Text style={styles.listText}>
+									{i18n.t('web.terms.reviews.item1')}
+								</Text>
+							</View>
+							<View style={styles.listItem}>
+								<View style={styles.bullet} />
+								<Text style={styles.listText}>
+									{i18n.t('web.terms.reviews.item2')}
+								</Text>
+							</View>
+							<View style={styles.listItem}>
+								<View style={styles.bullet} />
+								<Text style={styles.listText}>
+									{i18n.t('web.terms.reviews.item3')}
+								</Text>
+							</View>
+							<View style={styles.listItem}>
+								<View style={styles.bullet} />
+								<Text style={styles.listText}>
+									{i18n.t('web.terms.reviews.item4')}
+								</Text>
+							</View>
+						</View>
+					</View>
+
+					{/* Restaurant Services */}
 					<View style={[styles.section, styles.highlightSection]}>
 						<View style={styles.highlightHeader}>
-							<Text style={styles.highlightIcon}>🛡️</Text>
+							<Text style={styles.highlightIcon}>🏪</Text>
 							<Text style={styles.sectionTitle}>
-								{i18n.t('web.privacy.gdpr.title')}
+								{i18n.t('web.terms.restaurantServices.title')}
 							</Text>
 						</View>
-						<Text style={styles.paragraph}>
-							{i18n.t('web.privacy.gdpr.intro')}
-						</Text>
-						<View style={styles.list}>
-							<View style={styles.listItem}>
-								<View style={styles.bullet} />
-								<Text style={styles.listText}>
-									{i18n.t('web.privacy.gdpr.right1')}
-								</Text>
-							</View>
-							<View style={styles.listItem}>
-								<View style={styles.bullet} />
-								<Text style={styles.listText}>
-									{i18n.t('web.privacy.gdpr.right2')}
-								</Text>
-							</View>
-							<View style={styles.listItem}>
-								<View style={styles.bullet} />
-								<Text style={styles.listText}>
-									{i18n.t('web.privacy.gdpr.right3')}
-								</Text>
-							</View>
-							<View style={styles.listItem}>
-								<View style={styles.bullet} />
-								<Text style={styles.listText}>
-									{i18n.t('web.privacy.gdpr.right4')}
-								</Text>
-							</View>
-							<View style={styles.listItem}>
-								<View style={styles.bullet} />
-								<Text style={styles.listText}>
-									{i18n.t('web.privacy.gdpr.right5')}
-								</Text>
-							</View>
-							<View style={styles.listItem}>
-								<View style={styles.bullet} />
-								<Text style={styles.listText}>
-									{i18n.t('web.privacy.gdpr.right6')}
-								</Text>
-							</View>
-						</View>
-						<Text style={styles.paragraph}>
-							{i18n.t('web.privacy.gdpr.contact')}
-						</Text>
-					</View>
 
-					{/* Cookies */}
-					<View style={styles.section}>
-						<Text style={styles.sectionTitle}>
-							{i18n.t('web.privacy.cookies.title')}
-						</Text>
-						<Text style={styles.paragraph}>
-							{i18n.t('web.privacy.cookies.text1')}
-						</Text>
 						<Text style={styles.subsectionTitle}>
-							{i18n.t('web.privacy.cookies.types.title')}
+							{i18n.t('web.terms.restaurantServices.free.title')}
+						</Text>
+						<Text style={styles.paragraph}>
+							{i18n.t('web.terms.restaurantServices.free.text')}
+						</Text>
+
+						<Text style={styles.subsectionTitle}>
+							{i18n.t('web.terms.restaurantServices.ai.title')}
+						</Text>
+						<Text style={styles.paragraph}>
+							{i18n.t('web.terms.restaurantServices.ai.text')}
+						</Text>
+
+						<Text style={styles.subsectionTitle}>
+							{i18n.t('web.terms.restaurantServices.noCommissions.title')}
+						</Text>
+						<Text style={styles.paragraph}>
+							{i18n.t('web.terms.restaurantServices.noCommissions.text')}
+						</Text>
+					</View>
+
+					{/* Disclaimers */}
+					<View style={styles.section}>
+						<Text style={styles.sectionTitle}>
+							{i18n.t('web.terms.disclaimers.title')}
+						</Text>
+
+						<Text style={styles.subsectionTitle}>
+							{i18n.t('web.terms.disclaimers.accuracy.title')}
+						</Text>
+						<Text style={styles.paragraph}>
+							{i18n.t('web.terms.disclaimers.accuracy.text')}
+						</Text>
+
+						<Text style={styles.subsectionTitle}>
+							{i18n.t('web.terms.disclaimers.service.title')}
+						</Text>
+						<Text style={styles.paragraph}>
+							{i18n.t('web.terms.disclaimers.service.text')}
+						</Text>
+
+						<Text style={styles.subsectionTitle}>
+							{i18n.t('web.terms.disclaimers.liability.title')}
+						</Text>
+						<Text style={styles.paragraph}>
+							{i18n.t('web.terms.disclaimers.liability.text')}
+						</Text>
+					</View>
+
+					{/* Termination */}
+					<View style={styles.section}>
+						<Text style={styles.sectionTitle}>
+							{i18n.t('web.terms.termination.title')}
 						</Text>
 						<View style={styles.list}>
 							<View style={styles.listItem}>
 								<View style={styles.bullet} />
 								<Text style={styles.listText}>
-									{i18n.t('web.privacy.cookies.types.essential')}
+									{i18n.t('web.terms.termination.item1')}
 								</Text>
 							</View>
 							<View style={styles.listItem}>
 								<View style={styles.bullet} />
 								<Text style={styles.listText}>
-									{i18n.t('web.privacy.cookies.types.functional')}
-								</Text>
-							</View>
-						</View>
-						<Text style={styles.paragraph}>
-							{i18n.t('web.privacy.cookies.text2')}
-						</Text>
-					</View>
-
-					{/* Data Retention */}
-					<View style={styles.section}>
-						<Text style={styles.sectionTitle}>
-							{i18n.t('web.privacy.retention.title')}
-						</Text>
-						<View style={styles.list}>
-							<View style={styles.listItem}>
-								<View style={styles.bullet} />
-								<Text style={styles.listText}>
-									{i18n.t('web.privacy.retention.item1')}
+									{i18n.t('web.terms.termination.item2')}
 								</Text>
 							</View>
 							<View style={styles.listItem}>
 								<View style={styles.bullet} />
 								<Text style={styles.listText}>
-									{i18n.t('web.privacy.retention.item2')}
+									{i18n.t('web.terms.termination.item3')}
 								</Text>
 							</View>
 							<View style={styles.listItem}>
 								<View style={styles.bullet} />
 								<Text style={styles.listText}>
-									{i18n.t('web.privacy.retention.item3')}
+									{i18n.t('web.terms.termination.item4')}
 								</Text>
 							</View>
 						</View>
 					</View>
 
-					{/* Security */}
+					{/* Modifications */}
 					<View style={styles.section}>
 						<Text style={styles.sectionTitle}>
-							{i18n.t('web.privacy.security.title')}
+							{i18n.t('web.terms.modifications.title')}
 						</Text>
 						<Text style={styles.paragraph}>
-							{i18n.t('web.privacy.security.text')}
+							{i18n.t('web.terms.modifications.text')}
 						</Text>
 					</View>
 
-					{/* Children */}
+					{/* Governing Law */}
 					<View style={styles.section}>
 						<Text style={styles.sectionTitle}>
-							{i18n.t('web.privacy.children.title')}
+							{i18n.t('web.terms.governingLaw.title')}
 						</Text>
 						<Text style={styles.paragraph}>
-							{i18n.t('web.privacy.children.text')}
-						</Text>
-					</View>
-
-					{/* Changes */}
-					<View style={styles.section}>
-						<Text style={styles.sectionTitle}>
-							{i18n.t('web.privacy.changes.title')}
-						</Text>
-						<Text style={styles.paragraph}>
-							{i18n.t('web.privacy.changes.text')}
+							{i18n.t('web.terms.governingLaw.text')}
 						</Text>
 					</View>
 
 					{/* Contact */}
 					<View style={styles.contactSection}>
 						<Text style={styles.sectionTitle}>
-							{i18n.t('web.privacy.contact.title')}
+							{i18n.t('web.terms.contact.title')}
 						</Text>
 						<Text style={styles.paragraph}>
-							{i18n.t('web.privacy.contact.text')}
+							{i18n.t('web.terms.contact.text')}
 						</Text>
 						<View style={styles.contactBox}>
 							<View style={styles.contactItem}>
@@ -348,7 +404,7 @@ export default function PrivacyPage() {
 							<View style={styles.contactItem}>
 								<Text style={styles.contactIcon}>📱</Text>
 								<Text style={styles.contactText}>
-									{i18n.t('web.privacy.contact.phone')}: +34 606 404 251
+									{i18n.t('web.terms.contact.phone')}: +34 606 404 251
 								</Text>
 							</View>
 						</View>

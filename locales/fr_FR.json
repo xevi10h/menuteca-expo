@@ -645,7 +645,8 @@
 		"nav": {
 			"product": "Produit",
 			"support": "Support",
-			"privacy": "Confidentialité"
+			"privacy": "Confidentialité",
+			"terms": "Conditions"
 		},
 		"footer": {
 			"rights": "Tous droits réservés."
@@ -837,6 +838,113 @@
 				"title": "Prêt à Découvrir de Superbes Menus ?",
 				"text": "Téléchargez Menuteca aujourd'hui et ne vous demandez plus jamais ce qu'il y a pour le déjeuner.",
 				"button": "Obtenir l'Application"
+			}
+		},
+		"terms": {
+			"title": "Conditions Générales",
+			"lastUpdated": "Dernière mise à jour",
+			"intro": {
+				"title": "Introduction",
+				"text1": "Bienvenue sur Menuteca. En accédant ou en utilisant notre application mobile, vous acceptez d'être lié par ces Conditions Générales.",
+				"text2": "Veuillez lire attentivement ces conditions avant d'utiliser notre service. Si vous n'acceptez pas une partie de ces conditions, vous ne pouvez pas utiliser notre application."
+			},
+			"acceptance": {
+				"title": "Acceptation des Conditions",
+				"text": "En créant un compte et en utilisant Menuteca, vous reconnaissez avoir lu, compris et accepté d'être lié par ces Conditions Générales, ainsi que par notre Politique de Confidentialité."
+			},
+			"userAccounts": {
+				"title": "Comptes Utilisateur",
+				"subtitle1": "Création de Compte:",
+				"item1": "Vous devez avoir au moins 13 ans pour utiliser ce service",
+				"item2": "Vous devez fournir des informations exactes et complètes",
+				"item3": "Vous êtes responsable du maintien de la sécurité de votre compte",
+				"item4": "Vous ne devez pas partager vos identifiants de compte avec d'autres",
+				"subtitle2": "Types de Compte:",
+				"diner": "Compte Convive: Pour les utilisateurs qui souhaitent découvrir des restaurants et écrire des avis",
+				"restaurant": "Compte Restaurant: Pour les propriétaires de restaurants qui souhaitent gérer le profil et les menus de leur établissement"
+			},
+			"userConduct": {
+				"title": "Conduite et Responsabilités de l'Utilisateur",
+				"subtitle1": "Tous les Utilisateurs Doivent:",
+				"item1": "Fournir des informations véridiques et exactes",
+				"item2": "Ne pas se livrer à des activités frauduleuses ou trompeuses",
+				"item3": "Ne pas violer les lois ou réglementations applicables",
+				"item4": "Ne pas harceler, abuser ou nuire à d'autres utilisateurs",
+				"item5": "Ne pas télécharger de logiciels malveillants ou de virus",
+				"subtitle2": "Les Convives Doivent:",
+				"diner1": "Écrire des avis honnêtes et authentiques basés sur des expériences réelles",
+				"diner2": "Ne pas publier d'avis faux, trompeurs ou malveillants",
+				"diner3": "Ne pas publier de contenu offensant, discriminatoire ou inapproprié",
+				"diner4": "Ne pas tenter de manipuler les notes ou les avis",
+				"subtitle3": "Les Propriétaires de Restaurants Doivent:",
+				"restaurant1": "Fournir des informations exactes sur leur restaurant",
+				"restaurant2": "Maintenir les informations du menu à jour et exactes",
+				"restaurant3": "Ne pas créer de faux avis ni manipuler les notes",
+				"restaurant4": "Ne pas se faire passer pour d'autres restaurants ou utilisateurs"
+			},
+			"intellectualProperty": {
+				"title": "Propriété Intellectuelle",
+				"item1": "Propriété du Contenu: Vous conservez la propriété du contenu que vous téléchargez (photos, avis, informations sur les menus)",
+				"item2": "Licence à Menuteca: En téléchargeant du contenu, vous accordez à Menuteca une licence mondiale non exclusive pour utiliser, afficher et distribuer votre contenu au sein de l'application",
+				"item3": "Propriété de l'Application: Tous les droits sur l'application Menuteca, sa conception et ses fonctionnalités restent la propriété de Menuteca",
+				"item4": "Utilisation Interdite: Vous ne pouvez pas copier, modifier ou procéder à l'ingénierie inverse de toute partie de l'application"
+			},
+			"reviews": {
+				"title": "Avis et Contenu Généré par les Utilisateurs",
+				"item1": "Les avis doivent être basés sur des expériences personnelles authentiques",
+				"item2": "Nous nous réservons le droit de supprimer les avis qui violent nos politiques",
+				"item3": "Les avis peuvent rester sur la plateforme même après la suppression du compte pour préserver l'intégrité des avis",
+				"item4": "Vous acceptez de ne pas publier de contenu diffamatoire, obscène ou portant atteinte aux droits d'autrui"
+			},
+			"restaurantServices": {
+				"title": "Services pour Restaurants",
+				"free": {
+					"title": "Service Gratuit:",
+					"text": "Menuteca est entièrement gratuit pour les restaurants. Vous pouvez enregistrer jusqu'à 10 restaurants par compte sans frais."
+				},
+				"ai": {
+					"title": "Traitement des Menus par IA:",
+					"text": "Notre traitement de photos de menus par IA est fourni tel quel. Bien que nous visions l'exactitude, nous ne pouvons garantir une précision à 100% dans l'extraction des menus. Les propriétaires de restaurants sont responsables de vérifier et de corriger les données de menu générées par l'IA."
+				},
+				"noCommissions": {
+					"title": "Pas de Commissions:",
+					"text": "Nous ne facturons pas de commissions sur les réservations ou les commandes. Toutes les fonctionnalités de réservation ou de contact renvoient directement aux systèmes propres du restaurant."
+				}
+			},
+			"disclaimers": {
+				"title": "Clauses de Non-Responsabilité et Limitations",
+				"accuracy": {
+					"title": "Exactitude des Informations:",
+					"text": "Bien que nous nous efforcions de maintenir des informations exactes, nous ne pouvons garantir que toutes les informations sur les restaurants, les menus et les prix sont toujours à jour ou correctes. Les utilisateurs doivent vérifier les détails directement avec les restaurants."
+				},
+				"service": {
+					"title": "Disponibilité du Service:",
+					"text": "Nous fournissons le service 'tel quel' sans garantie d'aucune sorte. Nous ne garantissons pas un service ininterrompu ou sans erreur."
+				},
+				"liability": {
+					"title": "Limitation de Responsabilité:",
+					"text": "Menuteca n'est pas responsable des litiges entre utilisateurs et restaurants, de la qualité de la nourriture, des allergies ou des expériences culinaires. Nous sommes uniquement une plateforme de découverte."
+				}
+			},
+			"termination": {
+				"title": "Résiliation du Compte",
+				"item1": "Vous pouvez supprimer votre compte à tout moment depuis les paramètres de l'application",
+				"item2": "Nous nous réservons le droit de suspendre ou de résilier les comptes qui violent ces conditions",
+				"item3": "Après la résiliation, vos données personnelles seront supprimées comme décrit dans notre Politique de Confidentialité",
+				"item4": "Les avis publics peuvent rester anonymisés après la suppression du compte"
+			},
+			"modifications": {
+				"title": "Modifications des Conditions",
+				"text": "Nous pouvons mettre à jour ces Conditions Générales de temps en temps. Nous informerons les utilisateurs des changements importants via l'application. L'utilisation continue du service après les modifications constitue l'acceptation des nouvelles conditions."
+			},
+			"governingLaw": {
+				"title": "Droit Applicable",
+				"text": "Ces Conditions Générales sont régies par les lois de l'Espagne. Tout litige sera résolu devant les tribunaux de Barcelone, Espagne."
+			},
+			"contact": {
+				"title": "Contactez-nous",
+				"text": "Si vous avez des questions sur ces Conditions Générales, veuillez nous contacter:",
+				"phone": "Téléphone"
 			}
 		}
 	}

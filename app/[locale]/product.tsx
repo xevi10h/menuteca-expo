@@ -3,7 +3,7 @@ import { WebLayout } from '@/components/web/WebLayout';
 import { i18n } from '@/i18n';
 import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
-import { View, Text, StyleSheet, Pressable, Linking } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 export default function ProductPage() {
 	const { locale } = useLocalSearchParams<{ locale: string }>();
@@ -21,66 +21,102 @@ export default function ProductPage() {
 			<View style={styles.container}>
 				{/* Hero Section */}
 				<View style={styles.hero}>
-					<Text style={styles.heroTitle}>{i18n.t('web.product.hero.title')}</Text>
-					<Text style={styles.heroSubtitle}>{i18n.t('web.product.hero.subtitle')}</Text>
+					<Text style={styles.heroTitle}>
+						{i18n.t('web.product.hero.title')}
+					</Text>
+					<Text style={styles.heroSubtitle}>
+						{i18n.t('web.product.hero.subtitle')}
+					</Text>
 					<Pressable style={styles.ctaButton} onPress={handleDownload}>
-						<Text style={styles.ctaButtonText}>{i18n.t('web.product.hero.cta')}</Text>
+						<Text style={styles.ctaButtonText}>
+							{i18n.t('web.product.hero.cta')}
+						</Text>
 					</Pressable>
 				</View>
 
 				{/* Features Section */}
 				<View style={styles.featuresSection}>
-					<Text style={styles.sectionTitle}>{i18n.t('web.product.features.title')}</Text>
+					<Text style={styles.sectionTitle}>
+						{i18n.t('web.product.features.title')}
+					</Text>
 
 					<View style={styles.featuresGrid}>
 						{/* Feature 1 */}
 						<View style={styles.featureCard}>
 							<Text style={styles.featureIcon}>🔍</Text>
-							<Text style={styles.featureTitle}>{i18n.t('web.product.features.feature1.title')}</Text>
-							<Text style={styles.featureText}>{i18n.t('web.product.features.feature1.text')}</Text>
+							<Text style={styles.featureTitle}>
+								{i18n.t('web.product.features.feature1.title')}
+							</Text>
+							<Text style={styles.featureText}>
+								{i18n.t('web.product.features.feature1.text')}
+							</Text>
 						</View>
 
 						{/* Feature 2 */}
 						<View style={styles.featureCard}>
 							<Text style={styles.featureIcon}>📍</Text>
-							<Text style={styles.featureTitle}>{i18n.t('web.product.features.feature2.title')}</Text>
-							<Text style={styles.featureText}>{i18n.t('web.product.features.feature2.text')}</Text>
+							<Text style={styles.featureTitle}>
+								{i18n.t('web.product.features.feature2.title')}
+							</Text>
+							<Text style={styles.featureText}>
+								{i18n.t('web.product.features.feature2.text')}
+							</Text>
 						</View>
 
 						{/* Feature 3 */}
 						<View style={styles.featureCard}>
 							<Text style={styles.featureIcon}>💰</Text>
-							<Text style={styles.featureTitle}>{i18n.t('web.product.features.feature3.title')}</Text>
-							<Text style={styles.featureText}>{i18n.t('web.product.features.feature3.text')}</Text>
+							<Text style={styles.featureTitle}>
+								{i18n.t('web.product.features.feature3.title')}
+							</Text>
+							<Text style={styles.featureText}>
+								{i18n.t('web.product.features.feature3.text')}
+							</Text>
 						</View>
 
 						{/* Feature 4 */}
 						<View style={styles.featureCard}>
 							<Text style={styles.featureIcon}>⏱️</Text>
-							<Text style={styles.featureTitle}>{i18n.t('web.product.features.feature4.title')}</Text>
-							<Text style={styles.featureText}>{i18n.t('web.product.features.feature4.text')}</Text>
+							<Text style={styles.featureTitle}>
+								{i18n.t('web.product.features.feature4.title')}
+							</Text>
+							<Text style={styles.featureText}>
+								{i18n.t('web.product.features.feature4.text')}
+							</Text>
 						</View>
 
 						{/* Feature 5 */}
 						<View style={styles.featureCard}>
 							<Text style={styles.featureIcon}>🤖</Text>
-							<Text style={styles.featureTitle}>{i18n.t('web.product.features.feature5.title')}</Text>
-							<Text style={styles.featureText}>{i18n.t('web.product.features.feature5.text')}</Text>
+							<Text style={styles.featureTitle}>
+								{i18n.t('web.product.features.feature5.title')}
+							</Text>
+							<Text style={styles.featureText}>
+								{i18n.t('web.product.features.feature5.text')}
+							</Text>
 						</View>
 
 						{/* Feature 6 */}
 						<View style={styles.featureCard}>
 							<Text style={styles.featureIcon}>⭐</Text>
-							<Text style={styles.featureTitle}>{i18n.t('web.product.features.feature6.title')}</Text>
-							<Text style={styles.featureText}>{i18n.t('web.product.features.feature6.text')}</Text>
+							<Text style={styles.featureTitle}>
+								{i18n.t('web.product.features.feature6.title')}
+							</Text>
+							<Text style={styles.featureText}>
+								{i18n.t('web.product.features.feature6.text')}
+							</Text>
 						</View>
 					</View>
 				</View>
 
 				{/* For Restaurants Section */}
 				<View style={styles.restaurantsSection}>
-					<Text style={styles.sectionTitle}>{i18n.t('web.product.restaurants.title')}</Text>
-					<Text style={styles.sectionSubtitle}>{i18n.t('web.product.restaurants.subtitle')}</Text>
+					<Text style={styles.sectionTitle}>
+						{i18n.t('web.product.restaurants.title')}
+					</Text>
+					<Text style={styles.sectionSubtitle}>
+						{i18n.t('web.product.restaurants.subtitle')}
+					</Text>
 
 					<View style={styles.benefitsGrid}>
 						<View style={styles.benefitCard}>
@@ -117,7 +153,9 @@ export default function ProductPage() {
 
 				{/* Testimonials Section */}
 				<View style={styles.testimonialsSection}>
-					<Text style={styles.sectionTitle}>{i18n.t('web.product.testimonials.title')}</Text>
+					<Text style={styles.sectionTitle}>
+						{i18n.t('web.product.testimonials.title')}
+					</Text>
 
 					<View style={styles.testimonialsGrid}>
 						{/* Testimonial 1 */}
@@ -166,7 +204,9 @@ export default function ProductPage() {
 					<Text style={styles.ctaTitle}>{i18n.t('web.product.cta.title')}</Text>
 					<Text style={styles.ctaText}>{i18n.t('web.product.cta.text')}</Text>
 					<Pressable style={styles.ctaButton} onPress={handleDownload}>
-						<Text style={styles.ctaButtonText}>{i18n.t('web.product.cta.button')}</Text>
+						<Text style={styles.ctaButtonText}>
+							{i18n.t('web.product.cta.button')}
+						</Text>
 					</Pressable>
 				</View>
 			</View>

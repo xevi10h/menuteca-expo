@@ -644,7 +644,8 @@
 		"nav": {
 			"product": "Producto",
 			"support": "Soporte",
-			"privacy": "Privacidad"
+			"privacy": "Privacidad",
+			"terms": "Términos"
 		},
 		"footer": {
 			"rights": "Todos los derechos reservados."
@@ -836,6 +837,113 @@
 				"title": "¿Listo para Descubrir Grandes Menús?",
 				"text": "Descarga Menuteca hoy y nunca más te preguntes qué hay para comer.",
 				"button": "Obtén la App"
+			}
+		},
+		"terms": {
+			"title": "Términos y Condiciones",
+			"lastUpdated": "Última actualización",
+			"intro": {
+				"title": "Introducción",
+				"text1": "Bienvenido a Menuteca. Al acceder o utilizar nuestra aplicación móvil, aceptas estar sujeto a estos Términos y Condiciones.",
+				"text2": "Lee atentamente estos términos antes de utilizar nuestro servicio. Si no estás de acuerdo con alguna parte de estos términos, no podrás utilizar nuestra aplicación."
+			},
+			"acceptance": {
+				"title": "Aceptación de los Términos",
+				"text": "Al crear una cuenta y utilizar Menuteca, reconoces que has leído, comprendido y aceptas estar sujeto a estos Términos y Condiciones, así como a nuestra Política de Privacidad."
+			},
+			"userAccounts": {
+				"title": "Cuentas de Usuario",
+				"subtitle1": "Creación de Cuenta:",
+				"item1": "Debes tener al menos 13 años para utilizar este servicio",
+				"item2": "Debes proporcionar información precisa y completa",
+				"item3": "Eres responsable de mantener la seguridad de tu cuenta",
+				"item4": "No debes compartir las credenciales de tu cuenta con otros",
+				"subtitle2": "Tipos de Cuenta:",
+				"diner": "Cuenta de Comensal: Para usuarios que quieren descubrir restaurantes y escribir reseñas",
+				"restaurant": "Cuenta de Restaurante: Para propietarios de restaurantes que quieren gestionar el perfil y los menús de su establecimiento"
+			},
+			"userConduct": {
+				"title": "Conducta y Responsabilidades del Usuario",
+				"subtitle1": "Todos los Usuarios Deben:",
+				"item1": "Proporcionar información veraz y precisa",
+				"item2": "No participar en actividades fraudulentas o engañosas",
+				"item3": "No violar leyes o regulaciones aplicables",
+				"item4": "No acosar, abusar o dañar a otros usuarios",
+				"item5": "No cargar software malicioso o virus",
+				"subtitle2": "Los Comensales Deben:",
+				"diner1": "Escribir reseñas honestas y genuinas basadas en experiencias reales",
+				"diner2": "No publicar reseñas falsas, engañosas o maliciosas",
+				"diner3": "No publicar contenido ofensivo, discriminatorio o inapropiado",
+				"diner4": "No intentar manipular calificaciones o reseñas",
+				"subtitle3": "Los Propietarios de Restaurantes Deben:",
+				"restaurant1": "Proporcionar información precisa sobre su restaurante",
+				"restaurant2": "Mantener la información del menú actualizada y precisa",
+				"restaurant3": "No crear reseñas falsas ni manipular calificaciones",
+				"restaurant4": "No hacerse pasar por otros restaurantes o usuarios"
+			},
+			"intellectualProperty": {
+				"title": "Propiedad Intelectual",
+				"item1": "Propiedad del Contenido: Conservas la propiedad del contenido que subes (fotos, reseñas, información del menú)",
+				"item2": "Licencia a Menuteca: Al subir contenido, otorgas a Menuteca una licencia mundial no exclusiva para usar, mostrar y distribuir tu contenido dentro de la aplicación",
+				"item3": "Propiedad de la App: Todos los derechos sobre la aplicación Menuteca, diseño y funcionalidad permanecen con Menuteca",
+				"item4": "Uso Prohibido: No puedes copiar, modificar o realizar ingeniería inversa de ninguna parte de la aplicación"
+			},
+			"reviews": {
+				"title": "Reseñas y Contenido Generado por Usuarios",
+				"item1": "Las reseñas deben basarse en experiencias personales genuinas",
+				"item2": "Nos reservamos el derecho de eliminar reseñas que violen nuestras políticas",
+				"item3": "Las reseñas pueden permanecer en la plataforma incluso después de la eliminación de la cuenta para preservar la integridad de las reseñas",
+				"item4": "Aceptas no publicar contenido difamatorio, obsceno o que infrinja los derechos de otros"
+			},
+			"restaurantServices": {
+				"title": "Servicios para Restaurantes",
+				"free": {
+					"title": "Servicio Gratuito:",
+					"text": "Menuteca es completamente gratuito para restaurantes. Puedes registrar hasta 10 restaurantes por cuenta sin costo alguno."
+				},
+				"ai": {
+					"title": "Procesamiento de Menús con IA:",
+					"text": "Nuestro procesamiento de fotos de menús con IA se proporciona tal cual. Aunque nos esforzamos por la precisión, no podemos garantizar una precisión del 100% en la extracción del menú. Los propietarios de restaurantes son responsables de verificar y corregir los datos del menú generados por IA."
+				},
+				"noCommissions": {
+					"title": "Sin Comisiones:",
+					"text": "No cobramos comisiones por reservas o pedidos. Cualquier función de reserva o contacto enlaza directamente con los sistemas propios del restaurante."
+				}
+			},
+			"disclaimers": {
+				"title": "Exenciones de Responsabilidad y Limitaciones",
+				"accuracy": {
+					"title": "Precisión de la Información:",
+					"text": "Aunque nos esforzamos por mantener información precisa, no podemos garantizar que toda la información del restaurante, menús y precios sean siempre actuales o correctos. Los usuarios deben verificar los detalles directamente con los restaurantes."
+				},
+				"service": {
+					"title": "Disponibilidad del Servicio:",
+					"text": "Proporcionamos el servicio 'tal cual' sin garantías de ningún tipo. No garantizamos un servicio ininterrumpido o libre de errores."
+				},
+				"liability": {
+					"title": "Limitación de Responsabilidad:",
+					"text": "Menuteca no es responsable de disputas entre usuarios y restaurantes, calidad de la comida, alergias o experiencias gastronómicas. Somos solo una plataforma de descubrimiento."
+				}
+			},
+			"termination": {
+				"title": "Terminación de Cuenta",
+				"item1": "Puedes eliminar tu cuenta en cualquier momento desde la configuración de la aplicación",
+				"item2": "Nos reservamos el derecho de suspender o terminar cuentas que violen estos términos",
+				"item3": "Tras la terminación, tus datos personales serán eliminados según lo descrito en nuestra Política de Privacidad",
+				"item4": "Las reseñas públicas pueden permanecer anonimizadas después de la eliminación de la cuenta"
+			},
+			"modifications": {
+				"title": "Modificaciones de los Términos",
+				"text": "Podemos actualizar estos Términos y Condiciones de vez en cuando. Notificaremos a los usuarios de cambios significativos a través de la aplicación. El uso continuado del servicio después de los cambios constituye la aceptación de los nuevos términos."
+			},
+			"governingLaw": {
+				"title": "Ley Aplicable",
+				"text": "Estos Términos y Condiciones se rigen por las leyes de España. Cualquier disputa será resuelta en los tribunales de Barcelona, España."
+			},
+			"contact": {
+				"title": "Contáctanos",
+				"text": "Si tienes preguntas sobre estos Términos y Condiciones, contáctanos:",
+				"phone": "Teléfono"
 			}
 		}
 	}

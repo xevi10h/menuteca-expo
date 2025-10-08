@@ -645,7 +645,8 @@
 		"nav": {
 			"product": "Product",
 			"support": "Support",
-			"privacy": "Privacy"
+			"privacy": "Privacy",
+			"terms": "Terms"
 		},
 		"footer": {
 			"rights": "All rights reserved."
@@ -837,6 +838,113 @@
 				"title": "Ready to Discover Great Menus?",
 				"text": "Download Menuteca today and never wonder what's for lunch again.",
 				"button": "Get the App"
+			}
+		},
+		"terms": {
+			"title": "Terms and Conditions",
+			"lastUpdated": "Last updated",
+			"intro": {
+				"title": "Introduction",
+				"text1": "Welcome to Menuteca. By accessing or using our mobile application, you agree to be bound by these Terms and Conditions.",
+				"text2": "Please read these terms carefully before using our service. If you do not agree with any part of these terms, you may not use our application."
+			},
+			"acceptance": {
+				"title": "Acceptance of Terms",
+				"text": "By creating an account and using Menuteca, you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions, as well as our Privacy Policy."
+			},
+			"userAccounts": {
+				"title": "User Accounts",
+				"subtitle1": "Account Creation:",
+				"item1": "You must be at least 13 years old to use this service",
+				"item2": "You must provide accurate and complete information",
+				"item3": "You are responsible for maintaining the security of your account",
+				"item4": "You must not share your account credentials with others",
+				"subtitle2": "Account Types:",
+				"diner": "Diner Account: For users who want to discover restaurants and write reviews",
+				"restaurant": "Restaurant Account: For restaurant owners who want to manage their establishment's profile and menus"
+			},
+			"userConduct": {
+				"title": "User Conduct and Responsibilities",
+				"subtitle1": "All Users Must:",
+				"item1": "Provide truthful and accurate information",
+				"item2": "Not engage in any fraudulent or deceptive activities",
+				"item3": "Not violate any applicable laws or regulations",
+				"item4": "Not harass, abuse, or harm other users",
+				"item5": "Not upload malicious software or viruses",
+				"subtitle2": "Diners Must:",
+				"diner1": "Write honest and genuine reviews based on real experiences",
+				"diner2": "Not post fake, misleading, or malicious reviews",
+				"diner3": "Not post offensive, discriminatory, or inappropriate content",
+				"diner4": "Not attempt to manipulate ratings or reviews",
+				"subtitle3": "Restaurant Owners Must:",
+				"restaurant1": "Provide accurate information about their restaurant",
+				"restaurant2": "Keep menu information up-to-date and accurate",
+				"restaurant3": "Not create fake reviews or manipulate ratings",
+				"restaurant4": "Not impersonate other restaurants or users"
+			},
+			"intellectualProperty": {
+				"title": "Intellectual Property",
+				"item1": "Content Ownership: You retain ownership of the content you upload (photos, reviews, menu information)",
+				"item2": "License to Menuteca: By uploading content, you grant Menuteca a worldwide, non-exclusive license to use, display, and distribute your content within the app",
+				"item3": "App Ownership: All rights to the Menuteca application, design, and functionality remain with Menuteca",
+				"item4": "Prohibited Use: You may not copy, modify, or reverse-engineer any part of the application"
+			},
+			"reviews": {
+				"title": "Reviews and User-Generated Content",
+				"item1": "Reviews must be based on genuine personal experiences",
+				"item2": "We reserve the right to remove reviews that violate our policies",
+				"item3": "Reviews may remain on the platform even after account deletion to preserve review integrity",
+				"item4": "You agree not to post content that is defamatory, obscene, or infringes on others' rights"
+			},
+			"restaurantServices": {
+				"title": "Restaurant Services",
+				"free": {
+					"title": "Free Service:",
+					"text": "Menuteca is completely free for restaurants. You can register up to 10 restaurants per account at no cost."
+				},
+				"ai": {
+					"title": "AI Menu Processing:",
+					"text": "Our AI menu photo processing is provided as-is. While we strive for accuracy, we cannot guarantee 100% accuracy in menu extraction. Restaurant owners are responsible for verifying and correcting AI-generated menu data."
+				},
+				"noCommissions": {
+					"title": "No Commissions:",
+					"text": "We do not charge commissions on reservations or orders. Any reservation or contact features link directly to the restaurant's own systems."
+				}
+			},
+			"disclaimers": {
+				"title": "Disclaimers and Limitations",
+				"accuracy": {
+					"title": "Information Accuracy:",
+					"text": "While we strive to maintain accurate information, we cannot guarantee that all restaurant information, menus, and prices are always current or correct. Users should verify details directly with restaurants."
+				},
+				"service": {
+					"title": "Service Availability:",
+					"text": "We provide the service 'as-is' without warranties of any kind. We do not guarantee uninterrupted or error-free service."
+				},
+				"liability": {
+					"title": "Limitation of Liability:",
+					"text": "Menuteca is not responsible for any disputes between users and restaurants, food quality, allergies, or dining experiences. We are a discovery platform only."
+				}
+			},
+			"termination": {
+				"title": "Account Termination",
+				"item1": "You may delete your account at any time from the app settings",
+				"item2": "We reserve the right to suspend or terminate accounts that violate these terms",
+				"item3": "Upon termination, your personal data will be deleted as described in our Privacy Policy",
+				"item4": "Public reviews may remain anonymized after account deletion"
+			},
+			"modifications": {
+				"title": "Modifications to Terms",
+				"text": "We may update these Terms and Conditions from time to time. We will notify users of significant changes through the app. Continued use of the service after changes constitutes acceptance of the new terms."
+			},
+			"governingLaw": {
+				"title": "Governing Law",
+				"text": "These Terms and Conditions are governed by the laws of Spain. Any disputes shall be resolved in the courts of Barcelona, Spain."
+			},
+			"contact": {
+				"title": "Contact Us",
+				"text": "If you have questions about these Terms and Conditions, please contact us:",
+				"phone": "Phone"
 			}
 		}
 	}
