@@ -354,10 +354,13 @@ export const useUserStore = create<UserState>()(
 			},
 
 			register: async (userData): Promise<boolean> => {
+				console.log('Registering user with data:', userData);
 				set({ isLoading: true, error: null });
 
 				try {
 					const result = await SupabaseAuthService.register(userData);
+
+					console.log('Registration result:', result);
 
 					if (result.success && result.data) {
 						const { user: profile, session } = result.data;
@@ -500,9 +503,13 @@ export const useUserStore = create<UserState>()(
 
 			checkEmailAvailability: async (email: string): Promise<boolean> => {
 				try {
+					console.log('Checking email availability for:', email);
+
 					const result = await SupabaseAuthService.checkEmailAvailability(
 						email,
 					);
+
+					console.log('Email availability result:', result);
 
 					if (result.success && result.data) {
 						return result.data.available;

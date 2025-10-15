@@ -81,6 +81,8 @@ export default function RegisterScreen() {
 
 		let hasErrors = false;
 
+		console.log('Validating form...');
+
 		// Validate name
 		if (!name.trim()) {
 			setNameError(t('validation.nameRequired'));

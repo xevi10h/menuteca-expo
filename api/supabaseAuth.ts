@@ -630,6 +630,8 @@ export class SupabaseAuthService {
 				.eq('email', email)
 				.maybeSingle();
 
+			console.log('Check email availability:', { email, found: !!data, error });
+
 			if (error) {
 				return {
 					success: false,
@@ -637,11 +639,14 @@ export class SupabaseAuthService {
 				};
 			}
 
+			console.log('Email availability result:', { available: !data });
+
 			return {
 				success: true,
 				data: { available: !data },
 			};
 		} catch (error) {
+			console.error('Error checking email availability:', error);
 			return {
 				success: false,
 				error: error instanceof Error ? error.message : 'Failed to check email',

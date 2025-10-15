@@ -51,6 +51,18 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA "extensions";
 
 
 
+CREATE TYPE "public"."menus_includes_coffee_and_dessert_check" AS ENUM (
+    'none',
+    'eitherOne',
+    'coffee',
+    'dessert',
+    'both'
+);
+
+
+ALTER TYPE "public"."menus_includes_coffee_and_dessert_check" OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "public"."cleanup_expired_reset_codes"() RETURNS integer
     LANGUAGE "plpgsql"
     AS $$
@@ -222,6 +234,22 @@ $$;
 ALTER FUNCTION "public"."handle_updated_at"() OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "public"."is_restaurant_owner"("restaurant_id" "text", "user_id" "uuid") RETURNS boolean
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$
+BEGIN
+    RETURN EXISTS (
+        SELECT 1 FROM public.restaurants 
+        WHERE id::text = restaurant_id 
+        AND owner_id = user_id
+    );
+END;
+$$;
+
+
+ALTER FUNCTION "public"."is_restaurant_owner"("restaurant_id" "text", "user_id" "uuid") OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "public"."update_password_reset_codes_updated_at"() RETURNS "trigger"
     LANGUAGE "plpgsql"
     AS $$
@@ -358,7 +386,9 @@ CREATE TABLE IF NOT EXISTS "public"."profiles" (
 
 ALTER TABLE "public"."profiles" OWNER TO "postgres";
 
+
 COMMENT ON TABLE "public"."profiles" IS 'User profiles linked to auth.users';
+
 
 
 CREATE TABLE IF NOT EXISTS "public"."restaurants" (
@@ -390,7 +420,7 @@ CREATE TABLE IF NOT EXISTS "public"."reviews" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "created_at" timestamp with time zone DEFAULT "timezone"('utc'::"text", "now"()) NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "timezone"('utc'::"text", "now"()) NOT NULL,
-    "profile_id" "uuid" NOT NULL,
+    "user_id" "uuid" NOT NULL,
     "restaurant_id" "uuid" NOT NULL,
     "rating" numeric(3,2) NOT NULL,
     "comment" "jsonb" NOT NULL,
@@ -451,7 +481,7 @@ ALTER TABLE ONLY "public"."reviews"
 
 
 ALTER TABLE ONLY "public"."reviews"
-    ADD CONSTRAINT "reviews_user_id_restaurant_id_key" UNIQUE ("profile_id", "restaurant_id");
+    ADD CONSTRAINT "reviews_user_id_restaurant_id_key" UNIQUE ("user_id", "restaurant_id");
 
 
 
@@ -527,7 +557,7 @@ CREATE INDEX "idx_reviews_restaurant_id" ON "public"."reviews" USING "btree" ("r
 
 
 
-CREATE INDEX "idx_reviews_user_id" ON "public"."reviews" USING "btree" ("profile_id");
+CREATE INDEX "idx_reviews_user_id" ON "public"."reviews" USING "btree" ("user_id");
 
 
 
@@ -606,12 +636,20 @@ ALTER TABLE ONLY "public"."restaurants"
 
 
 ALTER TABLE ONLY "public"."reviews"
-    ADD CONSTRAINT "reviews_profile_id_fkey" FOREIGN KEY ("profile_id") REFERENCES "public"."profiles"("id");
+    ADD CONSTRAINT "reviews_restaurant_id_fkey" FOREIGN KEY ("restaurant_id") REFERENCES "public"."restaurants"("id") ON DELETE CASCADE;
 
 
 
 ALTER TABLE ONLY "public"."reviews"
-    ADD CONSTRAINT "reviews_restaurant_id_fkey" FOREIGN KEY ("restaurant_id") REFERENCES "public"."restaurants"("id") ON DELETE CASCADE;
+    ADD CONSTRAINT "reviews_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."profiles"("id");
+
+
+
+CREATE POLICY "Anyone can view active restaurants" ON "public"."restaurants" FOR SELECT USING ((("is_active" = true) AND ("deleted_at" IS NULL)));
+
+
+
+CREATE POLICY "Anyone can view active reviews" ON "public"."reviews" FOR SELECT USING (("deleted_at" IS NULL));
 
 
 
@@ -619,7 +657,29 @@ CREATE POLICY "Public profiles are viewable by everyone" ON "public"."profiles" 
 
 
 
+CREATE POLICY "Restaurant owners can respond to reviews" ON "public"."reviews" FOR UPDATE TO "authenticated" USING ((("deleted_at" IS NULL) AND (EXISTS ( SELECT 1
+   FROM "public"."restaurants"
+  WHERE (("restaurants"."id" = "reviews"."restaurant_id") AND ("restaurants"."owner_id" = "auth"."uid"())))))) WITH CHECK ((("auth"."uid"() <> "user_id") AND (("restaurant_response_message" IS NOT NULL) OR ("restaurant_response_date" IS NOT NULL))));
+
+
+
+CREATE POLICY "Users can create their own restaurants" ON "public"."restaurants" FOR INSERT WITH CHECK (("auth"."uid"() = "owner_id"));
+
+
+
+CREATE POLICY "Users can create their own reviews" ON "public"."reviews" FOR INSERT TO "authenticated" WITH CHECK (("auth"."uid"() = "user_id"));
+
+
+
 CREATE POLICY "Users can delete their own profile" ON "public"."profiles" FOR DELETE USING (("auth"."uid"() = "id"));
+
+
+
+CREATE POLICY "Users can delete their own restaurants" ON "public"."restaurants" FOR DELETE USING (("auth"."uid"() = "owner_id"));
+
+
+
+CREATE POLICY "Users can delete their own reviews" ON "public"."reviews" FOR UPDATE TO "authenticated" USING ((("auth"."uid"() = "user_id") AND ("deleted_at" IS NULL))) WITH CHECK ((("auth"."uid"() = "user_id") AND ("deleted_at" IS NOT NULL)));
 
 
 
@@ -631,7 +691,21 @@ CREATE POLICY "Users can update their own profile" ON "public"."profiles" FOR UP
 
 
 
+CREATE POLICY "Users can update their own restaurants" ON "public"."restaurants" FOR UPDATE USING (("auth"."uid"() = "owner_id"));
+
+
+
+CREATE POLICY "Users can update their own reviews" ON "public"."reviews" FOR UPDATE TO "authenticated" USING ((("auth"."uid"() = "user_id") AND ("deleted_at" IS NULL))) WITH CHECK (("auth"."uid"() = "user_id"));
+
+
+
 ALTER TABLE "public"."profiles" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."restaurants" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."reviews" ENABLE ROW LEVEL SECURITY;
 
 
 
@@ -823,6 +897,12 @@ GRANT ALL ON FUNCTION "public"."handle_new_user"() TO "service_role";
 GRANT ALL ON FUNCTION "public"."handle_updated_at"() TO "anon";
 GRANT ALL ON FUNCTION "public"."handle_updated_at"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."handle_updated_at"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."is_restaurant_owner"("restaurant_id" "text", "user_id" "uuid") TO "anon";
+GRANT ALL ON FUNCTION "public"."is_restaurant_owner"("restaurant_id" "text", "user_id" "uuid") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."is_restaurant_owner"("restaurant_id" "text", "user_id" "uuid") TO "service_role";
 
 
 
