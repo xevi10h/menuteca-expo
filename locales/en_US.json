@@ -458,6 +458,7 @@
 		"guestModeMessage": "Guest mode will be available soon.",
 		"googleAuthError": "Google authentication error",
 		"googleAuthFailed": "Could not complete Google authentication",
+		"appleAuthError": "Apple authentication error",
 		"loginError": "Login error",
 		"loginFailed": "Could not log in. Please check your credentials.",
 		"registerError": "Registration error",

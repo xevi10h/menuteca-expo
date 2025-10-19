@@ -458,6 +458,7 @@
 		"guestModeMessage": "Le mode invité sera bientôt disponible.",
 		"googleAuthError": "Erreur d'authentification Google",
 		"googleAuthFailed": "Impossible de terminer l'authentification Google",
+		"appleAuthError": "Erreur d'authentification Apple",
 		"loginError": "Erreur de connexion",
 		"loginFailed": "Impossible de se connecter. Vérifiez vos identifiants.",
 		"registerError": "Erreur d'inscription",

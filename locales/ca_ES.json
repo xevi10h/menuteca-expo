@@ -458,6 +458,7 @@
 		"guestModeMessage": "El mode convidat estarà disponible aviat.",
 		"googleAuthError": "Error d'autenticació amb Google",
 		"googleAuthFailed": "No s'ha pogut completar l'autenticació amb Google",
+		"appleAuthError": "Error d'autenticació amb Apple",
 		"loginError": "Error d'inici de sessió",
 		"loginFailed": "No s'ha pogut iniciar sessió. Verifica les teves credencials.",
 		"registerError": "Error de registre",

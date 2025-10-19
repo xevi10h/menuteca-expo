@@ -27,6 +27,7 @@ export default function AuthIndexScreen() {
 	const isLoading = useUserStore((state) => state.isLoading);
 	const isAuthenticated = useUserStore((state) => state.isAuthenticated);
 	const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+	const [isAppleLoading, setIsAppleLoading] = useState(false);
 
 	// If already authenticated, redirect to main app
 	if (isAuthenticated) {
@@ -54,12 +55,71 @@ export default function AuthIndexScreen() {
 				setUser(result.data);
 				router.replace('/');
 			} else {
-				Alert.alert(t('auth.googleAuthError'), t('auth.googleAuthFailed'));
+				// Map API error to translation key
+				let translatedError = t('auth.errors.googleSignInFailed');
+
+				if (result.error) {
+					const errorLower = result.error.toLowerCase();
+					if (errorLower.includes('google sign-in failed') || errorLower.includes('google')) {
+						translatedError = t('auth.errors.googleSignInFailed');
+					}
+				}
+
+				Alert.alert(t('auth.googleAuthError'), translatedError);
 			}
 		} catch (error) {
-			Alert.alert(t('auth.googleAuthError'), t('auth.googleAuthFailed'));
+			Alert.alert(t('auth.googleAuthError'), t('auth.errors.googleSignInFailed'));
 		} finally {
 			setIsGoogleLoading(false);
+		}
+	};
+
+	const handleAppleAuth = async () => {
+		setIsAppleLoading(true);
+
+		try {
+			console.log('Starting Apple sign in...');
+			const result = await SupabaseAuthService.signInWithApple();
+
+			console.log('Apple sign in result:', result);
+
+			if (result.success && result.data) {
+				setUser(result.data);
+				router.replace('/');
+			} else {
+				// Map API error to translation key
+				let translatedError = t('auth.errors.appleSignInFailed');
+
+				if (result.error) {
+					const errorLower = result.error.toLowerCase();
+
+					if (errorLower.includes('not available')) {
+						translatedError = t('auth.errors.appleSignInNotAvailable');
+					}
+					else if (errorLower.includes('no identity token') || errorLower.includes('no token')) {
+						translatedError = t('auth.errors.appleSignInNoToken');
+					}
+					else if (errorLower.includes('no user data')) {
+						translatedError = t('auth.errors.appleSignInNoUserData');
+					}
+					else if (errorLower.includes('failed to create') && errorLower.includes('profile')) {
+						translatedError = t('auth.errors.appleSignInFailedToCreateProfile');
+					}
+					else if (errorLower.includes('failed to fetch') && errorLower.includes('profile')) {
+						translatedError = t('auth.errors.appleSignInFailedToFetchProfile');
+					}
+					else if (errorLower.includes('cancelled') || errorLower.includes('canceled')) {
+						translatedError = t('auth.errors.appleSignInCancelled');
+					}
+				}
+
+				Alert.alert(t('auth.appleAuthError'), translatedError);
+			}
+		} catch (error) {
+			console.error('Apple sign in error:', error);
+			Alert.alert(t('auth.appleAuthError'), t('auth.errors.appleSignInFailed'));
+		} finally {
+			setIsAppleLoading(false);
 		}
 	};
 
@@ -110,23 +170,29 @@ export default function AuthIndexScreen() {
 					{/* Apple Sign In Button (iOS only) */}
 					{Platform.OS === 'ios' && (
 						<TouchableOpacity
-							style={[styles.appleButton, isLoading && styles.buttonDisabled]}
-							onPress={() => {
-								// TODO: Implement Apple Sign In
-								Alert.alert(t('auth.appleAuth'), t('auth.appleAuthMessage'));
-							}}
-							disabled={isLoading}
+							style={[
+								styles.appleButton,
+								(isLoading || isAppleLoading) && styles.buttonDisabled,
+							]}
+							onPress={handleAppleAuth}
+							disabled={isLoading || isAppleLoading}
 							activeOpacity={0.8}
 						>
 							<View style={styles.appleButtonContent}>
-								<Ionicons
-									name="logo-apple"
-									size={20}
-									color={colors.quaternary}
-								/>
-								<Text style={styles.appleButtonText}>
-									{t('auth.continueWithApple')}
-								</Text>
+								{isAppleLoading ? (
+									<ActivityIndicator size="small" color={colors.quaternary} />
+								) : (
+									<>
+										<Ionicons
+											name="logo-apple"
+											size={20}
+											color={colors.quaternary}
+										/>
+										<Text style={styles.appleButtonText}>
+											{t('auth.continueWithApple')}
+										</Text>
+									</>
+								)}
 							</View>
 						</TouchableOpacity>
 					)}

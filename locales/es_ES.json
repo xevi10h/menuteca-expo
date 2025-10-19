@@ -457,6 +457,7 @@
 		"guestModeMessage": "El modo invitado estará disponible próximamente.",
 		"googleAuthError": "Error de autenticación con Google",
 		"googleAuthFailed": "No se pudo completar la autenticación con Google",
+		"appleAuthError": "Error de autenticación con Apple",
 		"loginError": "Error de inicio de sesión",
 		"loginFailed": "No se pudo iniciar sesión. Verifica tus credenciales.",
 		"registerError": "Error de registro",
