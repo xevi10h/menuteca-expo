@@ -102,14 +102,34 @@ export default function LoginScreen() {
 				// Navigation will be handled automatically by the authentication state change
 				router.replace('/');
 			} else {
-				// Error is handled by the store
+				// Handle specific errors from the API
 				if (error) {
-					Alert.alert(t('auth.loginError'), error);
+					const errorLower = error.toLowerCase();
+					let translatedError = error;
+
+					// Check for specific error patterns and map to translation keys
+					if (errorLower.includes('login failed') || errorLower.includes('invalid login credentials')) {
+						translatedError = t('auth.errors.loginFailed');
+					}
+					else if (errorLower.includes('email') && errorLower.includes('invalid')) {
+						translatedError = t('validation.emailInvalid');
+					}
+					else if (errorLower.includes('not authenticated')) {
+						translatedError = t('auth.errors.notAuthenticated');
+					}
+					else if (errorLower.includes('session check failed')) {
+						translatedError = t('auth.errors.sessionCheckFailed');
+					}
+					else {
+						translatedError = t('auth.errors.loginFailed');
+					}
+
+					Alert.alert(t('auth.loginError'), translatedError);
 				}
 			}
 		} catch (err) {
 			console.error('Login error:', err);
-			Alert.alert(t('auth.loginError'), t('auth.loginFailed'));
+			Alert.alert(t('auth.loginError'), t('auth.errors.loginFailed'));
 		}
 	};
 

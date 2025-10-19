@@ -144,10 +144,27 @@ export default function NewPasswordScreen() {
 			console.error('Password reset error:', error);
 			setStatus('error');
 
-			const errorMessage =
-				error instanceof Error ? error.message : t('auth.passwordResetError');
+			// Handle specific errors from the API
+			let translatedError = t('auth.passwordResetError');
 
-			setError(errorMessage);
+			if (error instanceof Error) {
+				const errorLower = error.message.toLowerCase();
+
+				if (errorLower.includes('password reset failed') || errorLower.includes('failed to reset')) {
+					translatedError = t('auth.errors.failedToResetPassword');
+				}
+				else if (errorLower.includes('password update failed')) {
+					translatedError = t('auth.errors.passwordUpdateFailed');
+				}
+				else if (errorLower.includes('invalid') && errorLower.includes('token')) {
+					translatedError = t('auth.invalidTokenMessage');
+				}
+				else if (errorLower.includes('token') && (errorLower.includes('expired') || errorLower.includes('invalid'))) {
+					translatedError = t('auth.invalidTokenMessage');
+				}
+			}
+
+			setError(translatedError);
 		}
 	};
 

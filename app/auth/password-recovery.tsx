@@ -81,12 +81,21 @@ export default function PasswordRecoveryScreen() {
 			console.error('Send reset code error:', error);
 			setStatus('error');
 
-			const errorMessage =
-				error instanceof Error
-					? error.message
-					: t('auth.resetEmailErrorMessage');
+			// Handle specific errors from the API
+			let translatedError = t('auth.resetEmailErrorMessage');
 
-			setError(errorMessage);
+			if (error instanceof Error) {
+				const errorLower = error.message.toLowerCase();
+
+				if (errorLower.includes('failed to send') && errorLower.includes('reset code')) {
+					translatedError = t('auth.errors.failedToSendResetCode');
+				}
+				else if (errorLower.includes('email') && errorLower.includes('not found')) {
+					translatedError = t('auth.errors.failedToCheckEmail');
+				}
+			}
+
+			setError(translatedError);
 		}
 	};
 

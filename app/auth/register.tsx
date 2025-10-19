@@ -160,25 +160,43 @@ export default function RegisterScreen() {
 				if (currentError) {
 					const errorLower = currentError.toLowerCase();
 
-					// Check for email-related errors
-					if (errorLower.includes('email') && (errorLower.includes('already') || errorLower.includes('registered') || errorLower.includes('taken'))) {
-						console.log('Setting email error:', currentError);
-						setEmailError(currentError);
+					// Map API errors to translation keys
+					let translatedError = currentError;
+
+					// Check for specific error patterns and map to translation keys
+					if (errorLower.includes('email') && (errorLower.includes('already') || errorLower.includes('registered'))) {
+						translatedError = t('auth.errors.emailAlreadyRegistered');
+						console.log('Setting email error:', translatedError);
+						setEmailError(translatedError);
 					}
 					// Check for username-related errors
 					else if (errorLower.includes('username') && (errorLower.includes('already') || errorLower.includes('taken'))) {
-						console.log('Setting username error:', currentError);
-						setUsernameError(currentError);
+						translatedError = t('auth.errors.usernameAlreadyTaken');
+						console.log('Setting username error:', translatedError);
+						setUsernameError(translatedError);
 					}
 					// Check for invalid email format
 					else if (errorLower.includes('email') && errorLower.includes('invalid')) {
-						console.log('Setting email invalid error:', currentError);
-						setEmailError(currentError);
+						translatedError = t('validation.emailInvalid');
+						console.log('Setting email invalid error:', translatedError);
+						setEmailError(translatedError);
+					}
+					// Check for user creation failed
+					else if (errorLower.includes('user creation failed') || errorLower.includes('failed to create')) {
+						translatedError = t('auth.errors.userCreationFailed');
+						console.log('Showing user creation error alert:', translatedError);
+						Alert.alert(t('auth.registerError'), translatedError);
+					}
+					// Generic registration failed error
+					else if (errorLower.includes('registration failed')) {
+						translatedError = t('auth.errors.registrationFailed');
+						console.log('Showing registration failed alert:', translatedError);
+						Alert.alert(t('auth.registerError'), translatedError);
 					}
 					// Generic error - show in alert
 					else {
 						console.log('Showing generic error alert:', currentError);
-						Alert.alert(t('auth.registerError'), currentError);
+						Alert.alert(t('auth.registerError'), t('auth.registerFailed'));
 					}
 				} else {
 					// No specific error message
