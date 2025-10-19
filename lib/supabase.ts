@@ -366,7 +366,7 @@ export type Database = {
 					id: string;
 					created_at: string;
 					updated_at: string;
-					profile_id: string;
+					user_id: string;
 					restaurant_id: string;
 					rating: number;
 					comment: any; // jsonb
@@ -379,7 +379,7 @@ export type Database = {
 					id?: string;
 					created_at?: string;
 					updated_at?: string;
-					profile_id: string;
+					user_id: string;
 					restaurant_id: string;
 					rating: number;
 					comment: any;
@@ -389,7 +389,7 @@ export type Database = {
 					deleted_at?: string | null;
 				};
 				Update: {
-					profile_id?: string;
+					user_id?: string;
 					restaurant_id?: string;
 					rating?: number;
 					comment?: any;

@@ -1,12 +1,12 @@
 // zustand/UserStore.ts - Versión actualizada con Supabase Storage
-import { SupabaseAuthService } from '@/api/supabaseAuth';
-import { SupabaseStorageService } from '@/api/supabaseStorage';
-import { getDeviceLanguage } from '@/shared/functions/utils';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as ImagePicker from 'expo-image-picker';
-import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
-import { Language, User } from '../shared/types';
+import { SupabaseAuthService } from "@/api/supabaseAuth";
+import { SupabaseStorageService } from "@/api/supabaseStorage";
+import { getDeviceLanguage } from "@/shared/functions/utils";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as ImagePicker from "expo-image-picker";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { Language, User } from "../shared/types";
 
 interface UserState {
 	user: User;
@@ -39,14 +39,14 @@ interface UserState {
 }
 
 export const undefinedUser: User = {
-	id: '',
-	email: '',
-	username: '',
+	id: "",
+	email: "",
+	username: "",
 	created_at: new Date().toISOString(),
-	name: '',
-	photo: '',
-	google_id: '',
-	access_token: '', // Este será el access_token de Supabase
+	name: "",
+	photo: "",
+	google_id: "",
+	access_token: "", // Este será el access_token de Supabase
 	has_password: false,
 	language: getDeviceLanguage(),
 };
@@ -69,7 +69,8 @@ export const useUserStore = create<UserState>()(
 				try {
 					SupabaseAuthService.initializeGoogleSignIn();
 					// Check for existing session
-					const sessionResult = await SupabaseAuthService.getSession();
+					const sessionResult = await SupabaseAuthService
+						.getSession();
 
 					if (sessionResult.success && sessionResult.data) {
 						const { user: profile, session } = sessionResult.data;
@@ -80,9 +81,10 @@ export const useUserStore = create<UserState>()(
 								access_token: session.access_token,
 								has_password: true, // Los usuarios de Supabase siempre tienen password o OAuth
 								google_id:
-									session.user.app_metadata.provider === 'google'
+									session.user.app_metadata.provider ===
+											"google"
 										? session.user.user_metadata.sub
-										: '',
+										: "",
 							},
 							isAuthenticated: true,
 							isLoading: false,
@@ -90,19 +92,23 @@ export const useUserStore = create<UserState>()(
 						});
 
 						// Setup auth state listener
-						SupabaseAuthService.onAuthStateChange((event, session) => {
-							if (event === 'SIGNED_OUT') {
-								get().setDefaultUser();
-							} else if (event === 'TOKEN_REFRESHED' && session) {
-								// Update token
-								set((state) => ({
-									user: {
-										...state.user,
-										access_token: session.access_token,
-									},
-								}));
-							}
-						});
+						SupabaseAuthService.onAuthStateChange(
+							(event, session) => {
+								if (event === "SIGNED_OUT") {
+									get().setDefaultUser();
+								} else if (
+									event === "TOKEN_REFRESHED" && session
+								) {
+									// Update token
+									set((state) => ({
+										user: {
+											...state.user,
+											access_token: session.access_token,
+										},
+									}));
+								}
+							},
+						);
 					} else {
 						set({
 							isAuthenticated: false,
@@ -111,11 +117,11 @@ export const useUserStore = create<UserState>()(
 						});
 					}
 				} catch (error) {
-					console.error('Error initializing user store:', error);
+					console.error("Error initializing user store:", error);
 					set({
 						isLoading: false,
 						isInitialized: true,
-						error: 'Failed to initialize authentication',
+						error: "Failed to initialize authentication",
 					});
 				}
 			},
@@ -123,11 +129,12 @@ export const useUserStore = create<UserState>()(
 			setUser: (user: User) => {
 				const userWithToken = {
 					...user,
-					access_token: user.access_token || '',
+					access_token: user.access_token || "",
 				};
 				set({
 					user: userWithToken,
-					isAuthenticated: !!userWithToken.id && !!userWithToken.access_token,
+					isAuthenticated: !!userWithToken.id &&
+						!!userWithToken.access_token,
 					error: null,
 					isInitialized: true,
 				});
@@ -142,28 +149,29 @@ export const useUserStore = create<UserState>()(
 					const state = get();
 
 					if (!state.isAuthenticated || !state.user.id) {
-						throw new Error('User not authenticated');
+						throw new Error("User not authenticated");
 					}
 
-					console.log('Uploading photo asset:', photoAsset);
+					console.log("Uploading photo asset:", photoAsset);
 
 					// Upload to Supabase Storage
-					const uploadResult =
-						await SupabaseStorageService.uploadUserProfilePhoto(
+					const uploadResult = await SupabaseStorageService
+						.uploadUserProfilePhoto(
 							state.user.id,
 							photoAsset,
 						);
 
-					console.log('Upload result:', uploadResult);
+					console.log("Upload result:", uploadResult);
 
 					if (!uploadResult.success) {
 						throw new Error(uploadResult.error);
 					}
 
 					// Update profile in database with the new photo URL
-					const updateResult = await SupabaseAuthService.updateProfile({
-						photo: uploadResult.data!.publicUrl,
-					});
+					const updateResult = await SupabaseAuthService
+						.updateProfile({
+							photo: uploadResult.data!.publicUrl,
+						});
 
 					if (updateResult.success) {
 						set((state) => ({
@@ -180,8 +188,9 @@ export const useUserStore = create<UserState>()(
 						throw new Error(updateResult.error);
 					}
 				} catch (error) {
-					const errorMessage =
-						error instanceof Error ? error.message : 'Failed to update photo';
+					const errorMessage = error instanceof Error
+						? error.message
+						: "Failed to update photo";
 					set({ error: errorMessage, isLoading: false });
 					return false;
 				}
@@ -194,27 +203,28 @@ export const useUserStore = create<UserState>()(
 					const state = get();
 
 					if (!state.isAuthenticated || !state.user.id) {
-						throw new Error('User not authenticated');
+						throw new Error("User not authenticated");
 					}
 
 					// Delete from Supabase Storage
-					const deleteResult =
-						await SupabaseStorageService.deleteUserProfilePhoto(state.user.id);
+					const deleteResult = await SupabaseStorageService
+						.deleteUserProfilePhoto(state.user.id);
 
 					if (!deleteResult.success) {
 						throw new Error(deleteResult.error);
 					}
 
 					// Update profile in database to remove photo URL
-					const updateResult = await SupabaseAuthService.updateProfile({
-						photo: '',
-					});
+					const updateResult = await SupabaseAuthService
+						.updateProfile({
+							photo: "",
+						});
 
 					if (updateResult.success) {
 						set((state) => ({
 							user: {
 								...state.user,
-								photo: '',
+								photo: "",
 							},
 							isLoading: false,
 						}));
@@ -223,8 +233,9 @@ export const useUserStore = create<UserState>()(
 						throw new Error(updateResult.error);
 					}
 				} catch (error) {
-					const errorMessage =
-						error instanceof Error ? error.message : 'Failed to delete photo';
+					const errorMessage = error instanceof Error
+						? error.message
+						: "Failed to delete photo";
 					set({ error: errorMessage, isLoading: false });
 					return false;
 				}
@@ -237,24 +248,32 @@ export const useUserStore = create<UserState>()(
 					const state = get();
 
 					// Verificar disponibilidad excluyendo al usuario actual
-					const availabilityResult =
-						await SupabaseAuthService.checkUsernameAvailabilityForUpdate(
+					const availabilityResult = await SupabaseAuthService
+						.checkUsernameAvailabilityForUpdate(
 							username,
 							state.user.id,
 						);
 
 					if (!availabilityResult.success) {
-						set({ error: availabilityResult.error, isLoading: false });
+						set({
+							error: availabilityResult.error,
+							isLoading: false,
+						});
 						return false;
 					}
 
 					if (!availabilityResult.data?.available) {
-						set({ error: 'Username is already taken', isLoading: false });
+						set({
+							error: "Username is already taken",
+							isLoading: false,
+						});
 						return false;
 					}
 
 					// Si está disponible, proceder con la actualización
-					const result = await SupabaseAuthService.updateProfile({ username });
+					const result = await SupabaseAuthService.updateProfile({
+						username,
+					});
 
 					if (result.success) {
 						set((state) => ({
@@ -267,10 +286,9 @@ export const useUserStore = create<UserState>()(
 						return false;
 					}
 				} catch (error) {
-					const errorMessage =
-						error instanceof Error
-							? error.message
-							: 'Failed to update username';
+					const errorMessage = error instanceof Error
+						? error.message
+						: "Failed to update username";
 					set({ error: errorMessage, isLoading: false });
 					return false;
 				}
@@ -298,29 +316,40 @@ export const useUserStore = create<UserState>()(
 						await SupabaseAuthService.updateProfile({ language });
 
 						// Refresh cuisines for the new language
-						const { useCuisineStore } = await import('@/zustand/CuisineStore');
+						const { useCuisineStore } = await import(
+							"@/zustand/CuisineStore"
+						);
 						const { refreshCuisines } = useCuisineStore.getState();
 
 						try {
 							await refreshCuisines();
 						} catch (cuisineError) {
 							console.error(
-								'Failed to refresh cuisines after language change:',
+								"Failed to refresh cuisines after language change:",
 								cuisineError,
 							);
 						}
 					} catch (error) {
-						console.error('Failed to update language on server:', error);
+						console.error(
+							"Failed to update language on server:",
+							error,
+						);
 					}
 				}
 			},
 
-			login: async (email: string, password: string): Promise<boolean> => {
+			login: async (
+				email: string,
+				password: string,
+			): Promise<boolean> => {
 				set({ isLoading: true, error: null });
 
 				try {
-					const result = await SupabaseAuthService.login(email, password);
-					console.log('Login result:', result);
+					const result = await SupabaseAuthService.login(
+						email,
+						password,
+					);
+					console.log("Login result:", result);
 
 					if (result.success && result.data) {
 						const { user: profile, session } = result.data;
@@ -331,9 +360,10 @@ export const useUserStore = create<UserState>()(
 								access_token: session.access_token,
 								has_password: true,
 								google_id:
-									session.user.app_metadata.provider === 'google'
+									session.user.app_metadata.provider ===
+											"google"
 										? session.user.user_metadata.sub
-										: '',
+										: "",
 							},
 							isAuthenticated: true,
 							isLoading: false,
@@ -346,21 +376,22 @@ export const useUserStore = create<UserState>()(
 						return false;
 					}
 				} catch (error) {
-					const errorMessage =
-						error instanceof Error ? error.message : 'Login failed';
+					const errorMessage = error instanceof Error
+						? error.message
+						: "Login failed";
 					set({ error: errorMessage, isLoading: false });
 					return false;
 				}
 			},
 
 			register: async (userData): Promise<boolean> => {
-				console.log('Registering user with data:', userData);
-				set({ isLoading: true, error: null });
+				console.log("Registering user with data:", userData);
+				set({ error: null });
 
 				try {
 					const result = await SupabaseAuthService.register(userData);
 
-					console.log('Registration result:', result);
+					console.log("Registration result:", result);
 
 					if (result.success && result.data) {
 						const { user: profile, session } = result.data;
@@ -368,24 +399,25 @@ export const useUserStore = create<UserState>()(
 						set({
 							user: {
 								...profile,
-								access_token: session?.access_token || '',
+								access_token: session?.access_token || "",
 								has_password: true,
-								google_id: '',
+								google_id: "",
 							},
 							isAuthenticated: !!session,
-							isLoading: false,
+
 							error: null,
 							isInitialized: true,
 						});
 						return true;
 					} else {
-						set({ error: result.error, isLoading: false });
+						set({ error: result.error });
 						return false;
 					}
 				} catch (error) {
-					const errorMessage =
-						error instanceof Error ? error.message : 'Registration failed';
-					set({ error: errorMessage, isLoading: false });
+					const errorMessage = error instanceof Error
+						? error.message
+						: "Registration failed";
+					set({ error: errorMessage });
 					return false;
 				}
 			},
@@ -416,19 +448,19 @@ export const useUserStore = create<UserState>()(
 								access_token: session.access_token,
 								has_password: true,
 								google_id:
-									session.user.app_metadata.provider === 'google'
+									session.user.app_metadata.provider ===
+											"google"
 										? session.user.user_metadata.sub
-										: '',
+										: "",
 							},
 						}));
 					} else {
-						throw new Error('Failed to refresh profile');
+						throw new Error("Failed to refresh profile");
 					}
 				} catch (error) {
-					const errorMessage =
-						error instanceof Error
-							? error.message
-							: 'Failed to refresh profile';
+					const errorMessage = error instanceof Error
+						? error.message
+						: "Failed to refresh profile";
 					set({ error: errorMessage });
 
 					// If session is invalid, logout
@@ -440,7 +472,9 @@ export const useUserStore = create<UserState>()(
 				set({ isLoading: true, error: null });
 
 				try {
-					const result = await SupabaseAuthService.updatePassword(newPassword);
+					const result = await SupabaseAuthService.updatePassword(
+						newPassword,
+					);
 
 					if (result.success) {
 						set({ isLoading: false });
@@ -450,10 +484,9 @@ export const useUserStore = create<UserState>()(
 						return false;
 					}
 				} catch (error) {
-					const errorMessage =
-						error instanceof Error
-							? error.message
-							: 'Failed to change password';
+					const errorMessage = error instanceof Error
+						? error.message
+						: "Failed to change password";
 					set({ error: errorMessage, isLoading: false });
 					return false;
 				}
@@ -463,7 +496,9 @@ export const useUserStore = create<UserState>()(
 				set({ isLoading: true, error: null });
 
 				try {
-					const result = await SupabaseAuthService.resetPassword(email);
+					const result = await SupabaseAuthService.resetPassword(
+						email,
+					);
 
 					if (result.success) {
 						set({ isLoading: false });
@@ -473,52 +508,69 @@ export const useUserStore = create<UserState>()(
 						return false;
 					}
 				} catch (error) {
-					const errorMessage =
-						error instanceof Error ? error.message : 'Reset failed';
+					const errorMessage = error instanceof Error
+						? error.message
+						: "Reset failed";
 					set({ error: errorMessage, isLoading: false });
 					return false;
 				}
 			},
 
-			checkUsernameAvailability: async (username: string): Promise<boolean> => {
+			checkUsernameAvailability: async (
+				username: string,
+			): Promise<boolean> => {
 				try {
-					const result = await SupabaseAuthService.checkUsernameAvailability(
-						username,
-					);
+					const result = await SupabaseAuthService
+						.checkUsernameAvailability(
+							username,
+						);
 
 					if (result.success && result.data) {
 						return result.data.available;
 					} else {
 						console.error(
-							'Error checking username availability:',
+							"Error checking username availability:",
 							result.error,
 						);
 						return false;
 					}
 				} catch (error) {
-					console.error('Error checking username availability:', error);
+					console.error(
+						"Error checking username availability:",
+						error,
+					);
 					return false;
 				}
 			},
 
 			checkEmailAvailability: async (email: string): Promise<boolean> => {
 				try {
-					console.log('Checking email availability for:', email);
+					console.log("Checking email availability for:", email);
 
-					const result = await SupabaseAuthService.checkEmailAvailability(
-						email,
-					);
+					const result = await SupabaseAuthService
+						.checkEmailAvailability(
+							email,
+						);
 
-					console.log('Email availability result:', result);
+					console.log("Email availability result:", result);
 
 					if (result.success && result.data) {
 						return result.data.available;
 					} else {
-						console.error('Error checking email availability:', result.error);
+						console.error(
+							"Error checking email availability:",
+							result.error,
+						);
+						// Set error in store so UI can show it
+						set({ error: result.error });
 						return false;
 					}
 				} catch (error) {
-					console.error('Error checking email availability:', error);
+					console.error("Error checking email availability:", error);
+					const errorMessage = error instanceof Error
+						? error.message
+						: "Network error";
+					set({ error: errorMessage });
 					return false;
 				}
 			},
@@ -528,7 +580,7 @@ export const useUserStore = create<UserState>()(
 			},
 		}),
 		{
-			name: 'user-storage',
+			name: "user-storage",
 			storage: createJSONStorage(() => AsyncStorage),
 			partialize: (state) => ({
 				user: state.user,
@@ -536,7 +588,7 @@ export const useUserStore = create<UserState>()(
 			}),
 			onRehydrateStorage: () => (state, error) => {
 				if (error) {
-					console.error('Error rehydrating user store:', error);
+					console.error("Error rehydrating user store:", error);
 					return;
 				}
 

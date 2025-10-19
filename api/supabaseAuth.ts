@@ -76,42 +76,52 @@ export class SupabaseAuthService {
 				throw new Error('User creation failed');
 			}
 
-			// 4. El trigger automáticamente creará el perfil en public.profiles
-			// Esperamos un poco para que se ejecute el trigger
-			await new Promise((resolve) => setTimeout(resolve, 100));
+			console.log('User created, checking for session and token...');
+			console.log('Has session:', !!authData.session);
+			console.log('Has access_token:', !!authData.session?.access_token);
 
-			// 5. Obtener el perfil creado
-			const { data: profile, error: profileError } = await supabase
+			// 4. Wait for trigger to execute and try to fetch profile
+			// The trigger should create the profile automatically
+			await new Promise((resolve) => setTimeout(resolve, 200));
+
+			// 5. Try to get the profile created by the trigger (use array query to avoid 406)
+			const { data: profiles, error: profileError } = await supabase
 				.from('profiles')
 				.select('*')
-				.eq('id', authData.user.id)
-				.single();
+				.eq('id', authData.user.id);
 
-			if (profileError) {
-				console.error('Profile creation error:', profileError);
-				// Si el trigger falló, crear manualmente
-				const { data: manualProfile, error: manualError } = await supabase
-					.from('profiles')
-					.insert({
-						id: authData.user.id,
-						email: userData.email,
-						username: userData.username,
-						name: userData.name,
-						language: userData.language,
-						has_password: true,
-					})
-					.select()
-					.single();
+			let profile = profiles && profiles.length > 0 ? profiles[0] : null;
 
-				if (manualError) throw manualError;
+			// 6. If trigger didn't create profile, create it manually
+			// The supabase client should now be authenticated after signUp
+			if (!profile) {
+				console.error('Profile not found, creating manually...');
 
-				return {
-					success: true,
-					data: {
-						user: manualProfile,
-						session: authData.session,
-					},
-				};
+				// After signUp, the supabase client should be authenticated
+				// We can insert directly without creating a new client
+				const { data: manualProfile, error: manualError } =
+					await supabase
+						.from('profiles')
+						.insert({
+							id: authData.user.id,
+							email: userData.email,
+							username: userData.username,
+							name: userData.name,
+							language: userData.language,
+							has_password: true,
+						})
+						.select()
+						.single();
+
+				if (manualError) {
+					console.error('Manual profile creation failed:', manualError);
+					throw new Error(
+						`Failed to create profile: ${manualError.message}`,
+					);
+				}
+
+				profile = manualProfile;
+				console.log('Profile created successfully');
 			}
 
 			return {
@@ -593,24 +603,43 @@ export class SupabaseAuthService {
 	 */
 	static async checkUsernameAvailability(username: string) {
 		try {
+			console.log('🔍 Checking username availability for:', username);
+			console.log('📡 Querying Supabase...');
+
 			const { data, error } = await supabase
 				.from('profiles')
 				.select('id')
-				.eq('username', username)
-				.maybeSingle();
+				.eq('username', username.trim());
+
+			console.log('📊 Username check result:', {
+				data,
+				error,
+				dataIsArray: Array.isArray(data),
+				dataLength: data?.length,
+			});
 
 			if (error) {
+				console.error('❌ Database error:', error);
 				return {
 					success: false,
 					error: error.message,
 				};
 			}
 
+			// Check if the array is empty (username is available)
+			const available = !data || data.length === 0;
+			console.log(
+				available
+					? '✅ Username available'
+					: '❌ Username already taken',
+			);
+
 			return {
 				success: true,
-				data: { available: !data },
+				data: { available },
 			};
 		} catch (error) {
+			console.error('💥 Fatal error checking username availability:', error);
 			return {
 				success: false,
 				error:
@@ -624,29 +653,45 @@ export class SupabaseAuthService {
 	 */
 	static async checkEmailAvailability(email: string) {
 		try {
+			console.log('🔍 Checking email availability for:', email);
+
+			// Use select without maybeSingle - just get the array
+			console.log('📡 Querying Supabase...');
+
 			const { data, error } = await supabase
 				.from('profiles')
 				.select('id')
-				.eq('email', email)
-				.maybeSingle();
+				.eq('email', email.toLowerCase().trim());
 
-			console.log('Check email availability:', { email, found: !!data, error });
+			console.log('📦 Query result:', {
+				data,
+				error,
+				dataIsArray: Array.isArray(data),
+				dataLength: data?.length,
+			});
 
 			if (error) {
+				console.error('❌ Database error:', error);
 				return {
 					success: false,
 					error: error.message,
 				};
 			}
 
-			console.log('Email availability result:', { available: !data });
+			// Check if the array is empty (email is available)
+			const available = !data || data.length === 0;
+			console.log(
+				available
+					? '✅ Email available (no matches found)'
+					: '❌ Email already registered',
+			);
 
 			return {
 				success: true,
-				data: { available: !data },
+				data: { available },
 			};
 		} catch (error) {
-			console.error('Error checking email availability:', error);
+			console.error('💥 Fatal error checking email availability:', error);
 			return {
 				success: false,
 				error: error instanceof Error ? error.message : 'Failed to check email',

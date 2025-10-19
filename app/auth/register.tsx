@@ -24,12 +24,6 @@ export default function RegisterScreen() {
 	const { t, locale } = useTranslation();
 	const router = useRouter();
 	const register = useUserStore((state) => state.register);
-	const checkEmailAvailability = useUserStore(
-		(state) => state.checkEmailAvailability,
-	);
-	const checkUsernameAvailability = useUserStore(
-		(state) => state.checkUsernameAvailability,
-	);
 	const isLoading = useUserStore((state) => state.isLoading);
 	const isAuthenticated = useUserStore((state) => state.isAuthenticated);
 	const error = useUserStore((state) => state.error);
@@ -57,7 +51,9 @@ export default function RegisterScreen() {
 	}
 
 	const validateEmail = (email: string) => {
-		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		// More strict email validation to match Supabase's requirements
+		// Requires at least 3 characters before @, valid domain
+		const emailRegex = /^[a-zA-Z0-9][a-zA-Z0-9._-]{2,}@[a-zA-Z0-9][a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 		return emailRegex.test(email);
 	};
 
@@ -137,22 +133,7 @@ export default function RegisterScreen() {
 		if (hasErrors) return;
 
 		try {
-			// Check email availability
-			const emailAvailable = await checkEmailAvailability(email.trim());
-			if (!emailAvailable) {
-				setEmailError(t('validation.emailNotAvailable'));
-				return;
-			}
-
-			// Check username availability
-			const usernameAvailable = await checkUsernameAvailability(
-				username.trim(),
-			);
-			if (!usernameAvailable) {
-				setUsernameError(t('validation.usernameNotAvailable'));
-				return;
-			}
-
+			// Try to register - the API will check email/username availability
 			const success = await register({
 				email: email.trim(),
 				username: username.trim(),
@@ -161,16 +142,55 @@ export default function RegisterScreen() {
 				language: 'es_ES', // Default language
 			});
 
+			console.log('Register function returned success:', success);
+
 			if (success) {
-				// Navigation will be handled automatically by the authentication state change
-				// The user will be redirected to the main app through the index.tsx redirect
+				// Only navigate on successful registration
+				console.log('Registration successful, navigating to home');
 				router.replace('/');
 			} else {
-				if (error) {
-					Alert.alert(t('auth.registerError'), error);
+				// Registration failed - stay on this screen and show errors
+				// Get the error from the store after the failed registration
+				const currentError = useUserStore.getState().error;
+
+				console.log('Registration failed with error:', currentError);
+				console.log('Staying on register screen to show error');
+
+				// Handle specific errors from the API
+				if (currentError) {
+					const errorLower = currentError.toLowerCase();
+
+					// Check for email-related errors
+					if (errorLower.includes('email') && (errorLower.includes('already') || errorLower.includes('registered') || errorLower.includes('taken'))) {
+						console.log('Setting email error:', currentError);
+						setEmailError(currentError);
+					}
+					// Check for username-related errors
+					else if (errorLower.includes('username') && (errorLower.includes('already') || errorLower.includes('taken'))) {
+						console.log('Setting username error:', currentError);
+						setUsernameError(currentError);
+					}
+					// Check for invalid email format
+					else if (errorLower.includes('email') && errorLower.includes('invalid')) {
+						console.log('Setting email invalid error:', currentError);
+						setEmailError(currentError);
+					}
+					// Generic error - show in alert
+					else {
+						console.log('Showing generic error alert:', currentError);
+						Alert.alert(t('auth.registerError'), currentError);
+					}
+				} else {
+					// No specific error message
+					console.log('No error message available');
+					Alert.alert(t('auth.registerError'), t('auth.registerFailed'));
 				}
+
+				// Explicitly prevent navigation
+				return;
 			}
 		} catch (err) {
+			console.error('Registration exception:', err);
 			Alert.alert(t('auth.registerError'), t('auth.registerFailed'));
 		}
 	};
