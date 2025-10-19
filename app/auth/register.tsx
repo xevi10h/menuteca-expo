@@ -24,7 +24,7 @@ export default function RegisterScreen() {
 	const { t, locale } = useTranslation();
 	const router = useRouter();
 	const register = useUserStore((state) => state.register);
-	const isLoading = useUserStore((state) => state.isLoading);
+	const isLoading = useUserStore((state) => state.isAuthOperationLoading);
 	const isAuthenticated = useUserStore((state) => state.isAuthenticated);
 	const error = useUserStore((state) => state.error);
 

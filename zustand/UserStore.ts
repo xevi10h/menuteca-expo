@@ -11,7 +11,8 @@ import { Language, User } from "../shared/types";
 interface UserState {
 	user: User;
 	isAuthenticated: boolean;
-	isLoading: boolean;
+	isLoading: boolean; // Only for app initialization
+	isAuthOperationLoading: boolean; // For auth operations (login, register, etc.)
 	error: string | null;
 	isInitialized: boolean;
 	setUser: (user: User) => void;
@@ -57,6 +58,7 @@ export const useUserStore = create<UserState>()(
 			user: undefinedUser,
 			isAuthenticated: false,
 			isLoading: false,
+			isAuthOperationLoading: false,
 			error: null,
 			isInitialized: false,
 
@@ -342,7 +344,7 @@ export const useUserStore = create<UserState>()(
 				email: string,
 				password: string,
 			): Promise<boolean> => {
-				set({ isLoading: true, error: null });
+				set({ isAuthOperationLoading: true, error: null });
 
 				try {
 					const result = await SupabaseAuthService.login(
@@ -366,27 +368,27 @@ export const useUserStore = create<UserState>()(
 										: "",
 							},
 							isAuthenticated: true,
-							isLoading: false,
+							isAuthOperationLoading: false,
 							error: null,
 							isInitialized: true,
 						});
 						return true;
 					} else {
-						set({ error: result.error, isLoading: false });
+						set({ error: result.error, isAuthOperationLoading: false });
 						return false;
 					}
 				} catch (error) {
 					const errorMessage = error instanceof Error
 						? error.message
 						: "Login failed";
-					set({ error: errorMessage, isLoading: false });
+					set({ error: errorMessage, isAuthOperationLoading: false });
 					return false;
 				}
 			},
 
 			register: async (userData): Promise<boolean> => {
 				console.log("Registering user with data:", userData);
-				set({ error: null });
+				set({ isAuthOperationLoading: true, error: null });
 
 				try {
 					const result = await SupabaseAuthService.register(userData);
@@ -404,20 +406,20 @@ export const useUserStore = create<UserState>()(
 								google_id: "",
 							},
 							isAuthenticated: !!session,
-
+						isAuthOperationLoading: false,
 							error: null,
 							isInitialized: true,
 						});
 						return true;
 					} else {
-						set({ error: result.error });
+						set({ error: result.error, isAuthOperationLoading: false });
 						return false;
 					}
 				} catch (error) {
 					const errorMessage = error instanceof Error
 						? error.message
 						: "Registration failed";
-					set({ error: errorMessage });
+					set({ error: errorMessage, isAuthOperationLoading: false });
 					return false;
 				}
 			},
