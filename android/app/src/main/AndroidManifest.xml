@@ -31,7 +31,9 @@
       </intent-filter>
       <intent-filter android:autoVerify="true" data-generated="true">
         <action android:name="android.intent.action.VIEW"/>
-        <data android:scheme="https" android:host="redbeeapp.com"/>
+        <data android:scheme="https" android:host="menutecaapp.com" android:pathPrefix="/restaurant"/>
+        <data android:scheme="https" android:host="www.menutecaapp.com" android:pathPrefix="/restaurant"/>
+        <data android:scheme="menutecaapp"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <category android:name="android.intent.category.DEFAULT"/>
       </intent-filter>

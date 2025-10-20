@@ -1,5 +1,7 @@
+import { SupabaseAuthService } from '@/api/supabaseAuth';
 import { useCuisineStore } from '@/zustand/CuisineStore';
 import { useUserStore } from '@/zustand/UserStore';
+import { Platform } from 'react-native';
 import { useEffect, useState } from 'react';
 
 interface AppInitializationState {
@@ -30,6 +32,17 @@ export const useAppInitialization = (): AppInitializationState => {
 		const initializeApp = async () => {
 			try {
 				setState((prev) => ({ ...prev, isLoading: true, error: null }));
+
+				// Initialize Google Sign-In (required for native modules)
+				if (Platform.OS !== 'web') {
+					try {
+						SupabaseAuthService.initializeGoogleSignIn();
+						console.log('✅ Google Sign-In initialized');
+					} catch (error) {
+						console.warn('⚠️ Google Sign-In initialization failed:', error);
+						// Don't fail the app if Google Sign-In fails to initialize
+					}
+				}
 
 				// Initialize user authentication first
 				await userInitialize();
