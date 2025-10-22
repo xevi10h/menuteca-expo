@@ -369,6 +369,7 @@ export class SupabaseAuthService {
 			});
 
 			if (!credential.identityToken) {
+				console.log("❌ No identity token received");
 				return {
 					success: false,
 					error: "No identity token received from Apple",
@@ -376,12 +377,23 @@ export class SupabaseAuthService {
 			}
 
 			// Sign in to Supabase with the identity token
+			console.log("🔐 Signing in to Supabase with Apple token...");
 			const { data, error } = await supabase.auth.signInWithIdToken({
 				provider: "apple",
 				token: credential.identityToken,
 			});
 
+			console.log("📊 Supabase response:", {
+				hasUser: !!data?.user,
+				hasSession: !!data?.session,
+				userId: data?.user?.id,
+				userEmail: data?.user?.email,
+				errorCode: error?.status,
+				errorMessage: error?.message,
+			});
+
 			if (error) {
+				console.error("❌ Supabase auth error:", error);
 				return {
 					success: false,
 					error: error.message,
@@ -389,21 +401,31 @@ export class SupabaseAuthService {
 			}
 
 			if (!data.user) {
+				console.log("❌ No user data received");
 				return {
 					success: false,
 					error: "No user data received from Supabase",
 				};
 			}
 
-			// Check if user has a profile, create one if not
+			// Check if user has a profile, create one if not (use maybeSingle to avoid 406)
+			console.log("🔍 Looking for existing profile...");
 			let { data: profile, error: profileError } = await supabase
 				.from("profiles")
 				.select("*")
 				.eq("id", data.user.id)
-				.single();
+				.maybeSingle();
 
-			if (profileError && profileError.code === "PGRST116") {
-				// Profile doesn't exist, create one
+			if (profileError) {
+				console.error("❌ Error fetching profile:", profileError);
+				// Don't fail here, try to create the profile
+			}
+
+			// If no profile exists, create one
+			if (!profile) {
+				console.log("🆕 Creating new profile...");
+
+				// Get display name from Apple credential or metadata
 				let displayName = data.user.user_metadata?.full_name;
 
 				// Apple provides full name only on first sign in
@@ -413,47 +435,76 @@ export class SupabaseAuthService {
 					}`.trim();
 				}
 
-				const username = this.generateUsernameFromEmail(
-					data.user.email || credential.email || "",
-				);
+				// Get email from user data or credential
+				const email = data.user.email || credential.email || "";
+
+				if (!email) {
+					console.error("❌ No email available from Apple");
+					return {
+						success: false,
+						error:
+							"No email received from Apple. Please try again.",
+					};
+				}
+
+				const username = this.generateUsernameFromEmail(email);
+				const name = displayName || username;
+
+				const profileData = {
+					id: data.user.id,
+					email: email,
+					username: username,
+					name: name,
+					photo: null,
+					language: getDeviceLanguage(),
+					has_password: false,
+				};
+
+				console.log("📝 Profile data:", {
+					id: profileData.id,
+					email: profileData.email,
+					username: profileData.username,
+					name: profileData.name,
+					language: profileData.language,
+				});
 
 				const { data: newProfile, error: createError } = await supabase
 					.from("profiles")
-					.insert({
-						id: data.user.id,
-						username,
-						display_name: displayName || username,
-					})
+					.insert(profileData)
 					.select()
 					.single();
 
 				if (createError) {
+					console.error("❌ Error creating profile:", createError);
 					return {
 						success: false,
-						error: "Failed to create user profile",
+						error:
+							`Failed to create user profile: ${createError.message}`,
 					};
 				}
 
 				profile = newProfile;
-			} else if (profileError) {
-				return {
-					success: false,
-					error: "Failed to fetch user profile",
-				};
+				console.log("✅ Profile created successfully");
+			} else {
+				console.log("✅ Profile found");
 			}
 
 			const user: User = {
 				...profile!,
-				email: data.user.email || credential.email || "",
+				email: data.user.email || credential.email || profile!.email,
 				access_token: data.session?.access_token,
 				language: profile!.language || getDeviceLanguage(),
 			};
+
+			console.log("🎉 Apple Sign-In completed successfully");
 
 			return {
 				success: true,
 				data: user,
 			};
 		} catch (error: any) {
+			console.error("💥 Apple Sign-In error:", error);
+
 			if (error.code === "ERR_REQUEST_CANCELED") {
 				return {
 					success: false,

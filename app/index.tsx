@@ -12,7 +12,6 @@ import CuisineFilter from '@/components/filters/CuisineFilter';
 import RestaurantList from '@/components/list/RestaurantList';
 import ScrollHorizontalRestaurant from '@/components/list/ScrollHorizontalResturant';
 import { useAppInitialization } from '@/hooks/useAppInitialization';
-import { useRequireAuth } from '@/hooks/useAuth';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Restaurant } from '@/shared/types';
 import { useFilterStore } from '@/zustand/FilterStore';
@@ -30,9 +29,6 @@ const DEFAULT_LOCATION = {
 };
 
 export default function Index() {
-	// Use require auth hook
-	const { isLoading: authLoading } = useRequireAuth();
-
 	// Use app initialization hook
 	const {
 		isInitialized,
@@ -40,14 +36,12 @@ export default function Index() {
 		error: appError,
 	} = useAppInitialization();
 
-	// Show loading while checking authentication or initializing app
-	if (authLoading || appLoading || !isInitialized) {
+	// Show loading while initializing app
+	if (appLoading || !isInitialized) {
 		return (
 			<LoadingScreen
 				showLogo={true}
-				message={
-					authLoading ? 'Checking authentication...' : 'Initializing app...'
-				}
+				message={'Initializing app...'}
 				showProgress={false}
 			/>
 		);
@@ -59,7 +53,7 @@ export default function Index() {
 		// Still proceed to show the app - most errors aren't critical
 	}
 
-	// If authenticated and initialized, show main app content
+	// Show main app content (no authentication required for browsing)
 	return <MainAppContent />;
 }
 

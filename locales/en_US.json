@@ -408,7 +408,12 @@
 		"deleteRestaurant": "Delete restaurant",
 		"deleteRestaurantConfirm": "Are you sure you want to delete this restaurant? This action cannot be undone.",
 		"restaurantDeleted": "Restaurant deleted successfully",
-		"errorDeletingRestaurant": "Could not delete the restaurant. Please try again."
+		"errorDeletingRestaurant": "Could not delete the restaurant. Please try again.",
+		"deleteAccount": "Delete Account",
+		"deleteAccountConfirm": "Are you sure you want to permanently delete your account? This action cannot be undone and will delete all your data including your restaurants, reviews, and profile information.",
+		"accountDeleted": "Account deleted successfully",
+		"errorDeletingAccount": "Could not delete the account. Please try again.",
+		"dangerZone": "Danger Zone"
 	},
 	"languages": {
 		"es_ES": "Spanish",

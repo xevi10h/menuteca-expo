@@ -35,6 +35,7 @@ interface UserState {
 	resetPassword: (email: string) => Promise<boolean>;
 	checkUsernameAvailability: (username: string) => Promise<boolean>;
 	checkEmailAvailability: (email: string) => Promise<boolean>;
+	deleteAccount: () => Promise<boolean>;
 	initialize: () => Promise<void>;
 	clearError: () => void;
 }
@@ -573,6 +574,38 @@ export const useUserStore = create<UserState>()(
 						? error.message
 						: "Network error";
 					set({ error: errorMessage });
+					return false;
+				}
+			},
+
+			deleteAccount: async (): Promise<boolean> => {
+				set({ isLoading: true, error: null });
+
+				try {
+					const { SupabaseUserService } = await import(
+						"@/api/supabaseUser"
+					);
+					const result = await SupabaseUserService.deleteAccount();
+
+					if (result.success) {
+						// Clear user data and logout
+						await SupabaseAuthService.logout();
+						set({
+							user: { ...undefinedUser, language: get().user.language },
+							isAuthenticated: false,
+							isLoading: false,
+							error: null,
+						});
+						return true;
+					} else {
+						set({ error: result.error, isLoading: false });
+						return false;
+					}
+				} catch (error) {
+					const errorMessage = error instanceof Error
+						? error.message
+						: "Failed to delete account";
+					set({ error: errorMessage, isLoading: false });
 					return false;
 				}
 			},

@@ -407,7 +407,12 @@
 		"deleteRestaurant": "Eliminar restaurante",
 		"deleteRestaurantConfirm": "¿Estás seguro de que quieres eliminar este restaurante? Esta acción no se puede deshacer.",
 		"restaurantDeleted": "Restaurante eliminado correctamente",
-		"errorDeletingRestaurant": "No se pudo eliminar el restaurante. Inténtalo de nuevo."
+		"errorDeletingRestaurant": "No se pudo eliminar el restaurante. Inténtalo de nuevo.",
+		"deleteAccount": "Eliminar cuenta",
+		"deleteAccountConfirm": "¿Estás seguro de que quieres eliminar permanentemente tu cuenta? Esta acción no se puede deshacer y eliminará todos tus datos incluyendo tus restaurantes, reseñas e información de perfil.",
+		"accountDeleted": "Cuenta eliminada correctamente",
+		"errorDeletingAccount": "No se pudo eliminar la cuenta. Inténtalo de nuevo.",
+		"dangerZone": "Zona de peligro"
 	},
 	"languages": {
 		"es_ES": "Español",

@@ -408,7 +408,12 @@
 		"deleteRestaurant": "Eliminar restaurant",
 		"deleteRestaurantConfirm": "Estàs segur que vols eliminar aquest restaurant? Aquesta acció no es pot desfer.",
 		"restaurantDeleted": "Restaurant eliminat correctament",
-		"errorDeletingRestaurant": "No s'ha pogut eliminar el restaurant. Torna-ho a intentar."
+		"errorDeletingRestaurant": "No s'ha pogut eliminar el restaurant. Torna-ho a intentar.",
+		"deleteAccount": "Eliminar compte",
+		"deleteAccountConfirm": "Estàs segur que vols eliminar permanentment el teu compte? Aquesta acció no es pot desfer i eliminarà totes les teves dades incloent els teus restaurants, ressenyes i informació del perfil.",
+		"accountDeleted": "Compte eliminat correctament",
+		"errorDeletingAccount": "No s'ha pogut eliminar el compte. Torna-ho a intentar.",
+		"dangerZone": "Zona de perill"
 	},
 	"languages": {
 		"es_ES": "Espanyol",

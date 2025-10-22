@@ -408,7 +408,12 @@
 		"deleteRestaurant": "Supprimer le restaurant",
 		"deleteRestaurantConfirm": "Êtes-vous sûr de vouloir supprimer ce restaurant ? Cette action ne peut pas être annulée.",
 		"restaurantDeleted": "Restaurant supprimé avec succès",
-		"errorDeletingRestaurant": "Impossible de supprimer le restaurant. Veuillez réessayer."
+		"errorDeletingRestaurant": "Impossible de supprimer le restaurant. Veuillez réessayer.",
+		"deleteAccount": "Supprimer le compte",
+		"deleteAccountConfirm": "Êtes-vous sûr de vouloir supprimer définitivement votre compte ? Cette action est irréversible et supprimera toutes vos données, y compris vos restaurants, avis et informations de profil.",
+		"accountDeleted": "Compte supprimé avec succès",
+		"errorDeletingAccount": "Impossible de supprimer le compte. Veuillez réessayer.",
+		"dangerZone": "Zone de danger"
 	},
 	"languages": {
 		"en_US": "Anglais",

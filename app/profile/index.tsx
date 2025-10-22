@@ -30,6 +30,7 @@ export default function ProfileScreen() {
 	const user = useUserStore((state) => state.user);
 	const updatePhoto = useUserStore((state) => state.updatePhoto);
 	const deletePhoto = useUserStore((state) => state.deletePhoto);
+	const deleteAccount = useUserStore((state) => state.deleteAccount);
 	const logout = useUserStore((state) => state.logout);
 	const isAuthenticated = useUserStore((state) => state.isAuthenticated);
 	const userLoading = useUserStore((state) => state.isLoading);
@@ -186,6 +187,25 @@ export default function ProfileScreen() {
 					logout();
 					// Navigation will be handled automatically by the redirect in this component
 					router.replace('/auth');
+				},
+			},
+		]);
+	};
+
+	const handleDeleteAccount = () => {
+		Alert.alert(t('profile.deleteAccount'), t('profile.deleteAccountConfirm'), [
+			{ text: t('general.cancel'), style: 'cancel' },
+			{
+				text: t('profile.deleteAccount'),
+				style: 'destructive',
+				onPress: async () => {
+					const success = await deleteAccount();
+					if (success) {
+						Alert.alert(t('validation.success'), t('profile.accountDeleted'));
+						router.replace('/auth');
+					} else {
+						Alert.alert(t('validation.error'), t('profile.errorDeletingAccount'));
+					}
 				},
 			},
 		]);
@@ -508,6 +528,27 @@ export default function ProfileScreen() {
 								color={colors.primaryLight}
 							/>
 						</View>
+					</TouchableOpacity>
+
+					<TouchableOpacity
+						style={styles.actionItem}
+						onPress={handleDeleteAccount}
+					>
+						<View style={styles.actionLeft}>
+							<Ionicons
+								name="trash-outline"
+								size={18}
+								color={colors.primary}
+							/>
+							<Text style={styles.actionText}>
+								{t('profile.deleteAccount')}
+							</Text>
+						</View>
+						<Ionicons
+							name="chevron-forward"
+							size={20}
+							color={colors.primaryLight}
+						/>
 					</TouchableOpacity>
 				</View>
 

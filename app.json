@@ -21,9 +21,6 @@
 				"com.apple.developer.associated-domains": [
 					"applinks:menutecaapp.com",
 					"applinks:www.menutecaapp.com"
-				],
-				"com.apple.developer.in-app-payments": [
-					"merchant.com.menutecaapp.mobile"
 				]
 			},
 			"infoPlist": {
