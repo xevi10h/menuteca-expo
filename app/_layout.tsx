@@ -29,9 +29,10 @@ export default function RootLayout() {
 	// Check if we're on a web marketing page (skip loading screen and initialization for those)
 	const isWebMarketingPage =
 		typeof window !== 'undefined' &&
-		(window.location.pathname.includes('/product') ||
-			window.location.pathname.includes('/support') ||
-			window.location.pathname.includes('/privacy'));
+		typeof window.location !== 'undefined' &&
+		(window.location.pathname?.includes('/product') ||
+			window.location.pathname?.includes('/support') ||
+			window.location.pathname?.includes('/privacy'));
 
 	// Use the app initialization hook (skip for marketing pages)
 	const { isInitialized, isLoading, error} = isWebMarketingPage

@@ -1,29 +1,50 @@
-import type { Database } from '@/lib/supabase';
-import { supabase } from '@/lib/supabase';
-import { getDeviceLanguage } from '@/shared/functions/utils';
-import { AuthResponse, User } from '@/shared/types';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import * as AppleAuthentication from 'expo-apple-authentication';
-
-type Profile = Database['public']['Tables']['profiles']['Row'];
+import { supabase } from "@/lib/supabase";
+import { getDeviceLanguage } from "@/shared/functions/utils";
+import { AuthResponse, User } from "@/shared/types";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import * as AppleAuthentication from "expo-apple-authentication";
 
 export class SupabaseAuthService {
+	// Track if GoogleSignIn has been initialized
+	private static isGoogleSignInInitialized = false;
+
 	/**
 	 * Initialize Google Sign-In configuration
-	 * Call this in your app's initialization (App.tsx or index.tsx)
+	 * This is called lazily when the user attempts to sign in with Google
+	 * Safe to call multiple times (idempotent)
 	 */
 	static initializeGoogleSignIn() {
-		GoogleSignin.configure({
-			// You'll get these from your Google Cloud Console
-			// webClientId should be your Supabase project's Google OAuth client ID
-			webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-			iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+		// Skip if already initialized
+		if (this.isGoogleSignInInitialized) {
+			console.log("ℹ️ GoogleSignIn already initialized");
+			return;
+		}
 
-			// Include any additional scopes you need
-			scopes: ['email', 'profile'],
-			// Ensure offline access to get refresh tokens
-			offlineAccess: true,
-		});
+		try {
+			if (!process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID) {
+				console.warn("⚠️ EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID is not set");
+				return;
+			}
+
+			GoogleSignin.configure({
+				// You'll get these from your Google Cloud Console
+				// webClientId should be your Supabase project's Google OAuth client ID
+				webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+				iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+
+				// Include any additional scopes you need
+				scopes: ["email", "profile"],
+				// Ensure offline access to get refresh tokens
+				offlineAccess: true,
+			});
+
+			this.isGoogleSignInInitialized = true;
+			console.log("✅ GoogleSignIn.configure() completed successfully");
+		} catch (error) {
+			console.error("❌ GoogleSignIn.configure() failed:", error);
+			// Don't throw - allow app to continue without Google Sign-In
+			// Users can still use other auth methods
+		}
 	}
 
 	/**
@@ -38,11 +59,13 @@ export class SupabaseAuthService {
 	}) {
 		try {
 			// 1. Check email availability first
-			const emailCheck = await this.checkEmailAvailability(userData.email);
+			const emailCheck = await this.checkEmailAvailability(
+				userData.email,
+			);
 			if (!emailCheck.success || !emailCheck.data?.available) {
 				return {
 					success: false,
-					error: 'Email is already registered',
+					error: "Email is already registered",
 				};
 			}
 
@@ -53,32 +76,33 @@ export class SupabaseAuthService {
 			if (!usernameCheck.success || !usernameCheck.data?.available) {
 				return {
 					success: false,
-					error: 'Username is already taken',
+					error: "Username is already taken",
 				};
 			}
 
 			// 3. Create auth user with metadata
-			const { data: authData, error: authError } = await supabase.auth.signUp({
-				email: userData.email,
-				password: userData.password,
-				options: {
-					data: {
-						username: userData.username,
-						name: userData.name,
-						language: userData.language,
+			const { data: authData, error: authError } = await supabase.auth
+				.signUp({
+					email: userData.email,
+					password: userData.password,
+					options: {
+						data: {
+							username: userData.username,
+							name: userData.name,
+							language: userData.language,
+						},
 					},
-				},
-			});
+				});
 
 			if (authError) throw authError;
 
 			if (!authData.user) {
-				throw new Error('User creation failed');
+				throw new Error("User creation failed");
 			}
 
-			console.log('User created, checking for session and token...');
-			console.log('Has session:', !!authData.session);
-			console.log('Has access_token:', !!authData.session?.access_token);
+			console.log("User created, checking for session and token...");
+			console.log("Has session:", !!authData.session);
+			console.log("Has access_token:", !!authData.session?.access_token);
 
 			// 4. Wait for trigger to execute and try to fetch profile
 			// The trigger should create the profile automatically
@@ -86,22 +110,22 @@ export class SupabaseAuthService {
 
 			// 5. Try to get the profile created by the trigger (use array query to avoid 406)
 			const { data: profiles, error: profileError } = await supabase
-				.from('profiles')
-				.select('*')
-				.eq('id', authData.user.id);
+				.from("profiles")
+				.select("*")
+				.eq("id", authData.user.id);
 
 			let profile = profiles && profiles.length > 0 ? profiles[0] : null;
 
 			// 6. If trigger didn't create profile, create it manually
 			// The supabase client should now be authenticated after signUp
 			if (!profile) {
-				console.error('Profile not found, creating manually...');
+				console.error("Profile not found, creating manually...");
 
 				// After signUp, the supabase client should be authenticated
 				// We can insert directly without creating a new client
 				const { data: manualProfile, error: manualError } =
 					await supabase
-						.from('profiles')
+						.from("profiles")
 						.insert({
 							id: authData.user.id,
 							email: userData.email,
@@ -114,14 +138,17 @@ export class SupabaseAuthService {
 						.single();
 
 				if (manualError) {
-					console.error('Manual profile creation failed:', manualError);
+					console.error(
+						"Manual profile creation failed:",
+						manualError,
+					);
 					throw new Error(
 						`Failed to create profile: ${manualError.message}`,
 					);
 				}
 
 				profile = manualProfile;
-				console.log('Profile created successfully');
+				console.log("Profile created successfully");
 			}
 
 			return {
@@ -134,7 +161,9 @@ export class SupabaseAuthService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Registration failed',
+				error: error instanceof Error
+					? error.message
+					: "Registration failed",
 			};
 		}
 	}
@@ -152,9 +181,9 @@ export class SupabaseAuthService {
 			if (error) throw error;
 
 			const { data: profile, error: profileError } = await supabase
-				.from('profiles')
-				.select('*')
-				.eq('id', data.user.id)
+				.from("profiles")
+				.select("*")
+				.eq("id", data.user.id)
 				.single();
 
 			if (profileError) throw profileError;
@@ -169,7 +198,7 @@ export class SupabaseAuthService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Login failed',
+				error: error instanceof Error ? error.message : "Login failed",
 			};
 		}
 	}
@@ -179,11 +208,14 @@ export class SupabaseAuthService {
 	 */
 	static async signInWithGoogle(): Promise<AuthResponse<User>> {
 		try {
-			console.log('🔍 Iniciando Google Sign-In...');
+			console.log("🔍 Iniciando Google Sign-In...");
+
+			// Initialize GoogleSignIn if not already configured (lazy initialization)
+			this.initializeGoogleSignIn();
 
 			// Check Google Play Services
 			await GoogleSignin.hasPlayServices();
-			console.log('✅ Google Play Services disponibles');
+			console.log("✅ Google Play Services disponibles");
 
 			// Sign out first to ensure fresh login
 			try {
@@ -194,22 +226,22 @@ export class SupabaseAuthService {
 
 			// Get user info from Google
 			const userInfo = await GoogleSignin.signIn();
-			console.log('📝 Google user info:', {
+			console.log("📝 Google user info:", {
 				email: userInfo.data?.user.email,
 				hasIdToken: !!userInfo.data?.idToken,
 			});
 
 			if (!userInfo.data?.idToken) {
-				throw new Error('No ID token received from Google');
+				throw new Error("No ID token received from Google");
 			}
 
 			// Sign in to Supabase with Google ID token
 			const { data, error } = await supabase.auth.signInWithIdToken({
-				provider: 'google',
+				provider: "google",
 				token: userInfo.data.idToken,
 			});
 
-			console.log('📊 Supabase response:', {
+			console.log("📊 Supabase response:", {
 				hasUser: !!data?.user,
 				hasSession: !!data?.session,
 				errorCode: error?.status,
@@ -217,21 +249,21 @@ export class SupabaseAuthService {
 			});
 
 			if (error) {
-				console.error('❌ Supabase auth error:', error);
+				console.error("❌ Supabase auth error:", error);
 				throw new Error(`Supabase auth failed: ${error.message}`);
 			}
 
 			if (!data.user) {
-				throw new Error('No user data received from Supabase');
+				throw new Error("No user data received from Supabase");
 			}
 
 			// Handle user profile creation/retrieval
 			return await this.handleUserAfterAuth(data, userInfo.data.user);
 		} catch (error: any) {
-			console.error('💥 Google Sign-In error:', error);
+			console.error("💥 Google Sign-In error:", error);
 			return {
 				success: false,
-				error: error.message || 'Google Sign-In failed',
+				error: error.message || "Google Sign-In failed",
 			};
 		}
 	}
@@ -243,27 +275,27 @@ export class SupabaseAuthService {
 		authData: any,
 		googleUser: any,
 	): Promise<AuthResponse<User>> {
-		console.log('👤 Usuario autenticado:', {
+		console.log("👤 Usuario autenticado:", {
 			id: authData.user.id,
 			email: authData.user.email,
 		});
 
 		// Intentar obtener perfil existente
-		console.log('🔍 Buscando perfil existente...');
+		console.log("🔍 Buscando perfil existente...");
 		let { data: profile, error: profileError } = await supabase
-			.from('profiles')
-			.select('*')
-			.eq('id', authData.user.id)
+			.from("profiles")
+			.select("*")
+			.eq("id", authData.user.id)
 			.maybeSingle();
 
 		if (profileError) {
-			console.error('❌ Error buscando perfil:', profileError);
+			console.error("❌ Error buscando perfil:", profileError);
 			// No fallar aquí, intentar crear el perfil
 		}
 
 		// Si no existe perfil, crear uno
 		if (!profile) {
-			console.log('🆕 Creando perfil...');
+			console.log("🆕 Creando perfil...");
 
 			const username = this.generateUsernameFromEmail(googleUser.email);
 
@@ -277,23 +309,25 @@ export class SupabaseAuthService {
 				has_password: false,
 			};
 
-			console.log('📝 Datos del perfil:', profileData);
+			console.log("📝 Datos del perfil:", profileData);
 
 			const { data: newProfile, error: createError } = await supabase
-				.from('profiles')
+				.from("profiles")
 				.insert(profileData)
 				.select()
 				.single();
 
 			if (createError) {
-				console.error('❌ Error creando perfil:', createError);
-				throw new Error(`Failed to create profile: ${createError.message}`);
+				console.error("❌ Error creando perfil:", createError);
+				throw new Error(
+					`Failed to create profile: ${createError.message}`,
+				);
 			}
 
 			profile = newProfile;
-			console.log('✅ Perfil creado exitosamente');
+			console.log("✅ Perfil creado exitosamente");
 		} else {
-			console.log('✅ Perfil encontrado');
+			console.log("✅ Perfil encontrado");
 		}
 
 		// Crear objeto User
@@ -304,7 +338,7 @@ export class SupabaseAuthService {
 			language: profile.language || getDeviceLanguage(),
 		};
 
-		console.log('🎉 Autenticación completada exitosamente');
+		console.log("🎉 Autenticación completada exitosamente");
 
 		return {
 			success: true,
@@ -322,7 +356,7 @@ export class SupabaseAuthService {
 			if (!isAvailable) {
 				return {
 					success: false,
-					error: 'Apple Sign In is not available on this device',
+					error: "Apple Sign In is not available on this device",
 				};
 			}
 
@@ -337,13 +371,13 @@ export class SupabaseAuthService {
 			if (!credential.identityToken) {
 				return {
 					success: false,
-					error: 'No identity token received from Apple',
+					error: "No identity token received from Apple",
 				};
 			}
 
 			// Sign in to Supabase with the identity token
 			const { data, error } = await supabase.auth.signInWithIdToken({
-				provider: 'apple',
+				provider: "apple",
 				token: credential.identityToken,
 			});
 
@@ -357,34 +391,34 @@ export class SupabaseAuthService {
 			if (!data.user) {
 				return {
 					success: false,
-					error: 'No user data received from Supabase',
+					error: "No user data received from Supabase",
 				};
 			}
 
 			// Check if user has a profile, create one if not
 			let { data: profile, error: profileError } = await supabase
-				.from('profiles')
-				.select('*')
-				.eq('id', data.user.id)
+				.from("profiles")
+				.select("*")
+				.eq("id", data.user.id)
 				.single();
 
-			if (profileError && profileError.code === 'PGRST116') {
+			if (profileError && profileError.code === "PGRST116") {
 				// Profile doesn't exist, create one
 				let displayName = data.user.user_metadata?.full_name;
 
 				// Apple provides full name only on first sign in
 				if (!displayName && credential.fullName) {
-					displayName = `${credential.fullName.givenName || ''} ${
-						credential.fullName.familyName || ''
+					displayName = `${credential.fullName.givenName || ""} ${
+						credential.fullName.familyName || ""
 					}`.trim();
 				}
 
 				const username = this.generateUsernameFromEmail(
-					data.user.email || credential.email || '',
+					data.user.email || credential.email || "",
 				);
 
 				const { data: newProfile, error: createError } = await supabase
-					.from('profiles')
+					.from("profiles")
 					.insert({
 						id: data.user.id,
 						username,
@@ -396,7 +430,7 @@ export class SupabaseAuthService {
 				if (createError) {
 					return {
 						success: false,
-						error: 'Failed to create user profile',
+						error: "Failed to create user profile",
 					};
 				}
 
@@ -404,13 +438,13 @@ export class SupabaseAuthService {
 			} else if (profileError) {
 				return {
 					success: false,
-					error: 'Failed to fetch user profile',
+					error: "Failed to fetch user profile",
 				};
 			}
 
 			const user: User = {
 				...profile!,
-				email: data.user.email || credential.email || '',
+				email: data.user.email || credential.email || "",
 				access_token: data.session?.access_token,
 				language: profile!.language || getDeviceLanguage(),
 			};
@@ -420,19 +454,18 @@ export class SupabaseAuthService {
 				data: user,
 			};
 		} catch (error: any) {
-			if (error.code === 'ERR_REQUEST_CANCELED') {
+			if (error.code === "ERR_REQUEST_CANCELED") {
 				return {
 					success: false,
-					error: 'auth.errors.appleSignInCancelled',
+					error: "auth.errors.appleSignInCancelled",
 				};
 			}
 
 			return {
 				success: false,
-				error:
-					error instanceof Error
-						? error.message
-						: 'auth.errors.appleSignInFailed',
+				error: error instanceof Error
+					? error.message
+					: "auth.errors.appleSignInFailed",
 			};
 		}
 	}
@@ -441,9 +474,9 @@ export class SupabaseAuthService {
 	 * Helper method to generate username from email
 	 */
 	private static generateUsernameFromEmail(email: string): string {
-		const baseUsername = email.split('@')[0].toLowerCase();
+		const baseUsername = email.split("@")[0].toLowerCase();
 		// Remove any non-alphanumeric characters except underscore
-		const cleanUsername = baseUsername.replace(/[^a-z0-9_]/g, '');
+		const cleanUsername = baseUsername.replace(/[^a-z0-9_]/g, "");
 		// Add random suffix to avoid conflicts
 		const randomSuffix = Math.floor(Math.random() * 1000);
 		return `${cleanUsername}${randomSuffix}`;
@@ -467,9 +500,9 @@ export class SupabaseAuthService {
 
 			// Get user profile from public.profiles
 			const { data: profile, error: profileError } = await supabase
-				.from('profiles')
-				.select('*')
-				.eq('id', session.user.id)
+				.from("profiles")
+				.select("*")
+				.eq("id", session.user.id)
 				.single();
 
 			if (profileError) throw profileError;
@@ -484,7 +517,9 @@ export class SupabaseAuthService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Session check failed',
+				error: error instanceof Error
+					? error.message
+					: "Session check failed",
 			};
 		}
 	}
@@ -501,7 +536,7 @@ export class SupabaseAuthService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Logout failed',
+				error: error instanceof Error ? error.message : "Logout failed",
 			};
 		}
 	}
@@ -520,16 +555,16 @@ export class SupabaseAuthService {
 				data: { user },
 			} = await supabase.auth.getUser();
 
-			if (!user) throw new Error('Not authenticated');
+			if (!user) throw new Error("Not authenticated");
 
 			// Update in public.profiles table
 			const { data, error } = await supabase
-				.from('profiles')
+				.from("profiles")
 				.update({
 					...updates,
 					updated_at: new Date().toISOString(),
 				})
-				.eq('id', user.id)
+				.eq("id", user.id)
 				.select()
 				.single();
 
@@ -542,7 +577,7 @@ export class SupabaseAuthService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Update failed',
+				error: error instanceof Error ? error.message : "Update failed",
 			};
 		}
 	}
@@ -553,19 +588,19 @@ export class SupabaseAuthService {
 	static async resetPassword(email: string) {
 		try {
 			const { error } = await supabase.auth.resetPasswordForEmail(email, {
-				redirectTo: 'your-app://auth/reset-password',
+				redirectTo: "your-app://auth/reset-password",
 			});
 
 			if (error) throw error;
 
 			return {
 				success: true,
-				message: 'Reset link sent to your email',
+				message: "Reset link sent to your email",
 			};
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Reset failed',
+				error: error instanceof Error ? error.message : "Reset failed",
 			};
 		}
 	}
@@ -585,8 +620,9 @@ export class SupabaseAuthService {
 		} catch (error) {
 			return {
 				success: false,
-				error:
-					error instanceof Error ? error.message : 'Password update failed',
+				error: error instanceof Error
+					? error.message
+					: "Password update failed",
 			};
 		}
 	}
@@ -603,15 +639,15 @@ export class SupabaseAuthService {
 	 */
 	static async checkUsernameAvailability(username: string) {
 		try {
-			console.log('🔍 Checking username availability for:', username);
-			console.log('📡 Querying Supabase...');
+			console.log("🔍 Checking username availability for:", username);
+			console.log("📡 Querying Supabase...");
 
 			const { data, error } = await supabase
-				.from('profiles')
-				.select('id')
-				.eq('username', username.trim());
+				.from("profiles")
+				.select("id")
+				.eq("username", username.trim());
 
-			console.log('📊 Username check result:', {
+			console.log("📊 Username check result:", {
 				data,
 				error,
 				dataIsArray: Array.isArray(data),
@@ -619,7 +655,7 @@ export class SupabaseAuthService {
 			});
 
 			if (error) {
-				console.error('❌ Database error:', error);
+				console.error("❌ Database error:", error);
 				return {
 					success: false,
 					error: error.message,
@@ -630,8 +666,8 @@ export class SupabaseAuthService {
 			const available = !data || data.length === 0;
 			console.log(
 				available
-					? '✅ Username available'
-					: '❌ Username already taken',
+					? "✅ Username available"
+					: "❌ Username already taken",
 			);
 
 			return {
@@ -639,11 +675,15 @@ export class SupabaseAuthService {
 				data: { available },
 			};
 		} catch (error) {
-			console.error('💥 Fatal error checking username availability:', error);
+			console.error(
+				"💥 Fatal error checking username availability:",
+				error,
+			);
 			return {
 				success: false,
-				error:
-					error instanceof Error ? error.message : 'Failed to check username',
+				error: error instanceof Error
+					? error.message
+					: "Failed to check username",
 			};
 		}
 	}
@@ -653,17 +693,17 @@ export class SupabaseAuthService {
 	 */
 	static async checkEmailAvailability(email: string) {
 		try {
-			console.log('🔍 Checking email availability for:', email);
+			console.log("🔍 Checking email availability for:", email);
 
 			// Use select without maybeSingle - just get the array
-			console.log('📡 Querying Supabase...');
+			console.log("📡 Querying Supabase...");
 
 			const { data, error } = await supabase
-				.from('profiles')
-				.select('id')
-				.eq('email', email.toLowerCase().trim());
+				.from("profiles")
+				.select("id")
+				.eq("email", email.toLowerCase().trim());
 
-			console.log('📦 Query result:', {
+			console.log("📦 Query result:", {
 				data,
 				error,
 				dataIsArray: Array.isArray(data),
@@ -671,7 +711,7 @@ export class SupabaseAuthService {
 			});
 
 			if (error) {
-				console.error('❌ Database error:', error);
+				console.error("❌ Database error:", error);
 				return {
 					success: false,
 					error: error.message,
@@ -682,8 +722,8 @@ export class SupabaseAuthService {
 			const available = !data || data.length === 0;
 			console.log(
 				available
-					? '✅ Email available (no matches found)'
-					: '❌ Email already registered',
+					? "✅ Email available (no matches found)"
+					: "❌ Email already registered",
 			);
 
 			return {
@@ -691,10 +731,12 @@ export class SupabaseAuthService {
 				data: { available },
 			};
 		} catch (error) {
-			console.error('💥 Fatal error checking email availability:', error);
+			console.error("💥 Fatal error checking email availability:", error);
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to check email',
+				error: error instanceof Error
+					? error.message
+					: "Failed to check email",
 			};
 		}
 	}
@@ -708,14 +750,14 @@ export class SupabaseAuthService {
 	) {
 		try {
 			const { data, error } = await supabase
-				.from('profiles')
-				.select('id')
-				.eq('username', username)
-				.neq('id', currentUserId) // Exclude current user
+				.from("profiles")
+				.select("id")
+				.eq("username", username)
+				.neq("id", currentUserId) // Exclude current user
 				.maybeSingle();
 
 			if (error) {
-				console.error('Error checking username availability:', error);
+				console.error("Error checking username availability:", error);
 				return {
 					success: false,
 					error: error.message,
@@ -732,8 +774,9 @@ export class SupabaseAuthService {
 		} catch (error) {
 			return {
 				success: false,
-				error:
-					error instanceof Error ? error.message : 'Failed to check username',
+				error: error instanceof Error
+					? error.message
+					: "Failed to check username",
 			};
 		}
 	}
@@ -744,17 +787,17 @@ export class SupabaseAuthService {
 	static async sendPasswordResetCode(email: string) {
 		try {
 			// Create a new client without user session for public function
-			const { createClient } = await import('@supabase/supabase-js');
+			const { createClient } = await import("@supabase/supabase-js");
 			const publicClient = createClient(
 				process.env.EXPO_PUBLIC_SUPABASE_URL!,
 				process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!,
 			);
 
 			const { data, error } = await publicClient.functions.invoke(
-				'password-reset',
+				"password-reset",
 				{
 					body: {
-						action: 'send-reset-code',
+						action: "send-reset-code",
 						email: email.toLowerCase(),
 					},
 				},
@@ -768,8 +811,9 @@ export class SupabaseAuthService {
 		} catch (error) {
 			return {
 				success: false,
-				error:
-					error instanceof Error ? error.message : 'Failed to send reset code',
+				error: error instanceof Error
+					? error.message
+					: "Failed to send reset code",
 			};
 		}
 	}
@@ -780,17 +824,17 @@ export class SupabaseAuthService {
 	static async verifyPasswordResetCode(email: string, code: string) {
 		try {
 			// Create a new client without user session for public function
-			const { createClient } = await import('@supabase/supabase-js');
+			const { createClient } = await import("@supabase/supabase-js");
 			const publicClient = createClient(
 				process.env.EXPO_PUBLIC_SUPABASE_URL!,
 				process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!,
 			);
 
 			const { data, error } = await publicClient.functions.invoke(
-				'password-reset',
+				"password-reset",
 				{
 					body: {
-						action: 'verify-reset-code',
+						action: "verify-reset-code",
 						email: email.toLowerCase(),
 						code,
 					},
@@ -805,7 +849,9 @@ export class SupabaseAuthService {
 		} catch (error) {
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to verify code',
+				error: error instanceof Error
+					? error.message
+					: "Failed to verify code",
 			};
 		}
 	}
@@ -816,17 +862,17 @@ export class SupabaseAuthService {
 	static async resetPasswordWithToken(token: string, newPassword: string) {
 		try {
 			// Create a new client without user session for public function
-			const { createClient } = await import('@supabase/supabase-js');
+			const { createClient } = await import("@supabase/supabase-js");
 			const publicClient = createClient(
 				process.env.EXPO_PUBLIC_SUPABASE_URL!,
 				process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!,
 			);
 
 			const { data, error } = await publicClient.functions.invoke(
-				'password-reset',
+				"password-reset",
 				{
 					body: {
-						action: 'reset-password',
+						action: "reset-password",
 						token,
 						newPassword,
 					},
@@ -841,8 +887,9 @@ export class SupabaseAuthService {
 		} catch (error) {
 			return {
 				success: false,
-				error:
-					error instanceof Error ? error.message : 'Failed to reset password',
+				error: error instanceof Error
+					? error.message
+					: "Failed to reset password",
 			};
 		}
 	}

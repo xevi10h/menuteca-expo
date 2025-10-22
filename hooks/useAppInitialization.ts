@@ -33,17 +33,6 @@ export const useAppInitialization = (): AppInitializationState => {
 			try {
 				setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
-				// Initialize Google Sign-In (required for native modules)
-				if (Platform.OS !== 'web') {
-					try {
-						SupabaseAuthService.initializeGoogleSignIn();
-						console.log('✅ Google Sign-In initialized');
-					} catch (error) {
-						console.warn('⚠️ Google Sign-In initialization failed:', error);
-						// Don't fail the app if Google Sign-In fails to initialize
-					}
-				}
-
 				// Initialize user authentication first
 				await userInitialize();
 
@@ -57,6 +46,9 @@ export const useAppInitialization = (): AppInitializationState => {
 					);
 					// Don't fail the entire initialization if cuisines fail to load
 				}
+
+				// NOTE: GoogleSignIn is initialized lazily when the user attempts to sign in
+				// This prevents TurboModule initialization issues at app startup
 
 				// App is now initialized
 				setState({
