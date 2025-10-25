@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
 import { Ionicons } from '@expo/vector-icons';
@@ -136,8 +137,7 @@ const styles = StyleSheet.create({
 	nextButtonText: {
 		color: colors.secondary,
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		textAlign: 'center',
 	},
 	content: {
@@ -167,8 +167,7 @@ const styles = StyleSheet.create({
 	},
 	question: {
 		fontSize: 24,
-		fontFamily: 'Manrope',
-		fontWeight: '300',
+		fontFamily: fonts.regular,
 		color: colors.secondary,
 		textAlign: 'center',
 	},
@@ -179,8 +178,7 @@ const styles = StyleSheet.create({
 	},
 	label: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '300',
+		fontFamily: fonts.regular,
 		color: colors.secondary,
 	},
 	textInput: {
@@ -190,7 +188,7 @@ const styles = StyleSheet.create({
 		borderRadius: 12,
 		paddingHorizontal: 20,
 		fontSize: 16,
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		marginBottom: 40,
 		shadowColor: '#000',

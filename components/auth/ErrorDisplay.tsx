@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useRef } from 'react';
@@ -227,8 +228,7 @@ const styles = StyleSheet.create({
 	},
 	title: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		textAlign: 'center',
 		marginBottom: 8,
@@ -239,8 +239,7 @@ const styles = StyleSheet.create({
 	},
 	message: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		textAlign: 'center',
 		lineHeight: 20,
@@ -280,8 +279,7 @@ const styles = StyleSheet.create({
 	},
 	retryText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.quaternary,
 	},
 	dismissButton: {
@@ -304,8 +302,7 @@ const styles = StyleSheet.create({
 	},
 	dismissText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 });

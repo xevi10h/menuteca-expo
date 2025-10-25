@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Language } from '@/shared/types';
 import { useUserStore } from '@/zustand/UserStore';
@@ -215,8 +216,7 @@ const styles = StyleSheet.create({
 	},
 	title: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 	},
 	closeButton: {
@@ -228,8 +228,7 @@ const styles = StyleSheet.create({
 	},
 	subtitle: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		marginBottom: 16,
 		textAlign: 'center',
@@ -254,8 +253,7 @@ const styles = StyleSheet.create({
 	},
 	languageText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		flex: 1,
 	},
@@ -288,8 +286,7 @@ const styles = StyleSheet.create({
 	},
 	cancelButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	saveButton: {
@@ -304,8 +301,7 @@ const styles = StyleSheet.create({
 	},
 	saveButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.quaternary,
 	},
 	saveButtonTextDisabled: {

@@ -1,5 +1,6 @@
 import { RestaurantService, ReviewService } from '@/api/index';
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import ChangePasswordPopup from '@/components/profile/ChangePasswordPopup';
 import ChangeUsernamePopup from '@/components/profile/ChangeUsernamePopup';
 import LanguageSelectorPopup from '@/components/profile/LanguageSelectorPopup';
@@ -204,7 +205,10 @@ export default function ProfileScreen() {
 						Alert.alert(t('validation.success'), t('profile.accountDeleted'));
 						router.replace('/auth');
 					} else {
-						Alert.alert(t('validation.error'), t('profile.errorDeletingAccount'));
+						Alert.alert(
+							t('validation.error'),
+							t('profile.errorDeletingAccount'),
+						);
 					}
 				},
 			},
@@ -535,11 +539,7 @@ export default function ProfileScreen() {
 						onPress={handleDeleteAccount}
 					>
 						<View style={styles.actionLeft}>
-							<Ionicons
-								name="trash-outline"
-								size={18}
-								color={colors.primary}
-							/>
+							<Ionicons name="trash-outline" size={18} color={colors.primary} />
 							<Text style={styles.actionText}>
 								{t('profile.deleteAccount')}
 							</Text>
@@ -701,8 +701,7 @@ const styles = StyleSheet.create({
 	},
 	headerTitle: {
 		fontSize: 20,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 	},
 	logoutButton: {
@@ -723,8 +722,7 @@ const styles = StyleSheet.create({
 	loadingText: {
 		marginTop: 16,
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 	},
 	profileSection: {
@@ -751,8 +749,7 @@ const styles = StyleSheet.create({
 	},
 	profile_imageText: {
 		fontSize: 32,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
+		fontFamily: fonts.bold,
 		color: colors.quaternary,
 	},
 	editPhotoIcon: {
@@ -773,22 +770,19 @@ const styles = StyleSheet.create({
 	},
 	user_name: {
 		fontSize: 24,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
+		fontFamily: fonts.bold,
 		color: colors.primary,
 		marginBottom: 4,
 	},
 	userEmail: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		marginBottom: 4,
 	},
 	userSince: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 	},
 	errorContainer: {
@@ -799,8 +793,7 @@ const styles = StyleSheet.create({
 	},
 	errorText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: '#D32F2F',
 		textAlign: 'center',
 	},
@@ -816,8 +809,7 @@ const styles = StyleSheet.create({
 	},
 	sectionTitle: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 	},
 	viewAllButton: {
@@ -827,8 +819,7 @@ const styles = StyleSheet.create({
 	},
 	viewAllText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	restaurantActions: {
@@ -889,14 +880,12 @@ const styles = StyleSheet.create({
 	},
 	actionText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	currentValueText: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 	},
 	restaurantsContainer: {
@@ -911,16 +900,14 @@ const styles = StyleSheet.create({
 	},
 	emptyStateText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		marginTop: 16,
 		marginBottom: 8,
 	},
 	emptyStateSubtext: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		textAlign: 'center',
 	},
@@ -932,8 +919,7 @@ const styles = StyleSheet.create({
 	},
 	notAuthenticatedText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		textAlign: 'center',
 		marginBottom: 20,
@@ -946,8 +932,7 @@ const styles = StyleSheet.create({
 	},
 	loginButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.quaternary,
 	},
 });

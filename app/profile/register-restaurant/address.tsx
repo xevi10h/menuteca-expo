@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import AddressSearchInput from '@/components/restaurantCreation/AddressSearchInput';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Address } from '@/shared/types';
@@ -186,8 +187,7 @@ const styles = StyleSheet.create({
 	nextButtonText: {
 		color: colors.secondary,
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		textAlign: 'center',
 	},
 	content: {
@@ -217,8 +217,7 @@ const styles = StyleSheet.create({
 	},
 	question: {
 		fontSize: 24,
-		fontFamily: 'Manrope',
-		fontWeight: '300',
+		fontFamily: fonts.regular,
 		color: colors.secondary,
 		textAlign: 'center',
 	},
@@ -229,8 +228,7 @@ const styles = StyleSheet.create({
 	},
 	label: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '300',
+		fontFamily: fonts.regular,
 		color: colors.secondary,
 	},
 	additionalInfoSection: {
@@ -251,8 +249,7 @@ const styles = StyleSheet.create({
 	},
 	additionalInfoLabel: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		marginBottom: 10,
 	},
@@ -262,15 +259,14 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 15,
 		paddingVertical: 12,
 		fontSize: 16,
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		borderWidth: 1,
 		borderColor: colors.primaryLight,
 	},
 	helperText: {
 		fontSize: 11,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		marginTop: 5,
 		fontStyle: 'italic',
@@ -294,30 +290,27 @@ const styles = StyleSheet.create({
 	},
 	previewLabel: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		marginBottom: 5,
 	},
 	previewText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		lineHeight: 20,
 		marginBottom: 5,
 	},
 	coordinatesText: {
 		fontSize: 11,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		fontStyle: 'italic',
 	},
 	skipButtonText: {
 		color: colors.secondary,
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		marginTop: 20,
 	},
 });

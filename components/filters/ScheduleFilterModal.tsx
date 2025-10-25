@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -123,8 +124,7 @@ export default function ScheduleFilterModal({
 const styles = StyleSheet.create({
 	modalTitle: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		textAlign: 'center',
 		marginBottom: 20,
@@ -141,8 +141,7 @@ const styles = StyleSheet.create({
 	},
 	inputLabel: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		marginBottom: 8,
 	},
@@ -152,7 +151,7 @@ const styles = StyleSheet.create({
 		borderRadius: 8,
 		padding: 12,
 		fontSize: 16,
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		textAlign: 'center',
 		minWidth: 80,
@@ -163,7 +162,7 @@ const styles = StyleSheet.create({
 	},
 	timePickerText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 	},
 	timePickerContainer: {
@@ -175,8 +174,7 @@ const styles = StyleSheet.create({
 	},
 	timePickerLabel: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		marginBottom: 10,
 	},
@@ -194,13 +192,11 @@ const styles = StyleSheet.create({
 	timePickerConfirmText: {
 		color: colors.quaternary,
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 	},
 	timeSeparator: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		marginHorizontal: 10,
 		marginBottom: 12,
@@ -220,8 +216,7 @@ const styles = StyleSheet.create({
 	},
 	cancelButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		textAlign: 'center',
 	},
@@ -233,8 +228,7 @@ const styles = StyleSheet.create({
 	},
 	applyButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.quaternary,
 		textAlign: 'center',
 	},

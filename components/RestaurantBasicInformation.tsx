@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Restaurant } from '@/shared/types';
 import { Image, StyleSheet, Text, View } from 'react-native';
@@ -104,8 +105,7 @@ const styles = StyleSheet.create({
 	restaurantIconText: {
 		color: colors.quaternary,
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
+		fontFamily: fonts.bold,
 	},
 	restaurantDetails: {
 		flex: 1,
@@ -116,15 +116,13 @@ const styles = StyleSheet.create({
 	},
 	restaurant_name: {
 		fontSize: 20,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
+		fontFamily: fonts.bold,
 		color: colors.primary,
 		marginBottom: 5,
 	},
 	cuisineText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		marginBottom: 5,
 	},
@@ -134,19 +132,16 @@ const styles = StyleSheet.create({
 	},
 	ratingText: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		paddingHorizontal: 6,
 		paddingVertical: 2,
 	},
 	priceFromText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 	},
 	priceText: {
 		fontSize: 24,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 	},
 });

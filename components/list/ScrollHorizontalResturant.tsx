@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Restaurant } from '@/shared/types';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -44,8 +45,7 @@ const styles = StyleSheet.create({
 	},
 	title: {
 		fontSize: 24,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
+		fontFamily: fonts.bold,
 		color: colors.primary,
 	},
 	loadingContainer: {
@@ -65,8 +65,7 @@ const styles = StyleSheet.create({
 	},
 	errorText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primaryLight,
 		textAlign: 'center',
 	},

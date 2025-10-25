@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -79,14 +80,12 @@ const styles = StyleSheet.create({
 	},
 	requiredAsterisk: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: '#D32F2F',
 	},
 	photoLabel: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		textAlign: 'center',
 		marginBottom: 20,

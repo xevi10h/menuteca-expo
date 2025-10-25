@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -118,15 +119,13 @@ const styles = StyleSheet.create({
 	},
 	question: {
 		fontSize: 24,
-		fontFamily: 'Manrope',
-		fontWeight: '300',
+		fontFamily: fonts.regular,
 		color: colors.secondary,
 		textAlign: 'center',
 	},
 	questionMenu: {
 		fontSize: 24,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.secondary,
 		textAlign: 'center',
 	},
@@ -157,15 +156,13 @@ const styles = StyleSheet.create({
 	noButtonText: {
 		color: colors.secondary,
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '300',
+		fontFamily: fonts.regular,
 		textAlign: 'center',
 	},
 	yesButtonText: {
 		color: colors.primary,
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '300',
+		fontFamily: fonts.regular,
 		textAlign: 'center',
 	},
 });

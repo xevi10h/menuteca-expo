@@ -1,5 +1,6 @@
 import { MenuService, RestaurantService, ReviewService } from '@/api/index';
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import LoadingScreen from '@/components/LoadingScreen';
 import NotFoundRestaurant from '@/components/NotFoundRestaurant';
 import RestaurantBasicInformation from '@/components/RestaurantBasicInformation';
@@ -501,8 +502,7 @@ const styles = StyleSheet.create({
 	},
 	loadingText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 
@@ -520,15 +520,13 @@ const styles = StyleSheet.create({
 	},
 	errorTitle: {
 		fontSize: 24,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		textAlign: 'center',
 	},
 	errorDescription: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		textAlign: 'center',
 		lineHeight: 24,
@@ -545,8 +543,7 @@ const styles = StyleSheet.create({
 	},
 	retryButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.quaternary,
 	},
 
@@ -606,8 +603,7 @@ const styles = StyleSheet.create({
 	},
 	tabText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primaryLight,
 	},
 	activeTabText: {

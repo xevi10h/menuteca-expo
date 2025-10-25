@@ -1,5 +1,6 @@
 import { ReviewService } from '@/api';
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import AddReviewModal from '@/components/AddReviewModal';
 import { useTranslation } from '@/hooks/useTranslation';
 import {
@@ -711,8 +712,7 @@ const styles = StyleSheet.create({
 	},
 	tabText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primaryLight,
 	},
 	activeTabText: {

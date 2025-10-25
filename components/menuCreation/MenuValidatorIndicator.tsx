@@ -1,3 +1,4 @@
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
@@ -56,8 +57,7 @@ const styles = StyleSheet.create({
 	},
 	validText: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: '#4CAF50',
 	},
 	invalidContainer: {
@@ -72,8 +72,7 @@ const styles = StyleSheet.create({
 	},
 	invalidText: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: '#D32F2F',
 	},
 });

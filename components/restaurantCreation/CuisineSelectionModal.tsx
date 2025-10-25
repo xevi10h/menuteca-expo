@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useCuisineStore } from '@/zustand/CuisineStore';
 import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
@@ -102,8 +103,7 @@ const styles = StyleSheet.create({
 	},
 	label: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		marginBottom: 20,
 	},
@@ -115,8 +115,7 @@ const styles = StyleSheet.create({
 	},
 	loadingText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 	},
 	cuisineGrid: {
@@ -139,8 +138,7 @@ const styles = StyleSheet.create({
 	cuisineButtonText: {
 		color: colors.primary,
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 	},
 	cuisineButtonTextSelected: {
 		color: colors.quaternary,
@@ -153,8 +151,7 @@ const styles = StyleSheet.create({
 	},
 	emptyText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		textAlign: 'center',
 	},
@@ -167,7 +164,6 @@ const styles = StyleSheet.create({
 	retryButtonText: {
 		color: colors.quaternary,
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 	},
 });

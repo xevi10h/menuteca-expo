@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { DishCategory } from '@/shared/enums';
 import { Dish, MenuData } from '@/shared/types';
@@ -838,15 +839,13 @@ const styles = StyleSheet.create({
 	},
 	label: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '300',
+		fontFamily: fonts.regular,
 		color: colors.tertiary,
 		marginBottom: 10,
 	},
 	requiredAsterisk: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: '#D32F2F',
 	},
 	input: {
@@ -854,8 +853,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 20,
 		paddingVertical: 15,
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '300',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		borderWidth: 1,
 		borderColor: colors.primary,
@@ -870,8 +868,7 @@ const styles = StyleSheet.create({
 	},
 	menuTitle: {
 		fontSize: 24,
-		fontFamily: 'Manrope',
-		fontWeight: '300',
+		fontFamily: fonts.regular,
 		color: colors.tertiary,
 		marginBottom: 20,
 	},
@@ -894,8 +891,7 @@ const styles = StyleSheet.create({
 	addManualMenuText: {
 		color: colors.primary,
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '300',
+		fontFamily: fonts.regular,
 	},
 	addPhotoMenuButton: {
 		backgroundColor: colors.primary,
@@ -922,8 +918,7 @@ const styles = StyleSheet.create({
 	addPhotoMenuText: {
 		color: colors.quaternary,
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '300',
+		fontFamily: fonts.regular,
 	},
 	processingModalOverlay: {
 		flex: 1,
@@ -949,16 +944,14 @@ const styles = StyleSheet.create({
 	},
 	processingModalTitle: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		marginTop: 20,
 		textAlign: 'center',
 	},
 	processingModalSubtitle: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '300',
+		fontFamily: fonts.regular,
 		color: colors.tertiary,
 		marginTop: 10,
 		textAlign: 'center',
@@ -973,7 +966,6 @@ const styles = StyleSheet.create({
 	cancelProcessingText: {
 		color: colors.quaternary,
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 	},
 });

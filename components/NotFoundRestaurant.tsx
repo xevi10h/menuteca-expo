@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -193,16 +194,14 @@ const styles = StyleSheet.create({
 	},
 	title: {
 		fontSize: 24,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		textAlign: 'center',
 		marginBottom: 15,
 	},
 	description: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		textAlign: 'center',
 		lineHeight: 24,
@@ -221,15 +220,13 @@ const styles = StyleSheet.create({
 	},
 	idLabel: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primaryLight,
 		marginRight: 6,
 	},
 	idValue: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	buttonsContainer: {
@@ -257,8 +254,7 @@ const styles = StyleSheet.create({
 	},
 	primaryButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.quaternary,
 	},
 	secondaryButton: {
@@ -273,14 +269,12 @@ const styles = StyleSheet.create({
 	},
 	secondaryButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	helpText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		textAlign: 'center',
 		lineHeight: 20,

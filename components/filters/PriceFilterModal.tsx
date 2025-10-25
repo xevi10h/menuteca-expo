@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import React from 'react';
 import {
@@ -66,9 +67,7 @@ export default function PriceFilterModal({
 
 			<View style={styles.modalButtons}>
 				<TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-					<Text style={styles.cancelButtonText}>
-						{t('general.cancel')}
-					</Text>
+					<Text style={styles.cancelButtonText}>{t('general.cancel')}</Text>
 				</TouchableOpacity>
 				<TouchableOpacity style={styles.applyButton} onPress={onApply}>
 					<Text style={styles.applyButtonText}>{t('filters.apply')}</Text>
@@ -89,8 +88,7 @@ export default function PriceFilterModal({
 const styles = StyleSheet.create({
 	modalTitle: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		textAlign: 'center',
 		marginBottom: 20,
@@ -107,8 +105,7 @@ const styles = StyleSheet.create({
 	},
 	inputLabel: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		marginBottom: 8,
 	},
@@ -118,22 +115,20 @@ const styles = StyleSheet.create({
 		borderRadius: 8,
 		padding: 12,
 		fontSize: 16,
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		textAlign: 'center',
 		minWidth: 80,
 	},
 	currencyLabel: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		marginTop: 4,
 	},
 	priceSeparator: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		marginHorizontal: 10,
 		marginBottom: 12,
@@ -153,8 +148,7 @@ const styles = StyleSheet.create({
 	},
 	cancelButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		textAlign: 'center',
 	},
@@ -166,8 +160,7 @@ const styles = StyleSheet.create({
 	},
 	applyButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.quaternary,
 		textAlign: 'center',
 	},

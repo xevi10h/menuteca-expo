@@ -13,8 +13,6 @@ public class AppDelegate: ExpoAppDelegate {
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
-    print("🚀 AppDelegate: didFinishLaunchingWithOptions called")
-
     let delegate = ReactNativeDelegate()
     let factory = ExpoReactNativeFactory(delegate: delegate)
     delegate.dependencyProvider = RCTAppDependencyProvider()
@@ -25,12 +23,10 @@ public class AppDelegate: ExpoAppDelegate {
 
 #if os(iOS) || os(tvOS)
     window = UIWindow(frame: UIScreen.main.bounds)
-    print("🚀 AppDelegate: Starting React Native with module: main")
     factory.startReactNative(
       withModuleName: "main",
       in: window,
       launchOptions: launchOptions)
-    print("🚀 AppDelegate: React Native started successfully")
 #endif
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
@@ -61,22 +57,14 @@ class ReactNativeDelegate: ExpoReactNativeFactoryDelegate {
 
   override func sourceURL(for bridge: RCTBridge) -> URL? {
     // needed to return the correct URL for expo-dev-client.
-    let url = bridge.bundleURL ?? bundleURL()
-    print("🔗 ReactNativeDelegate: sourceURL = \(url?.absoluteString ?? "nil")")
-    return url
+    bridge.bundleURL ?? bundleURL()
   }
 
   override func bundleURL() -> URL? {
 #if DEBUG
-    print("🔧 ReactNativeDelegate: DEBUG mode - using Metro bundler")
     return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: ".expo/.virtual-metro-entry")
 #else
-    let url = Bundle.main.url(forResource: "main", withExtension: "jsbundle")
-    print("🔧 ReactNativeDelegate: RELEASE mode - bundle URL = \(url?.absoluteString ?? "nil")")
-    if url == nil {
-      print("❌ ReactNativeDelegate: main.jsbundle NOT FOUND in app bundle!")
-    }
-    return url
+    return Bundle.main.url(forResource: "main", withExtension: "jsbundle")
 #endif
   }
 }

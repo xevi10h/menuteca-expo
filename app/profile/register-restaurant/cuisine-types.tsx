@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useCuisineStore } from '@/zustand/CuisineStore';
 import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
@@ -169,8 +170,7 @@ const styles = StyleSheet.create({
 	nextButtonText: {
 		color: colors.secondary,
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		textAlign: 'center',
 	},
 	content: {
@@ -200,8 +200,7 @@ const styles = StyleSheet.create({
 	},
 	question: {
 		fontSize: 24,
-		fontFamily: 'Manrope',
-		fontWeight: '300',
+		fontFamily: fonts.regular,
 		color: colors.secondary,
 		textAlign: 'center',
 	},
@@ -212,8 +211,7 @@ const styles = StyleSheet.create({
 	},
 	label: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '300',
+		fontFamily: fonts.regular,
 		color: colors.secondary,
 	},
 	cuisineGrid: {
@@ -238,8 +236,7 @@ const styles = StyleSheet.create({
 	cuisineButtonText: {
 		color: colors.secondary,
 		fontSize: 10,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 	},
 	cuisineButtonTextSelected: {
 		color: colors.primary,
@@ -250,16 +247,14 @@ const styles = StyleSheet.create({
 	},
 	emptyStateText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.secondary,
 		textAlign: 'center',
 	},
 	skipButtonText: {
 		color: colors.secondary,
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 	},
 
 	errorContainer: {
@@ -270,8 +265,7 @@ const styles = StyleSheet.create({
 	},
 	errorTitle: {
 		fontSize: 20,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.secondary,
 		textAlign: 'center',
 		marginTop: 20,
@@ -279,8 +273,7 @@ const styles = StyleSheet.create({
 	},
 	errorMessage: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.secondary,
 		textAlign: 'center',
 		marginBottom: 30,
@@ -299,8 +292,7 @@ const styles = StyleSheet.create({
 	retryButtonText: {
 		color: colors.primary,
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 	},
 	skipButton: {
 		paddingHorizontal: 20,

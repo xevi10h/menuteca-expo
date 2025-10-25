@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { RestaurantTag } from '@/shared/enums';
 import React from 'react';
@@ -10,7 +11,11 @@ interface TagButtonProps {
 	onToggle: () => void;
 }
 
-export default function TagButton({ tag, isSelected, onToggle }: TagButtonProps) {
+export default function TagButton({
+	tag,
+	isSelected,
+	onToggle,
+}: TagButtonProps) {
 	const { t } = useTranslation();
 
 	return (
@@ -44,8 +49,7 @@ const styles = StyleSheet.create({
 	},
 	tagButtonText: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	tagButtonTextSelected: {

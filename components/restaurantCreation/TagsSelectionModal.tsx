@@ -2,6 +2,7 @@ import GlutenFreeIcon from '@/assets/icons/GlutenFreeIcon';
 import SpicyIcon from '@/assets/icons/SpicyIcon';
 import VeganIcon from '@/assets/icons/VeganIcon';
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { RestaurantTag } from '@/shared/enums';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -202,8 +203,7 @@ const styles = StyleSheet.create({
 	},
 	label: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		marginBottom: 20,
 	},
@@ -217,8 +217,7 @@ const styles = StyleSheet.create({
 	},
 	counterText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		textAlign: 'center',
 	},
@@ -250,8 +249,7 @@ const styles = StyleSheet.create({
 	tagButtonText: {
 		color: colors.primary,
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 	},
 	tagButtonTextSelected: {
 		color: colors.quaternary,

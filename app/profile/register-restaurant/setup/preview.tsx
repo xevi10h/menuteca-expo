@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import RestaurantBasicInformation from '@/components/RestaurantBasicInformation';
 import Information from '@/components/restaurantDetail/Information';
 import Menu from '@/components/restaurantDetail/Menu';
@@ -291,8 +292,7 @@ const styles = StyleSheet.create({
 	},
 	tabText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primaryLight,
 	},
 	activeTabText: {
@@ -333,16 +333,14 @@ const styles = StyleSheet.create({
 	},
 	emptyMenuText: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		textAlign: 'center',
 		marginBottom: 10,
 	},
 	emptyMenuSubtext: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		textAlign: 'center',
 	},

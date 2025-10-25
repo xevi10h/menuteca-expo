@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useCuisineStore } from '@/zustand/CuisineStore';
 import { useFilterStore } from '@/zustand/FilterStore';
 import { Ionicons } from '@expo/vector-icons';
@@ -148,8 +149,7 @@ const styles = StyleSheet.create({
 	loadingText: {
 		color: colors.primary,
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 	},
 	errorContainer: {
 		flex: 1,
@@ -160,8 +160,7 @@ const styles = StyleSheet.create({
 	errorText: {
 		color: colors.primaryLight,
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 	},
 	retryButton: {
 		paddingHorizontal: 12,
@@ -172,8 +171,7 @@ const styles = StyleSheet.create({
 	retryText: {
 		color: colors.quaternary,
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 	},
 	emptyContainer: {
 		flex: 1,
@@ -183,8 +181,7 @@ const styles = StyleSheet.create({
 	emptyText: {
 		color: colors.primaryLight,
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 	},
 	cuisineItem: {
 		alignItems: 'center',
@@ -232,7 +229,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		fontSize: 10,
 		fontWeight: '500',
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 	},
 	textSelected: {
 		color: colors.primary,

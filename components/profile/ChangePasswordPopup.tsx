@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
@@ -268,8 +269,7 @@ const styles = StyleSheet.create({
 	},
 	title: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 	},
 	closeButton: {
@@ -285,8 +285,7 @@ const styles = StyleSheet.create({
 	},
 	inputLabel: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		marginBottom: 8,
 	},
@@ -303,7 +302,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 16,
 		paddingVertical: 15,
 		fontSize: 16,
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 	},
 	passwordToggle: {
@@ -312,8 +311,7 @@ const styles = StyleSheet.create({
 	},
 	inputHelper: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		marginTop: 4,
 	},
@@ -334,8 +332,7 @@ const styles = StyleSheet.create({
 	},
 	cancelButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	saveButton: {
@@ -350,8 +347,7 @@ const styles = StyleSheet.create({
 	},
 	saveButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.quaternary,
 	},
 	saveButtonTextDisabled: {

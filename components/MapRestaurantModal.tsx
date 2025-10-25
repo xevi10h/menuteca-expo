@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Restaurant } from '@/shared/types';
 import { Ionicons } from '@expo/vector-icons';
@@ -135,8 +136,7 @@ export default function MapRestaurantModal({
 										<Text
 											style={{
 												fontSize: 12,
-												fontFamily: 'Manrope',
-												fontWeight: '500',
+												fontFamily: fonts.medium,
 												color: colors.primary,
 												paddingHorizontal: 6,
 												paddingVertical: 2,
@@ -211,8 +211,7 @@ const styles = StyleSheet.create({
 	restaurantIconText: {
 		color: colors.secondary,
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
+		fontFamily: fonts.bold,
 	},
 	restaurantDetails: {
 		flex: 1,
@@ -222,28 +221,24 @@ const styles = StyleSheet.create({
 	},
 	restaurant_name: {
 		fontSize: 20,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
+		fontFamily: fonts.bold,
 		color: colors.primary,
 		marginBottom: 5,
 	},
 	cuisineText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		marginBottom: 5,
 	},
 	priceFromText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	priceText: {
 		fontSize: 24,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 	},
 });

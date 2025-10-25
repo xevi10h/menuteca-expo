@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { RestaurantTag } from '@/shared/enums';
 import { useFilterStore } from '@/zustand/FilterStore';
@@ -500,8 +501,7 @@ const styles = StyleSheet.create({
 	clearAllText: {
 		color: colors.primary,
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 	},
 	activeFilterPill: {
 		backgroundColor: colors.primary,
@@ -515,8 +515,7 @@ const styles = StyleSheet.create({
 	activeFilterText: {
 		color: colors.quaternary,
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 	},
 	removeFilterButton: {
 		width: 16,

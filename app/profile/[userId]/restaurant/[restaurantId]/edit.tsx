@@ -1,6 +1,7 @@
 import { RestaurantService } from '@/api/index';
 import { SupabaseStorageService } from '@/api/supabaseStorage';
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import LoadingScreen from '@/components/LoadingScreen';
 import MenuCreationModal from '@/components/MenuCreationModal';
 import AddressEditModal from '@/components/restaurantCreation/AddressEditModal';
@@ -825,8 +826,7 @@ const styles = StyleSheet.create({
 	},
 	headerTitle: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		flex: 1,
 		textAlign: 'center',
@@ -845,8 +845,7 @@ const styles = StyleSheet.create({
 	},
 	saveButtonText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.quaternary,
 	},
 	content: {
@@ -878,15 +877,13 @@ const styles = StyleSheet.create({
 	},
 	statusTitle: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		marginBottom: 4,
 	},
 	statusDescription: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		lineHeight: 20,
 	},
@@ -903,14 +900,12 @@ const styles = StyleSheet.create({
 	},
 	sectionTitle: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 	},
 	requiredAsterisk: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: '#D32F2F',
 	},
 	editButton: {
@@ -945,15 +940,13 @@ const styles = StyleSheet.create({
 	},
 	copyMenuTitle: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		textAlign: 'center',
 	},
 	copyMenuDescription: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		textAlign: 'center',
 		marginBottom: 20,
@@ -964,8 +957,7 @@ const styles = StyleSheet.create({
 	},
 	inputLabel: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		marginBottom: 8,
 	},
@@ -975,7 +967,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 15,
 		paddingVertical: 12,
 		fontSize: 16,
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		borderWidth: 1,
 		borderColor: colors.primaryLight,
@@ -1005,14 +997,12 @@ const styles = StyleSheet.create({
 	},
 	cancelButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	confirmButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.quaternary,
 	},
 	confirmButtonTextDisabled: {

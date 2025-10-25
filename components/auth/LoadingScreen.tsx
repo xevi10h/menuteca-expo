@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import React, { useEffect, useRef } from 'react';
 import {
 	Animated,
@@ -217,16 +218,14 @@ const styles = StyleSheet.create({
 	},
 	appName: {
 		fontSize: 32,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
+		fontFamily: fonts.bold,
 		color: colors.primary,
 		marginBottom: 8,
 		textAlign: 'center',
 	},
 	tagline: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		textAlign: 'center',
 	},
@@ -257,8 +256,7 @@ const styles = StyleSheet.create({
 	},
 	loadingText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		textAlign: 'center',
 		marginBottom: 20,

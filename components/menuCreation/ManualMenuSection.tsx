@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { DishCategory } from '@/shared/enums';
 import {
@@ -654,14 +655,12 @@ const styles = StyleSheet.create({
 	},
 	courseTitle: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 	},
 	requiredAsterisk: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: '#D32F2F',
 	},
 	shareToggle: {
@@ -671,8 +670,7 @@ const styles = StyleSheet.create({
 	},
 	shareLabel: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 	},
 	dishItem: {
@@ -687,7 +685,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 20,
 		paddingVertical: 15,
 		fontSize: 14,
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		borderWidth: 1,
 		borderColor: colors.primaryLight,
@@ -718,8 +716,7 @@ const styles = StyleSheet.create({
 	},
 	priceIconText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 	},
 	priceTextHasContent: {
@@ -759,8 +756,7 @@ const styles = StyleSheet.create({
 	},
 	addDishText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primaryLight,
 	},
 	optionsSection: {
@@ -773,8 +769,7 @@ const styles = StyleSheet.create({
 	},
 	optionsSectionTitle: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		marginBottom: 15,
 	},
@@ -786,8 +781,7 @@ const styles = StyleSheet.create({
 	},
 	optionLabel: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		flex: 1,
 	},
@@ -796,8 +790,7 @@ const styles = StyleSheet.create({
 	},
 	selectorLabel: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		marginBottom: 10,
 	},
@@ -819,8 +812,7 @@ const styles = StyleSheet.create({
 	},
 	optionButtonText: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	optionButtonTextSelected: {
@@ -834,8 +826,7 @@ const styles = StyleSheet.create({
 	},
 	minimumPeopleLabel: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		flex: 1,
 	},
@@ -846,15 +837,14 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 12,
 		paddingVertical: 8,
 		fontSize: 14,
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		textAlign: 'center',
 		minWidth: 60,
 	},
 	minimumPeopleUnit: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 	},
 	dishInputContainer: {
@@ -892,8 +882,7 @@ const styles = StyleSheet.create({
 	},
 	editNameModalTitle: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		marginBottom: 16,
 		textAlign: 'center',
@@ -903,7 +892,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 16,
 		paddingVertical: 12,
 		fontSize: 16,
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		borderWidth: 1,
 		borderColor: colors.primaryLight,
@@ -928,8 +917,7 @@ const styles = StyleSheet.create({
 	cancelButtonText: {
 		color: colors.primary,
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 	},
 	saveButton: {
 		backgroundColor: colors.primary,
@@ -937,7 +925,6 @@ const styles = StyleSheet.create({
 	saveButtonText: {
 		color: colors.quaternary,
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 	},
 });

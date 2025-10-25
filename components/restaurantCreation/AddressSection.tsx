@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Address } from '@/shared/types';
 import { Ionicons } from '@expo/vector-icons';
@@ -79,8 +80,7 @@ const styles = StyleSheet.create({
 	},
 	sectionTitle: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 	},
 	editButton: {
@@ -94,8 +94,7 @@ const styles = StyleSheet.create({
 	},
 	addressText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		textAlign: 'center',
 		lineHeight: 20,
@@ -113,16 +112,14 @@ const styles = StyleSheet.create({
 	},
 	emptyAddressText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primaryLight,
 		marginTop: 10,
 		textAlign: 'center',
 	},
 	emptyAddressSubtext: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		marginTop: 5,
 		textAlign: 'center',

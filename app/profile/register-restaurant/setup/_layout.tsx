@@ -1,12 +1,12 @@
-import { AddressService, MenuService, RestaurantService } from '@/api/index';
+import { AddressService, RestaurantService } from '@/api/index';
 import { SupabaseStorageService } from '@/api/supabaseStorage';
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import HeaderModal from '@/components/restaurantCreation/HeaderModal';
 import { useTranslation } from '@/hooks/useTranslation';
 import { supabase } from '@/lib/supabase';
 import { Language } from '@/shared/types';
 import { useRegisterRestaurantStore } from '@/zustand/RegisterRestaurantStore';
-import { useUserStore } from '@/zustand/UserStore';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -158,8 +158,8 @@ export default function SetupLayout(): React.JSX.Element {
 
 			// Calculate minimum price from all menus
 			const allPrices = (provisionalRegisterRestaurant.menus || [])
-				.map(menu => menu.price)
-				.filter(price => price !== undefined && price !== null) as number[];
+				.map((menu) => menu.price)
+				.filter((price) => price !== undefined && price !== null) as number[];
 			const minimum_price = allPrices.length > 0 ? Math.min(...allPrices) : 0;
 
 			// PASO 1: Create restaurant WITHOUT images first
@@ -316,7 +316,8 @@ export default function SetupLayout(): React.JSX.Element {
 							soft_drinks: false,
 							beer: false,
 						},
-						includes_coffee_and_dessert: menu.includes_coffee_and_dessert || 'none',
+						includes_coffee_and_dessert:
+							menu.includes_coffee_and_dessert || 'none',
 						minimum_people: menu.minimum_people || 1,
 						has_minimum_people: menu.has_minimum_people ?? false,
 						is_active: true,
@@ -331,7 +332,10 @@ export default function SetupLayout(): React.JSX.Element {
 					const dishesData = menu.dishes.map((dish) => ({
 						menu_id: menuResult.id,
 						name: createUserTranslatedText(dish.name, userLanguage),
-						description: createUserTranslatedText(dish.description || '', userLanguage),
+						description: createUserTranslatedText(
+							dish.description || '',
+							userLanguage,
+						),
 						extra_price: dish.extra_price || 0,
 						category: dish.category,
 						is_vegetarian: dish.is_vegetarian ?? false,
@@ -576,7 +580,7 @@ const styles = StyleSheet.create({
 	},
 	tabText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 		color: colors.quaternary,
 		textAlign: 'center',
 		fontWeight: '500',

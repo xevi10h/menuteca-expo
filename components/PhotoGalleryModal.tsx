@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
@@ -329,8 +330,7 @@ const styles = StyleSheet.create({
 	counterText: {
 		color: colors.quaternary,
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 	},
 	placeholder: {
 		width: 44,
@@ -389,8 +389,7 @@ const styles = StyleSheet.create({
 	instructionsText: {
 		color: 'rgba(255, 255, 255, 0.8)',
 		fontSize: 13,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		textAlign: 'center',
 	},
 });

@@ -3,6 +3,7 @@ import LactoseFreeIcon from '@/assets/icons/LactoseFreeIcon';
 import SpicyIcon from '@/assets/icons/SpicyIcon';
 import VeganIcon from '@/assets/icons/VeganIcon';
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Dish } from '@/shared/types';
 import { Ionicons } from '@expo/vector-icons';
@@ -249,16 +250,14 @@ const styles = StyleSheet.create({
 	},
 	dishModalTitle: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		textAlign: 'center',
 		marginBottom: 20,
 	},
 	dishModalTitleName: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 	},
 	dishDescriptionInput: {
@@ -267,7 +266,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 15,
 		paddingVertical: 12,
 		fontSize: 14,
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		textAlignVertical: 'top',
 		marginBottom: 20,
@@ -275,8 +274,7 @@ const styles = StyleSheet.create({
 	},
 	dietaryLabel: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		textAlign: 'center',
 		marginBottom: 15,
@@ -303,8 +301,7 @@ const styles = StyleSheet.create({
 	},
 	dietaryText: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	dietaryTextSelected: {
@@ -319,7 +316,6 @@ const styles = StyleSheet.create({
 	addDescriptionText: {
 		color: colors.quaternary,
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 	},
 });

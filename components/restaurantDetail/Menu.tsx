@@ -1,5 +1,6 @@
 import SodaCanIcon from '@/assets/icons/SodaCanIcon';
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { DishCategory } from '@/shared/enums';
 import {
@@ -515,16 +516,14 @@ const styles = StyleSheet.create({
 	},
 	menuHeader: {
 		fontSize: 20,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		textAlign: 'center',
 		marginBottom: 2,
 	},
 	menuSubHeader: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		textAlign: 'center',
 	},
@@ -575,15 +574,13 @@ const styles = StyleSheet.create({
 	},
 	scheduleText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		flex: 1,
 	},
 	includesTitle: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		marginBottom: 10,
 	},
@@ -603,8 +600,7 @@ const styles = StyleSheet.create({
 	},
 	includeTagText: {
 		fontSize: 11,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.quaternary,
 	},
 	menuContent: {
@@ -634,8 +630,7 @@ const styles = StyleSheet.create({
 	},
 	menuCategoryTitle: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
+		fontFamily: fonts.bold,
 		color: colors.quaternary,
 		flex: 1,
 	},
@@ -650,8 +645,7 @@ const styles = StyleSheet.create({
 	},
 	shareTagText: {
 		fontSize: 10,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	menuItem: {
@@ -669,8 +663,7 @@ const styles = StyleSheet.create({
 	},
 	menuItemName: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		flex: 1,
 		marginRight: 10,
@@ -688,8 +681,7 @@ const styles = StyleSheet.create({
 	},
 	menuItemDescription: {
 		fontSize: 13,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		lineHeight: 18,
 		marginBottom: 12,
@@ -700,8 +692,7 @@ const styles = StyleSheet.create({
 	},
 	menuItemPriceText: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.quaternary,
 		backgroundColor: colors.primary,
 		paddingHorizontal: 12,
@@ -718,8 +709,7 @@ const styles = StyleSheet.create({
 	},
 	emptyText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		textAlign: 'center',
 	},

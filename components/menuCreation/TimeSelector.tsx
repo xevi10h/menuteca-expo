@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { formatMenuTime } from '@/shared/functions/utils';
 import { Ionicons } from '@expo/vector-icons';
@@ -176,14 +177,12 @@ const styles = StyleSheet.create({
 	},
 	timeLabel: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '300',
+		fontFamily: fonts.regular,
 		color: colors.tertiary,
 	},
 	timeTo: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '300',
+		fontFamily: fonts.regular,
 		color: colors.tertiary,
 	},
 	timeInputButton: {
@@ -198,7 +197,7 @@ const styles = StyleSheet.create({
 	},
 	timeInputText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		marginRight: 8,
 		fontWeight: '300',
@@ -220,8 +219,7 @@ const styles = StyleSheet.create({
 	},
 	timePickerTitle: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		marginBottom: 20,
 	},
@@ -249,14 +247,12 @@ const styles = StyleSheet.create({
 	},
 	cancelButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	confirmButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.quaternary,
 	},
 });

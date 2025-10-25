@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
@@ -53,7 +54,8 @@ export default function RegisterScreen() {
 	const validateEmail = (email: string) => {
 		// More strict email validation to match Supabase's requirements
 		// Requires at least 3 characters before @, valid domain
-		const emailRegex = /^[a-zA-Z0-9][a-zA-Z0-9._-]{2,}@[a-zA-Z0-9][a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+		const emailRegex =
+			/^[a-zA-Z0-9][a-zA-Z0-9._-]{2,}@[a-zA-Z0-9][a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 		return emailRegex.test(email);
 	};
 
@@ -164,25 +166,38 @@ export default function RegisterScreen() {
 					let translatedError = currentError;
 
 					// Check for specific error patterns and map to translation keys
-					if (errorLower.includes('email') && (errorLower.includes('already') || errorLower.includes('registered'))) {
+					if (
+						errorLower.includes('email') &&
+						(errorLower.includes('already') ||
+							errorLower.includes('registered'))
+					) {
 						translatedError = t('auth.errors.emailAlreadyRegistered');
 						console.log('Setting email error:', translatedError);
 						setEmailError(translatedError);
 					}
 					// Check for username-related errors
-					else if (errorLower.includes('username') && (errorLower.includes('already') || errorLower.includes('taken'))) {
+					else if (
+						errorLower.includes('username') &&
+						(errorLower.includes('already') || errorLower.includes('taken'))
+					) {
 						translatedError = t('auth.errors.usernameAlreadyTaken');
 						console.log('Setting username error:', translatedError);
 						setUsernameError(translatedError);
 					}
 					// Check for invalid email format
-					else if (errorLower.includes('email') && errorLower.includes('invalid')) {
+					else if (
+						errorLower.includes('email') &&
+						errorLower.includes('invalid')
+					) {
 						translatedError = t('validation.emailInvalid');
 						console.log('Setting email invalid error:', translatedError);
 						setEmailError(translatedError);
 					}
 					// Check for user creation failed
-					else if (errorLower.includes('user creation failed') || errorLower.includes('failed to create')) {
+					else if (
+						errorLower.includes('user creation failed') ||
+						errorLower.includes('failed to create')
+					) {
 						translatedError = t('auth.errors.userCreationFailed');
 						console.log('Showing user creation error alert:', translatedError);
 						Alert.alert(t('auth.registerError'), translatedError);
@@ -488,8 +503,7 @@ const styles = StyleSheet.create({
 	},
 	headerTitle: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		textAlign: 'center',
 		right: 0,
@@ -502,15 +516,13 @@ const styles = StyleSheet.create({
 	},
 	appName: {
 		fontSize: 32,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
+		fontFamily: fonts.bold,
 		color: colors.primary,
 		marginBottom: 10,
 	},
 	subtitle: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		textAlign: 'center',
 	},
@@ -524,8 +536,7 @@ const styles = StyleSheet.create({
 	},
 	inputLabel: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		marginBottom: 8,
 	},
@@ -535,7 +546,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 16,
 		paddingVertical: 14,
 		fontSize: 16,
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		borderWidth: 1,
 		borderColor: colors.primaryLight,
@@ -556,7 +567,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 16,
 		paddingVertical: 14,
 		fontSize: 16,
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 	},
 	eyeButton: {
@@ -565,8 +576,7 @@ const styles = StyleSheet.create({
 	},
 	errorText: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: '#D32F2F',
 		marginTop: 4,
 	},
@@ -600,15 +610,13 @@ const styles = StyleSheet.create({
 	},
 	termsText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		lineHeight: 20,
 	},
 	termsLink: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	registerButton: {
@@ -623,8 +631,7 @@ const styles = StyleSheet.create({
 	},
 	registerButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.quaternary,
 	},
 	loginContainer: {
@@ -635,14 +642,12 @@ const styles = StyleSheet.create({
 	},
 	loginText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 	},
 	loginLink: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 	},
 });

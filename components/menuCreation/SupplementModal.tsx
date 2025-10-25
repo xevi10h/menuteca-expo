@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Dish } from '@/shared/types';
 import { Ionicons } from '@expo/vector-icons';
@@ -104,16 +105,14 @@ const styles = StyleSheet.create({
 	},
 	supplementTitle: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		textAlign: 'center',
 		marginBottom: 20,
 	},
 	supplementNameDish: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 	},
 	priceContainer: {
@@ -130,7 +129,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 15,
 		paddingVertical: 12,
 		fontSize: 16,
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		textAlign: 'center',
 	},
@@ -146,8 +145,7 @@ const styles = StyleSheet.create({
 	},
 	euroText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.quaternary,
 	},
 	addSupplementButton: {
@@ -159,7 +157,6 @@ const styles = StyleSheet.create({
 	addSupplementText: {
 		color: colors.quaternary,
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 	},
 });

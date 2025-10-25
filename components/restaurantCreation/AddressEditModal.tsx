@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Address, createEmptyAddress, formatAddress } from '@/shared/types';
 import * as Location from 'expo-location';
@@ -398,8 +399,7 @@ const styles = StyleSheet.create({
 	},
 	modeButtonText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	modeButtonTextActive: {
@@ -407,8 +407,7 @@ const styles = StyleSheet.create({
 	},
 	label: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		marginBottom: 10,
 		marginTop: 10,
@@ -425,8 +424,7 @@ const styles = StyleSheet.create({
 	},
 	helperText: {
 		fontSize: 11,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		marginTop: 5,
 		fontStyle: 'italic',
@@ -441,8 +439,7 @@ const styles = StyleSheet.create({
 	},
 	inputLabel: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		marginBottom: 5,
 	},
@@ -452,7 +449,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 15,
 		paddingVertical: 12,
 		fontSize: 16,
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		borderWidth: 1,
 		borderColor: colors.primaryLight,
@@ -475,22 +472,20 @@ const styles = StyleSheet.create({
 	},
 	previewLabel: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		marginBottom: 5,
 	},
 	previewText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		lineHeight: 20,
 		marginBottom: 5,
 	},
 	coordinatesText: {
 		fontSize: 11,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		fontStyle: 'italic',
 	},

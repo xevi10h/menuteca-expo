@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useReviewSubmit } from '@/hooks/useReviewSubmit';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Review } from '@/shared/types';
@@ -337,20 +338,17 @@ const styles = StyleSheet.create({
 	},
 	cancelText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 	},
 	headerTitle: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 	},
 	submitText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		textAlign: 'right',
 	},
@@ -394,15 +392,13 @@ const styles = StyleSheet.create({
 	},
 	restaurant_name: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
+		fontFamily: fonts.bold,
 		color: colors.primary,
 		marginBottom: 4,
 	},
 	reviewPrompt: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 	},
 	section: {
@@ -410,15 +406,13 @@ const styles = StyleSheet.create({
 	},
 	sectionTitle: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		marginBottom: 12,
 	},
 	optionalText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		fontStyle: 'italic',
 	},
@@ -449,8 +443,7 @@ const styles = StyleSheet.create({
 	},
 	ratingLabel: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	commentCard: {
@@ -468,7 +461,7 @@ const styles = StyleSheet.create({
 	},
 	commentInput: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		minHeight: 120,
 		textAlignVertical: 'top',
@@ -480,8 +473,7 @@ const styles = StyleSheet.create({
 	},
 	characterCountText: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 	},
 	photosHeader: {
@@ -498,8 +490,7 @@ const styles = StyleSheet.create({
 	},
 	photosBadgeText: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.quaternary,
 	},
 	photosContainer: {
@@ -569,15 +560,13 @@ const styles = StyleSheet.create({
 	},
 	addPhotosText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		marginTop: 8,
 	},
 	addPhotosSubtext: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		marginTop: 4,
 	},
@@ -612,8 +601,7 @@ const styles = StyleSheet.create({
 	},
 	submitButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.quaternary,
 	},
 	loadingContainer: {

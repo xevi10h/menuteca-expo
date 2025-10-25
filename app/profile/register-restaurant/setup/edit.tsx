@@ -1,5 +1,6 @@
 import { SupabaseStorageService } from '@/api/supabaseStorage';
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import MenuCreationModal from '@/components/MenuCreationModal';
 import AddressEditModal from '@/components/restaurantCreation/AddressEditModal';
 import AddressSection from '@/components/restaurantCreation/AddressSection';
@@ -136,27 +137,28 @@ export default function EditTab() {
 		// happens in _layout.tsx during the final submission.
 
 		// Calculate minimum price from all menus including the new/updated one
-		const updatedMenus = editingMenuIndex !== null
-			? registerRestaurant.menus?.map((m, i) => i === editingMenuIndex ? menu : m) || []
-			: [...(registerRestaurant.menus || []), menu];
+		const updatedMenus =
+			editingMenuIndex !== null
+				? registerRestaurant.menus?.map((m, i) =>
+						i === editingMenuIndex ? menu : m,
+				  ) || []
+				: [...(registerRestaurant.menus || []), menu];
 
 		// Update minimum_price in the store
 		const allPrices = updatedMenus
-			.map(m => m.price)
-			.filter(price => price !== undefined && price !== null) as number[];
+			.map((m) => m.price)
+			.filter((price) => price !== undefined && price !== null) as number[];
 		const newMinimumPrice = allPrices.length > 0 ? Math.min(...allPrices) : 0;
 
 		// Update the restaurant with the new minimum price
-		const {
-			setRegisterRestaurantName,
-		} = useRegisterRestaurantStore.getState();
+		const { setRegisterRestaurantName } = useRegisterRestaurantStore.getState();
 
 		// We need to update the minimum_price in the store
 		useRegisterRestaurantStore.setState((state) => ({
 			registerRestaurant: {
 				...state.registerRestaurant,
 				minimum_price: newMinimumPrice,
-			}
+			},
 		}));
 
 		if (editingMenuIndex !== null) {
@@ -199,16 +201,17 @@ export default function EditTab() {
 				// Calculate minimum price including the new copied menu
 				const updatedMenus = [...(registerRestaurant.menus || []), copiedMenu];
 				const allPrices = updatedMenus
-					.map(m => m.price)
-					.filter(price => price !== undefined && price !== null) as number[];
-				const newMinimumPrice = allPrices.length > 0 ? Math.min(...allPrices) : 0;
+					.map((m) => m.price)
+					.filter((price) => price !== undefined && price !== null) as number[];
+				const newMinimumPrice =
+					allPrices.length > 0 ? Math.min(...allPrices) : 0;
 
 				// Update the restaurant with the new minimum price
 				useRegisterRestaurantStore.setState((state) => ({
 					registerRestaurant: {
 						...state.registerRestaurant,
 						minimum_price: newMinimumPrice,
-					}
+					},
 				}));
 
 				addRegisterRestaurantMenu(copiedMenu);
@@ -242,18 +245,22 @@ export default function EditTab() {
 					style: 'destructive',
 					onPress: () => {
 						// Calculate minimum price after removing the menu
-						const updatedMenus = registerRestaurant.menus?.filter((_, i) => i !== index) || [];
+						const updatedMenus =
+							registerRestaurant.menus?.filter((_, i) => i !== index) || [];
 						const allPrices = updatedMenus
-							.map(m => m.price)
-							.filter(price => price !== undefined && price !== null) as number[];
-						const newMinimumPrice = allPrices.length > 0 ? Math.min(...allPrices) : 0;
+							.map((m) => m.price)
+							.filter(
+								(price) => price !== undefined && price !== null,
+							) as number[];
+						const newMinimumPrice =
+							allPrices.length > 0 ? Math.min(...allPrices) : 0;
 
 						// Update the restaurant with the new minimum price
 						useRegisterRestaurantStore.setState((state) => ({
 							registerRestaurant: {
 								...state.registerRestaurant,
 								minimum_price: newMinimumPrice,
-							}
+							},
 						}));
 
 						removeRegisterRestaurantMenu(index);
@@ -541,14 +548,12 @@ const styles = StyleSheet.create({
 	},
 	sectionTitle: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 	},
 	requiredAsterisk: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: '#D32F2F',
 	},
 	editButton: {
@@ -583,15 +588,13 @@ const styles = StyleSheet.create({
 	},
 	copyMenuTitle: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		textAlign: 'center',
 	},
 	copyMenuDescription: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		textAlign: 'center',
 		marginBottom: 20,
@@ -602,8 +605,7 @@ const styles = StyleSheet.create({
 	},
 	inputLabel: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		marginBottom: 8,
 	},
@@ -613,7 +615,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 15,
 		paddingVertical: 12,
 		fontSize: 16,
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		borderWidth: 1,
 		borderColor: colors.primaryLight,
@@ -643,14 +645,12 @@ const styles = StyleSheet.create({
 	},
 	cancelButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	confirmButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.quaternary,
 	},
 	confirmButtonTextDisabled: {

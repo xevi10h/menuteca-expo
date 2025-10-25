@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import CenterLocationMapButton from '@/components/CenterLocationMapButton';
 import ExpandableMapRestaurantModal from '@/components/ExpandableMapRestaurantModal';
 import ListFilter from '@/components/ListFilter';
@@ -516,8 +517,7 @@ function MainAppContent() {
 				<Text
 					style={{
 						fontSize: 18,
-						fontFamily: 'Manrope',
-						fontWeight: '600',
+						fontFamily: fonts.semiBold,
 						color: colors.primary,
 						textAlign: 'center',
 						marginBottom: 20,
@@ -528,7 +528,7 @@ function MainAppContent() {
 				<Text
 					style={{
 						fontSize: 14,
-						fontFamily: 'Manrope',
+						fontFamily: fonts.regular,
 						color: colors.primaryLight,
 						textAlign: 'center',
 					}}

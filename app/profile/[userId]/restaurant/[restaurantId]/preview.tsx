@@ -1,5 +1,6 @@
 import { MenuService, RestaurantService } from '@/api/index';
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import LoadingScreen from '@/components/LoadingScreen';
 import RestaurantBasicInformation from '@/components/RestaurantBasicInformation';
 import Information from '@/components/restaurantDetail/Information';
@@ -366,8 +367,7 @@ const styles = StyleSheet.create({
 	},
 	headerTitle: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		marginLeft: 10,
 	},
@@ -430,8 +430,7 @@ const styles = StyleSheet.create({
 	},
 	statusText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.quaternary,
 	},
 	contentBackground: {
@@ -454,8 +453,7 @@ const styles = StyleSheet.create({
 	},
 	tabText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primaryLight,
 	},
 	activeTabText: {
@@ -496,16 +494,14 @@ const styles = StyleSheet.create({
 	},
 	emptyText: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		textAlign: 'center',
 		marginBottom: 10,
 	},
 	emptySubtext: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		textAlign: 'center',
 	},

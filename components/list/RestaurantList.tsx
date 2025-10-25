@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import RestaurantCard from '@/components/RestaurantCard';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Restaurant } from '@/shared/types';
@@ -99,8 +100,7 @@ const styles = StyleSheet.create({
 	},
 	loadingText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 	},
 	emptyContainer: {
@@ -112,16 +112,14 @@ const styles = StyleSheet.create({
 	},
 	emptyTitle: {
 		fontSize: 20,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		textAlign: 'center',
 		marginBottom: 10,
 	},
 	emptySubtitle: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		textAlign: 'center',
 		lineHeight: 24,

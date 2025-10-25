@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -82,21 +83,18 @@ const styles = StyleSheet.create({
 	cancelText: {
 		color: colors.primary,
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 	},
 	modalTitle: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		textAlign: 'center',
 	},
 	saveText: {
 		color: colors.primary,
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 	},
 	saveTextDisabled: {
 		opacity: 0.5,

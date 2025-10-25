@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Restaurant } from '@/shared/types';
 import { useRouter } from 'expo-router';
@@ -59,8 +60,7 @@ export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
 					<Text
 						style={{
 							fontSize: 10,
-							fontFamily: 'Manrope',
-							fontWeight: '500',
+							fontFamily: fonts.medium,
 							color: colors.quaternary,
 							paddingHorizontal: 6,
 							paddingVertical: 2,
@@ -82,8 +82,7 @@ export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
 				<Text
 					style={{
 						fontSize: 12,
-						fontFamily: 'Manrope',
-						fontWeight: '700',
+						fontFamily: fonts.bold,
 						color: colors.primary,
 					}}
 					numberOfLines={1}
@@ -93,8 +92,7 @@ export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
 				<Text
 					style={{
 						fontSize: 16,
-						fontFamily: 'Manrope',
-						fontWeight: '700',
+						fontFamily: fonts.bold,
 						color: colors.primary,
 					}}
 				>
@@ -113,8 +111,7 @@ export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
 				<Text
 					style={{
 						fontSize: 10,
-						fontFamily: 'Manrope',
-						fontWeight: '500',
+						fontFamily: fonts.medium,
 						color: colors.primary,
 					}}
 					numberOfLines={1}
@@ -124,8 +121,7 @@ export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
 				<Text
 					style={{
 						fontSize: 10,
-						fontFamily: 'Manrope',
-						fontWeight: '500',
+						fontFamily: fonts.medium,
 						color: colors.primary,
 					}}
 				>

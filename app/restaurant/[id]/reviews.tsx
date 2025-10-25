@@ -1,5 +1,6 @@
 import { ReviewService } from '@/api/index';
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import AddReviewModal from '@/components/AddReviewModal';
 import LoadingScreen from '@/components/LoadingScreen';
 import ReviewItem from '@/components/reviews/ReviewItem';
@@ -467,8 +468,7 @@ const styles = StyleSheet.create({
 	},
 	headerTitle: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		position: 'absolute',
 		left: 0,
@@ -491,8 +491,7 @@ const styles = StyleSheet.create({
 	},
 	sortLabel: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		marginBottom: 12,
 	},
@@ -513,8 +512,7 @@ const styles = StyleSheet.create({
 	},
 	loadingText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 	},
 	emptyState: {
@@ -525,8 +523,7 @@ const styles = StyleSheet.create({
 	},
 	emptyStateTitle: {
 		fontSize: 20,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		textAlign: 'center',
 		marginTop: 16,
@@ -534,8 +531,7 @@ const styles = StyleSheet.create({
 	},
 	emptyStateSubtitle: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		textAlign: 'center',
 		lineHeight: 22,
@@ -561,8 +557,7 @@ const styles = StyleSheet.create({
 	},
 	firstReviewButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.quaternary,
 	},
 	reviewedBadge: {
@@ -576,8 +571,7 @@ const styles = StyleSheet.create({
 	},
 	reviewedText: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.quaternary,
 	},
 	alreadyReviewedContainer: {
@@ -586,8 +580,7 @@ const styles = StyleSheet.create({
 	},
 	alreadyReviewedTitle: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		marginTop: 16,
 		marginBottom: 8,
@@ -595,8 +588,7 @@ const styles = StyleSheet.create({
 	},
 	alreadyReviewedSubtitle: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		textAlign: 'center',
 		lineHeight: 20,

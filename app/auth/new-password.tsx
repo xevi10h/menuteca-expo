@@ -1,5 +1,6 @@
 import { AuthService } from '@/api/index';
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import ErrorDisplay from '@/components/auth/ErrorDisplay';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Ionicons } from '@expo/vector-icons';
@@ -150,16 +151,22 @@ export default function NewPasswordScreen() {
 			if (error instanceof Error) {
 				const errorLower = error.message.toLowerCase();
 
-				if (errorLower.includes('password reset failed') || errorLower.includes('failed to reset')) {
+				if (
+					errorLower.includes('password reset failed') ||
+					errorLower.includes('failed to reset')
+				) {
 					translatedError = t('auth.errors.failedToResetPassword');
-				}
-				else if (errorLower.includes('password update failed')) {
+				} else if (errorLower.includes('password update failed')) {
 					translatedError = t('auth.errors.passwordUpdateFailed');
-				}
-				else if (errorLower.includes('invalid') && errorLower.includes('token')) {
+				} else if (
+					errorLower.includes('invalid') &&
+					errorLower.includes('token')
+				) {
 					translatedError = t('auth.invalidTokenMessage');
-				}
-				else if (errorLower.includes('token') && (errorLower.includes('expired') || errorLower.includes('invalid'))) {
+				} else if (
+					errorLower.includes('token') &&
+					(errorLower.includes('expired') || errorLower.includes('invalid'))
+				) {
 					translatedError = t('auth.invalidTokenMessage');
 				}
 			}
@@ -443,8 +450,7 @@ const styles = StyleSheet.create({
 	},
 	headerTitle: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		marginLeft: 10,
 	},
@@ -459,8 +465,7 @@ const styles = StyleSheet.create({
 	},
 	appName: {
 		fontSize: 32,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
+		fontFamily: fonts.bold,
 		color: colors.primary,
 		marginBottom: 10,
 	},
@@ -496,16 +501,14 @@ const styles = StyleSheet.create({
 	},
 	title: {
 		fontSize: 24,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
+		fontFamily: fonts.bold,
 		color: colors.primary,
 		marginBottom: 12,
 		textAlign: 'center',
 	},
 	subtitle: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		textAlign: 'center',
 		lineHeight: 22,
@@ -519,8 +522,7 @@ const styles = StyleSheet.create({
 	},
 	inputLabel: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		marginBottom: 8,
 	},
@@ -537,7 +539,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 16,
 		paddingVertical: 14,
 		fontSize: 16,
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 	},
 	inputError: {
@@ -563,13 +565,11 @@ const styles = StyleSheet.create({
 	},
 	strengthText: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 	},
 	errorText: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: '#D32F2F',
 		marginTop: 4,
 	},
@@ -597,8 +597,7 @@ const styles = StyleSheet.create({
 	},
 	resetButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.quaternary,
 	},
 	resetButtonTextDisabled: {

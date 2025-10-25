@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { MenuData } from '@/shared/types';
 import { Ionicons } from '@expo/vector-icons';
@@ -91,8 +92,7 @@ const styles = StyleSheet.create({
 	},
 	sectionTitle: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		marginBottom: 10,
 	},
@@ -111,8 +111,7 @@ const styles = StyleSheet.create({
 	},
 	menuName: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '300',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		flex: 1,
 	},
@@ -150,8 +149,7 @@ const styles = StyleSheet.create({
 	},
 	addMenuText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 });

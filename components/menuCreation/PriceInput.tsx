@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import React from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
@@ -53,8 +54,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 20,
 		paddingVertical: 15,
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '300',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 	},
 	euroSymbol: {
@@ -71,8 +71,7 @@ const styles = StyleSheet.create({
 	},
 	euroText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.quaternary,
 	},
 });

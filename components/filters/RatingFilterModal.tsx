@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
@@ -150,16 +151,14 @@ export default function RatingFilterModal({
 const styles = StyleSheet.create({
 	modalTitle: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		textAlign: 'center',
 		marginBottom: 20,
 	},
 	modalSubtitle: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		textAlign: 'center',
 		marginBottom: 15,
@@ -193,8 +192,7 @@ const styles = StyleSheet.create({
 	},
 	compactRatingText: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 	},
 	customRatingFullOption: {
@@ -218,8 +216,7 @@ const styles = StyleSheet.create({
 	},
 	customRatingTitle: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 	},
 	customInputContainer: {
@@ -234,7 +231,7 @@ const styles = StyleSheet.create({
 		borderRadius: 8,
 		padding: 8,
 		fontSize: 16,
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		textAlign: 'center',
 		minWidth: 60,
@@ -255,8 +252,7 @@ const styles = StyleSheet.create({
 	},
 	cancelButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		textAlign: 'center',
 	},
@@ -268,8 +264,7 @@ const styles = StyleSheet.create({
 	},
 	applyButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.quaternary,
 		textAlign: 'center',
 	},

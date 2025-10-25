@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
@@ -108,19 +109,21 @@ export default function LoginScreen() {
 					let translatedError = error;
 
 					// Check for specific error patterns and map to translation keys
-					if (errorLower.includes('login failed') || errorLower.includes('invalid login credentials')) {
+					if (
+						errorLower.includes('login failed') ||
+						errorLower.includes('invalid login credentials')
+					) {
 						translatedError = t('auth.errors.loginFailed');
-					}
-					else if (errorLower.includes('email') && errorLower.includes('invalid')) {
+					} else if (
+						errorLower.includes('email') &&
+						errorLower.includes('invalid')
+					) {
 						translatedError = t('validation.emailInvalid');
-					}
-					else if (errorLower.includes('not authenticated')) {
+					} else if (errorLower.includes('not authenticated')) {
 						translatedError = t('auth.errors.notAuthenticated');
-					}
-					else if (errorLower.includes('session check failed')) {
+					} else if (errorLower.includes('session check failed')) {
 						translatedError = t('auth.errors.sessionCheckFailed');
-					}
-					else {
+					} else {
 						translatedError = t('auth.errors.loginFailed');
 					}
 
@@ -348,8 +351,7 @@ const styles = StyleSheet.create({
 	},
 	headerTitle: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		textAlign: 'center',
 		right: 0,
@@ -367,15 +369,13 @@ const styles = StyleSheet.create({
 	},
 	appName: {
 		fontSize: 32,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
+		fontFamily: fonts.bold,
 		color: colors.primary,
 		marginBottom: 10,
 	},
 	subtitle: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		textAlign: 'center',
 	},
@@ -389,8 +389,7 @@ const styles = StyleSheet.create({
 	},
 	inputLabel: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		marginBottom: 8,
 	},
@@ -411,7 +410,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 48,
 		paddingVertical: 14,
 		fontSize: 16,
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		borderWidth: 1,
 		borderColor: colors.primaryLight,
@@ -436,8 +435,7 @@ const styles = StyleSheet.create({
 	},
 	errorText: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: '#D32F2F',
 		marginTop: 4,
 		marginLeft: 4,
@@ -449,8 +447,7 @@ const styles = StyleSheet.create({
 	},
 	forgotPasswordText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	loginButton: {
@@ -477,8 +474,7 @@ const styles = StyleSheet.create({
 	},
 	loginButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.quaternary,
 	},
 	loginButtonTextDisabled: {
@@ -493,14 +489,12 @@ const styles = StyleSheet.create({
 	},
 	registerText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 	},
 	registerLink: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		textDecorationLine: 'underline',
 	},

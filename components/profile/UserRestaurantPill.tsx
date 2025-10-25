@@ -1,5 +1,6 @@
 import { RestaurantService } from '@/api';
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Restaurant } from '@/shared/types';
 import { useUserRestaurantsStore } from '@/zustand/UserRestaurantStore';
@@ -216,8 +217,7 @@ const styles = StyleSheet.create({
 	},
 	restaurantImageText: {
 		fontSize: 20,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
+		fontFamily: fonts.bold,
 		color: colors.quaternary,
 	},
 	infoContainer: {
@@ -232,8 +232,7 @@ const styles = StyleSheet.create({
 	},
 	restaurant_name: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		flex: 1,
 		marginRight: 8,
@@ -250,8 +249,7 @@ const styles = StyleSheet.create({
 	},
 	statusText: {
 		fontSize: 10,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 	},
 	detailsRow: {
 		flexDirection: 'row',
@@ -261,16 +259,14 @@ const styles = StyleSheet.create({
 	},
 	cuisineText: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		flex: 1,
 		marginRight: 8,
 	},
 	priceText: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 	},
 	ratingRow: {
@@ -280,14 +276,12 @@ const styles = StyleSheet.create({
 	},
 	ratingText: {
 		fontSize: 10,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	addressText: {
 		fontSize: 10,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		flex: 1,
 	},

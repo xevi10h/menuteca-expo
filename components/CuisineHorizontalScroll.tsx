@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useCuisineStore } from '@/zustand/CuisineStore';
 import {
 	Image,
@@ -74,7 +75,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		fontSize: 10,
 		fontWeight: '700',
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 	},
 	loadingContainer: {
 		height: 65,
@@ -89,8 +90,7 @@ const styles = StyleSheet.create({
 	},
 	errorText: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primaryLight,
 		textAlign: 'center',
 	},

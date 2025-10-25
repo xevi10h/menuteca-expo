@@ -1,5 +1,6 @@
 import { RestaurantService } from '@/api/index';
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import LoadingScreen from '@/components/LoadingScreen';
 import MenuCreationModal from '@/components/MenuCreationModal';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -584,8 +585,7 @@ const styles = StyleSheet.create({
 	},
 	headerTitle: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		textAlign: 'center',
 		position: 'absolute',
@@ -597,14 +597,12 @@ const styles = StyleSheet.create({
 	},
 	totalCount: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primaryLight,
 	},
 	activeCount: {
 		fontSize: 10,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 	},
 	content: {
@@ -642,8 +640,7 @@ const styles = StyleSheet.create({
 	},
 	restaurantImageText: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
+		fontFamily: fonts.bold,
 		color: colors.quaternary,
 	},
 	restaurantInfo: {
@@ -657,8 +654,7 @@ const styles = StyleSheet.create({
 	},
 	restaurantName: {
 		fontSize: 20,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
+		fontFamily: fonts.bold,
 		color: colors.primary,
 		flex: 1,
 		marginRight: 8,
@@ -675,8 +671,7 @@ const styles = StyleSheet.create({
 	},
 	restaurantStatusText: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 	},
 	statusDot: {
 		width: 10,
@@ -687,8 +682,7 @@ const styles = StyleSheet.create({
 	},
 	restaurantDetails: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primaryLight,
 		marginLeft: 4,
 	},
@@ -739,8 +733,7 @@ const styles = StyleSheet.create({
 	},
 	menuName: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		flex: 1,
 		marginRight: 6,
@@ -756,8 +749,7 @@ const styles = StyleSheet.create({
 	},
 	menuPrice: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 	},
 	menuItemDetails: {
@@ -768,16 +760,14 @@ const styles = StyleSheet.create({
 	},
 	menuDays: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		flex: 1,
 		marginRight: 8,
 	},
 	menuTime: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 	},
 	menuItemFooter: {
@@ -787,8 +777,7 @@ const styles = StyleSheet.create({
 	},
 	dishCount: {
 		fontSize: 11,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primaryLight,
 	},
 	statusTags: {
@@ -803,8 +792,7 @@ const styles = StyleSheet.create({
 	},
 	availableTagText: {
 		fontSize: 9,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.quaternary,
 	},
 	unavailableTag: {
@@ -815,8 +803,7 @@ const styles = StyleSheet.create({
 	},
 	unavailableTagText: {
 		fontSize: 9,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	inactiveTag: {
@@ -827,8 +814,7 @@ const styles = StyleSheet.create({
 	},
 	inactiveTagText: {
 		fontSize: 9,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primaryLight,
 	},
 	chevronContainer: {
@@ -845,8 +831,7 @@ const styles = StyleSheet.create({
 	},
 	emptyStateTitle: {
 		fontSize: 20,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		marginTop: 20,
 		marginBottom: 8,
@@ -854,8 +839,7 @@ const styles = StyleSheet.create({
 	},
 	emptyStateText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		textAlign: 'center',
 		lineHeight: 20,
@@ -869,8 +853,7 @@ const styles = StyleSheet.create({
 	},
 	addFirstMenuButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.quaternary,
 	},
 });

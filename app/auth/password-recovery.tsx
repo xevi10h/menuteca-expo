@@ -1,5 +1,6 @@
 import { AuthService } from '@/api/index';
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import ErrorDisplay from '@/components/auth/ErrorDisplay';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Ionicons } from '@expo/vector-icons';
@@ -87,10 +88,15 @@ export default function PasswordRecoveryScreen() {
 			if (error instanceof Error) {
 				const errorLower = error.message.toLowerCase();
 
-				if (errorLower.includes('failed to send') && errorLower.includes('reset code')) {
+				if (
+					errorLower.includes('failed to send') &&
+					errorLower.includes('reset code')
+				) {
 					translatedError = t('auth.errors.failedToSendResetCode');
-				}
-				else if (errorLower.includes('email') && errorLower.includes('not found')) {
+				} else if (
+					errorLower.includes('email') &&
+					errorLower.includes('not found')
+				) {
 					translatedError = t('auth.errors.failedToCheckEmail');
 				}
 			}
@@ -320,8 +326,7 @@ const styles = StyleSheet.create({
 	},
 	headerTitle: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		textAlign: 'center',
 		right: 0,
@@ -339,8 +344,7 @@ const styles = StyleSheet.create({
 	},
 	appName: {
 		fontSize: 32,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
+		fontFamily: fonts.bold,
 		color: colors.primary,
 		marginBottom: 10,
 	},
@@ -376,16 +380,14 @@ const styles = StyleSheet.create({
 	},
 	title: {
 		fontSize: 24,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
+		fontFamily: fonts.bold,
 		color: colors.primary,
 		marginBottom: 12,
 		textAlign: 'center',
 	},
 	subtitle: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		textAlign: 'center',
 		lineHeight: 22,
@@ -399,8 +401,7 @@ const styles = StyleSheet.create({
 	},
 	inputLabel: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		marginBottom: 8,
 	},
@@ -421,7 +422,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 48,
 		paddingVertical: 14,
 		fontSize: 16,
-		fontFamily: 'Manrope',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		borderWidth: 1,
 		borderColor: colors.primaryLight,
@@ -440,8 +441,7 @@ const styles = StyleSheet.create({
 	},
 	errorText: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: '#D32F2F',
 		marginTop: 4,
 		marginLeft: 4,
@@ -470,8 +470,7 @@ const styles = StyleSheet.create({
 	},
 	sendButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.quaternary,
 	},
 	sendButtonTextDisabled: {
@@ -488,8 +487,7 @@ const styles = StyleSheet.create({
 	},
 	backToLoginText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	textDisabled: {

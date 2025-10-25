@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Days } from '@/shared/enums';
 import React from 'react';
@@ -77,8 +78,7 @@ const styles = StyleSheet.create({
 	},
 	dayText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	dayTextSelected: {

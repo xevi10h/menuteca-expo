@@ -1,5 +1,6 @@
 import { SupabaseAuthService } from '@/api/supabaseAuth';
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useUserStore } from '@/zustand/UserStore';
 import { Ionicons } from '@expo/vector-icons';
@@ -60,7 +61,10 @@ export default function AuthIndexScreen() {
 
 				if (result.error) {
 					const errorLower = result.error.toLowerCase();
-					if (errorLower.includes('google sign-in failed') || errorLower.includes('google')) {
+					if (
+						errorLower.includes('google sign-in failed') ||
+						errorLower.includes('google')
+					) {
 						translatedError = t('auth.errors.googleSignInFailed');
 					}
 				}
@@ -68,7 +72,10 @@ export default function AuthIndexScreen() {
 				Alert.alert(t('auth.googleAuthError'), translatedError);
 			}
 		} catch (error) {
-			Alert.alert(t('auth.googleAuthError'), t('auth.errors.googleSignInFailed'));
+			Alert.alert(
+				t('auth.googleAuthError'),
+				t('auth.errors.googleSignInFailed'),
+			);
 		} finally {
 			setIsGoogleLoading(false);
 		}
@@ -95,20 +102,27 @@ export default function AuthIndexScreen() {
 
 					if (errorLower.includes('not available')) {
 						translatedError = t('auth.errors.appleSignInNotAvailable');
-					}
-					else if (errorLower.includes('no identity token') || errorLower.includes('no token')) {
+					} else if (
+						errorLower.includes('no identity token') ||
+						errorLower.includes('no token')
+					) {
 						translatedError = t('auth.errors.appleSignInNoToken');
-					}
-					else if (errorLower.includes('no user data')) {
+					} else if (errorLower.includes('no user data')) {
 						translatedError = t('auth.errors.appleSignInNoUserData');
-					}
-					else if (errorLower.includes('failed to create') && errorLower.includes('profile')) {
+					} else if (
+						errorLower.includes('failed to create') &&
+						errorLower.includes('profile')
+					) {
 						translatedError = t('auth.errors.appleSignInFailedToCreateProfile');
-					}
-					else if (errorLower.includes('failed to fetch') && errorLower.includes('profile')) {
+					} else if (
+						errorLower.includes('failed to fetch') &&
+						errorLower.includes('profile')
+					) {
 						translatedError = t('auth.errors.appleSignInFailedToFetchProfile');
-					}
-					else if (errorLower.includes('cancelled') || errorLower.includes('canceled')) {
+					} else if (
+						errorLower.includes('cancelled') ||
+						errorLower.includes('canceled')
+					) {
 						translatedError = t('auth.errors.appleSignInCancelled');
 					}
 				}
@@ -287,15 +301,13 @@ const styles = StyleSheet.create({
 	},
 	appName: {
 		fontSize: 36,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
+		fontFamily: fonts.bold,
 		color: colors.primary,
 		marginBottom: 12,
 	},
 	tagline: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		textAlign: 'center',
 		paddingHorizontal: 20,
@@ -329,8 +341,7 @@ const styles = StyleSheet.create({
 	},
 	googleButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	appleButton: {
@@ -348,8 +359,7 @@ const styles = StyleSheet.create({
 	},
 	appleButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.quaternary,
 	},
 	dividerContainer: {
@@ -365,8 +375,7 @@ const styles = StyleSheet.create({
 	},
 	dividerText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		marginHorizontal: 16,
 	},
@@ -389,8 +398,7 @@ const styles = StyleSheet.create({
 	},
 	primaryButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.quaternary,
 	},
 	secondaryButton: {
@@ -406,8 +414,7 @@ const styles = StyleSheet.create({
 	},
 	secondaryButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	buttonDisabled: {
@@ -422,16 +429,14 @@ const styles = StyleSheet.create({
 	},
 	termsText: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		textAlign: 'center',
 		lineHeight: 18,
 	},
 	termsLink: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		textDecorationLine: 'underline',
 	},

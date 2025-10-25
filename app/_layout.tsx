@@ -22,7 +22,12 @@ export default function RootLayout() {
 	const colorScheme = useColorScheme();
 	const router = useRouter();
 	const [loaded] = useFonts({
-		Manrope: require('../assets/fonts/Manrope-VariableFont_wght.ttf'),
+		'Manrope-Regular': require('../assets/fonts/Manrope-Regular.ttf'),
+		'Manrope-Medium': require('../assets/fonts/Manrope-Medium.ttf'),
+		'Manrope-SemiBold': require('../assets/fonts/Manrope-SemiBold.ttf'),
+		'Manrope-Bold': require('../assets/fonts/Manrope-Bold.ttf'),
+		// Keep variable font for backwards compatibility during migration
+		'Manrope': require('../assets/fonts/Manrope-VariableFont_wght.ttf'),
 	});
 	const [showCustomLoading, setShowCustomLoading] = useState(false);
 

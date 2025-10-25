@@ -1,5 +1,6 @@
 import SodaCanIcon from '@/assets/icons/SodaCanIcon';
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { DrinkType } from '@/shared/enums';
 import { DrinkInclusion, createEmptyDrinks, hasDrinks } from '@/shared/types';
@@ -208,8 +209,7 @@ const styles = StyleSheet.create({
 	},
 	sectionLabel: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		flex: 1,
 	},
@@ -230,8 +230,7 @@ const styles = StyleSheet.create({
 	},
 	quickActionText: {
 		fontSize: 11,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	quickActionTextActive: {
@@ -261,8 +260,7 @@ const styles = StyleSheet.create({
 	},
 	drinkButtonText: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	drinkButtonTextSelected: {
@@ -270,8 +268,7 @@ const styles = StyleSheet.create({
 	},
 	helperText: {
 		fontSize: 11,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		textAlign: 'center',
 		marginTop: 5,

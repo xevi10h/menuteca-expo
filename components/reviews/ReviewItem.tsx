@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import StarRating from '@/components/StarRating';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Review } from '@/shared/types';
@@ -112,15 +113,13 @@ const styles = StyleSheet.create({
 	},
 	user_name: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		marginBottom: 2,
 	},
 	reviewDate: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 	},
 	ratingContainer: {
@@ -130,14 +129,12 @@ const styles = StyleSheet.create({
 	},
 	ratingNumber: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 	},
 	reviewComment: {
 		fontSize: 15,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		lineHeight: 22,
 		marginBottom: 15,
@@ -158,21 +155,18 @@ const styles = StyleSheet.create({
 	},
 	responseLabel: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		flex: 1,
 	},
 	responseDate: {
 		fontSize: 11,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 	},
 	responseMessage: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primary,
 		lineHeight: 20,
 	},

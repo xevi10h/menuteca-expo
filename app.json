@@ -29,8 +29,10 @@
 			"appleTeamId": "4WWBHK245Y"
 		},
 		"android": {
+			"icon": "./assets/images/icon-store.png",
 			"adaptiveIcon": {
-				"foregroundImage": "./assets/images/icon-store.png"
+				"foregroundImage": "./assets/images/icon_white_splash_screen.png",
+				"backgroundColor": "#48280E"
 			},
 			"edgeToEdgeEnabled": true,
 			"package": "com.menutecaapp.mobile",

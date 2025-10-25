@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import AddReviewModal from '@/components/AddReviewModal';
 import PhotoGalleryModal from '@/components/PhotoGalleryModal';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -324,8 +325,7 @@ const styles = StyleSheet.create({
 	},
 	contactText: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.quaternary,
 	},
 	tagsContainer: {
@@ -346,8 +346,7 @@ const styles = StyleSheet.create({
 	},
 	tagText: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.quaternary,
 	},
 	addressContainer: {
@@ -357,8 +356,7 @@ const styles = StyleSheet.create({
 	},
 	addressText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		marginLeft: 8,
 	},
@@ -422,8 +420,7 @@ const styles = StyleSheet.create({
 	},
 	sectionTitle: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	ratingContainer: {
@@ -441,8 +438,7 @@ const styles = StyleSheet.create({
 	},
 	ratingText: {
 		fontSize: 20,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		marginRight: 8,
 	},
@@ -453,14 +449,12 @@ const styles = StyleSheet.create({
 	},
 	viewReviewsText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 	},
 	reviewsCount: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 	},
 	writeReviewButton: {
@@ -484,8 +478,7 @@ const styles = StyleSheet.create({
 	},
 	writeReviewButtonText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.quaternary,
 	},
 	reviewContainer: {
@@ -507,8 +500,7 @@ const styles = StyleSheet.create({
 	},
 	reviewedText: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.quaternary,
 	},
 });

@@ -1,5 +1,6 @@
 import { ReviewService } from '@/api/index';
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import LoadingScreen from '@/components/LoadingScreen';
 import SortButton from '@/components/reviews/SortButton';
 import UserReviewItem from '@/components/reviews/UserReviewItem';
@@ -374,8 +375,7 @@ const styles = StyleSheet.create({
 	},
 	headerTitle: {
 		fontSize: 20,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		textAlign: 'center',
 		position: 'absolute',
@@ -424,8 +424,7 @@ const styles = StyleSheet.create({
 	},
 	userAvatarText: {
 		fontSize: 24,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
+		fontFamily: fonts.bold,
 		color: colors.quaternary,
 	},
 	userDetails: {
@@ -433,15 +432,13 @@ const styles = StyleSheet.create({
 	},
 	user_name: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		marginBottom: 2,
 	},
 	userEmail: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 	},
 	statsContainer: {
@@ -454,14 +451,12 @@ const styles = StyleSheet.create({
 	},
 	statNumber: {
 		fontSize: 24,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
+		fontFamily: fonts.bold,
 		color: colors.primary,
 	},
 	statLabel: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		marginTop: 4,
 	},
@@ -470,8 +465,7 @@ const styles = StyleSheet.create({
 	},
 	sortLabel: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		marginBottom: 12,
 	},
@@ -492,8 +486,7 @@ const styles = StyleSheet.create({
 	},
 	loadingText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 	},
 	emptyState: {
@@ -503,8 +496,7 @@ const styles = StyleSheet.create({
 	},
 	emptyStateTitle: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		marginTop: 16,
 		marginBottom: 8,
@@ -512,8 +504,7 @@ const styles = StyleSheet.create({
 	},
 	emptyStateSubtitle: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		textAlign: 'center',
 		lineHeight: 20,
@@ -526,8 +517,7 @@ const styles = StyleSheet.create({
 	},
 	notAuthenticatedText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		textAlign: 'center',
 	},

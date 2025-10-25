@@ -1,3 +1,5 @@
+import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import { useTranslation } from '@/hooks/useTranslation';
 import { RestaurantTag } from '@/shared/enums';
 import React from 'react';
@@ -9,7 +11,6 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native';
-import { colors } from '@/assets/styles/colors';
 import { ModalWrapper } from './ModalWrapper';
 import TagButton from './TagButton';
 
@@ -52,9 +53,7 @@ export default function TagsFilterModal({
 
 			<View style={styles.modalButtons}>
 				<TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-					<Text style={styles.cancelButtonText}>
-						{t('general.cancel')}
-					</Text>
+					<Text style={styles.cancelButtonText}>{t('general.cancel')}</Text>
 				</TouchableOpacity>
 				<TouchableOpacity style={styles.applyButton} onPress={onApply}>
 					<Text style={styles.applyButtonText}>{t('filters.apply')}</Text>
@@ -65,9 +64,7 @@ export default function TagsFilterModal({
 
 	return (
 		<Modal visible={visible} transparent animationType="fade">
-			<ModalWrapper onClose={onClose}>
-				{content}
-			</ModalWrapper>
+			<ModalWrapper onClose={onClose}>{content}</ModalWrapper>
 		</Modal>
 	);
 }
@@ -75,16 +72,14 @@ export default function TagsFilterModal({
 const styles = StyleSheet.create({
 	modalTitle: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 		textAlign: 'center',
 		marginBottom: 20,
 	},
 	modalSubtitle: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		textAlign: 'center',
 		marginBottom: 15,
@@ -113,8 +108,7 @@ const styles = StyleSheet.create({
 	},
 	cancelButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		textAlign: 'center',
 	},
@@ -126,8 +120,7 @@ const styles = StyleSheet.create({
 	},
 	applyButtonText: {
 		fontSize: 16,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.quaternary,
 		textAlign: 'center',
 	},

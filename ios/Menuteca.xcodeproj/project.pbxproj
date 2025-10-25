@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1207C48C26919048428162D8 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAA59CA1DF1FCCDD1531E607 /* ExpoModulesProvider.swift */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		5F50F77E89E49B9B82D7DC21 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 787FE41D200D0BB0C6A8EE30 /* PrivacyInfo.xcprivacy */; };
-		737FB9BDFD5CB127C44CDAF5 /* libPods-Menuteca.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 22309ECB9A31F0B39EBAE674 /* libPods-Menuteca.a */; };
+		5A5E0EFE65BE0348C150D0D9 /* libPods-Menuteca.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB79BD1F20197B75B2680ECE /* libPods-Menuteca.a */; };
+		6CC9163DA80F779A79726638 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 273081D8F72F0203A8E03DCE /* PrivacyInfo.xcprivacy */; };
+		98282DE7B5B1FFF2DABD21B5 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEC7490064DC96B75461F11B /* ExpoModulesProvider.swift */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
@@ -20,16 +20,16 @@
 		13B07F961A680F5B00A75B9A /* Menuteca.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Menuteca.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Menuteca/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Menuteca/Info.plist; sourceTree = "<group>"; };
-		22309ECB9A31F0B39EBAE674 /* libPods-Menuteca.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Menuteca.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		787FE41D200D0BB0C6A8EE30 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = Menuteca/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		797A8D8B998B57DB3754A8CB /* Pods-Menuteca.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Menuteca.debug.xcconfig"; path = "Target Support Files/Pods-Menuteca/Pods-Menuteca.debug.xcconfig"; sourceTree = "<group>"; };
-		7F8526E9AD0468054B80527A /* Pods-Menuteca.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Menuteca.release.xcconfig"; path = "Target Support Files/Pods-Menuteca/Pods-Menuteca.release.xcconfig"; sourceTree = "<group>"; };
+		273081D8F72F0203A8E03DCE /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = Menuteca/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		A591608E22DEAD79ADC24EBD /* Pods-Menuteca.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Menuteca.release.xcconfig"; path = "Target Support Files/Pods-Menuteca/Pods-Menuteca.release.xcconfig"; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = Menuteca/SplashScreen.storyboard; sourceTree = "<group>"; };
-		BAA59CA1DF1FCCDD1531E607 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-Menuteca/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
+		BB79BD1F20197B75B2680ECE /* libPods-Menuteca.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Menuteca.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D21443D855B562781D6165FB /* Pods-Menuteca.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Menuteca.debug.xcconfig"; path = "Target Support Files/Pods-Menuteca/Pods-Menuteca.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = Menuteca/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* Menuteca-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "Menuteca-Bridging-Header.h"; path = "Menuteca/Menuteca-Bridging-Header.h"; sourceTree = "<group>"; };
+		FEC7490064DC96B75461F11B /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-Menuteca/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -37,29 +37,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				737FB9BDFD5CB127C44CDAF5 /* libPods-Menuteca.a in Frameworks */,
+				5A5E0EFE65BE0348C150D0D9 /* libPods-Menuteca.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		09CE82DDAF72C05D5DCB5273 /* Menuteca */ = {
-			isa = PBXGroup;
-			children = (
-				BAA59CA1DF1FCCDD1531E607 /* ExpoModulesProvider.swift */,
-			);
-			name = Menuteca;
-			sourceTree = "<group>";
-		};
-		130CB29742B98C85E387961E /* ExpoModulesProviders */ = {
-			isa = PBXGroup;
-			children = (
-				09CE82DDAF72C05D5DCB5273 /* Menuteca */,
-			);
-			name = ExpoModulesProviders;
-			sourceTree = "<group>";
-		};
 		13B07FAE1A68108700A75B9A /* Menuteca */ = {
 			isa = PBXGroup;
 			children = (
@@ -69,7 +53,7 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				787FE41D200D0BB0C6A8EE30 /* PrivacyInfo.xcprivacy */,
+				273081D8F72F0203A8E03DCE /* PrivacyInfo.xcprivacy */,
 			);
 			name = Menuteca;
 			sourceTree = "<group>";
@@ -78,9 +62,35 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				22309ECB9A31F0B39EBAE674 /* libPods-Menuteca.a */,
+				BB79BD1F20197B75B2680ECE /* libPods-Menuteca.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		57FB7C685790C6301E74BF51 /* Menuteca */ = {
+			isa = PBXGroup;
+			children = (
+				FEC7490064DC96B75461F11B /* ExpoModulesProvider.swift */,
+			);
+			name = Menuteca;
+			sourceTree = "<group>";
+		};
+		70A4504A767761AA69BE3BCB /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				D21443D855B562781D6165FB /* Pods-Menuteca.debug.xcconfig */,
+				A591608E22DEAD79ADC24EBD /* Pods-Menuteca.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		7AB06C376AFF9E77A7E26D36 /* ExpoModulesProviders */ = {
+			isa = PBXGroup;
+			children = (
+				57FB7C685790C6301E74BF51 /* Menuteca */,
+			);
+			name = ExpoModulesProviders;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -97,8 +107,8 @@
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				A9E7F040BE06FAB437C903EA /* Pods */,
-				130CB29742B98C85E387961E /* ExpoModulesProviders */,
+				70A4504A767761AA69BE3BCB /* Pods */,
+				7AB06C376AFF9E77A7E26D36 /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -111,15 +121,6 @@
 				13B07F961A680F5B00A75B9A /* Menuteca.app */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		A9E7F040BE06FAB437C903EA /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				797A8D8B998B57DB3754A8CB /* Pods-Menuteca.debug.xcconfig */,
-				7F8526E9AD0468054B80527A /* Pods-Menuteca.release.xcconfig */,
-			);
-			path = Pods;
 			sourceTree = "<group>";
 		};
 		BB2F792B24A3F905000567C9 /* Supporting */ = {
@@ -139,13 +140,13 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "Menuteca" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				BFEAF8F956C79C39C5150AC0 /* [Expo] Configure project */,
+				C39855ADAE1DFFD8BB2C9087 /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				86EFE172EBBC36F0A1D677DD /* [CP] Embed Pods Frameworks */,
+				EC48C433DC87D6228A5919BD /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -195,7 +196,7 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				5F50F77E89E49B9B82D7DC21 /* PrivacyInfo.xcprivacy in Resources */,
+				6CC9163DA80F779A79726638 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -295,25 +296,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Menuteca/Pods-Menuteca-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		86EFE172EBBC36F0A1D677DD /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Menuteca/Pods-Menuteca-frameworks.sh",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Menuteca/Pods-Menuteca-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		BFEAF8F956C79C39C5150AC0 /* [Expo] Configure project */ = {
+		C39855ADAE1DFFD8BB2C9087 /* [Expo] Configure project */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -332,6 +315,24 @@
 			shellPath = /bin/sh;
 			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-Menuteca/expo-configure-project.sh\"\n";
 		};
+		EC48C433DC87D6228A5919BD /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Menuteca/Pods-Menuteca-frameworks.sh",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermes.framework/hermes",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Menuteca/Pods-Menuteca-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -340,7 +341,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
-				1207C48C26919048428162D8 /* ExpoModulesProvider.swift in Sources */,
+				98282DE7B5B1FFF2DABD21B5 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -349,12 +350,12 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 797A8D8B998B57DB3754A8CB /* Pods-Menuteca.debug.xcconfig */;
+			baseConfigurationReference = D21443D855B562781D6165FB /* Pods-Menuteca.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Menuteca/Menuteca.entitlements;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 4WWBHK245Y;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -386,12 +387,12 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7F8526E9AD0468054B80527A /* Pods-Menuteca.release.xcconfig */;
+			baseConfigurationReference = A591608E22DEAD79ADC24EBD /* Pods-Menuteca.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Menuteca/Menuteca.entitlements;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 4WWBHK245Y;
 				INFOPLIST_FILE = Menuteca/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
@@ -470,7 +471,10 @@
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift\"$(inherited)\"";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
@@ -525,7 +529,10 @@
 				);
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift\"$(inherited)\"";
 				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;

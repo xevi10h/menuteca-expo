@@ -1,4 +1,5 @@
 import { colors } from '@/assets/styles/colors';
+import { fonts } from '@/assets/styles/fonts';
 import StarRating from '@/components/StarRating';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Review } from '@/shared/types';
@@ -201,8 +202,7 @@ const styles = StyleSheet.create({
 	},
 	averageRatingNumber: {
 		fontSize: 48,
-		fontFamily: 'Manrope',
-		fontWeight: '700',
+		fontFamily: fonts.bold,
 		color: colors.primary,
 		marginBottom: 8,
 	},
@@ -211,8 +211,7 @@ const styles = StyleSheet.create({
 	},
 	totalReviews: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		marginTop: 8,
 	},
@@ -227,8 +226,7 @@ const styles = StyleSheet.create({
 	},
 	ratingLabel: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '500',
+		fontFamily: fonts.medium,
 		color: colors.primary,
 		width: 10,
 	},
@@ -246,8 +244,7 @@ const styles = StyleSheet.create({
 	},
 	ratingCount: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 		width: 30,
 		textAlign: 'right',
@@ -272,8 +269,7 @@ const styles = StyleSheet.create({
 	},
 	writeReviewText: {
 		fontSize: 14,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.quaternary,
 	},
 	// Compact styles
@@ -307,14 +303,12 @@ const styles = StyleSheet.create({
 	},
 	compactRatingNumber: {
 		fontSize: 18,
-		fontFamily: 'Manrope',
-		fontWeight: '600',
+		fontFamily: fonts.semiBold,
 		color: colors.primary,
 	},
 	compactReviewCount: {
 		fontSize: 12,
-		fontFamily: 'Manrope',
-		fontWeight: '400',
+		fontFamily: fonts.regular,
 		color: colors.primaryLight,
 	},
 	compactWriteButton: {
